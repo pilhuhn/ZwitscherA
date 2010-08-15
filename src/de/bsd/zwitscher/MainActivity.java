@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
         String serverUrl = "http://twitter.com/"; // trailing slash is important!
         String searchBaseUrl = "http://search.twitter.com/";
         String username = "pilhuhn";
-        String password = "bgfcrttw08";
+        String password = "xxx";
 
         Properties props = new Properties();
         props.put(PropertyConfiguration.SOURCE,"Zwitscher");
@@ -96,7 +96,7 @@ public class MainActivity extends Activity {
 			twitter.updateStatus(text);
 			Toast.makeText(getApplicationContext(), R.string.tweet_sent , 2500).show();
 		} catch (TwitterException e) {
-			Toast.makeText(getApplicationContext(), "Failed to send tweet: " + e.getLocalizedMessage(), 5000).show();
+			Toast.makeText(getApplicationContext(), "Failed to send tweet: " + e.getLocalizedMessage(), 10000).show();
 		}
 
 	}

@@ -36,19 +36,15 @@ public class TweetListActivity extends ListActivity {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	if (savedInstanceState!=null)
-    		System.out.println("state: " + savedInstanceState.toString());
     	
-System.out.println("onCreate");    	
         super.onCreate(savedInstanceState);
-System.out.println("after super");        
 
 		Toast.makeText(getApplicationContext(), R.string.loading, 1500).show();
 
         String serverUrl = "http://twitter.com/"; // trailing slash is important!
         String searchBaseUrl = "http://search.twitter.com/";
         String username = "pilhuhn";
-        String password = "bgfcrttw08";
+        String password = "xxx";
 
         Properties props = new Properties();
         props.put(PropertyConfiguration.SOURCE,"Jopr");
