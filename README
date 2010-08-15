@@ -1,0 +1,11 @@
+Welcome to ZwitscherA, a microblogging client for Android.
+I know that this is not the first one and far from working good.
+It is first a "real" project for me to get into Andriod programming.
+
+Currently the client uses the twitter4j library, but I think in the
+longer term, I will directly go to use REST/Json, as there is alredy
+native Json support in the Android libraries
+- this lets me learn that part 
+- it scales down the application size.
+
+
