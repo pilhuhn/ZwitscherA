@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  this is a single entry in the ListView created by ArrayAdapter -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="10dp"
+    android:textSize="14sp"
+    android:autoLink="all"
+     >
+</TextView>

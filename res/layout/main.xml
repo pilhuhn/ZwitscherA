@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+	<TextView  
+	    android:id="@+id/textOben"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:text="@string/hello"
+	    />
+	<EditText
+        android:id="@+id/edittext"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Type your tweet here:"
+        android:lines="4"
+        android:inputType="textMultiLine"
+        android:maxLength="140"
+        android:layout_below="@id/textOben"
+       />
+    
+
+	<Button android:id="@+id/TweetButton" 
+			android:text="@+string/TweetButton" 
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:layout_below="@id/edittext"
+			android:layout_alignParentRight="true"
+		/>
+	<Button android:id="@+id/ClearButton" 
+			android:text="@+string/ClearButton" 
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:layout_alignBaseline="@id/TweetButton"
+		/>
+	
+</RelativeLayout>
