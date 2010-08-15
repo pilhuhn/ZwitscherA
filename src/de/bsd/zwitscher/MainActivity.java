@@ -9,7 +9,9 @@ import twitter4j.conf.Configuration;
 import twitter4j.conf.PropertyConfiguration;
 import de.bsd.zwitscher.R;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -79,8 +81,12 @@ public class MainActivity extends Activity {
 	public void tweet(String text) {
         String serverUrl = "http://twitter.com/"; // trailing slash is important!
         String searchBaseUrl = "http://search.twitter.com/";
-        String username = "pilhuhn";
-        String password = "xxx";
+        
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String username = preferences.getString("username", "");
+        String password = preferences.getString("password", "");
+        System.out.println("u/p:" +username + "/" + preferences);
+        
 
         Properties props = new Properties();
         props.put(PropertyConfiguration.SOURCE,"Zwitscher");

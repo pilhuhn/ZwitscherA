@@ -54,12 +54,17 @@ System.out.println("setting current tab");
 	    switch (item.getItemId()) {
 	    case R.id.reload_item:
 	    	Toast.makeText(getApplicationContext(), R.string.no_connect, 2500).show();	        
-	    	return true;
+	    	break;
 	    case R.id.post_item:
 	    	Toast.makeText(getApplicationContext(), R.string.loading, 2500).show();
-	        return true;
+	        break;
+	    case R.id.preferences:
+	    	Intent i = new Intent(TabWidget.this, Preferences.class);
+			startActivity(i);
+			break;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
+	    return true;
 	}
 }

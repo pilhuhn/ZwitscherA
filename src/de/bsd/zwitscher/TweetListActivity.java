@@ -7,7 +7,9 @@ import java.util.Properties;
 import de.bsd.zwitscher.R;
 
 import android.app.ListActivity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -43,12 +45,15 @@ public class TweetListActivity extends ListActivity {
 
         String serverUrl = "http://twitter.com/"; // trailing slash is important!
         String searchBaseUrl = "http://search.twitter.com/";
-        String username = "pilhuhn";
-        String password = "xxx";
+        
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String username = preferences.getString("username", "");
+        String password = preferences.getString("password", "");
+        System.out.println("u/p:" +username + "/" + preferences);
 
         Properties props = new Properties();
-        props.put(PropertyConfiguration.SOURCE,"Jopr");
-        props.put(PropertyConfiguration.HTTP_USER_AGENT,"Jopr");
+        props.put(PropertyConfiguration.SOURCE,"Zwitscher");
+        props.put(PropertyConfiguration.HTTP_USER_AGENT,"Zwitscher");
         props.put(PropertyConfiguration.SEARCH_BASE_URL,searchBaseUrl);
         props.put(PropertyConfiguration.REST_BASE_URL,serverUrl);
         Configuration tconf = new PropertyConfiguration(props);
