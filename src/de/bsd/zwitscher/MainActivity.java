@@ -1,12 +1,6 @@
 package de.bsd.zwitscher;
 
-import java.util.Properties;
 
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.conf.Configuration;
-import twitter4j.conf.PropertyConfiguration;
 import de.bsd.zwitscher.R;
 import android.app.Activity;
 import android.os.Bundle;
@@ -16,7 +10,6 @@ import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -77,27 +70,7 @@ public class MainActivity extends Activity {
 	}
 	
 	public void tweet(String text) {
-        String serverUrl = "http://twitter.com/"; // trailing slash is important!
-        String searchBaseUrl = "http://search.twitter.com/";
-        String username = "pilhuhn";
-        String password = "xxx";
-
-        Properties props = new Properties();
-        props.put(PropertyConfiguration.SOURCE,"Zwitscher");
-        props.put(PropertyConfiguration.HTTP_USER_AGENT,"Zwitscher");
-        props.put(PropertyConfiguration.SEARCH_BASE_URL,searchBaseUrl);
-        props.put(PropertyConfiguration.REST_BASE_URL,serverUrl);
-        Configuration tconf = new PropertyConfiguration(props);
-
-         TwitterFactory tFactory = new TwitterFactory(tconf);
-        Twitter twitter = tFactory.getInstance(username,password);
-        
-        try {
-			twitter.updateStatus(text);
-			Toast.makeText(getApplicationContext(), R.string.tweet_sent , 2500).show();
-		} catch (TwitterException e) {
-			Toast.makeText(getApplicationContext(), "Failed to send tweet: " + e.getLocalizedMessage(), 10000).show();
-		}
-
+		TwitterHelper th = new TwitterHelper();
+		th.tweet(getApplicationContext(), text);
 	}
 }

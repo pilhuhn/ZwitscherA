@@ -8,4 +8,5 @@ native Json support in the Android libraries
 - this lets me learn that part 
 - it scales down the application size.
 
-
+I did not really set a target Android platform - at the end
+it has to work on my HTC Desire with Android 2.1.
