@@ -68,9 +68,11 @@ public class TwitterHelper {
 			return statuses;
 		}
 		catch (Exception e) {
-        	System.err.println("Got exception: " + e.getMessage() + ": " + e.getCause().getLocalizedMessage() );
-            String text =  "Can't connect to Twitter: " + e.getMessage();
-            Toast.makeText(context, text, 5000).show();
+        	System.err.println("Got exception: " + e.getMessage() );
+        	if (e.getCause()!=null)
+        		System.err.println("   " + e.getCause().getMessage());
+            String text =  context.getString(R.string.no_connect) + ": " + e.getMessage();
+            Toast.makeText(context, text, 15000).show();
             return new ArrayList<Status>();
 		}
 	}
