@@ -70,7 +70,6 @@ public class TweetListActivity extends ListActivity {
     
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
-    	// TODO Auto-generated method stub
 
     	if (item!=null && item.getItemId() == R.id.reload_item) {
     		List<String> data = getTimlineStringsFromTwitter();

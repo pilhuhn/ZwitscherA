@@ -9,10 +9,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TabHost;
-import android.widget.Toast;
 
 public class TabWidget extends TabActivity {
 
+	TabHost tabHost;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -20,25 +21,23 @@ public class TabWidget extends TabActivity {
 		setContentView(R.layout.tabs);
 		
 		Resources res = getResources();
-		TabHost tabHost = getTabHost();
+		tabHost = getTabHost();
 		TabHost.TabSpec spec;
 		Intent intent;
-System.out.println("Creating 1st");		
 		intent = new Intent().setClass(this,TweetListActivity.class);
 		
 		spec = tabHost.newTabSpec("home")
 				.setIndicator("Home",res.getDrawable(R.drawable.home))
 				.setContent(intent);
 		tabHost.addTab(spec);
-System.out.println("Creating 2nd");		
 		intent = new Intent().setClass(this,MainActivity.class);
 		
 		spec = tabHost.newTabSpec("main")
-				.setIndicator("Main",res.getDrawable(R.drawable.ic_tab_artists))
+				.setIndicator("Post",res.getDrawable(R.drawable.ic_tab_artists))
 				.setContent(intent);
 		tabHost.addTab(spec);
-System.out.println("setting current tab");		
-		tabHost.setCurrentTab(1);
+		
+		tabHost.setCurrentTab(1); // Post tab, tabs start at 0
 	}
 	
 	@Override
@@ -53,10 +52,10 @@ System.out.println("setting current tab");
 	    // Handle item selection
 	    switch (item.getItemId()) {
 	    case R.id.reload_item:
-	    	Toast.makeText(getApplicationContext(), R.string.no_connect, 2500).show();	        
+	    	// Handled within TweetListActivity
 	    	break;
 	    case R.id.post_item:
-	    	Toast.makeText(getApplicationContext(), R.string.loading, 2500).show();
+	    	tabHost.setCurrentTab(1); // Post tab, tabs start at 0
 	        break;
 	    case R.id.preferences:
 	    	Intent i = new Intent(TabWidget.this, Preferences.class);
