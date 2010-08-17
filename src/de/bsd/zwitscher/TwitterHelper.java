@@ -37,13 +37,7 @@ public class TwitterHelper {
 	}
 	
 	public void tweet(Context context, String text) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        // TODO convert to oauth
-        String username = preferences.getString("username", "");
-        String password = preferences.getString("password", "");
-
-        TwitterFactory tFactory = new TwitterFactory(tconf);
-        Twitter twitter = tFactory.getInstance(username,password);
+        Twitter twitter = getTwitter(context);
         
         try {
 			twitter.updateStatus(text);
@@ -54,13 +48,7 @@ public class TwitterHelper {
 	}
 	
 	public List<Status> getFriendsTimeline(Context context, Paging paging) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        // TODO convert to oauth
-        String username = preferences.getString("username", "");
-        String password = preferences.getString("password", "");
-
-        TwitterFactory tFactory = new TwitterFactory(tconf);
-        Twitter twitter = tFactory.getInstance(username,password);
+        Twitter twitter = getTwitter(context);
 
         List<Status> statuses;
 		try {
@@ -76,4 +64,16 @@ public class TwitterHelper {
             return new ArrayList<Status>();
 		}
 	}
+
+	private Twitter getTwitter(Context context) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        // TODO convert to oauth
+        String username = preferences.getString("username", "");
+        String password = preferences.getString("password", "");
+
+        TwitterFactory tFactory = new TwitterFactory(tconf);
+        Twitter twitter = tFactory.getInstance(username,password);
+		return twitter;
+	}
+	
 }
