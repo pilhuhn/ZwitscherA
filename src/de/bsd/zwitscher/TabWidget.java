@@ -1,5 +1,7 @@
 package de.bsd.zwitscher;
 
+import java.util.List;
+
 import de.bsd.zwitscher.R;
 import android.app.TabActivity;
 import android.content.Intent;
@@ -36,6 +38,16 @@ public class TabWidget extends TabActivity {
 				.setIndicator("Post",res.getDrawable(R.drawable.ic_tab_artists))
 				.setContent(intent);
 		tabHost.addTab(spec);
+		
+		TwitterHelper th = new TwitterHelper();
+		List<String> userLists =  th.getListNames(getApplicationContext());
+		for (String userList : userLists) {
+			intent = new Intent().setClass(this,MainActivity.class); // TODO Fix intent class
+			spec = tabHost.newTabSpec(userList)
+			.setIndicator(userList,res.getDrawable(R.drawable.ic_tab_artists))
+			.setContent(intent);
+			tabHost.addTab(spec);
+		}
 		
 		tabHost.setCurrentTab(1); // Post tab, tabs start at 0
 	}

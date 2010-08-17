@@ -14,6 +14,7 @@ import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
+import twitter4j.UserList;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.PropertyConfiguration;
 
@@ -22,7 +23,7 @@ public class TwitterHelper {
 	Configuration tconf;
 	
 	// TODO pull the next from preferences too
-    String serverUrl = "http://twitter.com/"; // trailing slash is important!
+    String serverUrl = "http://api.twitter.com/"; // trailing slash is important!
     String searchBaseUrl = "http://search.twitter.com/";
 
     
@@ -64,6 +65,25 @@ public class TwitterHelper {
             return new ArrayList<Status>();
 		}
 	}
+	
+	public List<String> getListNames(Context context) {
+		Twitter twitter = getTwitter(context);
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String username = preferences.getString("username", "");
+		
+		try {
+			List<UserList> userLists = twitter.getUserLists(username, -1);
+			List<String> lists = new ArrayList<String>(userLists.size());
+			for (UserList uList : userLists) {
+				lists.add(uList.getName());
+			}
+			return lists;
+		} catch (TwitterException e) {
+			Toast.makeText(context, "Getting lists failed: " + e.getMessage(), 15000).show();
+			return new ArrayList<String>();
+		} // TODO cursor?
+	}
+
 
 	private Twitter getTwitter(Context context) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
