@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <application android:icon="@drawable/icon" android:label="ZwitscherA" >
+    <application android:icon="@drawable/icon" android:label="ZwitscherA" android:debuggable="true"  android:allowBackup="true">
 
         
         <activity android:name=".TweetListActivity">
