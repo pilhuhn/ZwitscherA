@@ -2,7 +2,6 @@ package de.bsd.zwitscher;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,14 +15,11 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.UserList;
-import twitter4j.conf.Configuration;
-import twitter4j.conf.PropertyConfiguration;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
 
 public class TwitterHelper {
 
-	Configuration tconf;
 	
 	// TODO pull the next from preferences too
     String serverUrl = "http://api.twitter.com/"; // trailing slash is important!
@@ -34,12 +30,6 @@ public class TwitterHelper {
 
 	public TwitterHelper(Context context) {
 		this.context = context;
-        Properties props = new Properties();
-        props.put(PropertyConfiguration.SOURCE,"Zwitscher");
-        props.put(PropertyConfiguration.HTTP_USER_AGENT,"Zwitscher");
-        props.put(PropertyConfiguration.SEARCH_BASE_URL,searchBaseUrl);
-        props.put(PropertyConfiguration.REST_BASE_URL,serverUrl);
-        tconf = new PropertyConfiguration(props);
 	}
 	
 	public void tweet(String text) {
@@ -96,7 +86,7 @@ public class TwitterHelper {
         String accessTokenToken = preferences.getString("accessToken",null);
         String accessTokenSecret = preferences.getString("accessTokenSecret",null);
         if (accessTokenToken!=null && accessTokenSecret!=null) {
-        	Twitter twitter = new TwitterFactory(tconf).getInstance();
+        	Twitter twitter = new TwitterFactory().getInstance();
             twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
         	twitter.setOAuthAccessToken(accessTokenToken, accessTokenSecret); // TODO replace by non-deprecated method
         	
