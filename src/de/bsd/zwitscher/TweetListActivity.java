@@ -36,7 +36,7 @@ public class TweetListActivity extends ListActivity {
 
 		Toast.makeText(getApplicationContext(), R.string.loading, 1500).show();
 
-		List<String> data = getTimlineStringsFromTwitter();
+		List<String> data = getTimlineStringsFromTwitter(R.string.home_timeline);
 		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, data));
 
 		ListView lv = getListView();
@@ -53,13 +53,17 @@ public class TweetListActivity extends ListActivity {
 		});
 
     }
-
-	private List<String> getTimlineStringsFromTwitter() {
-		TwitterHelper th = new TwitterHelper();
+    
+	private List<String> getTimlineStringsFromTwitter(int timeline) {
+		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		Paging paging = new Paging();
         
-        	
-        statuses = th.getFriendsTimeline(getApplicationContext(), paging);
+        switch (timeline) {
+        
+        case R.string.home_timeline:
+        	statuses = th.getFriendsTimeline(paging);
+        	break;
+        }
 		List<String> data = new ArrayList<String>(statuses.size());
 		for (Status status : statuses) {
 			String item = status.getUser().getName() + ": " + status.getText();
@@ -72,7 +76,7 @@ public class TweetListActivity extends ListActivity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
     	if (item!=null && item.getItemId() == R.id.reload_item) {
-    		List<String> data = getTimlineStringsFromTwitter();
+    		List<String> data = getTimlineStringsFromTwitter(R.string.home_timeline);
     		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, data));
     		getListView().requestLayout();
     		return true;

@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
 	}
 	
 	public void tweet(String text) {
-		TwitterHelper th = new TwitterHelper();
-		th.tweet(getApplicationContext(), text);
+		TwitterHelper th = new TwitterHelper(getApplicationContext());
+		th.tweet(text);
 	}
 }

@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
@@ -17,6 +18,8 @@ import twitter4j.TwitterFactory;
 import twitter4j.UserList;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.PropertyConfiguration;
+import twitter4j.http.AccessToken;
+import twitter4j.http.RequestToken;
 
 public class TwitterHelper {
 
@@ -25,10 +28,12 @@ public class TwitterHelper {
 	// TODO pull the next from preferences too
     String serverUrl = "http://api.twitter.com/"; // trailing slash is important!
     String searchBaseUrl = "http://search.twitter.com/";
+    Context context;
 
     
 
-	public TwitterHelper() {
+	public TwitterHelper(Context context) {
+		this.context = context;
         Properties props = new Properties();
         props.put(PropertyConfiguration.SOURCE,"Zwitscher");
         props.put(PropertyConfiguration.HTTP_USER_AGENT,"Zwitscher");
@@ -37,8 +42,8 @@ public class TwitterHelper {
         tconf = new PropertyConfiguration(props);
 	}
 	
-	public void tweet(Context context, String text) {
-        Twitter twitter = getTwitter(context);
+	public void tweet(String text) {
+        Twitter twitter = getTwitter();
         
         try {
 			twitter.updateStatus(text);
@@ -48,8 +53,8 @@ public class TwitterHelper {
 		}
 	}
 	
-	public List<Status> getFriendsTimeline(Context context, Paging paging) {
-        Twitter twitter = getTwitter(context);
+	public List<Status> getFriendsTimeline(Paging paging) {
+        Twitter twitter = getTwitter();
 
         List<Status> statuses;
 		try {
@@ -66,8 +71,8 @@ public class TwitterHelper {
 		}
 	}
 	
-	public List<String> getListNames(Context context) {
-		Twitter twitter = getTwitter(context);
+	public List<String> getListNames() {
+		Twitter twitter = getTwitter();
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String username = preferences.getString("username", "");
 		
@@ -78,22 +83,75 @@ public class TwitterHelper {
 				lists.add(uList.getName());
 			}
 			return lists;
-		} catch (TwitterException e) {
+		} catch (Exception e) {
 			Toast.makeText(context, "Getting lists failed: " + e.getMessage(), 15000).show();
 			return new ArrayList<String>();
 		} // TODO cursor?
 	}
 
 
-	private Twitter getTwitter(Context context) {
+	private Twitter getTwitter() {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        // TODO convert to oauth
-        String username = preferences.getString("username", "");
-        String password = preferences.getString("password", "");
+        
+        String accessTokenToken = preferences.getString("accessToken",null);
+        String accessTokenSecret = preferences.getString("accessTokenSecret",null);
+        if (accessTokenToken!=null && accessTokenSecret!=null) {
+        	Twitter twitter = new TwitterFactory(tconf).getInstance();
+            twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
+        	twitter.setOAuthAccessToken(accessTokenToken, accessTokenSecret); // TODO replace by non-deprecated method
+        	
+        	return twitter;
+        }
+        
+		return null;
+	}
 
-        TwitterFactory tFactory = new TwitterFactory(tconf);
-        Twitter twitter = tFactory.getInstance(username,password);
-		return twitter;
+	public String getAuthUrl() throws Exception {
+		// TODO use fresh token for the first call
+        RequestToken requestToken = getRequestToken(true);
+        String authUrl = requestToken.getAuthorizationURL();
+        
+        return authUrl;
+	}
+
+	public RequestToken getRequestToken(boolean useFresh) throws Exception {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+		if (!useFresh) {
+			if (preferences.contains("requestToken")) {
+				String rt = preferences.getString("requestToken", null);
+				String rts = preferences.getString("requestTokenSecret", null);
+				RequestToken token = new RequestToken(rt, rts);
+				return token;
+			}
+		}
+		
+		
+        Twitter twitter = new TwitterFactory().getInstance();
+        twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
+        RequestToken requestToken = twitter.getOAuthRequestToken();
+        Editor editor = preferences.edit();
+        editor.putString("requestToken", requestToken.getToken());
+        editor.putString("requestTokenSecret", requestToken.getTokenSecret());
+        editor.commit();
+        
+        return requestToken;
+	}
+
+	public void generateAuthToken(String pin) throws Exception{
+        Twitter twitter = new TwitterFactory().getInstance();
+        twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
+        RequestToken requestToken = getRequestToken(false); // twitter.getOAuthRequestToken();
+		AccessToken accessToken = twitter.getOAuthAccessToken(requestToken, pin);
+		
+		
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		Editor editor = preferences.edit();
+		editor.putString("accessToken", accessToken.getToken());
+		editor.putString("accessTokenSecret", accessToken.getTokenSecret());
+		editor.commit();
+
+		
 	}
 	
 }

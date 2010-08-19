@@ -7,4 +7,5 @@
 <string name="no_connect">Can not connect to Twitter</string>
 <string name="TweetButton">Tweet this!</string>
 <string name="ClearButton">Clear!</string>
+<string name="home_timeline">Home</string>
 </resources>

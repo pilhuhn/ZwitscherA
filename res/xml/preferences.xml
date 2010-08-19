@@ -2,5 +2,6 @@
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
 <EditTextPreference android:title="User Name" android:summary="Please provide the user name" android:key="username"></EditTextPreference>
-<EditTextPreference android:title="Password" android:summary="Please provide the password" android:key="password"></EditTextPreference>
+
+<EditTextPreference android:title="OAuth pin" android:key="pin" android:summary="Please provide the OAuth pin"></EditTextPreference>
 </PreferenceScreen>

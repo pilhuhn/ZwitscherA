@@ -10,3 +10,22 @@ native Json support in the Android libraries
 
 I did not really set a target Android platform - at the end
 it has to work on my HTC Desire with Android 2.1.
+
+===== ATTENTION =========
+
+As Twitter is not really ready to handle open source projects,
+you need to register the app at Twitter and then provide a class
+TwitterConsumerToken that looks like this with the values Twitter
+provided you with put in:
+
+package de.bsd.zwitscher;
+
+public class TwitterConsumerToken {
+
+	public static String consumerKey = "replaceWithKey";
+	public static String consumerSecret = "replaceWithSecret";
+		
+}
+
+==========================
+

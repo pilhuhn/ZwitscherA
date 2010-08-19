@@ -39,8 +39,8 @@ public class TabWidget extends TabActivity {
 				.setContent(intent);
 		tabHost.addTab(spec);
 		
-		TwitterHelper th = new TwitterHelper();
-		List<String> userLists =  th.getListNames(getApplicationContext());
+		TwitterHelper th = new TwitterHelper(getApplicationContext());
+		List<String> userLists =  th.getListNames();
 		for (String userList : userLists) {
 			intent = new Intent().setClass(this,MainActivity.class); // TODO Fix intent class
 			spec = tabHost.newTabSpec(userList)
@@ -48,8 +48,11 @@ public class TabWidget extends TabActivity {
 			.setContent(intent);
 			tabHost.addTab(spec);
 		}
-		
+		tabHost.setVerticalScrollBarEnabled(true);
 		tabHost.setCurrentTab(1); // Post tab, tabs start at 0
+		
+		String tabTag = tabHost.getCurrentTabTag();
+		
 	}
 	
 	@Override
@@ -78,4 +81,6 @@ public class TabWidget extends TabActivity {
 	    }
 	    return true;
 	}
+
+	
 }
