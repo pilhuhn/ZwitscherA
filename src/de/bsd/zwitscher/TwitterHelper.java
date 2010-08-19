@@ -21,12 +21,7 @@ import twitter4j.http.RequestToken;
 public class TwitterHelper {
 
 	
-	// TODO pull the next from preferences too
-    String serverUrl = "http://api.twitter.com/"; // trailing slash is important!
-    String searchBaseUrl = "http://search.twitter.com/";
     Context context;
-
-    
 
 	public TwitterHelper(Context context) {
 		this.context = context;
@@ -63,10 +58,9 @@ public class TwitterHelper {
 	
 	public List<String> getListNames() {
 		Twitter twitter = getTwitter();
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String username = preferences.getString("username", "");
 		
 		try {
+			String username = twitter.getScreenName(); 
 			List<UserList> userLists = twitter.getUserLists(username, -1);
 			List<String> lists = new ArrayList<String>(userLists.size());
 			for (UserList uList : userLists) {
@@ -75,6 +69,7 @@ public class TwitterHelper {
 			return lists;
 		} catch (Exception e) {
 			Toast.makeText(context, "Getting lists failed: " + e.getMessage(), 15000).show();
+			e.printStackTrace();
 			return new ArrayList<String>();
 		} // TODO cursor?
 	}
