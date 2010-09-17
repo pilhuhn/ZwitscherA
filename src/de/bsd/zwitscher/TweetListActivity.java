@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import twitter4j.Paging;
 import twitter4j.Status;
 
@@ -49,6 +50,18 @@ public class TweetListActivity extends ListActivity {
 				Toast.makeText(getApplicationContext(),
 						((TextView) view).getText(), Toast.LENGTH_SHORT)
 						.show();
+			}
+		});
+		lv.setOnItemLongClickListener(new OnItemLongClickListener() { // TODO better use a context menu?
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Toast.makeText(getApplicationContext(),
+						"Long click", Toast.LENGTH_SHORT)
+						.show();
+
+				return true; // We've consumed the long click
 			}
 		});
 
