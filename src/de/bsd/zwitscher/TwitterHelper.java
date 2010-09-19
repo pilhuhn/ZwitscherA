@@ -7,10 +7,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import twitter4j.Paging;
 import twitter4j.Status;
+import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -26,18 +28,7 @@ public class TwitterHelper {
 	public TwitterHelper(Context context) {
 		this.context = context;
 	}
-	
-	public void tweet(String text) {
-        Twitter twitter = getTwitter();
-        
-        try {
-			twitter.updateStatus(text);
-			Toast.makeText(context, R.string.tweet_sent , 2500).show();
-		} catch (TwitterException e) {
-			Toast.makeText(context, "Failed to send tweet: " + e.getLocalizedMessage(), 10000).show();
-		}
-	}
-	
+		
 	public List<Status> getFriendsTimeline(Paging paging) {
         Twitter twitter = getTwitter();
 
@@ -138,5 +129,18 @@ public class TwitterHelper {
 
 		
 	}
+	
+	public void updateStatus(StatusUpdate update) {
+		Twitter twitter = getTwitter();
+		Log.i("TwitterHelper", "Sendin update: " + update);
+		try {
+			twitter.updateStatus(update);
+			Toast.makeText(context, R.string.tweet_sent , 2500).show();
+		} catch (TwitterException e) {
+			Toast.makeText(context, "Failed to send tweet: " + e.getLocalizedMessage(), 10000).show();
+		}
+		
+	}
+
 	
 }

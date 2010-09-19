@@ -6,7 +6,9 @@ import java.util.List;
 import de.bsd.zwitscher.R;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -57,10 +59,11 @@ public class TweetListActivity extends ListActivity {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				Toast.makeText(getApplicationContext(),
-						"Long click", Toast.LENGTH_SHORT)
-						.show();
-
+				Log.i("TLA","Long click, pos=" + position + ",id="+id);
+				Intent i = new Intent(parent.getContext(),MainActivity.class);
+				i.putExtra("status", statuses.get(position));
+				startActivityForResult(i, 0); // TODO fix code
+				
 				return true; // We've consumed the long click
 			}
 		});

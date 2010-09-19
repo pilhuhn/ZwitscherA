@@ -1,8 +1,11 @@
 package de.bsd.zwitscher;
 
 
+import twitter4j.Status;
+import twitter4j.StatusUpdate;
 import de.bsd.zwitscher.R;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -13,16 +16,25 @@ import android.widget.EditText;
 
 public class MainActivity extends Activity {
 
+	EditText edittext;
+	Status origStatus;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 	    setContentView(R.layout.main);
 	    
 	    final Button tweetButton = (Button) findViewById(R.id.TweetButton);  
-		final EditText edittext = (EditText) findViewById(R.id.edittext);
+		edittext = (EditText) findViewById(R.id.edittext);
 		edittext.setSelected(true);
 		tweetButton.setEnabled(false);
+		
+		Bundle bundle = getIntent().getExtras();
+		if (bundle!=null) {
+			origStatus = (Status) bundle.get("status");
+			Log.i("Replying..", "Orig is " + origStatus);
+			edittext.setText("@"+origStatus.getUser().getScreenName()+" ");
+		}
+		
 		edittext.setOnKeyListener(new OnKeyListener() {
 		    public boolean onKey(View v, int keyCode, KeyEvent event) {
 		    	
@@ -32,7 +44,11 @@ public class MainActivity extends Activity {
 		            (keyCode == KeyEvent.KEYCODE_ENTER)) {
 		          // Perform action on key press
 //		          Toast.makeText(getApplicationContext(), edittext.getText(), 2000).show();
-		        	tweet(edittext.getText().toString());
+		        	if (origStatus!=null) {
+		        		tweetReply(edittext.getText().toString());
+		        	}
+		        	else
+		        		tweet(edittext.getText().toString());
 		          return true;
 		        }
 		        
@@ -69,8 +85,19 @@ public class MainActivity extends Activity {
       
 	}
 	
-	public void tweet(String text) {
+	protected void tweetReply(String text) {
+		StatusUpdate update = new StatusUpdate(text);
+		update.setInReplyToStatusId(origStatus.getId());
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
-		th.tweet(text);
+		th.updateStatus(update);
+
 	}
+
+	public void tweet(String text) {
+		StatusUpdate update = new StatusUpdate(text);
+		TwitterHelper th = new TwitterHelper(getApplicationContext());
+		th.updateStatus(update);
+	}
+	
+			
 }
