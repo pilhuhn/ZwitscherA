@@ -50,7 +50,7 @@ public class TabWidget extends TabActivity {
 			tabHost.addTab(spec);
 		}
 */		tabHost.setVerticalScrollBarEnabled(true);
-		tabHost.setCurrentTab(1); // Post tab, tabs start at 0
+		tabHost.setCurrentTab(0); // Home tab, tabs start at 0
 		
 		String tabTag = tabHost.getCurrentTabTag();
 		
