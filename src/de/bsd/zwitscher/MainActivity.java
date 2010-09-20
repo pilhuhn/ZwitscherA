@@ -5,7 +5,6 @@ import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import de.bsd.zwitscher.R;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -45,11 +44,13 @@ public class MainActivity extends Activity {
 		            (keyCode == KeyEvent.KEYCODE_ENTER)) {
 		          // Perform action on key press
 //		          Toast.makeText(getApplicationContext(), edittext.getText(), 2000).show();
+		        	StatusUpdate up  = new StatusUpdate(edittext.getText().toString());
 		        	if (origStatus!=null) {
-		        		tweetReply(edittext.getText().toString());
+		        		up.setInReplyToStatusId(origStatus.getId());
 		        	}
-		        	else
-		        		tweet(edittext.getText().toString());
+		        	tweet(up);
+		        	origStatus=null;
+		        	finish();
 		          return true;
 		        }
 		        
@@ -64,11 +65,16 @@ public class MainActivity extends Activity {
 		
 		tweetButton.setOnClickListener(new OnClickListener() {
 			
-			
 			@Override
 			public void onClick(View v) {
 				System.out.println("clicked, text is " + edittext.getText().toString());
-				tweet(edittext.getText().toString());
+				StatusUpdate up  = new StatusUpdate(edittext.getText().toString());
+	        	if (origStatus!=null) {
+	        		up.setInReplyToStatusId(origStatus.getId());
+	        	}
+	        	tweet(up);
+	        	origStatus=null;
+	        	finish();
 				
 			}
 		});
@@ -86,16 +92,8 @@ public class MainActivity extends Activity {
       
 	}
 	
-	protected void tweetReply(String text) {
-		StatusUpdate update = new StatusUpdate(text);
-		update.setInReplyToStatusId(origStatus.getId());
-		TwitterHelper th = new TwitterHelper(getApplicationContext());
-		th.updateStatus(update);
 
-	}
-
-	public void tweet(String text) {
-		StatusUpdate update = new StatusUpdate(text);
+	public void tweet(StatusUpdate update) {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		th.updateStatus(update);
 	}

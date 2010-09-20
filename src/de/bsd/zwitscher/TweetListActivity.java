@@ -6,6 +6,7 @@ import java.util.List;
 import de.bsd.zwitscher.R;
 
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +21,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import twitter4j.Paging;
 import twitter4j.Status;
+import twitter4j.User;
 
 /**
  * Show the list of tweets (home timeline only at the moment)
@@ -37,13 +39,14 @@ public class TweetListActivity extends ListActivity {
     	
         super.onCreate(savedInstanceState);
 
-		Toast.makeText(getApplicationContext(), R.string.loading, 1500).show();
-
+        ProgressDialog dialog = ProgressDialog.show(TweetListActivity.this, "Loading tweets", 
+                "Please wait...", true);
 		List<String> data = getTimlineStringsFromTwitter(R.string.home_timeline);
 		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, data));
 
 		ListView lv = getListView();
 		lv.setTextFilterEnabled(true);
+		dialog.cancel();
 
 		lv.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -82,7 +85,8 @@ public class TweetListActivity extends ListActivity {
         }
 		List<String> data = new ArrayList<String>(statuses.size());
 		for (Status status : statuses) {
-			String item = status.getUser().getName() + ": " + status.getText();
+			User user = status.getUser();
+			String item = user.getName() +  " (" + user.getScreenName() + "): " + status.getText();
 			data.add(item);
 		}
 		return data;
