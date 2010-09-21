@@ -13,6 +13,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
@@ -32,6 +33,8 @@ public class MainActivity extends Activity {
 		if (bundle!=null) {
 			origStatus = (Status) bundle.get("status");
 			Log.i("Replying..", "Orig is " + origStatus);
+			TextView textOben = (TextView) findViewById(R.id.textOben);
+			textOben.setText(origStatus.getText());
 			edittext.setText("@"+origStatus.getUser().getScreenName()+" ");
 		}
 		
