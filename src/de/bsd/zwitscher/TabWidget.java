@@ -33,12 +33,12 @@ public class TabWidget extends TabActivity {
 				.setContent(intent);
 		tabHost.addTab(spec);
 		intent = new Intent().setClass(this,MainActivity.class);
-		
-		spec = tabHost.newTabSpec("main")
+// Post is now a generic intent from the menu		
+/*		spec = tabHost.newTabSpec("main")
 				.setIndicator("Post",res.getDrawable(R.drawable.ic_tab_artists))
 				.setContent(intent);
 		tabHost.addTab(spec);
-		
+*/		
 /* Temporarily disable, as it delays startup and is not yet really used. 
   		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		List<String> userLists =  th.getListNames();
@@ -65,16 +65,18 @@ public class TabWidget extends TabActivity {
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent i;
 	    // Handle item selection
 	    switch (item.getItemId()) {
 	    case R.id.reload_item:
 	    	// Handled within TweetListActivity
 	    	break;
 	    case R.id.post_item:
-	    	tabHost.setCurrentTab(1); // Post tab, tabs start at 0
+	    	i = new Intent(TabWidget.this,MainActivity.class);
+	    	startActivity(i);
 	        break;
 	    case R.id.preferences:
-	    	Intent i = new Intent(TabWidget.this, Preferences.class);
+	    	i = new Intent(TabWidget.this, Preferences.class);
 			startActivity(i);
 			break;
 	    default:
