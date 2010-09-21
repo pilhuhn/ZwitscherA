@@ -52,12 +52,14 @@ public class TweetListActivity extends ListActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// When clicked, show a toast with the TextView text
-				Toast.makeText(getApplicationContext(),
-						((TextView) view).getText(), Toast.LENGTH_SHORT)
-						.show();
+				// TODO how to handle the case of a tweet with a link inside?
+				Intent i = new Intent(parent.getContext(),OneTweetActivity.class);
+				i.putExtra("status", statuses.get(position));
+				startActivity(i);
+
 			}
 		});
-		lv.setOnItemLongClickListener(new OnItemLongClickListener() { // TODO better use a context menu?
+		lv.setOnItemLongClickListener(new OnItemLongClickListener() { // directly go to reply.
 
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
@@ -65,7 +67,7 @@ public class TweetListActivity extends ListActivity {
 				Log.i("TLA","Long click, pos=" + position + ",id="+id);
 				Intent i = new Intent(parent.getContext(),MainActivity.class);
 				i.putExtra("status", statuses.get(position));
-				startActivityForResult(i, 0); // TODO fix code
+				startActivity(i); 
 				
 				return true; // We've consumed the long click
 			}
