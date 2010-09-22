@@ -9,28 +9,37 @@
 			android:id="@+id/ImageView01"/>
 <TextView android:text="@+id/TextView01" 
 			android:id="@+id/TextView01" 
-			android:layout_width="wrap_content" 
+			android:layout_width="wrap_content"
+			android:textStyle="bold"
+			android:minLines="2" 
 			android:layout_height="wrap_content"/>
 
 <TextView android:id="@+id/TweetTextView" 
 		  android:layout_below="@+id/TextView01" 
 		  android:layout_width="fill_parent" 
-		  android:layout_height="wrap_content" 
+		  android:layout_height="wrap_content"
 		  android:text="@+id/TweetTextView"/>
+<TextView android:id="@+id/MiscTextView" 
+		  android:layout_below="@+id/TweetTextView" 
+		  android:layout_width="fill_parent" 
+		  android:layout_height="wrap_content" 
+		  android:textStyle="italic"
+		  android:text="@+id/MiscTextView"/>
+		  
 		  
 <Button android:id="@+id/ReplyButton"
-		android:layout_below="@id/TweetTextView"
+		android:layout_below="@id/MiscTextView"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"		
         android:text="Reply"/>
 <Button android:id="@+id/RetweetButton"
-		android:layout_below="@id/TweetTextView"
+		android:layout_below="@id/MiscTextView"
 		android:layout_toRightOf="@id/ReplyButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 		android:text="Retweet"/>
 <Button android:id="@+id/ClassicRetweetButton"
-		android:layout_below="@id/TweetTextView"
+		android:layout_below="@id/MiscTextView"
 		android:layout_toRightOf="@id/RetweetButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -46,6 +55,18 @@
         android:layout_height="wrap_content"
 		android:layout_toRightOf="@id/ThreadButton"
 		android:text="Direct"/>
+<Button android:id="@+id/FavoriteButton"
+		android:layout_below="@id/ReplyButton"
+		android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:layout_toRightOf="@id/DirectButton"
+		android:text="Favorite"/>
+
+<Button android:id="@+id/DoneButton"
+		android:layout_below="@id/ThreadButton"
+		android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:text="Done"/>
 		
 				  
 </RelativeLayout>

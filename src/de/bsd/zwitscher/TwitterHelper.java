@@ -142,5 +142,30 @@ public class TwitterHelper {
 		
 	}
 
+	public void retweet(long id) {
+		Twitter twitter = getTwitter();
+		try {
+			twitter.retweetStatus(id);
+			Toast.makeText(context, R.string.tweet_sent , 2500).show();
+		} catch (TwitterException e) {
+			Toast.makeText(context, "Failed to  retweet: " + e.getLocalizedMessage(), 10000).show();
+		}
+			
+	}
+
+	public void favorite(Status status) {
+		Twitter twitter = getTwitter();
+		try {
+			if (status.isFavorited())
+				twitter.destroyFavorite(status.getId());
+			else
+				twitter.createFavorite(status.getId());
+			Toast.makeText(context, R.string.tweet_sent , 2500).show();
+		} catch (TwitterException e) {
+			Toast.makeText(context, "Failed to (un)create a favorite: " + e.getLocalizedMessage(), 10000).show();
+		}
+		
+	}
+
 	
 }
