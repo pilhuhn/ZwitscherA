@@ -1,11 +1,18 @@
 package de.bsd.zwitscher;
 
+import java.net.URL;
+
 import twitter4j.Status;
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class OneTweetActivity extends Activity {
@@ -24,6 +31,8 @@ public class OneTweetActivity extends Activity {
 			if (status.getInReplyToScreenName()!=null) {
 				TextView mtv = (TextView) findViewById(R.id.MiscTextView);
 				mtv.setText("In reply to: " + status.getInReplyToScreenName());
+				URL imageUrl = status.getUser().getProfileImageURL();
+				ImageView iv = (ImageView) findViewById(R.id.ImageView01);
 			}
 			
 			
@@ -33,12 +42,17 @@ public class OneTweetActivity extends Activity {
 		
 			final TwitterHelper th = new TwitterHelper(getApplicationContext());
 			
+			// -- now the buttons --
+			
 			Button replyButton = (Button) findViewById(R.id.ReplyButton);
 			replyButton.setOnClickListener(new OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
+					Intent i = new Intent(getApplicationContext(),OneTweetActivity.class);
+					i.putExtra("status", status.getText());
+					i.putExtra("op", "reply");
+					startActivity(i);
 					
 				}
 			});
@@ -88,6 +102,24 @@ public class OneTweetActivity extends Activity {
 					// TODO update button state
 				}
 			});
+
+			Button speakButton = (Button) findViewById(R.id.SpeakButton);
+			speakButton.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					TextToSpeech tts = new TextToSpeech(getApplicationContext(),new OnInitListener() {
+						
+						@Override
+						public void onInit(int status) {
+							// TODO Auto-generated method stub
+							
+						}
+					});
+					tts.speak(status.getText(), TextToSpeech.QUEUE_ADD, null);
+				}
+			});
+
 			
 			Button doneButton = (Button) findViewById(R.id.DoneButton);
 			doneButton.setOnClickListener(new OnClickListener() {

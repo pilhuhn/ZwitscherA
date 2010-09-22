@@ -44,6 +44,7 @@
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 		android:text="Classic Retweet"/>
+		
 <Button android:id="@+id/ThreadButton"
 		android:layout_below="@id/ReplyButton"
 		android:layout_width="wrap_content"
@@ -62,11 +63,17 @@
 		android:layout_toRightOf="@id/DirectButton"
 		android:text="Favorite"/>
 
-<Button android:id="@+id/DoneButton"
+<Button android:id="@+id/SpeakButton"
 		android:layout_below="@id/ThreadButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-		android:text="Done"/>
+		android:text="Speak"/>
+
+<Button android:id="@+id/DoneButton"
+		android:layout_below="@id/SpeakButton"
+		android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:text="Done!"/>
 		
 				  
 </RelativeLayout>

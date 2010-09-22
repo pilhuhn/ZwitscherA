@@ -38,14 +38,20 @@ public class TweetListActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
     	
         super.onCreate(savedInstanceState);
+    }
+    
+    @Override
+    public void onResume() {
 
         ProgressDialog dialog = ProgressDialog.show(TweetListActivity.this, "Loading tweets", 
                 "Please wait...", true);
 		List<String> data = getTimlineStringsFromTwitter(R.string.home_timeline);
-		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, data));
+		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.list_item, data);
+		setListAdapter(arrayAdapter);
 
 		ListView lv = getListView();
 		lv.setTextFilterEnabled(true);
+		
 		dialog.cancel();
 
 		lv.setOnItemClickListener(new OnItemClickListener() {
