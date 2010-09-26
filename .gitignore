@@ -4,3 +4,4 @@ src/de/bsd/zwitscher/TwitterConsumerToken.java
 *.iml
 *.ipr
 *.iws
+gen
