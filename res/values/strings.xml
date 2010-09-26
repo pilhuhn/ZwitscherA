@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="status">status</string>
+    <string name="reply">reply</string>
+    <string name="replyall">replyAll</string>
     <string name="tweet_sent">Tweet sent</string>
     <string name="hello">Enter your tweet text below:</string>
     <string name="app_name"></string>
@@ -8,4 +11,5 @@
 <string name="TweetButton">Tweet this!</string>
 <string name="ClearButton">Clear!</string>
 <string name="home_timeline">Home</string>
+<string name="classicretweet">ClassicRetweet</string>
 </resources>

@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <application android:icon="@drawable/icon" android:label="ZwitscherA" 
+    <application android:icon="@drawable/icon" android:label="Zwitscher" 
     			android:debuggable="true"  android:allowBackup="true"
     			>
 

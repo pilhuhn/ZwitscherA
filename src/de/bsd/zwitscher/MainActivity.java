@@ -1,6 +1,9 @@
 package de.bsd.zwitscher;
 
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import de.bsd.zwitscher.R;
@@ -19,6 +22,7 @@ public class MainActivity extends Activity {
 
 	EditText edittext;
 	Status origStatus;
+	Pattern p = Pattern.compile(".*?(@\\w+ )*.*"); 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -35,7 +39,30 @@ public class MainActivity extends Activity {
 			Log.i("Replying..", "Orig is " + origStatus);
 			TextView textOben = (TextView) findViewById(R.id.textOben);
 			textOben.setText(origStatus.getText());
-			edittext.setText("@"+origStatus.getUser().getScreenName()+" ");
+			String op = (String) bundle.get("op"); 
+			if (op!=null) {
+				if (op.equals(getString(R.string.reply))) {
+					edittext.setText("@"+origStatus.getUser().getScreenName()+" ");
+				} else if (op.equals(getString(R.string.replyall))) {
+					String oText = origStatus.getText();
+//					Matcher m = p.matcher(oText);
+					StringBuilder sb = new StringBuilder();
+					sb.append("@");
+					sb.append(origStatus.getUser().getScreenName()).append(" ");
+//					if (m.matches()) {
+//						for (int i = 1; i < m.groupCount() ; i++) {
+//							sb.append(m.group(i));
+//							sb.append(" ");
+//						}
+//					}
+					findUsers (sb,oText);
+					edittext.setText(sb.toString());
+				} else if (op.equals(getString(R.string.classicretweet))) {
+					String msg = "RT @" + origStatus.getUser().getScreenName() + " ";
+					msg = msg + origStatus.getText();
+					edittext.setText(msg); // TODO limit to 140 chars
+				}
+			}
 		}
 		
 		edittext.setOnKeyListener(new OnKeyListener() {
@@ -95,6 +122,33 @@ public class MainActivity extends Activity {
       
 	}
 	
+
+	/** Extract the @users from the passed oText and put them into sb
+	 * Should go away in favor of a RegExp
+	 * @deprecated 
+	 */
+	private void findUsers(StringBuilder sb, String oText) {
+		if (!oText.contains("@"))
+			return;
+		
+		String txt = oText;
+		while (txt.length()>0) {
+			int j = txt.indexOf("@");
+			if (j<0)
+				return;
+			txt = txt.substring(j);
+			int k = txt.indexOf(" ");
+			if (k<0) { // end
+				sb.append(txt);
+				return;
+			} else {
+				sb.append(txt.substring(0, k));
+				sb.append(" ");
+				txt = txt.substring(k);
+			}
+		}
+	}
+
 
 	public void tweet(StatusUpdate update) {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());

@@ -42,6 +42,8 @@ public class TweetListActivity extends ListActivity {
     
     @Override
     public void onResume() {
+    	
+    	super.onResume();
 
         ProgressDialog dialog = ProgressDialog.show(TweetListActivity.this, "Loading tweets", 
                 "Please wait...", true);
@@ -60,7 +62,7 @@ public class TweetListActivity extends ListActivity {
 				// When clicked, show a toast with the TextView text
 				// TODO how to handle the case of a tweet with a link inside?
 				Intent i = new Intent(parent.getContext(),OneTweetActivity.class);
-				i.putExtra("status", statuses.get(position));
+				i.putExtra(getString(R.string.status), statuses.get(position));
 				startActivity(i);
 
 			}
@@ -72,7 +74,8 @@ public class TweetListActivity extends ListActivity {
 					int position, long id) {
 				Log.i("TLA","Long click, pos=" + position + ",id="+id);
 				Intent i = new Intent(parent.getContext(),MainActivity.class);
-				i.putExtra("status", statuses.get(position));
+				i.putExtra(getString(R.string.status), statuses.get(position));
+				i.putExtra("op",getString(R.string.reply));
 				startActivity(i); 
 				
 				return true; // We've consumed the long click
