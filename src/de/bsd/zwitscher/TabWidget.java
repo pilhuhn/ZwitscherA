@@ -1,5 +1,9 @@
 package de.bsd.zwitscher;
 
+import java.util.List;
+
+import twitter4j.UserList;
+
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -29,24 +33,20 @@ public class TabWidget extends TabActivity {
 				.setIndicator("Home",res.getDrawable(R.drawable.home))
 				.setContent(intent);
 		tabHost.addTab(spec);
-		intent = new Intent().setClass(this, NewTweetActivity.class);
-// Post is now a generic intent from the menu
-/*		spec = tabHost.newTabSpec("main")
-				.setIndicator("Post",res.getDrawable(R.drawable.ic_tab_artists))
-				.setContent(intent);
-		tabHost.addTab(spec);
-*/
-/* Temporarily disable, as it delays startup and is not yet really used.
+		
   		TwitterHelper th = new TwitterHelper(getApplicationContext());
-		List<String> userLists =  th.getListNames();
-		for (String userList : userLists) {
-			intent = new Intent().setClass(this,NewTweetActivity.class); // TODO Fix intent class
-			spec = tabHost.newTabSpec(userList)
-			.setIndicator(userList,res.getDrawable(R.drawable.ic_tab_artists))
+		List<UserList> userLists =  th.getUserLists();
+		for (UserList userList : userLists) {
+			intent = new Intent().setClass(this,TweetListActivity.class);
+			intent.putExtra("listName", userList);
+			intent.putExtra("id", userList.getId());
+			
+			spec = tabHost.newTabSpec(userList.getName())
+			.setIndicator(userList.getName(),res.getDrawable(R.drawable.list))
 			.setContent(intent);
 			tabHost.addTab(spec);
 		}
-*/		tabHost.setVerticalScrollBarEnabled(true);
+		tabHost.setVerticalScrollBarEnabled(true);
 		tabHost.setCurrentTab(0); // Home tab, tabs start at 0
 
 		String tabTag = tabHost.getCurrentTabTag();

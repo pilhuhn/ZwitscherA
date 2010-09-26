@@ -12,4 +12,5 @@
 <string name="ClearButton">Clear!</string>
 <string name="home_timeline">Home</string>
 <string name="classicretweet">ClassicRetweet</string>
+<string name="list">list</string>
 </resources>

@@ -47,21 +47,17 @@ public class TwitterHelper {
 		}
 	}
 	
-	public List<String> getListNames() {
+	public List<UserList> getUserLists() {
 		Twitter twitter = getTwitter();
 		
 		try {
 			String username = twitter.getScreenName(); 
 			List<UserList> userLists = twitter.getUserLists(username, -1);
-			List<String> lists = new ArrayList<String>(userLists.size());
-			for (UserList uList : userLists) {
-				lists.add(uList.getName());
-			}
-			return lists;
+			return userLists;
 		} catch (Exception e) {
 			Toast.makeText(context, "Getting lists failed: " + e.getMessage(), 15000).show();
 			e.printStackTrace();
-			return new ArrayList<String>();
+			return new ArrayList<UserList>();
 		} // TODO cursor?
 	}
 
@@ -165,6 +161,27 @@ public class TwitterHelper {
 			Toast.makeText(context, "Failed to (un)create a favorite: " + e.getLocalizedMessage(), 10000).show();
 		}
 		
+	}
+
+	public List<Status> getUserList(Paging paging, int id) {
+        Twitter twitter = getTwitter();
+
+        
+        List<Status> statuses;
+		try {
+	        String listOwnerScreenName = twitter.getScreenName();
+
+			statuses = twitter.getUserListStatuses(listOwnerScreenName, id, paging); 
+			return statuses;
+		}
+		catch (Exception e) {
+        	System.err.println("Got exception: " + e.getMessage() );
+        	if (e.getCause()!=null)
+        		System.err.println("   " + e.getCause().getMessage());
+            String text =  context.getString(R.string.no_connect) + ": " + e.getMessage();
+            Toast.makeText(context, text, 15000).show();
+            return new ArrayList<Status>();
+		}
 	}
 
 	

@@ -13,8 +13,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import twitter4j.Paging;
@@ -45,7 +43,16 @@ public class TweetListActivity extends ListActivity {
 
         ProgressDialog dialog = ProgressDialog.show(TweetListActivity.this, "Loading tweets",
                 "Please wait...", true);
-		List<String> data = getTimlineStringsFromTwitter(R.string.home_timeline);
+        Bundle bundle = getIntent().getExtras();
+        List<String> data;
+        if (bundle!=null) {
+        	String listName = bundle.getString("listName");
+        	int id = bundle.getInt("id");
+        	data = getTimlineStringsFromTwitter(R.string.list,id);
+        }
+        else {
+        	data = getTimlineStringsFromTwitter(R.string.home_timeline,0);
+        }
 		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.list_item, data);
 		setListAdapter(arrayAdapter);
 
@@ -82,7 +89,7 @@ public class TweetListActivity extends ListActivity {
 
     }
 
-	private List<String> getTimlineStringsFromTwitter(int timeline) {
+	private List<String> getTimlineStringsFromTwitter(int timeline,int id) {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		Paging paging = new Paging();
 
@@ -90,6 +97,9 @@ public class TweetListActivity extends ListActivity {
 
         case R.string.home_timeline:
         	statuses = th.getFriendsTimeline(paging);
+        	break;
+        case R.string.list:
+        	statuses = th.getUserList(paging,id);
         	break;
         }
 		List<String> data = new ArrayList<String>(statuses.size());
@@ -105,7 +115,7 @@ public class TweetListActivity extends ListActivity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
     	if (item!=null && item.getItemId() == R.id.reload_item) {
-    		List<String> data = getTimlineStringsFromTwitter(R.string.home_timeline);
+    		List<String> data = getTimlineStringsFromTwitter(R.string.home_timeline,0); // TODO depending on tab
     		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, data));
     		getListView().requestLayout();
     		return true;
