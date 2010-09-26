@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="de.bsd.zwitscher" android:versionName="Tick"  
+          package="de.bsd.zwitscher" android:versionName="Tick"
           android:versionCode="7"
           android:installLocation="preferExternal">
 
@@ -8,11 +8,11 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <application android:icon="@drawable/icon" android:label="Zwitscher" 
+    <application android:icon="@drawable/icon" android:label="Zwitscher"
     			android:debuggable="true"  android:allowBackup="true"
     			>
 
-        
+
         <activity android:name=".TweetListActivity">
 		</activity>
 
@@ -22,14 +22,14 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-		
+
 		-->
 		</activity>
 
 		<activity android:name=".OneTweetActivity">
 		</activity>
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".NewTweetActivity">
 
 
         </activity>
@@ -39,7 +39,7 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-	
+
 	</activity>
 </application>
 

@@ -3,8 +3,6 @@ package de.bsd.zwitscher;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.bsd.zwitscher.R;
-
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -36,16 +34,16 @@ public class TweetListActivity extends ListActivity {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-    	
+
         super.onCreate(savedInstanceState);
     }
-    
+
     @Override
     public void onResume() {
-    	
+
     	super.onResume();
 
-        ProgressDialog dialog = ProgressDialog.show(TweetListActivity.this, "Loading tweets", 
+        ProgressDialog dialog = ProgressDialog.show(TweetListActivity.this, "Loading tweets",
                 "Please wait...", true);
 		List<String> data = getTimlineStringsFromTwitter(R.string.home_timeline);
 		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.list_item, data);
@@ -53,7 +51,7 @@ public class TweetListActivity extends ListActivity {
 
 		ListView lv = getListView();
 		lv.setTextFilterEnabled(true);
-		
+
 		dialog.cancel();
 
 		lv.setOnItemClickListener(new OnItemClickListener() {
@@ -73,23 +71,23 @@ public class TweetListActivity extends ListActivity {
 			public boolean onItemLongClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				Log.i("TLA","Long click, pos=" + position + ",id="+id);
-				Intent i = new Intent(parent.getContext(),MainActivity.class);
+				Intent i = new Intent(parent.getContext(), NewTweetActivity.class);
 				i.putExtra(getString(R.string.status), statuses.get(position));
 				i.putExtra("op",getString(R.string.reply));
-				startActivity(i); 
-				
+				startActivity(i);
+
 				return true; // We've consumed the long click
 			}
 		});
 
     }
-    
+
 	private List<String> getTimlineStringsFromTwitter(int timeline) {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		Paging paging = new Paging();
-        
+
         switch (timeline) {
-        
+
         case R.string.home_timeline:
         	statuses = th.getFriendsTimeline(paging);
         	break;
@@ -102,7 +100,7 @@ public class TweetListActivity extends ListActivity {
 		}
 		return data;
 	}
-    
+
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
@@ -112,8 +110,8 @@ public class TweetListActivity extends ListActivity {
     		getListView().requestLayout();
     		return true;
     	}
-    	
+
     	return super.onMenuItemSelected(featureId, item);
     }
-    
+
 }

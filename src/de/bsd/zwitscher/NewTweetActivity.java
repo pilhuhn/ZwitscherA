@@ -18,28 +18,28 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class NewTweetActivity extends Activity {
 
 	EditText edittext;
 	Status origStatus;
-	Pattern p = Pattern.compile(".*?(@\\w+ )*.*"); 
+	Pattern p = Pattern.compile(".*?(@\\w+ )*.*");
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	    setContentView(R.layout.main);
-	    
-	    final Button tweetButton = (Button) findViewById(R.id.TweetButton);  
+
+	    final Button tweetButton = (Button) findViewById(R.id.TweetButton);
 		edittext = (EditText) findViewById(R.id.edittext);
 		edittext.setSelected(true);
 		tweetButton.setEnabled(false);
-		
+
 		Bundle bundle = getIntent().getExtras();
 		if (bundle!=null) {
 			origStatus = (Status) bundle.get("status");
 			Log.i("Replying..", "Orig is " + origStatus);
 			TextView textOben = (TextView) findViewById(R.id.textOben);
 			textOben.setText(origStatus.getText());
-			String op = (String) bundle.get("op"); 
+			String op = (String) bundle.get("op");
 			if (op!=null) {
 				if (op.equals(getString(R.string.reply))) {
 					edittext.setText("@"+origStatus.getUser().getScreenName()+" ");
@@ -64,11 +64,11 @@ public class MainActivity extends Activity {
 				}
 			}
 		}
-		
+
 		edittext.setOnKeyListener(new OnKeyListener() {
 		    public boolean onKey(View v, int keyCode, KeyEvent event) {
-		    	
-		    	
+
+
 		        // If the event is a key-down event on the "enter" button
 		        if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
 		            (keyCode == KeyEvent.KEYCODE_ENTER)) {
@@ -83,18 +83,18 @@ public class MainActivity extends Activity {
 		        	finish();
 		          return true;
 		        }
-		        
+
 		        if ((event.getAction() == KeyEvent.ACTION_UP) && edittext.getTextSize() >0 ) {
 		        	tweetButton.setEnabled(true);
 		        }
-		        
+
 		        return false;
 		    }
 		});
-		
-		
+
+
 		tweetButton.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				System.out.println("clicked, text is " + edittext.getText().toString());
@@ -105,32 +105,32 @@ public class MainActivity extends Activity {
 	        	tweet(up);
 	        	origStatus=null;
 	        	finish();
-				
+
 			}
 		});
 
 		final Button clearButton = (Button) findViewById(R.id.ClearButton);
 		clearButton.setOnClickListener(new OnClickListener() {
-			
-			
+
+
 			@Override
 			public void onClick(View v) {
 				edittext.setText("");
-				
+
 			}
 		});
-      
+
 	}
-	
+
 
 	/** Extract the @users from the passed oText and put them into sb
 	 * Should go away in favor of a RegExp
-	 * @deprecated 
+	 * @deprecated
 	 */
 	private void findUsers(StringBuilder sb, String oText) {
 		if (!oText.contains("@"))
 			return;
-		
+
 		String txt = oText;
 		while (txt.length()>0) {
 			int j = txt.indexOf("@");
@@ -154,6 +154,6 @@ public class MainActivity extends Activity {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		th.updateStatus(update);
 	}
-	
-			
+
+
 }

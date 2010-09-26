@@ -1,8 +1,5 @@
 package de.bsd.zwitscher;
 
-import java.util.List;
-
-import de.bsd.zwitscher.R;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -15,35 +12,35 @@ import android.widget.TabHost;
 public class TabWidget extends TabActivity {
 
 	TabHost tabHost;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		setContentView(R.layout.tabs);
-		
+
 		Resources res = getResources();
 		tabHost = getTabHost();
 		TabHost.TabSpec spec;
 		Intent intent;
 		intent = new Intent().setClass(this,TweetListActivity.class);
-		
+
 		spec = tabHost.newTabSpec("home")
 				.setIndicator("Home",res.getDrawable(R.drawable.home))
 				.setContent(intent);
 		tabHost.addTab(spec);
-		intent = new Intent().setClass(this,MainActivity.class);
-// Post is now a generic intent from the menu		
+		intent = new Intent().setClass(this, NewTweetActivity.class);
+// Post is now a generic intent from the menu
 /*		spec = tabHost.newTabSpec("main")
 				.setIndicator("Post",res.getDrawable(R.drawable.ic_tab_artists))
 				.setContent(intent);
 		tabHost.addTab(spec);
-*/		
-/* Temporarily disable, as it delays startup and is not yet really used. 
+*/
+/* Temporarily disable, as it delays startup and is not yet really used.
   		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		List<String> userLists =  th.getListNames();
 		for (String userList : userLists) {
-			intent = new Intent().setClass(this,MainActivity.class); // TODO Fix intent class
+			intent = new Intent().setClass(this,NewTweetActivity.class); // TODO Fix intent class
 			spec = tabHost.newTabSpec(userList)
 			.setIndicator(userList,res.getDrawable(R.drawable.ic_tab_artists))
 			.setContent(intent);
@@ -51,18 +48,18 @@ public class TabWidget extends TabActivity {
 		}
 */		tabHost.setVerticalScrollBarEnabled(true);
 		tabHost.setCurrentTab(0); // Home tab, tabs start at 0
-		
+
 		String tabTag = tabHost.getCurrentTabTag();
-		
+
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		 MenuInflater inflater = getMenuInflater();
 		    inflater.inflate(R.menu.main_menu, menu);
 		    return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent i;
@@ -72,7 +69,7 @@ public class TabWidget extends TabActivity {
 	    	// Handled within TweetListActivity
 	    	break;
 	    case R.id.post_item:
-	    	i = new Intent(TabWidget.this,MainActivity.class);
+	    	i = new Intent(TabWidget.this, NewTweetActivity.class);
 	    	startActivity(i);
 	        break;
 	    case R.id.preferences:
@@ -85,5 +82,5 @@ public class TabWidget extends TabActivity {
 	    return true;
 	}
 
-	
+
 }
