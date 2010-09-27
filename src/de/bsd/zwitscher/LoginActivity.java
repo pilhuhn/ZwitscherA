@@ -90,7 +90,7 @@ public class LoginActivity extends Activity {
 		        }
 			}
 		});
-        
+/*        
         final Button continueButton = (Button) findViewById(R.id.continueButton);
         continueButton.setOnClickListener(new OnClickListener() {
 			
@@ -102,6 +102,7 @@ public class LoginActivity extends Activity {
 				startActivity(i);
 			}
 		});
+*/		
 	}
 	
 	

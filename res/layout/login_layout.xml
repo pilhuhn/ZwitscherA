@@ -7,7 +7,7 @@
 		android:layout_height="wrap_content" 
 		android:id="@+id/GetPinButton" 
 		android:text="Get pin from Twitter"/>
-<EditText android:text="@+id/EditText01" 
+<EditText  
 		  android:layout_width="wrap_content" 
 		  android:layout_height="wrap_content" 
 		  android:contentDescription="OAuth pin" 
@@ -20,9 +20,11 @@
  		android:id="@+id/setPinButton" 
  		android:text="Set Pin"></Button>
 
+<!-- 
 <Button android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
 		android:id="@+id/continueButton"
-		android:layout_below="@id/EditText01" 
+		android:layout_below="@id/pinText" 
 		android:text="Continue..."/>
+-->		
 </LinearLayout>
