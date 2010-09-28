@@ -12,6 +12,8 @@
 		  android:layout_height="wrap_content" 
 		  android:contentDescription="OAuth pin" 
 		  android:inputType="number"
+		  android:maxLength="7"
+		  android:minEms="10"
 		  android:layout_below="@id/GetPinButton" 
 		  android:id="@+id/pinText"/>
 
