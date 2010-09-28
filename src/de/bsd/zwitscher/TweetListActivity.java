@@ -48,10 +48,10 @@ public class TweetListActivity extends ListActivity {
         if (bundle!=null) {
         	String listName = bundle.getString("listName");
         	int id = bundle.getInt("id");
-        	data = getTimlineStringsFromTwitter(R.string.list,id);
+        	data = getTimlineStringsFromTwitter(R.string.list,id, listName);
         }
         else {
-        	data = getTimlineStringsFromTwitter(R.string.home_timeline,0);
+        	data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null);
         }
 		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.list_item, data);
 		setListAdapter(arrayAdapter);
@@ -89,10 +89,19 @@ public class TweetListActivity extends ListActivity {
 
     }
 
-	private List<String> getTimlineStringsFromTwitter(int timeline,int id) {
+	private List<String> getTimlineStringsFromTwitter(int timeline,int id, String specialName) {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		Paging paging = new Paging();
+		TweetDB tdb = new TweetDB(this);
+		
+		// First get saved paging id to limit what to fetch
+		if (timeline== R.string.home_timeline)
+			specialName = "home";
 
+    	long last = tdb.getLastRead(specialName);
+    	if (last!=0)
+    		paging.sinceId(last);
+		
         switch (timeline) {
 
         case R.string.home_timeline:
@@ -102,6 +111,13 @@ public class TweetListActivity extends ListActivity {
         	statuses = th.getUserList(paging,id);
         	break;
         }
+        
+        // Update the 'since' id in the database
+    	if (statuses.size()>0) {
+    		last = statuses.get(0).getId(); // assumption is that twitter sends the newest (=highest id) first 
+    		tdb.updateLastRead(specialName, last);
+    	}
+
 		List<String> data = new ArrayList<String>(statuses.size());
 		for (Status status : statuses) {
 			User user = status.getUser();
@@ -115,7 +131,7 @@ public class TweetListActivity extends ListActivity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
     	if (item!=null && item.getItemId() == R.id.reload_item) {
-    		List<String> data = getTimlineStringsFromTwitter(R.string.home_timeline,0); // TODO depending on tab
+    		List<String> data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null); // TODO depending on tab
     		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, data));
     		getListView().requestLayout();
     		return true;
