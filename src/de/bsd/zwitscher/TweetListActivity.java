@@ -124,6 +124,9 @@ public class TweetListActivity extends ListActivity {
 			String item = user.getName() +  " (" + user.getScreenName() + "): " + status.getText();
 			data.add(item);
 		}
+		if (statuses.size()==0) { // No (new) tweet found
+			data.add(">>  Sorry, no tweets currently available, try later << ");
+		}
 		return data;
 	}
 

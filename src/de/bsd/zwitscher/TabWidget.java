@@ -38,7 +38,7 @@ public class TabWidget extends TabActivity {
 		List<UserList> userLists =  th.getUserLists();
 		for (UserList userList : userLists) {
 			intent = new Intent().setClass(this,TweetListActivity.class);
-			intent.putExtra("listName", userList);
+			intent.putExtra("listName", userList.getName());
 			intent.putExtra("id", userList.getId());
 			
 			spec = tabHost.newTabSpec(userList.getName())
