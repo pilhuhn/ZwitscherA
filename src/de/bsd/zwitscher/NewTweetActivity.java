@@ -1,7 +1,6 @@
 package de.bsd.zwitscher;
 
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import twitter4j.Status;

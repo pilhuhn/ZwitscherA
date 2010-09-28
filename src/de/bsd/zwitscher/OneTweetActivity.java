@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
@@ -57,7 +56,6 @@ public class OneTweetActivity extends Activity {
 			ImageView iv = (ImageView) findViewById(R.id.UserPictureImageView);
 			try {
 				Bitmap bi = BitmapFactory.decodeStream(imageUrl.openConnection() .getInputStream());
-				// TODO why does this not show the image?
 				iv.setImageBitmap(bi); // TODO optimize see e.g. http://www.androidpeople.com/android-load-image-from-url-example/#comment-388
 				Log.i("show image","h="+iv.getHeight()+",bi.h="+bi.getHeight());
 			} catch (IOException e) {
