@@ -34,7 +34,7 @@ public class TwitterHelper {
 
         List<Status> statuses;
 		try {
-			statuses = twitter.getFriendsTimeline(paging );
+			statuses = twitter.getHomeTimeline(paging ); //like friends + including retweets
 			return statuses;
 		}
 		catch (Exception e) {
