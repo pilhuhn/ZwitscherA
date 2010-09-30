@@ -115,7 +115,7 @@ public class TweetListActivity extends ListActivity {
         // Update the 'since' id in the database
     	if (statuses.size()>0) {
     		last = statuses.get(0).getId(); // assumption is that twitter sends the newest (=highest id) first 
-    		tdb.updateLastRead(specialName, last);
+    		tdb.updateOrInsertLastRead(specialName, last);
     	}
 
 		List<String> data = new ArrayList<String>(statuses.size());

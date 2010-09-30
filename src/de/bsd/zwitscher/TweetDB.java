@@ -34,6 +34,10 @@ public class TweetDB {
 					"item TEXT, " + //
 					"time LONG )" //
 			);
+			db.execSQL("CREATE TABLE lists (" + //
+					"name TEXT, " + //
+					"id LONG )"
+			);
 		}
 
 		@Override
@@ -55,10 +59,11 @@ public class TweetDB {
 			ret = c.getLong(0);
 		}
 		c.close();
+		db.close();
 		return ret;
 	}
 	
-	void updateLastRead(String item, long time) {
+	void updateOrInsertLastRead(String item, long time) {
 		ContentValues cv = new ContentValues();
 		cv.put("item", item);
 		cv.put("time", time);
@@ -70,4 +75,5 @@ public class TweetDB {
 			db.insert("lastRead", null, cv);
 		}
 	}
+	
 }
