@@ -120,6 +120,7 @@ public class TabWidget extends TabActivity {
 				tdb.removeList(id);
 				View tab = tabHost.findViewWithTag(id.toString());
 				tabHost.removeView(tab);
+				tabHost.setCurrentTab(0);
 			}
 		}
 	}
