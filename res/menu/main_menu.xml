@@ -7,5 +7,5 @@
 		  android:title="Preferences" 
 		  android:enabled="true" 
 		  android:visible="true"/>
-<item android:titleCondensed="RLists" android:enabled="true" android:title="Reload Lists" android:id="@+id/reloadLists"></item>
+<item android:enabled="true" android:id="@+id/reloadLists" android:titleCondensed="Sync Lists" android:title="Synchronize Lists"></item>
 </menu>

@@ -19,6 +19,7 @@ import android.widget.TabHost;
 public class TabWidget extends TabActivity {
 
 	TabHost tabHost;
+	TabHost.TabSpec homeSpec;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,13 +29,12 @@ public class TabWidget extends TabActivity {
 
 		Resources res = getResources();
 		tabHost = getTabHost();
-		TabHost.TabSpec spec;
 		Intent homeIntent = new Intent().setClass(this,TweetListActivity.class);
 
-		spec = tabHost.newTabSpec("home")
+		homeSpec = tabHost.newTabSpec("home")
 				.setIndicator("Home",res.getDrawable(R.drawable.home))
 				.setContent(homeIntent);
-		tabHost.addTab(spec);
+		tabHost.addTab(homeSpec);
 		
   		TweetDB tdb = new TweetDB(getApplicationContext());
   		Map<String, Integer> userLists = tdb.getLists();
@@ -93,6 +93,13 @@ public class TabWidget extends TabActivity {
 	    return true;
 	}
 
+	/**
+	 * Synchronize lists between what is available in the db 
+	 * and on twitter.
+	 * Unfortunately there is no easy way to just remove a tab from
+	 * a tabHost. So we need to clean out the tabs and add the remaining
+	 * ones again
+	 */
 	private void syncLists() {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		TweetDB tdb = new TweetDB(getApplicationContext());
@@ -109,18 +116,28 @@ public class TabWidget extends TabActivity {
 			}
 		}
 		// check for outdated lists and remove them
+		boolean needsReload = false;
 		for (Entry<String, Integer> entry : storedLists.entrySet()) {
 			Integer id = entry.getValue();
 			boolean found = false;
 			for (UserList userList2 : userLists) {
-				if (userList2.getId() == id)
+				if (userList2.getId() == id) {
 					found = true;
+					break;
+				}
 			}
 			if (!found) {
 				tdb.removeList(id);
-				View tab = tabHost.findViewWithTag(id.toString());
-				tabHost.removeView(tab);
-				tabHost.setCurrentTab(0);
+				needsReload = true;
+			}
+		}
+		if (needsReload) {
+			tabHost.setCurrentTab(0);
+			tabHost.clearAllTabs();
+			tabHost.addTab(homeSpec);
+			storedLists = tdb.getLists();
+			for (Entry<String, Integer> entry : storedLists.entrySet()) {
+				setUpTab(getResources(), entry.getKey(), entry.getValue());
 			}
 		}
 	}
