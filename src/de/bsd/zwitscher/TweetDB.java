@@ -1,5 +1,8 @@
 package de.bsd.zwitscher;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -74,6 +77,40 @@ public class TweetDB {
 			// row not yet present
 			db.insert("lastRead", null, cv);
 		}
+		db.close();
 	}
 	
+	Map<String, Integer> getLists() {
+		SQLiteDatabase db = tdHelper.getReadableDatabase();
+		Map<String,Integer> ret = new HashMap<String,Integer>();
+		Cursor c = db.query("lists", new String[] {"name","id"}, null, null, null, null, "name");
+		if (c.getCount()>0){
+			c.moveToFirst();
+			do {
+				String name = c.getString(0);
+				Integer id = c.getInt(1);
+				ret.put(name, id);
+			} while (c.moveToNext());
+		}
+		c.close();
+		db.close();
+		return ret;
+	}
+
+	public void addList(String name, int id) {
+		ContentValues cv = new ContentValues();
+		cv.put("name", name);
+		cv.put("id",id);
+		
+		SQLiteDatabase db = tdHelper.getWritableDatabase();
+		db.insert("lists", null, cv);
+		db.close();
+		
+	}
+
+	public void removeList(Integer id) {
+		SQLiteDatabase db = tdHelper.getWritableDatabase();
+		db.delete("lists", "id = ?", new String[] {id.toString()});
+		db.close();
+	}
 }
