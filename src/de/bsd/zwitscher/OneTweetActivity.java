@@ -3,6 +3,9 @@ package de.bsd.zwitscher;
 import java.io.IOException;
 import java.net.URL;
 
+import com.google.api.translate.Language;
+import com.google.api.translate.Translate;
+
 import twitter4j.Status;
 import android.app.Activity;
 import android.content.Intent;
@@ -14,9 +17,11 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class OneTweetActivity extends Activity {
 
@@ -163,6 +168,26 @@ public class OneTweetActivity extends Activity {
 
 				}
 			});
+			
+			Button translateButton = (Button) findViewById(R.id.TranslateButton);
+			translateButton.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					Translate.setHttpReferrer("http://bsd.de/zwitscher");
+					try {
+						// TODO get target language from system
+						String result = Translate.execute(status.getText(), Language.AUTO_DETECT, Language.GERMAN);
+						// TODO show translation in popup
+						Toast.makeText(getApplicationContext(), result, 35000).show();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						Toast.makeText(getApplicationContext(), e.getMessage(), 15000).show();
+					} // TODO get target lang from system
+				}
+			});
+			
 
 
 			Button doneButton = (Button) findViewById(R.id.DoneButton);

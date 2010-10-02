@@ -77,6 +77,12 @@
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 		android:text="Speak"/>
+<Button android:id="@+id/TranslateButton"
+		android:layout_below="@id/ThreadButton"
+		android:layout_toRightOf="@id/SpeakButton"
+		android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:text="Translate"/>
 
 <Button android:id="@+id/DoneButton"
 		android:layout_below="@id/SpeakButton"
