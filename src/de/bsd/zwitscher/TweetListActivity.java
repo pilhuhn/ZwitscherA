@@ -7,6 +7,7 @@ import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Debug;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -99,7 +100,7 @@ public class TweetListActivity extends ListActivity {
 			specialName = "home";
 
     	long last = tdb.getLastRead(specialName);
-    	if (last!=0)
+    	if (last!=0 && !Debug.isDebuggerConnected())
     		paging.sinceId(last);
 		
         switch (timeline) {

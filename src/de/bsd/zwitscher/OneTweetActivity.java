@@ -6,6 +6,9 @@ import com.google.api.translate.Translate;
 
 import twitter4j.Status;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -22,6 +25,8 @@ import android.widget.Toast;
 
 public class OneTweetActivity extends Activity {
 
+	Context ctx = this;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -186,8 +191,18 @@ public class OneTweetActivity extends Activity {
 					try {
 						// TODO get target language from system
 						String result = Translate.execute(status.getText(), Language.AUTO_DETECT, Language.GERMAN);
-						// TODO show translation in popup
-						Toast.makeText(getApplicationContext(), result, 35000).show();
+						AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+						builder.setMessage(result);
+						builder.setTitle("Translation result");
+						builder.setNeutralButton("ok", new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						});
+						AlertDialog alert = builder.create();
+						alert.show();
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

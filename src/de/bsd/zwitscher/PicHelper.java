@@ -31,7 +31,7 @@ public class PicHelper {
 			fis.close();
 		}
 		catch (IOException ioe) {
-			ioe.printStackTrace();
+			Log.i("PicHelper", ioe.getMessage());
 		}
 // TODO check if file is outdated		
 //		if (imgFile.exists()) {
