@@ -56,11 +56,13 @@ public class OneTweetActivity extends Activity {
 			Bitmap bi; 
 			
 			if (status.getRetweetedStatus()==null)
-				bi = ph.getUserPic(status.getUser());
+				bi = ph.getUserPic(status.getUser(),this);
 			else
-				bi = ph.getUserPic(status.getRetweetedStatus().getUser());
-			ImageView iv = (ImageView) findViewById(R.id.UserPictureImageView);
-			iv.setImageBitmap(bi); 
+				bi = ph.getUserPic(status.getRetweetedStatus().getUser(),this);
+			if (bi!=null) {
+				ImageView iv = (ImageView) findViewById(R.id.UserPictureImageView);
+				iv.setImageBitmap(bi);
+			}
 
 			TextView tweetView = (TextView)findViewById(R.id.TweetTextView);
 			tweetView.setText(status.getText());
@@ -190,7 +192,7 @@ public class OneTweetActivity extends Activity {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 						Toast.makeText(getApplicationContext(), e.getMessage(), 15000).show();
-					} // TODO get target lang from system
+					}
 				}
 			});
 			
