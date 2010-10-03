@@ -1,7 +1,5 @@
 package de.bsd.zwitscher;
 
-import java.io.IOException;
-import java.net.URL;
 
 import com.google.api.translate.Language;
 import com.google.api.translate.Translate;
@@ -10,14 +8,13 @@ import twitter4j.Status;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,6 +30,8 @@ public class OneTweetActivity extends Activity {
 		Bundle bundle = getIntent().getExtras();
 		if (bundle!=null) {
 			final Status status = (Status) bundle.get(getString(R.string.status));
+			Log.i("OneTweetActivity","Showing status: " + status.toString());
+						
 			TextView tv01 = (TextView) findViewById(R.id.TextView01);
 			if (status.getRetweetedStatus()==null) {
 				tv01.setText(status.getUser().getName());
@@ -52,21 +51,16 @@ public class OneTweetActivity extends Activity {
 			else {
 				mtv.setText("");
 			}
-			URL imageUrl;
+			
+			PicHelper ph = new PicHelper();
+			Bitmap bi; 
+			
 			if (status.getRetweetedStatus()==null)
-				imageUrl = status.getUser().getProfileImageURL();
+				bi = ph.getUserPic(status.getUser());
 			else
-				imageUrl = status.getRetweetedStatus().getUser().getProfileImageURL();
-			Log.i("show image",imageUrl.toString());
+				bi = ph.getUserPic(status.getRetweetedStatus().getUser());
 			ImageView iv = (ImageView) findViewById(R.id.UserPictureImageView);
-			try {
-				Bitmap bi = BitmapFactory.decodeStream(imageUrl.openConnection() .getInputStream());
-				iv.setImageBitmap(bi); // TODO optimize see e.g. http://www.androidpeople.com/android-load-image-from-url-example/#comment-388
-				Log.i("show image","h="+iv.getHeight()+",bi.h="+bi.getHeight());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			iv.setImageBitmap(bi); 
 
 			TextView tweetView = (TextView)findViewById(R.id.TweetTextView);
 			tweetView.setText(status.getText());
@@ -135,7 +129,10 @@ public class OneTweetActivity extends Activity {
 
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
+					Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
+					i.putExtra(getString(R.string.status), status);
+					i.putExtra("op", getString(R.string.direct));
+					startActivity(i);
 
 				}
 			});
@@ -162,6 +159,15 @@ public class OneTweetActivity extends Activity {
 						public void onInit(int status) {
 							// TODO Auto-generated method stub
 
+						}
+						
+					});
+					tts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
+						
+						@Override
+						public void onUtteranceCompleted(String utteranceId) {
+							System.out.println("Utterance done");
+							
 						}
 					});
 					tts.speak(status.getText(), TextToSpeech.QUEUE_ADD, null);

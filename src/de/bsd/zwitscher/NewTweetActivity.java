@@ -73,6 +73,10 @@ public class NewTweetActivity extends Activity {
 		            (keyCode == KeyEvent.KEYCODE_ENTER)) {
 		          // Perform action on key press
 //		          Toast.makeText(getApplicationContext(), edittext.getText(), 2000).show();
+		        	
+		        	// TODO check for passed op
+		        	// e.g. R.string.direct for direct msg.
+		        	
 		        	StatusUpdate up  = new StatusUpdate(edittext.getText().toString());
 		        	if (origStatus!=null) {
 		        		up.setInReplyToStatusId(origStatus.getId());

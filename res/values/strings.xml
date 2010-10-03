@@ -13,4 +13,5 @@
 <string name="home_timeline">Home</string>
 <string name="classicretweet">ClassicRetweet</string>
 <string name="list">list</string>
+<string name="direct">Direct</string>
 </resources>
