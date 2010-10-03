@@ -123,6 +123,9 @@ public class OneTweetActivity extends Activity {
 				}
 			});
 			Button threadButton = (Button) findViewById(R.id.ThreadButton);
+			if (status.getInReplyToScreenName()==null) {
+				threadButton.setEnabled(false);
+			}
 			threadButton.setOnClickListener(new OnClickListener() {
 
 				@Override
