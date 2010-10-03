@@ -33,12 +33,14 @@
 		android:layout_below="@id/MiscTextView"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"		
+        android:onClick="reply"
         android:text="Reply"/>
 <Button android:id="@+id/ReplyAllButton"
 		android:layout_below="@id/MiscTextView"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/ReplyButton"		
+        android:layout_toRightOf="@id/ReplyButton"	
+        android:onClick="replyAll"	
         android:text="Reply All"/>
         
 <Button android:id="@+id/RetweetButton"
@@ -46,12 +48,14 @@
 		android:layout_toRightOf="@id/ReplyAllButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="retweet"
 		android:text="Retweet"/>
 <Button android:id="@+id/ClassicRetweetButton"
 		android:layout_below="@id/MiscTextView"
 		android:layout_toRightOf="@id/RetweetButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="classicRetweet"
 		android:text="Classic Retweet"/>
 		
 <Button android:id="@+id/ThreadButton"
@@ -76,18 +80,21 @@
 		android:layout_below="@id/ThreadButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="speak"
 		android:text="Speak"/>
 <Button android:id="@+id/TranslateButton"
 		android:layout_below="@id/ThreadButton"
 		android:layout_toRightOf="@id/SpeakButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="translate"
 		android:text="Translate"/>
 
 <Button android:id="@+id/DoneButton"
 		android:layout_below="@id/SpeakButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="done"
 		android:text="Done!"/>
 		
 				  
