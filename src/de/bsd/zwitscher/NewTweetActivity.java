@@ -25,7 +25,7 @@ public class NewTweetActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	    setContentView(R.layout.main);
+	    setContentView(R.layout.new_tweet);
 
 	    final Button tweetButton = (Button) findViewById(R.id.TweetButton);
 		edittext = (EditText) findViewById(R.id.edittext);
