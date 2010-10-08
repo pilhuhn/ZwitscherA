@@ -90,6 +90,12 @@ public class NewTweetActivity extends Activity {
 		        if ((event.getAction() == KeyEvent.ACTION_UP) && edittext.getTextSize() >0 ) {
 		        	tweetButton.setEnabled(true);
 		        }
+		        
+		        if (event.getAction() == KeyEvent.ACTION_UP || event.getAction() == KeyEvent.ACTION_DOWN) {
+		        	int len = edittext.getText().length();
+		        	TextView tv = (TextView) findViewById(R.id.CharCount);
+		        	tv.setText(String.valueOf(tv));
+		        }
 
 		        return false;
 		    }
