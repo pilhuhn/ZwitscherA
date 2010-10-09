@@ -22,13 +22,13 @@ import twitter4j.http.RequestToken;
 
 public class TwitterHelper {
 
-	
+
     Context context;
 
 	public TwitterHelper(Context context) {
 		this.context = context;
 	}
-		
+
 	public List<Status> getFriendsTimeline(Paging paging) {
         Twitter twitter = getTwitter();
 
@@ -46,12 +46,12 @@ public class TwitterHelper {
             return new ArrayList<Status>();
 		}
 	}
-	
+
 	public List<UserList> getUserLists() {
 		Twitter twitter = getTwitter();
-		
+
 		try {
-			String username = twitter.getScreenName(); 
+			String username = twitter.getScreenName();
 			List<UserList> userLists = twitter.getUserLists(username, -1);
 			return userLists;
 		} catch (Exception e) {
@@ -64,17 +64,17 @@ public class TwitterHelper {
 
 	private Twitter getTwitter() {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        
+
         String accessTokenToken = preferences.getString("accessToken",null);
         String accessTokenSecret = preferences.getString("accessTokenSecret",null);
         if (accessTokenToken!=null && accessTokenSecret!=null) {
         	Twitter twitter = new TwitterFactory().getInstance();
             twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
         	twitter.setOAuthAccessToken(accessTokenToken, accessTokenSecret); // TODO replace by non-deprecated method
-        	
+
         	return twitter;
         }
-        
+
 		return null;
 	}
 
@@ -82,7 +82,7 @@ public class TwitterHelper {
 		// TODO use fresh token for the first call
         RequestToken requestToken = getRequestToken(true);
         String authUrl = requestToken.getAuthorizationURL();
-        
+
         return authUrl;
 	}
 
@@ -97,8 +97,8 @@ public class TwitterHelper {
 				return token;
 			}
 		}
-		
-		
+
+
         Twitter twitter = new TwitterFactory().getInstance();
         twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
         RequestToken requestToken = twitter.getOAuthRequestToken();
@@ -106,7 +106,7 @@ public class TwitterHelper {
         editor.putString("requestToken", requestToken.getToken());
         editor.putString("requestTokenSecret", requestToken.getTokenSecret());
         editor.commit();
-        
+
         return requestToken;
 	}
 
@@ -115,17 +115,17 @@ public class TwitterHelper {
         twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
         RequestToken requestToken = getRequestToken(false); // twitter.getOAuthRequestToken();
 		AccessToken accessToken = twitter.getOAuthAccessToken(requestToken, pin);
-		
-		
+
+
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		Editor editor = preferences.edit();
 		editor.putString("accessToken", accessToken.getToken());
 		editor.putString("accessTokenSecret", accessToken.getTokenSecret());
 		editor.commit();
 
-		
+
 	}
-	
+
 	public void updateStatus(StatusUpdate update) {
 		Twitter twitter = getTwitter();
 		Log.i("TwitterHelper", "Sendin update: " + update);
@@ -135,7 +135,7 @@ public class TwitterHelper {
 		} catch (TwitterException e) {
 			Toast.makeText(context, "Failed to send tweet: " + e.getLocalizedMessage(), 10000).show();
 		}
-		
+
 	}
 
 	public void retweet(long id) {
@@ -146,7 +146,7 @@ public class TwitterHelper {
 		} catch (TwitterException e) {
 			Toast.makeText(context, "Failed to  retweet: " + e.getLocalizedMessage(), 10000).show();
 		}
-			
+
 	}
 
 	public void favorite(Status status) {
@@ -160,18 +160,18 @@ public class TwitterHelper {
 		} catch (TwitterException e) {
 			Toast.makeText(context, "Failed to (un)create a favorite: " + e.getLocalizedMessage(), 10000).show();
 		}
-		
+
 	}
 
 	public List<Status> getUserList(Paging paging, int id) {
         Twitter twitter = getTwitter();
 
-        
+
         List<Status> statuses;
 		try {
 	        String listOwnerScreenName = twitter.getScreenName();
 
-			statuses = twitter.getUserListStatuses(listOwnerScreenName, id, paging); 
+			statuses = twitter.getUserListStatuses(listOwnerScreenName, id, paging);
 			return statuses;
 		}
 		catch (Exception e) {
@@ -184,5 +184,15 @@ public class TwitterHelper {
 		}
 	}
 
-	
+
+    public Status getStatusById(long statusId) {
+        Twitter twitter = getTwitter();
+        Status status = null;
+        try {
+             status = twitter.showStatus(statusId);
+        } catch (TwitterException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+        return status;
+    }
 }

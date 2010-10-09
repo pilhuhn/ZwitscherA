@@ -27,7 +27,7 @@ public class OneTweetActivity extends Activity {
 
 	Context ctx = this;
 	Status status ;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,7 +37,7 @@ public class OneTweetActivity extends Activity {
 		if (bundle!=null) {
 			status = (Status) bundle.get(getString(R.string.status));
 			Log.i("OneTweetActivity","Showing status: " + status.toString());
-						
+
 			TextView tv01 = (TextView) findViewById(R.id.TextView01);
 			if (status.getRetweetedStatus()==null) {
 				tv01.setText(status.getUser().getName());
@@ -57,10 +57,10 @@ public class OneTweetActivity extends Activity {
 			else {
 				mtv.setText("");
 			}
-			
+
 			PicHelper ph = new PicHelper();
-			Bitmap bi; 
-			
+			Bitmap bi;
+
 			if (status.getRetweetedStatus()==null)
 				bi = ph.getUserPic(status.getUser(),this);
 			else
@@ -87,7 +87,13 @@ public class OneTweetActivity extends Activity {
 
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
+
+                    Status newStatus = th.getStatusById(status.getInReplyToStatusId());
+
+                    Intent i = new Intent(getApplicationContext(),OneTweetActivity.class);
+                    i.putExtra(getString(R.string.status), newStatus);
+                    startActivity(i);
+
 
 				}
 			});
@@ -114,10 +120,10 @@ public class OneTweetActivity extends Activity {
 					// TODO update button state
 				}
 			});
-			
+
 		}
 	}
-	
+
 	public void reply(View v) {
 		Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
 		i.putExtra(getString(R.string.status), status);
@@ -125,7 +131,7 @@ public class OneTweetActivity extends Activity {
 		startActivity(i);
 
 	}
-	
+
 	public void replyAll(View v) {
 		Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
 		i.putExtra(getString(R.string.status), status);
@@ -135,13 +141,13 @@ public class OneTweetActivity extends Activity {
 	}
 
 
-	
+
 	public void retweet(View v) {
 		TwitterHelper th = new TwitterHelper(ctx);
 		th.retweet(status.getId());
 	}
 
-	
+
 	public void classicRetweet(View v) {
 		Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
 		i.putExtra(getString(R.string.status), status);
@@ -150,7 +156,7 @@ public class OneTweetActivity extends Activity {
 
 	}
 
-	
+
 	public void speak(View v) {
 		TextToSpeech tts = new TextToSpeech(getApplicationContext(),new OnInitListener() {
 
@@ -159,21 +165,21 @@ public class OneTweetActivity extends Activity {
 				// TODO Auto-generated method stub
 
 			}
-			
+
 		});
 		tts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
-			
+
 			@Override
 			public void onUtteranceCompleted(String utteranceId) {
 				System.out.println("Utterance done");
-				
+
 			}
 		});
 		tts.speak(status.getText(), TextToSpeech.QUEUE_ADD, null);
 
 	}
 
-	
+
 	public void translate(View v) {
 		Translate.setHttpReferrer("http://bsd.de/zwitscher");
 		try {
@@ -183,7 +189,7 @@ public class OneTweetActivity extends Activity {
 			builder.setMessage(result);
 			builder.setTitle("Translation result");
 			builder.setNeutralButton("ok", new DialogInterface.OnClickListener() {
-				
+
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
@@ -198,7 +204,7 @@ public class OneTweetActivity extends Activity {
 		}
 	}
 
-	
+
 	public void done(View v) {
 		finish();
 	}
