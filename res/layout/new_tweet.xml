@@ -4,10 +4,10 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-	<TextView  
+	<TextView
 	    android:id="@+id/textOben"
-	    android:layout_width="fill_parent" 
-	    android:layout_height="wrap_content" 
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
 	    android:text="@string/hello"
 	    />
 	<EditText
@@ -21,22 +21,24 @@
        />
     <TextView
     	android:id="@+id/CharCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
     	android:layout_below="@id/edittext"
     	android:minEms="3"
     />
 
-	<Button android:id="@+id/TweetButton" 
-			android:text="@+string/TweetButton" 
-			android:layout_width="wrap_content" 
+	<Button android:id="@+id/TweetButton"
+			android:text="@string/TweetButton"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_below="@id/CharCount"
 			android:layout_alignParentRight="true"
 		/>
-	<Button android:id="@+id/ClearButton" 
-			android:text="@+string/ClearButton" 
-			android:layout_width="wrap_content" 
+	<Button android:id="@+id/ClearButton"
+			android:text="@string/ClearButton"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_alignBaseline="@id/TweetButton"
 		/>
-	
+
 </RelativeLayout>
