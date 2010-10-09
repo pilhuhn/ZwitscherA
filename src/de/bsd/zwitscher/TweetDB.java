@@ -9,16 +9,20 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import twitter4j.Status;
 
 public class TweetDB {
-	
-	private TweetDBOpenHelper tdHelper;
+
+    private static final String STATUSES = "statuses";
+    private TweetDBOpenHelper tdHelper;
 
 	public TweetDB(Context context) {
 		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 1);
 	}
-	
-	private class TweetDBOpenHelper extends SQLiteOpenHelper {
+
+
+
+    private class TweetDBOpenHelper extends SQLiteOpenHelper {
 
 		public TweetDBOpenHelper(Context context, String name,
 				CursorFactory factory, int version) {
@@ -28,11 +32,13 @@ public class TweetDB {
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			db.execSQL("CREATE TABLE statuses (" + //
-					"ID LONG, " +//
-					"USER TEXT, " + //
-					"MSG TEXT )" 
-					);
+            db.execSQL("CREATE TABLE "+ STATUSES + " (" +
+                    "ID LONG, " +
+                    "I_REP_TO LONG, " +
+                    "STATUS BLOB " +
+                    ")"
+            );
+
 			db.execSQL("CREATE TABLE lastRead (" + //
 					"item TEXT, " + //
 					"time LONG )" //
@@ -45,12 +51,10 @@ public class TweetDB {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			// TODO Auto-generated method stub
-			
 		}
-		
+
 	}
-	
+
 	long getLastRead(String name) {
 		SQLiteDatabase db = tdHelper.getReadableDatabase();
 		Cursor c = db.query("lastRead", new String[] {"time"}, "item = ?", new String[] {name}, null, null, null);
@@ -65,12 +69,12 @@ public class TweetDB {
 		db.close();
 		return ret;
 	}
-	
+
 	void updateOrInsertLastRead(String item, long time) {
 		ContentValues cv = new ContentValues();
 		cv.put("item", item);
 		cv.put("time", time);
-		
+
 		SQLiteDatabase db = tdHelper.getWritableDatabase();
 		int updated = db.update("lastRead", cv, "item = ?", new String[] {item});
 		if (updated==0) {
@@ -79,7 +83,7 @@ public class TweetDB {
 		}
 		db.close();
 	}
-	
+
 	Map<String, Integer> getLists() {
 		SQLiteDatabase db = tdHelper.getReadableDatabase();
 		Map<String,Integer> ret = new HashMap<String,Integer>();
@@ -101,11 +105,11 @@ public class TweetDB {
 		ContentValues cv = new ContentValues();
 		cv.put("name", name);
 		cv.put("id",id);
-		
+
 		SQLiteDatabase db = tdHelper.getWritableDatabase();
 		db.insert("lists", null, cv);
 		db.close();
-		
+
 	}
 
 	public void removeList(Integer id) {
@@ -113,4 +117,32 @@ public class TweetDB {
 		db.delete("lists", "id = ?", new String[] {id.toString()});
 		db.close();
 	}
+
+    public void storeStatus(long id, long i_reply_id, byte[] statusObj) {
+        ContentValues cv = new ContentValues(3);
+        cv.put("ID",id);
+        cv.put("I_REP_TO",i_reply_id);
+        cv.put("STATUS",statusObj);
+
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.insert(STATUSES, null, cv);
+        db.close();
+    }
+
+    public byte[] getStatusObjectById(long statusId) {
+
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        byte[] ret = null;
+
+        Cursor c = db.query(STATUSES,new String[]{"STATUS"},"id = ?",new String[]{String.valueOf(statusId)},null,null,null);
+        if (c.getCount()>0){
+            c.moveToFirst();
+            ret = c.getBlob(0);
+        }
+        c.close();
+        db.close();
+
+        return ret;
+    }
+
 }

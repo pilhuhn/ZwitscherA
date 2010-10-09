@@ -1,5 +1,10 @@
 package de.bsd.zwitscher;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +40,10 @@ public class TwitterHelper {
         List<Status> statuses;
 		try {
 			statuses = twitter.getHomeTimeline(paging ); //like friends + including retweets
+            TweetDB tdb = new TweetDB(context);
+            for (Status status : statuses) {
+                persistStatus(tdb, status);
+            }
 			return statuses;
 		}
 		catch (Exception e) {
@@ -47,7 +56,8 @@ public class TwitterHelper {
 		}
 	}
 
-	public List<UserList> getUserLists() {
+
+    public List<UserList> getUserLists() {
 		Twitter twitter = getTwitter();
 
 		try {
@@ -186,13 +196,49 @@ public class TwitterHelper {
 
 
     public Status getStatusById(long statusId) {
-        Twitter twitter = getTwitter();
+        TweetDB tdb = new TweetDB(context);
         Status status = null;
+
+        byte[] obj  = tdb.getStatusObjectById(statusId);
+        if (obj!=null) {
+            status = materializeStatus(obj);
+            if (status!=null)
+                return status;
+        }
+
+        Twitter twitter = getTwitter();
         try {
              status = twitter.showStatus(statusId);
-        } catch (TwitterException e) {
+            persistStatus(tdb,status);
+        } catch (Exception e) {
             e.printStackTrace();  // TODO: Customise this generated block
         }
         return status;
+    }
+
+
+    private void persistStatus(TweetDB tdb, Status status) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(bos);
+        out.writeObject(status);
+        tdb.storeStatus(status.getId(),status.getInReplyToStatusId(),bos.toByteArray());
+    }
+
+
+
+    private Status materializeStatus(byte[] obj) {
+
+        Status status = null;
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(obj));
+            status = (Status) ois.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+
+        return status;
+
     }
 }
