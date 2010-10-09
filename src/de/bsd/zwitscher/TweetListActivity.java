@@ -27,6 +27,7 @@ import twitter4j.User;
 public class TweetListActivity extends ListActivity {
 
     List<Status> statuses;
+    Bundle intentInfo;
 
     /**
      * Called when the activity is first created.
@@ -35,32 +36,18 @@ public class TweetListActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        intentInfo = getIntent().getExtras();
+        fillListViewFromTimeline();
     }
 
     @Override
     public void onResume() {
 
     	super.onResume();
-
-        ProgressDialog dialog = ProgressDialog.show(TweetListActivity.this, "Loading tweets",
-                "Please wait...", true);
-        Bundle bundle = getIntent().getExtras();
-        List<String> data;
-        if (bundle!=null) {
-        	String listName = bundle.getString("listName");
-        	int id = bundle.getInt("id");
-        	data = getTimlineStringsFromTwitter(R.string.list,id, listName);
-        }
-        else {
-        	data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null);
-        }
-		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.list_item, data);
-		setListAdapter(arrayAdapter);
+        intentInfo = getIntent().getExtras();
 
 		ListView lv = getListView();
-		lv.setTextFilterEnabled(true);
-
-		dialog.cancel();
 
 		lv.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -94,7 +81,7 @@ public class TweetListActivity extends ListActivity {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		Paging paging = new Paging();
 		TweetDB tdb = new TweetDB(this);
-		
+
 		// First get saved paging id to limit what to fetch
 		if (timeline== R.string.home_timeline)
 			specialName = "home";
@@ -102,7 +89,7 @@ public class TweetListActivity extends ListActivity {
     	long last = tdb.getLastRead(specialName);
     	if (last!=0 && !Debug.isDebuggerConnected())
     		paging.sinceId(last);
-		
+
         switch (timeline) {
 
         case R.string.home_timeline:
@@ -112,10 +99,10 @@ public class TweetListActivity extends ListActivity {
         	statuses = th.getUserList(paging,id);
         	break;
         }
-        
+
         // Update the 'since' id in the database
     	if (statuses.size()>0) {
-    		last = statuses.get(0).getId(); // assumption is that twitter sends the newest (=highest id) first 
+    		last = statuses.get(0).getId(); // assumption is that twitter sends the newest (=highest id) first
     		tdb.updateOrInsertLastRead(specialName, last);
     	}
 
@@ -135,13 +122,24 @@ public class TweetListActivity extends ListActivity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
     	if (item!=null && item.getItemId() == R.id.reload_item) {
-    		List<String> data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null); // TODO depending on tab
-    		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, data));
-    		getListView().requestLayout();
+            fillListViewFromTimeline();
     		return true;
     	}
 
     	return super.onMenuItemSelected(featureId, item);
+    }
+
+    private void fillListViewFromTimeline() {
+        List<String> data;
+        if (intentInfo==null)
+            data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null);
+        else {
+            String listName = intentInfo.getString("listName");
+            int id = intentInfo.getInt("id");
+            data = getTimlineStringsFromTwitter(R.string.list,id, listName);
+        }
+        setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, data));
+        getListView().requestLayout();
     }
 
 }
