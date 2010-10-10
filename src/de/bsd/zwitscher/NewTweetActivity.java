@@ -3,6 +3,8 @@ package de.bsd.zwitscher;
 
 import java.util.regex.Pattern;
 
+import android.os.AsyncTask;
+import android.widget.Toast;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import de.bsd.zwitscher.R;
@@ -73,10 +75,10 @@ public class NewTweetActivity extends Activity {
 		            (keyCode == KeyEvent.KEYCODE_ENTER)) {
 		          // Perform action on key press
 //		          Toast.makeText(getApplicationContext(), edittext.getText(), 2000).show();
-		        	
+
 		        	// TODO check for passed op
 		        	// e.g. R.string.direct for direct msg.
-		        	
+
 		        	StatusUpdate up  = new StatusUpdate(edittext.getText().toString());
 		        	if (origStatus!=null) {
 		        		up.setInReplyToStatusId(origStatus.getId());
@@ -90,7 +92,7 @@ public class NewTweetActivity extends Activity {
 		        if ((event.getAction() == KeyEvent.ACTION_UP) && edittext.getTextSize() >0 ) {
 		        	tweetButton.setEnabled(true);
 		        }
-		        
+
 		        if (event.getAction() == KeyEvent.ACTION_UP || event.getAction() == KeyEvent.ACTION_DOWN) {
 		        	int len = edittext.getText().length();
 		        	TextView tv = (TextView) findViewById(R.id.CharCount);
@@ -160,9 +162,23 @@ public class NewTweetActivity extends Activity {
 
 
 	public void tweet(StatusUpdate update) {
-		TwitterHelper th = new TwitterHelper(getApplicationContext());
-		th.updateStatus(update);
+//		TwitterHelper th = new TwitterHelper(getApplicationContext());
+//		th.updateStatus(update);
+        new UpdateStatusTask().execute(update);
 	}
 
+    private class UpdateStatusTask extends AsyncTask<StatusUpdate,Void,String> {
+
+        @Override
+        protected String doInBackground(StatusUpdate... statusUpdates) {
+            TwitterHelper th = new TwitterHelper(getApplicationContext());
+            String ret = th.updateStatus(statusUpdates[0]);
+            return ret;
+        }
+
+        protected void onPostExecute(String result) {
+            Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG);
+        }
+    }
 
 }

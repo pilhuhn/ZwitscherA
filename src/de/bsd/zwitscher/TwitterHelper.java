@@ -158,14 +158,14 @@ public class TwitterHelper {
 
 	}
 
-	public void updateStatus(StatusUpdate update) {
+	public String updateStatus(StatusUpdate update) {
 		Twitter twitter = getTwitter();
-		Log.i("TwitterHelper", "Sendin update: " + update);
+		Log.i("TwitterHelper", "Sending update: " + update);
 		try {
 			twitter.updateStatus(update);
-			Toast.makeText(context, R.string.tweet_sent , 2500).show();
+			return "Tweet sent";
 		} catch (TwitterException e) {
-			Toast.makeText(context, "Failed to send tweet: " + e.getLocalizedMessage(), 10000).show();
+			return "Failed to send tweet: " + e.getLocalizedMessage();
 		}
 
 	}
