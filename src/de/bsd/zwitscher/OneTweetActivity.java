@@ -47,7 +47,7 @@ public class OneTweetActivity extends Activity {
 				sb.append(" (");
 				sb.append(status.getRetweetedStatus().getUser().getScreenName());
 				sb.append(" ) retweeted by  ");
-				status.getUser().getName();
+				sb.append(status.getUser().getName());
 				tv01.setText(sb.toString());
 			}
 			TextView mtv = (TextView) findViewById(R.id.MiscTextView);
@@ -162,7 +162,7 @@ public class OneTweetActivity extends Activity {
 
 			@Override
 			public void onInit(int status) {
-				// TODO Auto-generated method stub
+				Log.i("speak","onInit " + status);
 
 			}
 
@@ -171,7 +171,7 @@ public class OneTweetActivity extends Activity {
 
 			@Override
 			public void onUtteranceCompleted(String utteranceId) {
-				System.out.println("Utterance done");
+				Log.i("speak","Utterance done");
 
 			}
 		});
