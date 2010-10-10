@@ -29,9 +29,11 @@ public class TwitterHelper {
 
 
     Context context;
+    TweetDB tweetDB;
 
 	public TwitterHelper(Context context) {
 		this.context = context;
+        tweetDB = new TweetDB(context);
 	}
 
 	public List<Status> getFriendsTimeline(Paging paging) {
@@ -44,6 +46,16 @@ public class TwitterHelper {
             for (Status status : statuses) {
                 persistStatus(tdb, status);
             }
+            int size = statuses.size();
+            Log.i("getFriendsTimeline","Got " + size + " statuses from Twitter");
+            if (size <20) {
+                if (size==0)
+                    statuses.addAll(getStatuesFromDb(-1,20- size));
+                else
+                    statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),20- size));
+            }
+            Log.i("getFriendsTimeline","Now we have " + statuses.size());
+
 			return statuses;
 		}
 		catch (Exception e) {
@@ -55,6 +67,16 @@ public class TwitterHelper {
             return new ArrayList<Status>();
 		}
 	}
+
+    private List<Status> getStatuesFromDb(long sinceId, int number) {
+        List<Long> ids = tweetDB.getStatusesOlderThan(sinceId,number);
+        List<Status> ret = new ArrayList<Status>();
+        for (Long id : ids) {
+            Status status = getStatusById(id);
+            ret.add(status);
+        }
+        return ret;
+    }
 
 
     public List<UserList> getUserLists() {
@@ -196,10 +218,9 @@ public class TwitterHelper {
 
 
     public Status getStatusById(long statusId) {
-        TweetDB tdb = new TweetDB(context);
         Status status = null;
 
-        byte[] obj  = tdb.getStatusObjectById(statusId);
+        byte[] obj  = tweetDB.getStatusObjectById(statusId);
         if (obj!=null) {
             status = materializeStatus(obj);
             if (status!=null)
@@ -209,7 +230,7 @@ public class TwitterHelper {
         Twitter twitter = getTwitter();
         try {
              status = twitter.showStatus(statusId);
-            persistStatus(tdb,status);
+            persistStatus(tweetDB,status);
         } catch (Exception e) {
             e.printStackTrace();  // TODO: Customise this generated block
         }
@@ -218,6 +239,10 @@ public class TwitterHelper {
 
 
     private void persistStatus(TweetDB tdb, Status status) throws IOException {
+        if (tdb.getStatusObjectById(status.getId())!=null)
+            return; // This is already in DB, so do nothing
+
+        // Serialize and then store in DB
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream out = new ObjectOutputStream(bos);
         out.writeObject(status);

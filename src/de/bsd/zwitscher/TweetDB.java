@@ -1,6 +1,8 @@
 package de.bsd.zwitscher;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.content.ContentValues;
@@ -144,5 +146,28 @@ public class TweetDB {
 
         return ret;
     }
+
+    public List<Long> getStatusesOlderThan(long sinceId, int number) {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        List<Long> ret = new ArrayList<Long>(number);
+
+        Cursor c;
+        if (sinceId>-1)
+            c = db.query(STATUSES,new String[]{"ID"},"id < ?",new String[]{String.valueOf(sinceId)},null,null,"ID DESC",String.valueOf(number));
+        else
+            c = db.query(STATUSES,new String[]{"ID"},null,null,null,null,"ID DESC",String.valueOf(number));
+
+        if (c.getCount()>0){
+            c.moveToFirst();
+            do {
+                Long id = c.getLong(0);
+                ret.add(id);
+            } while (c.moveToNext());
+        }
+        c.close();
+        db.close();
+        return ret;
+    }
+
 
 }
