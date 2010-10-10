@@ -3,46 +3,47 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="wrap_content"
   android:layout_height="wrap_content">
-<ImageView android:layout_width="64px" 
-			android:layout_height="64px" 
+<ImageView android:layout_width="64px"
+			android:layout_height="64px"
 			android:src="@drawable/user_unknown"
 			android:scaleType="center"
 			android:id="@+id/UserPictureImageView"/>
-<TextView android:text="@+id/TextView01" 
-			android:id="@+id/TextView01" 
+<TextView android:text="@+id/TextView01"
+			android:id="@+id/TextView01"
 			android:layout_width="wrap_content"
 			android:textStyle="bold"
 			android:minLines="2"
-			android:layout_toRightOf="@id/UserPictureImageView" 
+			android:layout_toRightOf="@id/UserPictureImageView"
 			android:layout_height="wrap_content"/>
 
-<TextView android:id="@+id/TweetTextView" 
-		  android:layout_below="@+id/UserPictureImageView" 
-		  android:layout_width="fill_parent" 
+<TextView android:id="@+id/TweetTextView"
+		  android:layout_below="@+id/UserPictureImageView"
+		  android:layout_width="fill_parent"
 		  android:layout_height="wrap_content"
+          android:autoLink="all"
 		  android:text="@+id/TweetTextView"/>
-<TextView android:id="@+id/MiscTextView" 
-		  android:layout_below="@+id/TweetTextView" 
-		  android:layout_width="fill_parent" 
-		  android:layout_height="wrap_content" 
+<TextView android:id="@+id/MiscTextView"
+		  android:layout_below="@+id/TweetTextView"
+		  android:layout_width="fill_parent"
+		  android:layout_height="wrap_content"
 		  android:textStyle="italic"
 		  android:text="@+id/MiscTextView"/>
-		  
-		  
+
+
 <Button android:id="@+id/ReplyButton"
 		android:layout_below="@id/MiscTextView"
 		android:layout_width="wrap_content"
-        android:layout_height="wrap_content"		
+        android:layout_height="wrap_content"
         android:onClick="reply"
         android:text="Reply"/>
 <Button android:id="@+id/ReplyAllButton"
 		android:layout_below="@id/MiscTextView"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/ReplyButton"	
-        android:onClick="replyAll"	
+        android:layout_toRightOf="@id/ReplyButton"
+        android:onClick="replyAll"
         android:text="Reply All"/>
-        
+
 <Button android:id="@+id/RetweetButton"
 		android:layout_below="@id/MiscTextView"
 		android:layout_toRightOf="@id/ReplyAllButton"
@@ -57,7 +58,7 @@
         android:layout_height="wrap_content"
         android:onClick="classicRetweet"
 		android:text="Classic Retweet"/>
-		
+
 <Button android:id="@+id/ThreadButton"
 		android:layout_below="@id/ReplyButton"
 		android:layout_width="wrap_content"
@@ -96,6 +97,6 @@
         android:layout_height="wrap_content"
         android:onClick="done"
 		android:text="Done!"/>
-		
-				  
+
+
 </RelativeLayout>
