@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
-import de.bsd.zwitscher.R;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -162,8 +161,6 @@ public class NewTweetActivity extends Activity {
 
 
 	public void tweet(StatusUpdate update) {
-//		TwitterHelper th = new TwitterHelper(getApplicationContext());
-//		th.updateStatus(update);
         new UpdateStatusTask().execute(update);
 	}
 
