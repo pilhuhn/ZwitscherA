@@ -3,8 +3,14 @@ package de.bsd.zwitscher;
 
 import java.util.regex.Pattern;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
+import twitter4j.GeoLocation;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import android.app.Activity;
@@ -68,27 +74,7 @@ public class NewTweetActivity extends Activity {
 		edittext.setOnKeyListener(new OnKeyListener() {
 		    public boolean onKey(View v, int keyCode, KeyEvent event) {
 
-
-		        // If the event is a key-down event on the "enter" button
-		        if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-		            (keyCode == KeyEvent.KEYCODE_ENTER)) {
-		          // Perform action on key press
-//		          Toast.makeText(getApplicationContext(), edittext.getText(), 2000).show();
-
-		        	// TODO check for passed op
-		        	// e.g. R.string.direct for direct msg.
-
-		        	StatusUpdate up  = new StatusUpdate(edittext.getText().toString());
-		        	if (origStatus!=null) {
-		        		up.setInReplyToStatusId(origStatus.getId());
-		        	}
-		        	tweet(up);
-		        	origStatus=null;
-		        	finish();
-		          return true;
-		        }
-
-		        if ((event.getAction() == KeyEvent.ACTION_UP) && edittext.getTextSize() >0 ) {
+		        if ((event.getAction() == KeyEvent.ACTION_UP) && edittext.getText().length() >0 ) {
 		        	tweetButton.setEnabled(true);
 		        }
 
@@ -107,8 +93,17 @@ public class NewTweetActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				System.out.println("clicked, text is " + edittext.getText().toString());
 				StatusUpdate up  = new StatusUpdate(edittext.getText().toString());
+                // add location  if enabled in preferences
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(v.getContext());
+                boolean locationEnabled = preferences.getBoolean("location",false);
+                if (locationEnabled) {
+                    Location location = getCurrentLocation();
+                    if (location!=null) {
+                        GeoLocation geoLocation = new GeoLocation(location.getLatitude(),location.getLongitude());
+                        up.setLocation(geoLocation);
+                    }
+                }
 	        	if (origStatus!=null) {
 	        		up.setInReplyToStatusId(origStatus.getId());
 	        	}
@@ -132,6 +127,16 @@ public class NewTweetActivity extends Activity {
 
 	}
 
+
+    private Location getCurrentLocation() {
+		LocationManager locMngr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		Location currLoc = null;
+		currLoc = locMngr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		if (currLoc == null) {
+			currLoc = locMngr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		}
+		return currLoc;
+	}
 
 	/** Extract the @users from the passed oText and put them into sb
 	 * Should go away in favor of a RegExp

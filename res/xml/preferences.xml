@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
-<EditTextPreference android:title="User Name" android:summary="Please provide the user name" android:key="username"></EditTextPreference>
+    <EditTextPreference android:title="User Name"
+                        android:summary="Please provide the user name"
+                        android:key="username"/>
 
-<EditTextPreference android:title="OAuth pin" android:key="pin" android:summary="Please provide the OAuth pin"></EditTextPreference>
+    <EditTextPreference android:title="OAuth pin"
+                        android:key="pin"
+                        android:summary="Please provide the OAuth pin"/>
+
+    <CheckBoxPreference android:title="Location enabled"
+                        android:key="location"
+                        android:summary="Shall Zwitscher add location to status updates?"/>
+
+
 </PreferenceScreen>
