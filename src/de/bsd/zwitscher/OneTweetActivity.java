@@ -1,6 +1,7 @@
 package de.bsd.zwitscher;
 
 
+import android.os.AsyncTask;
 import com.google.api.translate.Language;
 import com.google.api.translate.Translate;
 
@@ -22,21 +23,35 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import twitter4j.User;
+
+import java.util.Locale;
 
 public class OneTweetActivity extends Activity {
 
 	Context ctx = this;
 	Status status ;
+    ImageView userPictureView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.single_tweet);
+        userPictureView = (ImageView) findViewById(R.id.UserPictureImageView);
+
 		Bundle bundle = getIntent().getExtras();
 		if (bundle!=null) {
 			status = (Status) bundle.get(getString(R.string.status));
 			Log.i("OneTweetActivity","Showing status: " + status.toString());
+
+            // Download the user profile image in a background task, as this may
+            // mean a network call.
+            if (status.getRetweetedStatus()==null)
+                new DownloadImageTask().execute(status.getUser());
+            else
+                new DownloadImageTask().execute(status.getRetweetedStatus().getUser());
+
 
 			TextView tv01 = (TextView) findViewById(R.id.TextView01);
 			if (status.getRetweetedStatus()==null) {
@@ -58,17 +73,7 @@ public class OneTweetActivity extends Activity {
 				mtv.setText("");
 			}
 
-			PicHelper ph = new PicHelper();
-			Bitmap bi;
 
-			if (status.getRetweetedStatus()==null)
-				bi = ph.getUserPic(status.getUser(),this);
-			else
-				bi = ph.getUserPic(status.getRetweetedStatus().getUser(),this);
-			if (bi!=null) {
-				ImageView iv = (ImageView) findViewById(R.id.UserPictureImageView);
-				iv.setImageBitmap(bi);
-			}
 
 			TextView tweetView = (TextView)findViewById(R.id.TweetTextView);
 			tweetView.setText(status.getText());
@@ -167,6 +172,7 @@ public class OneTweetActivity extends Activity {
 			}
 
 		});
+        tts.setLanguage(Locale.US);
 		tts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
 
 			@Override
@@ -208,4 +214,22 @@ public class OneTweetActivity extends Activity {
 	public void done(View v) {
 		finish();
 	}
+
+    /**
+     * Background task to download the user profile images.
+     */
+    private class DownloadImageTask extends AsyncTask<User, Void,Bitmap> {
+        protected Bitmap doInBackground(User... users) {
+
+            User user = users[0];
+            PicHelper picHelper = new PicHelper();
+            Bitmap bi = picHelper.getUserPic(user,ctx);
+            return bi;
+        }
+
+
+        protected void onPostExecute(Bitmap result) {
+            userPictureView.setImageBitmap(result);
+     }
+ }
 }
