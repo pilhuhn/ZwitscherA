@@ -170,13 +170,13 @@ public class TwitterHelper {
 
 	}
 
-	public void retweet(long id) {
+	public String retweet(long id) {
 		Twitter twitter = getTwitter();
 		try {
 			twitter.retweetStatus(id);
-			Toast.makeText(context, R.string.tweet_sent , 2500).show();
+			return "Retweeted successfully";
 		} catch (TwitterException e) {
-			Toast.makeText(context, "Failed to  retweet: " + e.getLocalizedMessage(), 10000).show();
+			return "Failed to  retweet: " + e.getLocalizedMessage();
 		}
 
 	}

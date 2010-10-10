@@ -109,10 +109,8 @@ public class OneTweetActivity extends Activity {
 	}
 
 
-
 	public void retweet(View v) {
-		TwitterHelper th = new TwitterHelper(ctx);
-		th.retweet(status.getId());
+        new RetweetTask().execute(status.getId());
 	}
 
 
@@ -220,6 +218,21 @@ public class OneTweetActivity extends Activity {
 
         protected void onPostExecute(Bitmap result) {
             userPictureView.setImageBitmap(result);
-     }
- }
+        }
+    }
+
+    private class RetweetTask extends AsyncTask<Long,Void,String> {
+
+        @Override
+        protected String doInBackground(Long... longs) {
+            TwitterHelper th = new TwitterHelper(ctx);
+            String ret = th.retweet(status.getId());
+            return ret;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            Toast.makeText(ctx,s,Toast.LENGTH_SHORT).show();
+        }
+    }
 }
