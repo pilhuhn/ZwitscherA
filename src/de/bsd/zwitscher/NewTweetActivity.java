@@ -177,7 +177,7 @@ public class NewTweetActivity extends Activity {
         }
 
         protected void onPostExecute(String result) {
-            Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG);
+            Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
         }
     }
 
