@@ -79,52 +79,15 @@ public class OneTweetActivity extends Activity {
 			tweetView.setText(status.getText());
 
 
-			final TwitterHelper th = new TwitterHelper(getApplicationContext());
-
-			// -- now the buttons --
-
-
+            // Update Button state depending on Status' properties
 			Button threadButton = (Button) findViewById(R.id.ThreadButton);
 			if (status.getInReplyToScreenName()==null) {
 				threadButton.setEnabled(false);
 			}
-			threadButton.setOnClickListener(new OnClickListener() {
 
-				@Override
-				public void onClick(View v) {
-
-                    Status newStatus = th.getStatusById(status.getInReplyToStatusId());
-
-                    Intent i = new Intent(getApplicationContext(),OneTweetActivity.class);
-                    i.putExtra(getString(R.string.status), newStatus);
-                    startActivity(i);
-
-
-				}
-			});
-			Button directButton = (Button) findViewById(R.id.DirectButton);
-			directButton.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
-					i.putExtra(getString(R.string.status), status);
-					i.putExtra("op", getString(R.string.direct));
-					startActivity(i);
-
-				}
-			});
 			Button favoriteButton = (Button) findViewById(R.id.FavoriteButton);
 			if (status.isFavorited())
 				favoriteButton.setText("Un-Favorite");
-			favoriteButton.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					th.favorite(status);
-					// TODO update button state
-				}
-			});
 
 		}
 	}
@@ -160,6 +123,33 @@ public class OneTweetActivity extends Activity {
 		startActivity(i);
 
 	}
+
+    public void threadView(View v) {
+        TwitterHelper th = new TwitterHelper(ctx);
+        Status newStatus = th.getStatusById(status.getInReplyToStatusId());
+
+        Intent i = new Intent(getApplicationContext(),OneTweetActivity.class);
+        i.putExtra(getString(R.string.status), newStatus);
+        startActivity(i);
+
+
+    }
+
+    public void favorite(View v) {
+        TwitterHelper th = new TwitterHelper(ctx);
+
+        th.favorite(status);
+        // TODO update button state
+    }
+
+    public void directMessage(View v) {
+        Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
+        i.putExtra(getString(R.string.status), status);
+        i.putExtra("op", getString(R.string.direct));
+        startActivity(i);
+
+    }
+
 
 
 	public void speak(View v) {

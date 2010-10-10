@@ -63,18 +63,21 @@
 		android:layout_below="@id/ReplyButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="threadView"
 		android:text="Thread"/>
 <Button android:id="@+id/DirectButton"
 		android:layout_below="@id/ReplyButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 		android:layout_toRightOf="@id/ThreadButton"
+        android:onClick="directMessage"
 		android:text="Direct"/>
 <Button android:id="@+id/FavoriteButton"
 		android:layout_below="@id/ReplyButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 		android:layout_toRightOf="@id/DirectButton"
+        android:onClick="favorite"
 		android:text="Favorite"/>
 
 <Button android:id="@+id/SpeakButton"
