@@ -36,6 +36,7 @@ public class TweetDB {
 		public void onCreate(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE "+ STATUSES + " (" +
                     "ID LONG, " +
+                    "LIST_ID LONG, " +
                     "I_REP_TO LONG, " +
                     "STATUS BLOB " +
                     ")"
