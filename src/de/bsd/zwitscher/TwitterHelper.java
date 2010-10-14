@@ -48,6 +48,7 @@ public class TwitterHelper {
             }
             int size = statuses.size();
             Log.i("getFriendsTimeline","Got " + size + " statuses from Twitter");
+            Toast.makeText(context,"Got " + size + " new tweets",Toast.LENGTH_LONG).show();
             if (size <20) {
                 if (size==0)
                     statuses.addAll(getStatuesFromDb(-1,20- size));
