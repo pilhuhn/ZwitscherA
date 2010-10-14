@@ -182,8 +182,7 @@ public class OneTweetActivity extends Activity {
 			AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 			builder.setMessage(result);
 			builder.setTitle("Translation result");
-			builder.setNeutralButton("ok", new DialogInterface.OnClickListener() {
-
+			builder.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
@@ -217,7 +216,8 @@ public class OneTweetActivity extends Activity {
 
 
         protected void onPostExecute(Bitmap result) {
-            userPictureView.setImageBitmap(result);
+        	if (result!=null)
+        		userPictureView.setImageBitmap(result);
         }
     }
 
