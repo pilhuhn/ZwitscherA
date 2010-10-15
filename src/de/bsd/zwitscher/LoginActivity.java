@@ -19,9 +19,10 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	}	
 		
-		
-		
+	@Override
+	protected void onResume() {	
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         
         String accessTokenToken = preferences.getString("accessToken",null);
@@ -41,7 +42,6 @@ public class LoginActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
-				//		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 						
 				TwitterHelper th = new TwitterHelper(getApplicationContext());
 				String authUrl;
@@ -51,7 +51,6 @@ public class LoginActivity extends Activity {
 					startActivity(i);
 
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					Toast.makeText(getApplicationContext(), "Error: " + e.getMessage() , 15000).show();
 					e.printStackTrace();
 				}
@@ -82,7 +81,6 @@ public class LoginActivity extends Activity {
 							startActivity(i);
 							
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
 							Toast.makeText(getApplicationContext(), "Error: " + e.getMessage() , 15000).show();
 							e.printStackTrace();
 						}
@@ -90,20 +88,5 @@ public class LoginActivity extends Activity {
 		        }
 			}
 		});
-/*        
-        final Button continueButton = (Button) findViewById(R.id.continueButton);
-        continueButton.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				// Now lets start
-				Intent i = new Intent().setClass(getApplication(),TabWidget.class);
-				startActivity(i);
-			}
-		});
-*/		
 	}
-	
-	
 }
