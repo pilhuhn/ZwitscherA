@@ -121,10 +121,11 @@ public class TweetDB {
 		db.close();
 	}
 
-    public void storeStatus(long id, long i_reply_id, byte[] statusObj) {
+    public void storeStatus(long id, long i_reply_id, long list_id, byte[] statusObj) {
         ContentValues cv = new ContentValues(3);
         cv.put("ID",id);
         cv.put("I_REP_TO",i_reply_id);
+        cv.put("LIST_ID", list_id);
         cv.put("STATUS",statusObj);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
@@ -148,15 +149,15 @@ public class TweetDB {
         return ret;
     }
 
-    public List<Long> getStatusesOlderThan(long sinceId, int number) {
+    public List<Long> getStatusesOlderThan(long sinceId, int number, long list_id) {
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         List<Long> ret = new ArrayList<Long>(number);
 
         Cursor c;
         if (sinceId>-1)
-            c = db.query(STATUSES,new String[]{"ID"},"id < ?",new String[]{String.valueOf(sinceId)},null,null,"ID DESC",String.valueOf(number));
+            c = db.query(STATUSES,new String[]{"ID"},"id < ? AND list_id = ?",new String[]{String.valueOf(sinceId),String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(number));
         else
-            c = db.query(STATUSES,new String[]{"ID"},null,null,null,null,"ID DESC",String.valueOf(number));
+            c = db.query(STATUSES,new String[]{"ID"},"list_id = ?",new String[]{String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(number));
 
         if (c.getCount()>0){
             c.moveToFirst();

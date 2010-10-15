@@ -3,6 +3,7 @@ package de.bsd.zwitscher;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.os.Debug;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -80,40 +82,49 @@ public class TweetListActivity extends ListActivity {
 
     }
 
-	private List<String> getTimlineStringsFromTwitter(int timeline,int id, String specialName) {
+	private List<String> getTimlineStringsFromTwitter(int timeline,int listId, String specialName) {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
-		Paging paging = new Paging();
+		Paging paging = new Paging().count(100);
 		TweetDB tdb = new TweetDB(this);
+		List<Status> myStatus = new ArrayList<Status>();
 
 		// First get saved paging id to limit what to fetch
 		if (timeline== R.string.home_timeline)
 			specialName = "home";
 
     	long last = tdb.getLastRead(specialName);
-    	if (last!=0 && !Debug.isDebuggerConnected())
+    	if (last!=0 )//&& !Debug.isDebuggerConnected())
     		paging.sinceId(last);
 
         switch (timeline) {
 
         case R.string.home_timeline:
-        	statuses = th.getFriendsTimeline(paging);
+        	myStatus = th.getFriendsTimeline(paging);
         	break;
         case R.string.list:
-        	statuses = th.getUserList(paging,id);
+        	myStatus = th.getUserList(paging,listId);
         	break;
         }
 
         // Update the 'since' id in the database
-    	if (statuses.size()>0) {
-    		last = statuses.get(0).getId(); // assumption is that twitter sends the newest (=highest id) first
+    	if (myStatus.size()>0) {
+    		last = myStatus.get(0).getId(); // assumption is that twitter sends the newest (=highest id) first
     		tdb.updateOrInsertLastRead(specialName, last);
     	}
 
-		List<String> data = new ArrayList<String>(statuses.size());
-		for (Status status : statuses) {
+    	statuses = new ArrayList<Status>(); 
+		List<String> data = new ArrayList<String>(myStatus.size());
+		for (Status status : myStatus) {
 			User user = status.getUser();
-			String item = user.getName() +  " (" + user.getScreenName() + "): " + status.getText();
-			data.add(item);
+			String item ="";
+			if (!status.getText().matches(".*http://4sq.com/.*")) { // TODO add configurable filters
+				item += user.getName() +  " (" + user.getScreenName() + "): " + status.getText();
+				data.add(item);
+				statuses.add(status);
+			} else {
+				Log.i("TweetListActivity::filter",status.getUser().getScreenName() + " - " + status.getText());
+				
+			}
 		}
 		if (statuses.size()==0) { // No (new) tweet found
 			data.add(">>  Sorry, no tweets currently available, try later << ");
@@ -144,11 +155,12 @@ public class TweetListActivity extends ListActivity {
         setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, data));
         getListView().requestLayout();
 */
+		getWindow().setFeatureInt(Window.FEATURE_PROGRESS, 100);
     	new GetTimeLineTask().execute(new Void[]{});
     }
 
     private class GetTimeLineTask extends AsyncTask<Void, Void, List<String>> {
-
+    	
 		@Override
 		protected List<String> doInBackground(Void... params) {
 	        List<String> data;
@@ -166,9 +178,6 @@ public class TweetListActivity extends ListActivity {
 		protected void onPostExecute(List<String> result) {
 	        setListAdapter(new ArrayAdapter<String>(thisActivity, R.layout.list_item, result));
 	        getListView().requestLayout();
-
 		}
-    	
-		
     }
 }

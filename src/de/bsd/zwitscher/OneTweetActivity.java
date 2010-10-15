@@ -124,7 +124,7 @@ public class OneTweetActivity extends Activity {
 
     public void threadView(View v) {
         TwitterHelper th = new TwitterHelper(ctx);
-        Status newStatus = th.getStatusById(status.getInReplyToStatusId());
+        Status newStatus = th.getStatusById(status.getInReplyToStatusId(),-1); // TODO rethink List id 
 
         Intent i = new Intent(getApplicationContext(),OneTweetActivity.class);
         i.putExtra(getString(R.string.status), newStatus);
