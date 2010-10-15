@@ -6,6 +6,7 @@ import java.util.List;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Debug;
 import android.util.Log;
@@ -28,6 +29,7 @@ public class TweetListActivity extends ListActivity {
 
     List<Status> statuses;
     Bundle intentInfo;
+    TweetListActivity thisActivity;
 
     /**
      * Called when the activity is first created.
@@ -38,6 +40,7 @@ public class TweetListActivity extends ListActivity {
         super.onCreate(savedInstanceState);
 
         intentInfo = getIntent().getExtras();
+        thisActivity = this;
         fillListViewFromTimeline();
     }
 
@@ -130,7 +133,7 @@ public class TweetListActivity extends ListActivity {
     }
 
     private void fillListViewFromTimeline() {
-        List<String> data;
+/*        List<String> data;
         if (intentInfo==null)
             data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null);
         else {
@@ -140,6 +143,32 @@ public class TweetListActivity extends ListActivity {
         }
         setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, data));
         getListView().requestLayout();
+*/
+    	new GetTimeLineTask().execute(new Void[]{});
     }
 
+    private class GetTimeLineTask extends AsyncTask<Void, Void, List<String>> {
+
+		@Override
+		protected List<String> doInBackground(Void... params) {
+	        List<String> data;
+	        if (intentInfo==null)
+	            data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null);
+	        else {
+	            String listName = intentInfo.getString("listName");
+	            int id = intentInfo.getInt("id");
+	            data = getTimlineStringsFromTwitter(R.string.list,id, listName);
+	        }
+	        return data;
+		}
+
+		@Override
+		protected void onPostExecute(List<String> result) {
+	        setListAdapter(new ArrayAdapter<String>(thisActivity, R.layout.list_item, result));
+	        getListView().requestLayout();
+
+		}
+    	
+		
+    }
 }

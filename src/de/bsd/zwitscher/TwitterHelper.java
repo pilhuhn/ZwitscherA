@@ -101,10 +101,10 @@ public class TwitterHelper {
         String accessTokenToken = preferences.getString("accessToken",null);
         String accessTokenSecret = preferences.getString("accessTokenSecret",null);
         if (accessTokenToken!=null && accessTokenSecret!=null) {
-        	Twitter twitter = new TwitterFactory().getInstance();
-            twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
-        	twitter.setOAuthAccessToken(accessTokenToken, accessTokenSecret); // TODO replace by non-deprecated method
-
+        	Twitter twitter = new TwitterFactory().getOAuthAuthorizedInstance(
+        			TwitterConsumerToken.consumerKey, 
+        			TwitterConsumerToken.consumerSecret,
+        			new AccessToken(accessTokenToken, accessTokenSecret));
         	return twitter;
         }
 
