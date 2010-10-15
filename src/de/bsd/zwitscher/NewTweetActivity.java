@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -70,6 +71,15 @@ public class NewTweetActivity extends Activity {
 				}
 			}
 		}
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		boolean locationEnabled = preferences.getBoolean("location",false);
+		CheckBox box = (CheckBox) findViewById(R.id.GeoCheckBox);
+		if (locationEnabled) {
+			box.setEnabled(true);
+			box.setChecked(true);
+		}
+			
+		
 
 		edittext.setOnKeyListener(new OnKeyListener() {
 		    public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -94,9 +104,9 @@ public class NewTweetActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				StatusUpdate up  = new StatusUpdate(edittext.getText().toString());
-                // add location  if enabled in preferences
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(v.getContext());
-                boolean locationEnabled = preferences.getBoolean("location",false);
+                // add location  if enabled in preferences and checked on tweet
+                CheckBox box = (CheckBox) findViewById(R.id.GeoCheckBox);
+                boolean locationEnabled = box.isChecked();
                 if (locationEnabled) {
                     Location location = getCurrentLocation();
                     if (location!=null) {
