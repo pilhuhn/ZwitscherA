@@ -23,6 +23,7 @@ public class LoginActivity extends Activity {
 		
 	@Override
 	protected void onResume() {	
+		super.onResume();
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         
         String accessTokenToken = preferences.getString("accessToken",null);
