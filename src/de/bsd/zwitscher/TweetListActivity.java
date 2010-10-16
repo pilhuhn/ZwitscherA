@@ -171,7 +171,8 @@ public class TweetListActivity extends ListActivity {
 	        if (intentInfo==null)
 	            data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null);
 	        else {
-	        	if (intentInfo.getString("timeline").contains("mentions")) {
+	        	String timelineString = intentInfo.getString("timeline");
+				if (timelineString!=null && timelineString.contains("mentions")) {
 	        		data = getTimlineStringsFromTwitter(R.string.mentions, 0, null);
 	        	} else {
 		        		
