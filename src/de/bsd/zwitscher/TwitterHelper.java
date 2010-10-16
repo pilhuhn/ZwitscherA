@@ -41,34 +41,34 @@ public class TwitterHelper {
         Twitter twitter = getTwitter();
 
         List<Status> statuses;
+        int pseudoListId =0;
 		try {
 			switch (timeline) {
 			case R.string.home_timeline:
-			
 				statuses = twitter.getHomeTimeline(paging ); //like friends + including retweet
+                pseudoListId =0;
 				break;
 			case R.string.mentions:
 				statuses = twitter.getMentions(paging);
+                pseudoListId = -1;
 				break;
 			default:
 				statuses = new ArrayList<Status>();
-				
 			}
-			
+
             TweetDB tdb = new TweetDB(context);
             for (Status status : statuses) {
-                persistStatus(tdb, status,0);
+                persistStatus(tdb, status,pseudoListId);
             }
             int size = statuses.size();
-            Log.i("getFriendsTimeline","Got " + size + " statuses from Twitter");
+            Log.i("getTimeline","Got " + size + " statuses from Twitter");
             if (size <MIN_TWEETS_TO_SHOW) {
-            	// TODO mentions ??
                 if (size==0)
-                    statuses.addAll(getStatuesFromDb(-1,MIN_TWEETS_TO_SHOW- size,0));
+                    statuses.addAll(getStatuesFromDb(-1,MIN_TWEETS_TO_SHOW- size,pseudoListId));
                 else
-                    statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,0));
+                    statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,pseudoListId));
             }
-            Log.i("getFriendsTimeline","Now we have " + statuses.size());
+            Log.i("getTimeline","Now we have " + statuses.size());
 
 			return statuses;
 		}
@@ -113,7 +113,7 @@ public class TwitterHelper {
         String accessTokenSecret = preferences.getString("accessTokenSecret",null);
         if (accessTokenToken!=null && accessTokenSecret!=null) {
         	Twitter twitter = new TwitterFactory().getOAuthAuthorizedInstance(
-        			TwitterConsumerToken.consumerKey, 
+        			TwitterConsumerToken.consumerKey,
         			TwitterConsumerToken.consumerSecret,
         			new AccessToken(accessTokenToken, accessTokenSecret));
         	return twitter;
@@ -217,7 +217,7 @@ public class TwitterHelper {
 			statuses = twitter.getUserListStatuses(listOwnerScreenName, listId, paging);
 			int size = statuses.size();
             Log.i("getUserList","Got " + size + " statuses from Twitter");
-			
+
             TweetDB tdb = new TweetDB(context);
 
             for (Status status : statuses) {
