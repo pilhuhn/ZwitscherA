@@ -14,4 +14,5 @@
 <string name="classicretweet">ClassicRetweet</string>
 <string name="list">list</string>
 <string name="direct">Direct</string>
+<string name="mentions">mentions</string>
 </resources>

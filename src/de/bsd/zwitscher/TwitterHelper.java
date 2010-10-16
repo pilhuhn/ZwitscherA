@@ -37,12 +37,24 @@ public class TwitterHelper {
         tweetDB = new TweetDB(context);
 	}
 
-	public List<Status> getFriendsTimeline(Paging paging) {
+	public List<Status> getTimeline(Paging paging, int timeline) {
         Twitter twitter = getTwitter();
 
         List<Status> statuses;
 		try {
-			statuses = twitter.getHomeTimeline(paging ); //like friends + including retweets
+			switch (timeline) {
+			case R.string.home_timeline:
+			
+				statuses = twitter.getHomeTimeline(paging ); //like friends + including retweet
+				break;
+			case R.string.mentions:
+				statuses = twitter.getMentions(paging);
+				break;
+			default:
+				statuses = new ArrayList<Status>();
+				
+			}
+			
             TweetDB tdb = new TweetDB(context);
             for (Status status : statuses) {
                 persistStatus(tdb, status,0);
@@ -50,6 +62,7 @@ public class TwitterHelper {
             int size = statuses.size();
             Log.i("getFriendsTimeline","Got " + size + " statuses from Twitter");
             if (size <MIN_TWEETS_TO_SHOW) {
+            	// TODO mentions ??
                 if (size==0)
                     statuses.addAll(getStatuesFromDb(-1,MIN_TWEETS_TO_SHOW- size,0));
                 else

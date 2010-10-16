@@ -3,13 +3,10 @@ package de.bsd.zwitscher;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Debug;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +21,7 @@ import twitter4j.Status;
 import twitter4j.User;
 
 /**
- * Show the list of tweets (home timeline only at the moment)
+ * Show the list of tweets
  * @author Heiko W. Rupp
  */
 public class TweetListActivity extends ListActivity {
@@ -57,8 +54,6 @@ public class TweetListActivity extends ListActivity {
 		lv.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				// When clicked, show a toast with the TextView text
-				// TODO how to handle the case of a tweet with a link inside?
 				Intent i = new Intent(parent.getContext(),OneTweetActivity.class);
 				i.putExtra(getString(R.string.status), statuses.get(position));
 				startActivity(i);
@@ -88,18 +83,27 @@ public class TweetListActivity extends ListActivity {
 		TweetDB tdb = new TweetDB(this);
 		List<Status> myStatus = new ArrayList<Status>();
 
-		// First get saved paging id to limit what to fetch
-		if (timeline== R.string.home_timeline)
-			specialName = "home";
-
+		// special name is set for lists - this is the list name
+		// Now fake it for other timelines
+        switch (timeline) {
+        case R.string.home_timeline:
+        	specialName = "home";
+        	break;
+        case R.string.mentions:
+        	specialName = "mentions";
+        	break;
+        }
+		
     	long last = tdb.getLastRead(specialName);
     	if (last!=0 )//&& !Debug.isDebuggerConnected())
     		paging.sinceId(last);
 
         switch (timeline) {
-
         case R.string.home_timeline:
-        	myStatus = th.getFriendsTimeline(paging);
+        	myStatus = th.getTimeline(paging,R.string.home_timeline);
+        	break;
+        case R.string.mentions:
+        	myStatus = th.getTimeline(paging, R.string.mentions);
         	break;
         case R.string.list:
         	myStatus = th.getUserList(paging,listId);
@@ -167,9 +171,14 @@ public class TweetListActivity extends ListActivity {
 	        if (intentInfo==null)
 	            data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null);
 	        else {
-	            String listName = intentInfo.getString("listName");
-	            int id = intentInfo.getInt("id");
-	            data = getTimlineStringsFromTwitter(R.string.list,id, listName);
+	        	if (intentInfo.getString("timeline").contains("mentions")) {
+	        		data = getTimlineStringsFromTwitter(R.string.mentions, 0, null);
+	        	} else {
+		        		
+		            String listName = intentInfo.getString("listName");
+		            int id = intentInfo.getInt("id");
+		            data = getTimlineStringsFromTwitter(R.string.list,id, listName);
+	        	}
 	        }
 	        return data;
 		}

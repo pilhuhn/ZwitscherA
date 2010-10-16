@@ -34,6 +34,15 @@ public class TabWidget extends TabActivity {
 				.setIndicator("Home",res.getDrawable(R.drawable.home))
 				.setContent(homeIntent);
 		tabHost.addTab(homeSpec);
+
+		Intent mentionsIntent = new Intent().setClass(this,TweetListActivity.class);
+		mentionsIntent.putExtra("timeline", "mentions");
+
+		homeSpec = tabHost.newTabSpec("mentions")
+				.setIndicator("Mentions",res.getDrawable(R.drawable.mentions))
+				.setContent(mentionsIntent);
+		tabHost.addTab(homeSpec);
+		
 		
   		TweetDB tdb = new TweetDB(getApplicationContext());
   		Map<String, Integer> userLists = tdb.getLists();
