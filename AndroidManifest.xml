@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.bsd.zwitscher"
           android:versionName="Tick"
-          android:versionCode="22"
+          android:versionCode="23"
           >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -30,16 +30,19 @@
 		<activity android:name=".OneTweetActivity">
 		</activity>
 
-        <activity android:name=".NewTweetActivity">
+        <activity android:name=".NewTweetActivity"/>
 
-
-        </activity>
-    <activity android:name="Preferences" android:label="Preferences"></activity>
-	<activity android:name="LoginActivity">
-        <intent-filter>
+		<activity android:name=".SelectAccountActivity">
+		    <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+		</activity>
+		
+		<activity android:name=".NewAccountActivity"/>
+
+    <activity android:name="Preferences" android:label="Preferences"></activity>
+	<activity android:name="LoginActivity">
 
 	</activity>
 </application>

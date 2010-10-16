@@ -15,4 +15,8 @@
 <string name="list">list</string>
 <string name="direct">Direct</string>
 <string name="mentions">mentions</string>
+<string-array name="accountTypes"><item>Twitter</item>
+<item>laconi.ca</item>
+<item>status.net</item>
+</string-array>
 </resources>
