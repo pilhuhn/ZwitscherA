@@ -49,6 +49,7 @@
 			  android:layout_below="@id/CharCount"
 			  android:layout_width="128px"
 			  android:layout_height="128px"
+			  android:layout_alignBaseline="@id/TweetButton"
 			  android:layout_toRightOf="@id/ClearButton"/>
 
 </RelativeLayout>
