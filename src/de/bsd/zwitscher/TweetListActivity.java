@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ProgressBar;
 import twitter4j.Paging;
 import twitter4j.Status;
 import twitter4j.User;
@@ -29,6 +30,7 @@ public class TweetListActivity extends ListActivity {
     List<Status> statuses;
     Bundle intentInfo;
     TweetListActivity thisActivity;
+    ProgressBar pg;
 
     /**
      * Called when the activity is first created.
@@ -40,6 +42,10 @@ public class TweetListActivity extends ListActivity {
 
         intentInfo = getIntent().getExtras();
         thisActivity = this;
+        // Get the windows progress bar from the enclosing TabWidget
+        TabWidget parent = (TabWidget) this.getParent();
+        pg = parent.pg;
+
         fillListViewFromTimeline();
     }
 
@@ -48,6 +54,10 @@ public class TweetListActivity extends ListActivity {
 
     	super.onResume();
         intentInfo = getIntent().getExtras();
+
+        // Get the windows progress bar from the enclosing TabWidget
+        TabWidget parent = (TabWidget) this.getParent();
+        pg = parent.pg;
 
 		ListView lv = getListView();
 
@@ -93,7 +103,7 @@ public class TweetListActivity extends ListActivity {
         	specialName = "mentions";
         	break;
         }
-		
+
     	long last = tdb.getLastRead(specialName);
     	if (last!=0 )//&& !Debug.isDebuggerConnected())
     		paging.sinceId(last);
@@ -116,7 +126,7 @@ public class TweetListActivity extends ListActivity {
     		tdb.updateOrInsertLastRead(specialName, last);
     	}
 
-    	statuses = new ArrayList<Status>(); 
+    	statuses = new ArrayList<Status>();
 		List<String> data = new ArrayList<String>(myStatus.size());
 		for (Status status : myStatus) {
 			User user = status.getUser();
@@ -127,7 +137,7 @@ public class TweetListActivity extends ListActivity {
 				statuses.add(status);
 			} else {
 				Log.i("TweetListActivity::filter",status.getUser().getScreenName() + " - " + status.getText());
-				
+
 			}
 		}
 		if (statuses.size()==0) { // No (new) tweet found
@@ -164,7 +174,14 @@ public class TweetListActivity extends ListActivity {
     }
 
     private class GetTimeLineTask extends AsyncTask<Void, Void, List<String>> {
-    	
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pg.setVisibility(ProgressBar.VISIBLE);
+        }
+
+
 		@Override
 		protected List<String> doInBackground(Void... params) {
 	        List<String> data;
@@ -175,7 +192,7 @@ public class TweetListActivity extends ListActivity {
 				if (timelineString!=null && timelineString.contains("mentions")) {
 	        		data = getTimlineStringsFromTwitter(R.string.mentions, 0, null);
 	        	} else {
-		        		
+
 		            String listName = intentInfo.getString("listName");
 		            int id = intentInfo.getInt("id");
 		            data = getTimlineStringsFromTwitter(R.string.list,id, listName);
@@ -187,6 +204,7 @@ public class TweetListActivity extends ListActivity {
 		@Override
 		protected void onPostExecute(List<String> result) {
 	        setListAdapter(new ArrayAdapter<String>(thisActivity, R.layout.list_item, result));
+            pg.setVisibility(ProgressBar.INVISIBLE);
 	        getListView().requestLayout();
 		}
     }

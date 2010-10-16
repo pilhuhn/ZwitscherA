@@ -9,7 +9,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.widget.Toast;
+import android.view.Window;
+import android.widget.*;
 import twitter4j.GeoLocation;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
@@ -20,20 +21,23 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.TextView;
 
 public class NewTweetActivity extends Activity {
 
 	EditText edittext;
 	Status origStatus;
 	Pattern p = Pattern.compile(".*?(@\\w+ )*.*");
+    ProgressBar pg;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 	    setContentView(R.layout.new_tweet);
+        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
+        pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+
 
 	    final Button tweetButton = (Button) findViewById(R.id.TweetButton);
 		edittext = (EditText) findViewById(R.id.edittext);
@@ -78,8 +82,8 @@ public class NewTweetActivity extends Activity {
 			box.setEnabled(true);
 			box.setChecked(true);
 		}
-			
-		
+
+
 
 		edittext.setOnKeyListener(new OnKeyListener() {
 		    public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -182,6 +186,12 @@ public class NewTweetActivity extends Activity {
     private class UpdateStatusTask extends AsyncTask<StatusUpdate,Void,String> {
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pg.setVisibility(ProgressBar.VISIBLE);
+        }
+
+        @Override
         protected String doInBackground(StatusUpdate... statusUpdates) {
             TwitterHelper th = new TwitterHelper(getApplicationContext());
             String ret = th.updateStatus(statusUpdates[0]);
@@ -189,6 +199,7 @@ public class NewTweetActivity extends Activity {
         }
 
         protected void onPostExecute(String result) {
+            pg.setVisibility(ProgressBar.INVISIBLE);
             Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
         }
     }

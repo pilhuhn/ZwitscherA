@@ -2,6 +2,8 @@ package de.bsd.zwitscher;
 
 
 import android.os.AsyncTask;
+import android.view.Window;
+import android.widget.*;
 import com.google.api.translate.Language;
 import com.google.api.translate.Translate;
 
@@ -19,10 +21,6 @@ import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 import twitter4j.User;
 
 import java.util.Locale;
@@ -32,12 +30,19 @@ public class OneTweetActivity extends Activity {
 	Context ctx = this;
 	Status status ;
     ImageView userPictureView;
+    ProgressBar pg;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+
 		setContentView(R.layout.single_tweet);
+
+        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
+        pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+
         userPictureView = (ImageView) findViewById(R.id.UserPictureImageView);
 
 		Bundle bundle = getIntent().getExtras();
@@ -72,8 +77,6 @@ public class OneTweetActivity extends Activity {
 			else {
 				mtv.setText("");
 			}
-
-
 
 			TextView tweetView = (TextView)findViewById(R.id.TweetTextView);
 			tweetView.setText(status.getText());
@@ -124,7 +127,7 @@ public class OneTweetActivity extends Activity {
 
     public void threadView(View v) {
         TwitterHelper th = new TwitterHelper(ctx);
-        Status newStatus = th.getStatusById(status.getInReplyToStatusId(),-1); // TODO rethink List id 
+        Status newStatus = th.getStatusById(status.getInReplyToStatusId(),-1); // TODO rethink List id
 
         Intent i = new Intent(getApplicationContext(),OneTweetActivity.class);
         i.putExtra(getString(R.string.status), newStatus);
@@ -206,6 +209,13 @@ public class OneTweetActivity extends Activity {
      * Background task to download the user profile images.
      */
     private class DownloadImageTask extends AsyncTask<User, Void,Bitmap> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pg.setVisibility(ProgressBar.VISIBLE);
+        }
+
         protected Bitmap doInBackground(User... users) {
 
             User user = users[0];
@@ -218,10 +228,17 @@ public class OneTweetActivity extends Activity {
         protected void onPostExecute(Bitmap result) {
         	if (result!=null)
         		userPictureView.setImageBitmap(result);
+            pg.setVisibility(ProgressBar.INVISIBLE);
         }
     }
 
     private class RetweetTask extends AsyncTask<Long,Void,String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pg.setVisibility(ProgressBar.VISIBLE);
+        }
 
         @Override
         protected String doInBackground(Long... longs) {
@@ -232,7 +249,7 @@ public class OneTweetActivity extends Activity {
 
         @Override
         protected void onPostExecute(String s) {
-            Toast.makeText(ctx,s,Toast.LENGTH_SHORT).show();
+            pg.setVisibility(ProgressBar.INVISIBLE);
         }
     }
 }

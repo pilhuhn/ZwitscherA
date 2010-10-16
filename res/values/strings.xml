@@ -5,7 +5,7 @@
     <string name="replyall">replyAll</string>
     <string name="tweet_sent">Tweet sent</string>
     <string name="hello">Enter your tweet text below:</string>
-    <string name="app_name"></string>
+    <string name="app_name">Zwitscher</string>
 <string name="loading">Loading Tweets ...</string>
 <string name="no_connect">Can not connect to Twitter</string>
 <string name="TweetButton">Tweet this!</string>
