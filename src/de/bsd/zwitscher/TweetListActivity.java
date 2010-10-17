@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -45,7 +44,7 @@ public class TweetListActivity extends ListActivity {
         pg = parent.pg;
         titleTextBox = parent.titleTextBox;
 
-        fillListViewFromTimeline();
+        fillListViewFromTimeline(true); // Only get tweets from db to speed things up at start
     }
 
     @Override
@@ -86,7 +85,7 @@ public class TweetListActivity extends ListActivity {
 
     }
 
-	private List<String> getTimlineStringsFromTwitter(int timeline,int listId, String specialName) {
+	private List<String> getTimlineStringsFromTwitter(int timeline, int listId, String specialName, boolean fromDbOnly) {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		Paging paging = new Paging().count(100);
 		TweetDB tdb = new TweetDB(this);
@@ -109,13 +108,13 @@ public class TweetListActivity extends ListActivity {
 
         switch (timeline) {
         case R.string.home_timeline:
-        	myStatus = th.getTimeline(paging,R.string.home_timeline);
+        	myStatus = th.getTimeline(paging,R.string.home_timeline, fromDbOnly);
         	break;
         case R.string.mentions:
-        	myStatus = th.getTimeline(paging, R.string.mentions);
+        	myStatus = th.getTimeline(paging, R.string.mentions, fromDbOnly);
         	break;
         case R.string.list:
-        	myStatus = th.getUserList(paging,listId);
+        	myStatus = th.getUserList(paging,listId, fromDbOnly);
         	break;
         }
 
@@ -130,7 +129,7 @@ public class TweetListActivity extends ListActivity {
 		for (Status status : myStatus) {
 			User user = status.getUser();
 			String item ="";
-			if (!status.getText().matches(".*http://4sq.com/.*")) { // TODO add configurable filters
+			if (!status.getText().matches(".*(http://4sq.com/|http://shz.am/).*")) { // TODO add configurable filters
 				item += user.getName() +  " (" + user.getScreenName() + "): " + status.getText();
 				data.add(item);
 				statuses.add(status);
@@ -149,30 +148,18 @@ public class TweetListActivity extends ListActivity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
     	if (item!=null && item.getItemId() == R.id.reload_item) {
-            fillListViewFromTimeline();
+            fillListViewFromTimeline(false);
     		return true;
     	}
 
     	return super.onMenuItemSelected(featureId, item);
     }
 
-    private void fillListViewFromTimeline() {
-/*        List<String> data;
-        if (intentInfo==null)
-            data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null);
-        else {
-            String listName = intentInfo.getString("listName");
-            int id = intentInfo.getInt("id");
-            data = getTimlineStringsFromTwitter(R.string.list,id, listName);
-        }
-        setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, data));
-        getListView().requestLayout();
-*/
-		getWindow().setFeatureInt(Window.FEATURE_PROGRESS, 100);
-    	new GetTimeLineTask().execute(new Void[]{});
+    private void fillListViewFromTimeline(boolean fromDbOnly) {
+    	new GetTimeLineTask().execute(new Boolean[]{fromDbOnly});
     }
 
-    private class GetTimeLineTask extends AsyncTask<Void, Void, List<String>> {
+    private class GetTimeLineTask extends AsyncTask<Boolean, Void, List<String>> {
 
         @Override
         protected void onPreExecute() {
@@ -183,19 +170,20 @@ public class TweetListActivity extends ListActivity {
 
 
 		@Override
-		protected List<String> doInBackground(Void... params) {
+		protected List<String> doInBackground(Boolean... params) {
+            boolean fromDbOnly = params[0];
 	        List<String> data;
 	        if (intentInfo==null)
-	            data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null);
+	            data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null, fromDbOnly);
 	        else {
 	        	String timelineString = intentInfo.getString("timeline");
 				if (timelineString!=null && timelineString.contains("mentions")) {
-	        		data = getTimlineStringsFromTwitter(R.string.mentions, 0, null);
+	        		data = getTimlineStringsFromTwitter(R.string.mentions, 0, null, fromDbOnly);
 	        	} else {
 
 		            String listName = intentInfo.getString("listName");
 		            int id = intentInfo.getInt("id");
-		            data = getTimlineStringsFromTwitter(R.string.list,id, listName);
+		            data = getTimlineStringsFromTwitter(R.string.list,id, listName, fromDbOnly);
 	        	}
 	        }
 	        return data;

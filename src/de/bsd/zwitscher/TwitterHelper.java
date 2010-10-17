@@ -11,6 +11,7 @@ import java.util.List;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -37,24 +38,28 @@ public class TwitterHelper {
         tweetDB = new TweetDB(context);
 	}
 
-	public List<Status> getTimeline(Paging paging, int timeline) {
+	public List<Status> getTimeline(Paging paging, int timeline, boolean fromDbOnly) {
         Twitter twitter = getTwitter();
 
-        List<Status> statuses;
+        List<Status> statuses = null;
         int pseudoListId =0;
 		try {
 			switch (timeline) {
 			case R.string.home_timeline:
-				statuses = twitter.getHomeTimeline(paging ); //like friends + including retweet
+                if (!fromDbOnly)
+				    statuses = twitter.getHomeTimeline(paging ); //like friends + including retweet
                 pseudoListId =0;
 				break;
 			case R.string.mentions:
-				statuses = twitter.getMentions(paging);
+                if (!fromDbOnly)
+				    statuses = twitter.getMentions(paging);
                 pseudoListId = -1;
 				break;
 			default:
 				statuses = new ArrayList<Status>();
 			}
+            if (statuses==null)
+                statuses=new ArrayList<Status>();
             TweetDB tdb = new TweetDB(context);
             for (Status status : statuses) {
                 persistStatus(tdb, status,pseudoListId);
@@ -68,7 +73,7 @@ public class TwitterHelper {
             statuses = new ArrayList<Status>();
 
         }
-
+        Debug.startMethodTracing("zwitscher");
         int size = statuses.size();
         Log.i("getTimeline","Got " + size + " statuses from Twitter");
         if (size <MIN_TWEETS_TO_SHOW) {
@@ -77,16 +82,17 @@ public class TwitterHelper {
             else
                 statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,pseudoListId));
         }
+        Debug.stopMethodTracing();
         Log.i("getTimeline","Now we have " + statuses.size());
 
         return statuses;
 	}
 
     private List<Status> getStatuesFromDb(long sinceId, int number, long list_id) {
-        List<Long> ids = tweetDB.getStatusesOlderThan(sinceId,number,list_id);
         List<Status> ret = new ArrayList<Status>();
-        for (Long id : ids) { // TODO optimize to get more tweets at a time
-            Status status = getStatusById(id,list_id);
+        List<byte[]> oStats = tweetDB.getStatusesObjsOlderThan(sinceId,number,list_id);
+        for (byte[] bytes : oStats) {
+            Status status = materializeStatus(bytes);
             ret.add(status);
         }
         return ret;
@@ -209,7 +215,7 @@ public class TwitterHelper {
 
 	}
 
-	public List<Status> getUserList(Paging paging, int listId) {
+	public List<Status> getUserList(Paging paging, int listId, boolean fromDbOnly) {
         Twitter twitter = getTwitter();
 
         List<Status> statuses;

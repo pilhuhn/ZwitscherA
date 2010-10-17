@@ -153,7 +153,7 @@ public class TweetDB {
         return ret;
     }
 
-    public List<Long> getStatusesOlderThan(long sinceId, int number, long list_id) {
+    public List<Long> getStatusesIdsOlderThan(long sinceId, int number, long list_id) {
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         List<Long> ret = new ArrayList<Long>(number);
 
@@ -174,6 +174,30 @@ public class TweetDB {
         db.close();
         return ret;
     }
+
+    public List<byte[]> getStatusesObjsOlderThan(long sinceId, int number, long list_id) {
+        List<byte[]> ret = new ArrayList<byte[]>();
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        Cursor c;
+        if (sinceId>-1)
+            c = db.query(STATUSES,new String[]{"STATUS"},"id < ? AND list_id = ?",new String[]{String.valueOf(sinceId),String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(number));
+        else
+            c = db.query(STATUSES,new String[]{"STATUS"},"list_id = ?",new String[]{String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(number));
+
+        if (c.getCount()>0){
+            c.moveToFirst();
+            do {
+                byte[] bytes = c.getBlob(0);
+                ret.add(bytes);
+            } while (c.moveToNext());
+        }
+        c.close();
+        db.close();
+        return ret;
+
+
+    }
+
 
     public void resetLastRead() {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
