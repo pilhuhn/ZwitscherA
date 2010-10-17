@@ -73,7 +73,7 @@ public class TwitterHelper {
             statuses = new ArrayList<Status>();
 
         }
-        Debug.startMethodTracing("zwitscher");
+ //       Debug.startMethodTracing("zwitscher");
         int size = statuses.size();
         Log.i("getTimeline","Got " + size + " statuses from Twitter");
         if (size <MIN_TWEETS_TO_SHOW) {
@@ -82,7 +82,7 @@ public class TwitterHelper {
             else
                 statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,pseudoListId));
         }
-        Debug.stopMethodTracing();
+   //     Debug.stopMethodTracing();
         Log.i("getTimeline","Now we have " + statuses.size());
 
         return statuses;
