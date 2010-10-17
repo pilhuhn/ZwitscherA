@@ -23,7 +23,6 @@ public class TweetDB {
 	}
 
 
-
     private class TweetDBOpenHelper extends SQLiteOpenHelper {
 
 		public TweetDBOpenHelper(Context context, String name,
@@ -133,12 +132,17 @@ public class TweetDB {
         db.close();
     }
 
-    public byte[] getStatusObjectById(long statusId) {
+    public byte[] getStatusObjectById(long statusId,Long listId) {
 
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         byte[] ret = null;
 
-        Cursor c = db.query(STATUSES,new String[]{"STATUS"},"id = ?",new String[]{String.valueOf(statusId)},null,null,null);
+        Cursor c;
+        if (listId==null)
+            c= db.query(STATUSES,new String[]{"STATUS"},"id = ?",new String[]{String.valueOf(statusId)},null,null,null);
+        else
+            c= db.query(STATUSES,new String[]{"STATUS"},"id = ? AND list_id = ?",
+                       new String[]{String.valueOf(statusId),listId.toString()},null,null,null);
         if (c.getCount()>0){
             c.moveToFirst();
             ret = c.getBlob(0);
@@ -169,6 +173,12 @@ public class TweetDB {
         c.close();
         db.close();
         return ret;
+    }
+
+    public void resetLastRead() {
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.execSQL("DELETE FROM lastRead");
+        db.close();
     }
 
 

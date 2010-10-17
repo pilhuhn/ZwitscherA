@@ -55,35 +55,37 @@ public class TwitterHelper {
 			default:
 				statuses = new ArrayList<Status>();
 			}
-
             TweetDB tdb = new TweetDB(context);
             for (Status status : statuses) {
                 persistStatus(tdb, status,pseudoListId);
             }
-            int size = statuses.size();
-            Log.i("getTimeline","Got " + size + " statuses from Twitter");
-            if (size <MIN_TWEETS_TO_SHOW) {
-                if (size==0)
-                    statuses.addAll(getStatuesFromDb(-1,MIN_TWEETS_TO_SHOW- size,pseudoListId));
-                else
-                    statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,pseudoListId));
-            }
-            Log.i("getTimeline","Now we have " + statuses.size());
 
-			return statuses;
-		}
-		catch (Exception e) {
-        	System.err.println("Got exception: " + e.getMessage() );
-        	if (e.getCause()!=null)
-        		System.err.println("   " + e.getCause().getMessage());
-            return new ArrayList<Status>();
-		}
+        }
+        catch (Exception e) {
+            System.err.println("Got exception: " + e.getMessage() );
+            if (e.getCause()!=null)
+                System.err.println("   " + e.getCause().getMessage());
+            statuses = new ArrayList<Status>();
+
+        }
+
+        int size = statuses.size();
+        Log.i("getTimeline","Got " + size + " statuses from Twitter");
+        if (size <MIN_TWEETS_TO_SHOW) {
+            if (size==0)
+                statuses.addAll(getStatuesFromDb(-1,MIN_TWEETS_TO_SHOW- size,pseudoListId));
+            else
+                statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,pseudoListId));
+        }
+        Log.i("getTimeline","Now we have " + statuses.size());
+
+        return statuses;
 	}
 
     private List<Status> getStatuesFromDb(long sinceId, int number, long list_id) {
         List<Long> ids = tweetDB.getStatusesOlderThan(sinceId,number,list_id);
         List<Status> ret = new ArrayList<Status>();
-        for (Long id : ids) {
+        for (Long id : ids) { // TODO optimize to get more tweets at a time
             Status status = getStatusById(id,list_id);
             ret.add(status);
         }
@@ -243,10 +245,10 @@ public class TwitterHelper {
 	}
 
 
-    public Status getStatusById(long statusId,long list_id) {
+    public Status getStatusById(long statusId,Long list_id) {
         Status status = null;
 
-        byte[] obj  = tweetDB.getStatusObjectById(statusId);
+        byte[] obj  = tweetDB.getStatusObjectById(statusId,list_id);
         if (obj!=null) {
             status = materializeStatus(obj);
             if (status!=null)
@@ -255,8 +257,13 @@ public class TwitterHelper {
 
         Twitter twitter = getTwitter();
         try {
-             status = twitter.showStatus(statusId);
-            persistStatus(tweetDB,status,list_id);
+            status = twitter.showStatus(statusId);
+            long id;
+            if (list_id==null)
+                id = 0;
+            else
+                id = list_id;
+            persistStatus(tweetDB,status,id);
         } catch (Exception e) {
             e.printStackTrace();  // TODO: Customise this generated block
         }
@@ -265,7 +272,7 @@ public class TwitterHelper {
 
 
     private void persistStatus(TweetDB tdb, Status status, long list_id) throws IOException {
-        if (tdb.getStatusObjectById(status.getId())!=null)
+        if (tdb.getStatusObjectById(status.getId(),list_id)!=null)
             return; // This is already in DB, so do nothing
 
         // Serialize and then store in DB

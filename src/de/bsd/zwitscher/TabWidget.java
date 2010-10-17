@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import android.view.Window;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import twitter4j.UserList;
 
 import android.app.TabActivity;
@@ -22,6 +23,7 @@ public class TabWidget extends TabActivity {
 	TabHost tabHost;
 	TabHost.TabSpec homeSpec;
     ProgressBar pg;
+    TextView titleTextBox;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,7 @@ public class TabWidget extends TabActivity {
 		setContentView(R.layout.tabs);
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+        titleTextBox = (TextView) findViewById(R.id.title_msg_box);
 
 
 		Resources res = getResources();
@@ -100,6 +103,9 @@ public class TabWidget extends TabActivity {
 	    case R.id.reloadLists:
 	  		syncLists();
 	  		break;
+        case R.id.DevelResetLastRead:
+            resetLastRead();
+            break;
 
 
 	    default:
@@ -156,6 +162,11 @@ public class TabWidget extends TabActivity {
 			}
 		}
 	}
+
+    public void resetLastRead() {
+        TweetDB tb = new TweetDB(this);
+        tb.resetLastRead();
+    }
 }
 
 

@@ -11,12 +11,9 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ProgressBar;
 import twitter4j.Paging;
 import twitter4j.Status;
 import twitter4j.User;
@@ -31,6 +28,7 @@ public class TweetListActivity extends ListActivity {
     Bundle intentInfo;
     TweetListActivity thisActivity;
     ProgressBar pg;
+    TextView titleTextBox;
 
     /**
      * Called when the activity is first created.
@@ -45,6 +43,7 @@ public class TweetListActivity extends ListActivity {
         // Get the windows progress bar from the enclosing TabWidget
         TabWidget parent = (TabWidget) this.getParent();
         pg = parent.pg;
+        titleTextBox = parent.titleTextBox;
 
         fillListViewFromTimeline();
     }
@@ -179,6 +178,7 @@ public class TweetListActivity extends ListActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             pg.setVisibility(ProgressBar.VISIBLE);
+            titleTextBox.setText("Getting tweets...");
         }
 
 
@@ -205,6 +205,7 @@ public class TweetListActivity extends ListActivity {
 		protected void onPostExecute(List<String> result) {
 	        setListAdapter(new ArrayAdapter<String>(thisActivity, R.layout.list_item, result));
             pg.setVisibility(ProgressBar.INVISIBLE);
+            titleTextBox.setText("");
 	        getListView().requestLayout();
 		}
     }
