@@ -106,6 +106,12 @@ public class TabWidget extends TabActivity {
         case R.id.DevelResetLastRead:
             resetLastRead();
             break;
+        case R.id.DevelCleanTweets:
+            cleanTweetDB();
+            break;
+        case R.id.DevelCleanImages:
+            cleanImages();
+            break;
 
 
 	    default:
@@ -163,10 +169,21 @@ public class TabWidget extends TabActivity {
 		}
 	}
 
-    public void resetLastRead() {
+    private void resetLastRead() {
         TweetDB tb = new TweetDB(this);
         tb.resetLastRead();
     }
+
+    private void cleanTweetDB() {
+        TweetDB tb = new TweetDB(this);
+        tb.cleanTweets();
+    }
+
+    private void cleanImages() {
+        PicHelper ph = new PicHelper();
+        ph.cleanup();
+    }
+
 }
 
 

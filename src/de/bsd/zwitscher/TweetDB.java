@@ -181,5 +181,10 @@ public class TweetDB {
         db.close();
     }
 
+    public void cleanTweets() {
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.execSQL("DELETE FROM " + STATUSES);
+        db.close();
+    }
 
 }

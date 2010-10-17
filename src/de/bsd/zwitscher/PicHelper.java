@@ -33,7 +33,7 @@ public class PicHelper {
 				File iconFile = getPictureFileForUser(username);
 				if (iconFile.exists() && iconFile.lastModified() > System.currentTimeMillis() - ONE_DAY)
 					found = true;
-			} 
+			}
 			if (found)
 				Log.i("getUserPic","Picture was on file system");
 		}
@@ -86,4 +86,14 @@ public class PicHelper {
 		File iconFile = new File(iconDir,username);
 		return iconFile;
 	}
+
+    public void cleanup() {
+        File baseDir = Environment.getExternalStorageDirectory();
+        File iconDir = new File(baseDir,"/Android/data/de.bsd.zwitscher/files/user_profiles");
+
+        File[] files = iconDir.listFiles();
+        for (File file : files) {
+            file.delete();
+        }
+    }
 }

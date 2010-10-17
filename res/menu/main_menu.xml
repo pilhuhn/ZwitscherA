@@ -15,6 +15,11 @@
         <menu>
             <item android:id="@+id/DevelResetLastRead"
                   android:title="Reset Last Read"/>
+            <item android:id="@+id/DevelCleanTweets"
+                  android:title="Clean TweetDB"/>
+            <item android:id="@+id/DevelCleanImages"
+                  android:title="Clean User Pics"
+                    />
         </menu>
     </item>
 </menu>
