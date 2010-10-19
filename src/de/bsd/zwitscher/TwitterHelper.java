@@ -73,16 +73,7 @@ public class TwitterHelper {
             statuses = new ArrayList<Status>();
 
         }
- //       Debug.startMethodTracing("zwitscher");
-        int size = statuses.size();
-        Log.i("getTimeline","Got " + size + " statuses from Twitter");
-        if (size <MIN_TWEETS_TO_SHOW) {
-            if (size==0)
-                statuses.addAll(getStatuesFromDb(-1,MIN_TWEETS_TO_SHOW- size,pseudoListId));
-            else
-                statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,pseudoListId));
-        }
-   //     Debug.stopMethodTracing();
+        fillUpStatusesFromDB(pseudoListId,statuses);
         Log.i("getTimeline","Now we have " + statuses.size());
 
         return statuses;
@@ -239,6 +230,13 @@ public class TwitterHelper {
                 System.err.println("   " + e.getCause().getMessage());
         }
 
+        fillUpStatusesFromDB(listId, statuses);
+        Log.i("getUserList","Now we have " + statuses.size());
+
+        return statuses;
+	}
+
+    private void fillUpStatusesFromDB(int listId, List<Status> statuses) {
         int size = statuses.size();
         if (size<MIN_TWEETS_TO_SHOW) {
             if (size==0)
@@ -246,10 +244,7 @@ public class TwitterHelper {
             else
                 statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,listId));
         }
-        Log.i("getUserList","Now we have " + statuses.size());
-
-        return statuses;
-	}
+    }
 
 
     public Status getStatusById(long statusId,Long list_id) {
