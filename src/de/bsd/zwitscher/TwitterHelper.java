@@ -231,23 +231,24 @@ public class TwitterHelper {
             for (Status status : statuses) {
                 persistStatus(tdb, status,listId);
             }
+        } catch (Exception e) {
+            statuses = new ArrayList<Status>();
 
-			if (size<MIN_TWEETS_TO_SHOW) {
-                if (size==0)
-                    statuses.addAll(getStatuesFromDb(-1,MIN_TWEETS_TO_SHOW- size,listId));
-                else
-                    statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,listId));
-			}
-            Log.i("getUserList","Now we have " + statuses.size());
+            System.err.println("Got exception: " + e.getMessage() );
+            if (e.getCause()!=null)
+                System.err.println("   " + e.getCause().getMessage());
+        }
 
-			return statuses;
-		}
-		catch (Exception e) {
-        	System.err.println("Got exception: " + e.getMessage() );
-        	if (e.getCause()!=null)
-        		System.err.println("   " + e.getCause().getMessage());
-            return new ArrayList<Status>();
-		}
+        int size = statuses.size();
+        if (size<MIN_TWEETS_TO_SHOW) {
+            if (size==0)
+                statuses.addAll(getStatuesFromDb(-1,MIN_TWEETS_TO_SHOW- size,listId));
+            else
+                statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,listId));
+        }
+        Log.i("getUserList","Now we have " + statuses.size());
+
+        return statuses;
 	}
 
 
