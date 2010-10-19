@@ -13,5 +13,9 @@
                         android:key="location"
                         android:summary="Shall Zwitscher add location to status updates?"/>
 
+    <EditTextPreference android:title="Filter"
+                        android:summary="Provide Expressions, separated by Comma to filter tweets"
+                        android:key="filter"
+                        />
 
 </PreferenceScreen>

@@ -5,8 +5,10 @@ import java.util.List;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -126,10 +128,11 @@ public class TweetListActivity extends ListActivity {
 
     	statuses = new ArrayList<Status>();
 		List<String> data = new ArrayList<String>(myStatus.size());
+        String filter = getFilter();
 		for (Status status : myStatus) {
 			User user = status.getUser();
 			String item ="";
-			if (!status.getText().matches(".*(http://4sq.com/|http://shz.am/).*")) { // TODO add configurable filters
+			if ((filter==null) || (filter!= null && !status.getText().matches(filter))) {
 				item += user.getName() +  " (" + user.getScreenName() + "): " + status.getText();
 				data.add(item);
 				statuses.add(status);
@@ -196,5 +199,17 @@ public class TweetListActivity extends ListActivity {
             titleTextBox.setText("");
 	        getListView().requestLayout();
 		}
+    }
+
+    // ".*(http://4sq.com/|http://shz.am/).*"
+    private String getFilter() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String exp = prefs.getString("filter",null);
+        if (exp==null)
+            return null;
+        String ret=".*(" + exp.replaceAll(",","|") + ").*";
+
+        Log.i("TweetListActivity::getFilter()","Filter is " + ret);
+        return ret;
     }
 }

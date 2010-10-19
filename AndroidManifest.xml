@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.bsd.zwitscher"
           android:versionName="Tick"
-          android:versionCode="25"
+          android:versionCode="26"
           >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -34,7 +34,7 @@
 
 
         </activity>
-    <activity android:name="Preferences" android:label="Preferences"></activity>
+    <activity android:name="Preferences" android:label="Preferences"/>
 	<activity android:name="LoginActivity">
         <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
