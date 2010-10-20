@@ -7,6 +7,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -250,11 +251,26 @@ public class TweetListActivity extends ListActivity {
             Status status = items.get(position);
 
             ImageView iv = (ImageView) view.findViewById(R.id.ListImageView);
-            iv.setImageBitmap(ph.getUserPic(status.getUser(),thisActivity));
             TextView tv = (TextView) view.findViewById(R.id.ListTextView);
+            TextView uv = (TextView) view.findViewById(R.id.ListUserView);
 
+            Bitmap bi;
+            String userName ;
+            if (status.getRetweetedStatus()==null) {
+                bi = ph.getUserPic(status.getUser(),thisActivity);
+                userName = status.getUser().getName();
+                // TODO in reply to ..
+            }
+            else {
+                bi = ph.getUserPic(status.getRetweetedStatus().getUser(),thisActivity);
+                userName = status.getRetweetedStatus().getUser().getName() +
+                        " retweeted by " + status.getUser().getName();
+            }
+
+            iv.setImageBitmap(bi);
+            uv.setText(userName);
             tv.setText(status.getText());
-            tv.setTextColor(Color.YELLOW);
+         //   tv.setTextColor(Color.YELLOW);
             return view;
         }
     }
