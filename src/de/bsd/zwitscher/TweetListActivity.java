@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -257,17 +258,24 @@ public class TweetListActivity extends ListActivity {
             Bitmap bi;
             String userName ;
             if (status.getRetweetedStatus()==null) {
-                bi = ph.getUserPic(status.getUser(),thisActivity);
+                bi = ph.getBitMapForUserFromFile(status.getUser());
                 userName = status.getUser().getName();
-                // TODO in reply to ..
+                if (status.getInReplyToScreenName()!=null) {
+                    userName += " in reply to " + status.getInReplyToScreenName();
+                }
             }
             else {
-                bi = ph.getUserPic(status.getRetweetedStatus().getUser(),thisActivity);
+                bi = ph.getBitMapForUserFromFile(status.getRetweetedStatus().getUser());
                 userName = status.getRetweetedStatus().getUser().getName() +
                         " retweeted by " + status.getUser().getName();
             }
 
-            iv.setImageBitmap(bi);
+            if (bi!=null)
+                iv.setImageBitmap(bi);
+            else {
+                // underlying view seems to be reused, so default image is not loaded when bi==null
+                iv.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.user_unknown));
+            }
             uv.setText(userName);
             tv.setText(status.getText());
          //   tv.setTextColor(Color.YELLOW);

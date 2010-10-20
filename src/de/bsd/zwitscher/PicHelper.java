@@ -17,6 +17,13 @@ import android.util.Log;
 
 public class PicHelper {
 
+    String externalStorageState;
+
+    public PicHelper() {
+        externalStorageState = Environment.getExternalStorageState();
+    }
+
+
 	private static final long ONE_DAY = 24 * 60 * 60 * 1000L;
 
 	public Bitmap getUserPic(User user,Context context) {
@@ -27,7 +34,6 @@ public class PicHelper {
         Log.i("getUserPic","Looking for pic of user '" + username + "' from '" + imageUrl.toString() + "'");
 		boolean found = false;
 		// TODO use v8 methods when we require v8 in the manifest. Is probably too early yet.
-		String externalStorageState = Environment.getExternalStorageState();
 		try {
 			if (externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
 				File iconFile = getPictureFileForUser(username);
@@ -60,25 +66,31 @@ public class PicHelper {
 				ioe.printStackTrace();
 			}
 		}
-
-
-		try {
-            Log.i("getUserPic","creating bitmap");
-			if (externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
-				File iconFile = getPictureFileForUser(username);
-				FileInputStream fis = new FileInputStream(iconFile);
-			Bitmap bi = BitmapFactory.decodeStream(fis);
-			fis.close();
-			return bi;
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+        return getBitMapForUserFromFile(user);
 	}
 
-	private File getPictureFileForUser(String username) {
+    public Bitmap getBitMapForUserFromFile(User user) {
+        String username = user.getScreenName();
+        Log.d("getBitMapForUserFromFile","user = " +username);
+        try {
+            if (externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
+                File iconFile = getPictureFileForUser(username);
+                FileInputStream fis = new FileInputStream(iconFile);
+                Bitmap bi = BitmapFactory.decodeStream(fis);
+                fis.close();
+                return bi;
+            }
+        }
+        catch (Exception e) {
+            Log.w("getBitMapForUserFromFile", "Picture for " + username + " not found: " + e.getMessage());
+            return null;
+        }
+        return null;
+    }
+
+
+
+    private File getPictureFileForUser(String username) {
 		File baseDir = Environment.getExternalStorageDirectory();
 		File iconDir = new File(baseDir,"/Android/data/de.bsd.zwitscher/files/user_profiles");
 		if (!iconDir.exists())

@@ -7,8 +7,8 @@
     android:orientation="horizontal"
         >
     <ImageView android:id="@+id/ListImageView"
-               android:layout_width="64px"
-			android:layout_height="64px"
+               android:layout_width="80px"
+			android:layout_height="80px"
 			android:src="@drawable/user_unknown"
 			android:scaleType="fitXY"
 			android:padding="2px"
