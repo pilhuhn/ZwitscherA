@@ -14,6 +14,8 @@
 			android:layout_width="wrap_content"
 			android:textStyle="bold"
 			android:minLines="2"
+            android:paddingLeft="5px"
+            android:paddingRight="5px"
 			android:layout_toRightOf="@id/UserPictureImageView"
 			android:layout_height="wrap_content"/>
 
