@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--  this is a single entry in the ListView created by ArrayAdapter -->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:padding="10dp"
-    android:textSize="14sp"
-    android:autoLink="none"
-     >
-</TextView>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:padding="6dip"
+        >
+    <ImageView android:id="@+id/ListImageView"
+               android:layout_width="64px"
+			android:layout_height="64px"
+			android:src="@drawable/user_unknown"
+			android:scaleType="fitXY"
+			android:padding="2px"/>
+
+    <TextView
+        android:id="@+id/ListTextView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:textSize="14sp"
+        android:autoLink="none"
+         />
+</LinearLayout>

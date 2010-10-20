@@ -4,14 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -87,7 +91,7 @@ public class TweetListActivity extends ListActivity {
 
     }
 
-	private List<String> getTimlineStringsFromTwitter(int timeline, int listId, String specialName, boolean fromDbOnly) {
+	private List<Status> getTimlinesFromTwitter(int timeline, int listId, String specialName, boolean fromDbOnly) {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		Paging paging = new Paging().count(100);
 		TweetDB tdb = new TweetDB(this);
@@ -127,14 +131,14 @@ public class TweetListActivity extends ListActivity {
     	}
 
     	statuses = new ArrayList<Status>();
-		List<String> data = new ArrayList<String>(myStatus.size());
+		List<Status> data = new ArrayList<Status>(myStatus.size());
         String filter = getFilter();
 		for (Status status : myStatus) {
 			User user = status.getUser();
 			String item ="";
 			if ((filter==null) || (filter!= null && !status.getText().matches(filter))) {
-				item += user.getName() +  " (" + user.getScreenName() + "): " + status.getText();
-				data.add(item);
+//				item += user.getName() +  " (" + user.getScreenName() + "): " + status.getText();
+				data.add(status);
 				statuses.add(status);
 			} else {
 				Log.i("TweetListActivity::filter",status.getUser().getScreenName() + " - " + status.getText());
@@ -142,7 +146,7 @@ public class TweetListActivity extends ListActivity {
 			}
 		}
 		if (statuses.size()==0) { // No (new) tweet found
-			data.add(">>  Sorry, no tweets currently available, try later << ");
+			//data.add(">>  Sorry, no tweets currently available, try later << ");
 		}
 		return data;
 	}
@@ -162,7 +166,7 @@ public class TweetListActivity extends ListActivity {
     	new GetTimeLineTask().execute(new Boolean[]{fromDbOnly});
     }
 
-    private class GetTimeLineTask extends AsyncTask<Boolean, Void, List<String>> {
+    private class GetTimeLineTask extends AsyncTask<Boolean, Void, List<Status>> {
 
         @Override
         protected void onPreExecute() {
@@ -173,28 +177,28 @@ public class TweetListActivity extends ListActivity {
 
 
 		@Override
-		protected List<String> doInBackground(Boolean... params) {
+		protected List<twitter4j.Status> doInBackground(Boolean... params) {
             boolean fromDbOnly = params[0];
-	        List<String> data;
+	        List<twitter4j.Status> data;
 	        if (intentInfo==null)
-	            data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null, fromDbOnly);
+	            data = getTimlinesFromTwitter(R.string.home_timeline,0, null, fromDbOnly);
 	        else {
 	        	String timelineString = intentInfo.getString("timeline");
 				if (timelineString!=null && timelineString.contains("mentions")) {
-	        		data = getTimlineStringsFromTwitter(R.string.mentions, 0, null, fromDbOnly);
+	        		data = getTimlinesFromTwitter(R.string.mentions, 0, null, fromDbOnly);
 	        	} else {
 
 		            String listName = intentInfo.getString("listName");
 		            int id = intentInfo.getInt("id");
-		            data = getTimlineStringsFromTwitter(R.string.list,id, listName, fromDbOnly);
+		            data = getTimlinesFromTwitter(R.string.list,id, listName, fromDbOnly);
 	        	}
 	        }
 	        return data;
 		}
 
 		@Override
-		protected void onPostExecute(List<String> result) {
-	        setListAdapter(new ArrayAdapter<String>(thisActivity, R.layout.list_item, result));
+		protected void onPostExecute(List<twitter4j.Status> result) {
+	        setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, R.layout.list_item, result));
             pg.setVisibility(ProgressBar.INVISIBLE);
             titleTextBox.setText("");
 	        getListView().requestLayout();
@@ -211,5 +215,47 @@ public class TweetListActivity extends ListActivity {
 
         Log.i("TweetListActivity::getFilter()","Filter is " + ret);
         return ret;
+    }
+
+    /**
+     * Adapter for individual list rows of
+     * the TweetList
+     *
+     * @author Heiko W. Rupp
+     */
+    private class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
+
+        private List<Status> items;
+        PicHelper ph;
+
+        public StatusAdapter(Context context, int textViewResourceId, List<Status> objects) {
+            super(context, textViewResourceId, objects);
+            items = objects;
+            ph = new PicHelper();
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = convertView; //= super.getView(position, convertView, parent);
+            if (view==null) {
+                LayoutInflater li = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+                view = li.inflate(R.layout.list_item,null);
+            }
+
+            if (position %2 == 0)
+                view.setBackgroundColor(Color.BLACK);
+            else
+                view.setBackgroundColor(Color.DKGRAY);
+
+            Status status = items.get(position);
+
+            ImageView iv = (ImageView) view.findViewById(R.id.ListImageView);
+            iv.setImageBitmap(ph.getUserPic(status.getUser(),thisActivity));
+            TextView tv = (TextView) view.findViewById(R.id.ListTextView);
+
+            tv.setText(status.getText());
+            tv.setTextColor(Color.YELLOW);
+            return view;
+        }
     }
 }
