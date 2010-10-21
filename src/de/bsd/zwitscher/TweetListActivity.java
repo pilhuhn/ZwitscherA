@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -227,6 +228,8 @@ public class TweetListActivity extends ListActivity {
      */
     private class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
 
+        private static final String STRONG = "<b>";
+        private static final String STRONG_END = "</b>";
         private List<Status> items;
         PicHelper ph;
 
@@ -259,15 +262,15 @@ public class TweetListActivity extends ListActivity {
             String userName ;
             if (status.getRetweetedStatus()==null) {
                 bi = ph.getBitMapForUserFromFile(status.getUser());
-                userName = status.getUser().getName();
+                userName = STRONG + status.getUser().getName() + STRONG_END;
                 if (status.getInReplyToScreenName()!=null) {
-                    userName += " in reply to " + status.getInReplyToScreenName();
+                    userName += " in reply to " + STRONG + status.getInReplyToScreenName() + STRONG_END;
                 }
             }
             else {
                 bi = ph.getBitMapForUserFromFile(status.getRetweetedStatus().getUser());
                 userName = status.getRetweetedStatus().getUser().getName() +
-                        " retweeted by " + status.getUser().getName();
+                        " retweeted by " + STRONG + status.getUser().getName() + STRONG_END;
             }
 
             if (bi!=null)
@@ -276,7 +279,7 @@ public class TweetListActivity extends ListActivity {
                 // underlying view seems to be reused, so default image is not loaded when bi==null
                 iv.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.user_unknown));
             }
-            uv.setText(userName);
+            uv.setText(Html.fromHtml(userName));
             tv.setText(status.getText());
          //   tv.setTextColor(Color.YELLOW);
             return view;
