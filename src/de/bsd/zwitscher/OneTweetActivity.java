@@ -20,7 +20,6 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import twitter4j.User;
 
 import java.util.Locale;
@@ -127,13 +126,10 @@ public class OneTweetActivity extends Activity {
 
     public void threadView(View v) {
         TwitterHelper th = new TwitterHelper(ctx);
-        Status newStatus = th.getStatusById(status.getInReplyToStatusId(),null);
 
-        Intent i = new Intent(getApplicationContext(),OneTweetActivity.class);
-        i.putExtra(getString(R.string.status), newStatus);
+        Intent i = new Intent(getApplicationContext(),ThreadListActivity.class);
+        i.putExtra("startId", status.getId());
         startActivity(i);
-
-
     }
 
     public void favorite(View v) {
