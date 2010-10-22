@@ -117,10 +117,10 @@ public class TweetListActivity extends ListActivity {
 
         switch (timeline) {
         case R.string.home_timeline:
-        	myStatus = th.getTimeline(paging,R.string.home_timeline, fromDbOnly);
+        	myStatus = th.getTimeline(paging,R.string.home_timeline, fromDbOnly, true);
         	break;
         case R.string.mentions:
-        	myStatus = th.getTimeline(paging, R.string.mentions, fromDbOnly);
+        	myStatus = th.getTimeline(paging, R.string.mentions, fromDbOnly, true);
         	break;
         case R.string.list:
         	myStatus = th.getUserList(paging,listId, fromDbOnly);

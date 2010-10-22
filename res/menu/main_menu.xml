@@ -20,6 +20,8 @@
             <item android:id="@+id/DevelCleanImages"
                   android:title="Clean User Pics"
                     />
+            <item android:id="@+id/DevelStopServices"
+                  android:title="Stop Services"/>
         </menu>
     </item>
 </menu>

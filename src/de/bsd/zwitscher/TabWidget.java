@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -24,10 +26,14 @@ public class TabWidget extends TabActivity {
 	TabHost.TabSpec homeSpec;
     ProgressBar pg;
     TextView titleTextBox;
+    ComponentName sComponentName;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+        Intent serviceIntent = new Intent().setClass(this,TweetFetchService.class);
+        sComponentName = startService(serviceIntent);
 
         requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.tabs);
@@ -112,7 +118,10 @@ public class TabWidget extends TabActivity {
         case R.id.DevelCleanImages:
             cleanImages();
             break;
-
+        case R.id.DevelStopServices:
+            Intent serviceIntent = new Intent().setClass(this,TweetFetchService.class);
+            stopService(serviceIntent);
+            break;
 
 	    default:
 	        return super.onOptionsItemSelected(item);

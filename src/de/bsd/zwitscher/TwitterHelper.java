@@ -38,7 +38,7 @@ public class TwitterHelper {
         tweetDB = new TweetDB(context);
 	}
 
-	public List<Status> getTimeline(Paging paging, int timeline, boolean fromDbOnly) {
+	public List<Status> getTimeline(Paging paging, int timeline, boolean fromDbOnly, boolean fillUpFromDb) {
         Twitter twitter = getTwitter();
 
         List<Status> statuses = null;
@@ -73,7 +73,8 @@ public class TwitterHelper {
             statuses = new ArrayList<Status>();
 
         }
-        fillUpStatusesFromDB(pseudoListId,statuses);
+        if (fillUpFromDb)
+            fillUpStatusesFromDB(pseudoListId,statuses);
         Log.i("getTimeline","Now we have " + statuses.size());
 
         return statuses;
