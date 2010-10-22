@@ -269,7 +269,7 @@ public class TweetListActivity extends ListActivity {
             }
             else {
                 bi = ph.getBitMapForUserFromFile(status.getRetweetedStatus().getUser());
-                userName = status.getRetweetedStatus().getUser().getName() +
+                userName = STRONG + status.getRetweetedStatus().getUser().getName() + STRONG +
                         " retweeted by " + STRONG + status.getUser().getName() + STRONG_END;
             }
 
