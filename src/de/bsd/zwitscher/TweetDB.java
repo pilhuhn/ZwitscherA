@@ -120,7 +120,7 @@ public class TweetDB {
 		db.close();
 	}
 
-    public void storeStatus(long id, long i_reply_id, long list_id, byte[] statusObj) {
+    public void storeOrUpdateStatus(long id, long i_reply_id, long list_id, byte[] statusObj, boolean doInsert) {
         ContentValues cv = new ContentValues(3);
         cv.put("ID",id);
         cv.put("I_REP_TO",i_reply_id);
@@ -128,7 +128,10 @@ public class TweetDB {
         cv.put("STATUS",statusObj);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.insert(STATUSES, null, cv);
+        if (doInsert)
+            db.insert(STATUSES, null, cv);
+        else
+            db.update(STATUSES,cv,"id = ?", new String[]{String.valueOf(id)});
         db.close();
     }
 
