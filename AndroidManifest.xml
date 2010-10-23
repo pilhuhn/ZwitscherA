@@ -3,53 +3,53 @@
           package="de.bsd.zwitscher"
           android:versionName="Tick"
           android:versionCode="27"
-          >
+        >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application android:icon="@drawable/icon" android:label="Zwitscher"
-    			android:debuggable="true"  android:allowBackup="true"
-    			>
+                 android:debuggable="true" android:allowBackup="true"
+            >
 
 
         <activity android:name=".TweetListActivity">
-		</activity>
+        </activity>
 
-		<activity android:name=".TabWidget">
-		<!--
+        <activity android:name=".TabWidget">
+            <!--
+               <intent-filter>
+                   <action android:name="android.intent.action.MAIN"/>
+                   <category android:name="android.intent.category.LAUNCHER"/>
+               </intent-filter>
+
+           -->
+        </activity>
+
+        <activity android:name=".OneTweetActivity">
+        </activity>
+
+        <activity android:name=".NewTweetActivity"/>
+
+        <activity android:name=".account.SelectAccountActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
 
-		-->
-		</activity>
+        <activity android:name=".account.NewAccountActivity"/>
 
-		<activity android:name=".OneTweetActivity">
-		</activity>
+        <activity android:name="Preferences" android:label="Preferences"/>
+        <activity android:name=".account.LoginActivity">
 
-        <activity android:name=".NewTweetActivity"/>
-
-		<activity android:name=".SelectAccountActivity">
-		    <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-		</activity>
-
-		<activity android:name=".NewAccountActivity"/>
-
-    <activity android:name="Preferences" android:label="Preferences"></activity>
-	<activity android:name="LoginActivity">
-
-	</activity>
+        </activity>
         <activity android:name=".ThreadListActivity"/>
     </application>
 
-<!--  <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>  -->
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!--  <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>  -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
-<uses-sdk android:minSdkVersion="7" />
+    <uses-sdk android:minSdkVersion="7"/>
 </manifest>

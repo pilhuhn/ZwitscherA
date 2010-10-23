@@ -1,6 +1,7 @@
 bin
 out
 src/de/bsd/zwitscher/TwitterConsumerToken.java
+src/de/bsd/zwitscher/StatusNetConsumerToken.java
 *.iml
 *.ipr
 *.iws
