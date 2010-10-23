@@ -4,21 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.Html;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -220,69 +213,4 @@ public class TweetListActivity extends ListActivity {
         return ret;
     }
 
-    /**
-     * Adapter for individual list rows of
-     * the TweetList
-     *
-     * @author Heiko W. Rupp
-     */
-    private class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
-
-        private static final String STRONG = "<b>";
-        private static final String STRONG_END = "</b>";
-        private List<Status> items;
-        PicHelper ph;
-
-        public StatusAdapter(Context context, int textViewResourceId, List<Status> objects) {
-            super(context, textViewResourceId, objects);
-            items = objects;
-            ph = new PicHelper();
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView; //= super.getView(position, convertView, parent);
-            if (view==null) {
-                LayoutInflater li = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-                view = li.inflate(R.layout.list_item,null);
-            }
-
-            if (position %2 == 0)
-                view.setBackgroundColor(Color.BLACK);
-            else
-                view.setBackgroundColor(Color.DKGRAY);
-
-            Status status = items.get(position);
-
-            ImageView iv = (ImageView) view.findViewById(R.id.ListImageView);
-            TextView tv = (TextView) view.findViewById(R.id.ListTextView);
-            TextView uv = (TextView) view.findViewById(R.id.ListUserView);
-
-            Bitmap bi;
-            String userName ;
-            if (status.getRetweetedStatus()==null) {
-                bi = ph.getBitMapForUserFromFile(status.getUser());
-                userName = STRONG + status.getUser().getName() + STRONG_END;
-                if (status.getInReplyToScreenName()!=null) {
-                    userName += " in reply to " + STRONG + status.getInReplyToScreenName() + STRONG_END;
-                }
-            }
-            else {
-                bi = ph.getBitMapForUserFromFile(status.getRetweetedStatus().getUser());
-                userName = STRONG + status.getRetweetedStatus().getUser().getName() + STRONG +
-                        " retweeted by " + STRONG + status.getUser().getName() + STRONG_END;
-            }
-
-            if (bi!=null)
-                iv.setImageBitmap(bi);
-            else {
-                // underlying view seems to be reused, so default image is not loaded when bi==null
-                iv.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.user_unknown));
-            }
-            uv.setText(Html.fromHtml(userName));
-            tv.setText(status.getText());
-         //   tv.setTextColor(Color.YELLOW);
-            return view;
-        }
-    }
 }

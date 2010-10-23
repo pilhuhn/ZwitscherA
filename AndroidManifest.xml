@@ -42,9 +42,8 @@
             </intent-filter>
 
 	</activity>
-
-        <service android:name=".TweetFetchService" />
         <service android:name=".TweetFetchService"/>
+        <activity android:name=".ThreadListActivity"/>
     </application>
 
 <!--  <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>  -->
