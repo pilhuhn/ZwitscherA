@@ -2,6 +2,7 @@ package de.bsd.zwitscher;
 
 
 import android.os.AsyncTask;
+import android.text.Html;
 import android.view.Window;
 import android.widget.*;
 import com.google.api.translate.Language;
@@ -79,6 +80,11 @@ public class OneTweetActivity extends Activity {
 
 			TextView tweetView = (TextView)findViewById(R.id.TweetTextView);
 			tweetView.setText(status.getText());
+
+            TextView timeCientView = (TextView)findViewById(R.id.TimeTextView);
+            TwitterHelper th = new TwitterHelper(this);
+            String text = th.getStatusDate(status) + " via " + status.getSource();
+            timeCientView.setText(Html.fromHtml(text));
 
 
             // Update Button state depending on Status' properties

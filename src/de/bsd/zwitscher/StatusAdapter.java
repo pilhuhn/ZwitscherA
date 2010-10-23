@@ -31,6 +31,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import twitter4j.Status;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -45,6 +47,7 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
     private static final String STRONG_END = "</b>";
     private List<Status> items;
     PicHelper ph;
+    TwitterHelper th;
     private Context extContext;
 
     public StatusAdapter(Context context, int textViewResourceId, List<Status> objects) {
@@ -52,6 +55,8 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
         extContext = context;
         items = objects;
         ph = new PicHelper();
+        th = new TwitterHelper(context);
+
     }
 
     @Override
@@ -70,8 +75,9 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
         Status status = items.get(position);
 
         ImageView iv = (ImageView) view.findViewById(R.id.ListImageView);
-        TextView tv = (TextView) view.findViewById(R.id.ListTextView);
-        TextView uv = (TextView) view.findViewById(R.id.ListUserView);
+        TextView statusText = (TextView) view.findViewById(R.id.ListTextView);
+        TextView userInfo = (TextView) view.findViewById(R.id.ListUserView);
+        TextView timeClientInfo = (TextView) view.findViewById(R.id.ListTimeView);
 
         Bitmap bi;
         String userName ;
@@ -94,9 +100,12 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
             // underlying view seems to be reused, so default image is not loaded when bi==null
             iv.setImageBitmap(BitmapFactory.decodeResource(extContext.getResources(), R.drawable.user_unknown));
         }
-        uv.setText(Html.fromHtml(userName));
-        tv.setText(status.getText());
-     //   tv.setTextColor(Color.YELLOW);
+        userInfo.setText(Html.fromHtml(userName));
+        statusText.setText(status.getText());
+
+        DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM);
+        String text = th.getStatusDate(status) + " via " + status.getSource();
+        timeClientInfo.setText(Html.fromHtml(text));
         return view;
     }
 }

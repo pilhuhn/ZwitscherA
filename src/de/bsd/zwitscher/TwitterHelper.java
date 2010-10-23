@@ -6,13 +6,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.os.Debug;
 import android.preference.PreferenceManager;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -25,6 +26,9 @@ import twitter4j.TwitterFactory;
 import twitter4j.UserList;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
+
+import static android.text.format.DateUtils.*;
+import static android.text.format.DateUtils.getRelativeDateTimeString;
 
 public class TwitterHelper {
 
@@ -199,7 +203,7 @@ public class TwitterHelper {
 				twitter.destroyFavorite(status.getId());
 			else
 				twitter.createFavorite(status.getId());
-			Toast.makeText(context, R.string.tweet_sent , 2500).show();
+			Toast.makeText(context, "Fav sent" , 2500).show();
 		} catch (TwitterException e) {
 			Toast.makeText(context, "Failed to (un)create a favorite: " + e.getLocalizedMessage(), 10000).show();
 		}
@@ -281,9 +285,21 @@ public class TwitterHelper {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream out = new ObjectOutputStream(bos);
         out.writeObject(status);
-        tdb.storeStatus(status.getId(),status.getInReplyToStatusId(),list_id,bos.toByteArray());
+        tdb.storeOrUpdateStatus(status.getId(), status.getInReplyToStatusId(), list_id, bos.toByteArray(), true);
     }
 
+    private void updateStatus(TweetDB tdb, Status status, long list_id) throws IOException {
+        if (tdb.getStatusObjectById(status.getId(),list_id)==null) {
+            persistStatus(tdb,status,list_id);
+            return;
+        }
+
+        // Serialize and then store in DB
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(bos);
+        out.writeObject(status);
+        tdb.storeOrUpdateStatus(status.getId(), status.getInReplyToStatusId(), list_id, bos.toByteArray(), false);
+    }
 
 
     private Status materializeStatus(byte[] obj) {
@@ -299,6 +315,13 @@ public class TwitterHelper {
         }
 
         return status;
+
+    }
+
+    public String getStatusDate(Status status) {
+        Date date = status.getCreatedAt();
+        long time = date.getTime();
+        return (String) DateUtils.getRelativeDateTimeString(context, time, SECOND_IN_MILLIS, DAY_IN_MILLIS, DateUtils.FORMAT_ABBREV_ALL);
 
     }
 }

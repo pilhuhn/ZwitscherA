@@ -31,16 +31,22 @@
 		  android:layout_height="wrap_content"
 		  android:textStyle="italic"
 		  android:text="@+id/MiscTextView"/>
+    <TextView android:id="@+id/TimeTextView"
+              android:layout_below="@+id/MiscTextView"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              />
+
 
 
 <Button android:id="@+id/ReplyButton"
-		android:layout_below="@id/MiscTextView"
+		android:layout_below="@id/TimeTextView"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="reply"
         android:text="Reply"/>
 <Button android:id="@+id/ReplyAllButton"
-		android:layout_below="@id/MiscTextView"
+		android:layout_below="@id/TimeTextView"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/ReplyButton"
@@ -48,28 +54,28 @@
         android:text="Reply All"/>
 
 <Button android:id="@+id/RetweetButton"
-		android:layout_below="@id/MiscTextView"
+		android:layout_below="@id/TimeTextView"
 		android:layout_toRightOf="@id/ReplyAllButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="retweet"
 		android:text="Retweet"/>
 <Button android:id="@+id/ClassicRetweetButton"
-		android:layout_below="@id/MiscTextView"
+		android:layout_below="@id/TimeTextView"
 		android:layout_toRightOf="@id/RetweetButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="classicRetweet"
 		android:text="Classic Retweet"/>
 <Button android:id="@+id/DirectButton"
-		android:layout_below="@id/MiscTextView"
+		android:layout_below="@id/TimeTextView"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 		android:layout_toRightOf="@id/ClassicRetweetButton"
         android:onClick="directMessage"
 		android:text="Direct"/>
 <Button android:id="@+id/FavoriteButton"
-		android:layout_below="@id/MiscTextView"
+		android:layout_below="@id/TimeTextView"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 		android:layout_toRightOf="@id/DirectButton"
