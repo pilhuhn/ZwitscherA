@@ -23,7 +23,6 @@ public class TweetDB {
 	}
 
 
-
     private class TweetDBOpenHelper extends SQLiteOpenHelper {
 
 		public TweetDBOpenHelper(Context context, String name,
@@ -133,12 +132,17 @@ public class TweetDB {
         db.close();
     }
 
-    public byte[] getStatusObjectById(long statusId) {
+    public byte[] getStatusObjectById(long statusId,Long listId) {
 
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         byte[] ret = null;
 
-        Cursor c = db.query(STATUSES,new String[]{"STATUS"},"id = ?",new String[]{String.valueOf(statusId)},null,null,null);
+        Cursor c;
+        if (listId==null)
+            c= db.query(STATUSES,new String[]{"STATUS"},"id = ?",new String[]{String.valueOf(statusId)},null,null,null);
+        else
+            c= db.query(STATUSES,new String[]{"STATUS"},"id = ? AND list_id = ?",
+                       new String[]{String.valueOf(statusId),listId.toString()},null,null,null);
         if (c.getCount()>0){
             c.moveToFirst();
             ret = c.getBlob(0);
@@ -149,7 +153,7 @@ public class TweetDB {
         return ret;
     }
 
-    public List<Long> getStatusesOlderThan(long sinceId, int number, long list_id) {
+    public List<Long> getStatusesIdsOlderThan(long sinceId, int number, long list_id) {
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         List<Long> ret = new ArrayList<Long>(number);
 
@@ -171,5 +175,40 @@ public class TweetDB {
         return ret;
     }
 
+    public List<byte[]> getStatusesObjsOlderThan(long sinceId, int number, long list_id) {
+        List<byte[]> ret = new ArrayList<byte[]>();
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        Cursor c;
+        if (sinceId>-1)
+            c = db.query(STATUSES,new String[]{"STATUS"},"id < ? AND list_id = ?",new String[]{String.valueOf(sinceId),String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(number));
+        else
+            c = db.query(STATUSES,new String[]{"STATUS"},"list_id = ?",new String[]{String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(number));
+
+        if (c.getCount()>0){
+            c.moveToFirst();
+            do {
+                byte[] bytes = c.getBlob(0);
+                ret.add(bytes);
+            } while (c.moveToNext());
+        }
+        c.close();
+        db.close();
+        return ret;
+
+
+    }
+
+
+    public void resetLastRead() {
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.execSQL("DELETE FROM lastRead");
+        db.close();
+    }
+
+    public void cleanTweets() {
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.execSQL("DELETE FROM " + STATUSES);
+        db.close();
+    }
 
 }

@@ -5,15 +5,14 @@ import java.util.List;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import twitter4j.Paging;
@@ -29,6 +28,8 @@ public class TweetListActivity extends ListActivity {
     List<Status> statuses;
     Bundle intentInfo;
     TweetListActivity thisActivity;
+    ProgressBar pg;
+    TextView titleTextBox;
 
     /**
      * Called when the activity is first created.
@@ -40,7 +41,12 @@ public class TweetListActivity extends ListActivity {
 
         intentInfo = getIntent().getExtras();
         thisActivity = this;
-        fillListViewFromTimeline();
+        // Get the windows progress bar from the enclosing TabWidget
+        TabWidget parent = (TabWidget) this.getParent();
+        pg = parent.pg;
+        titleTextBox = parent.titleTextBox;
+
+        fillListViewFromTimeline(true); // Only get tweets from db to speed things up at start
     }
 
     @Override
@@ -48,6 +54,10 @@ public class TweetListActivity extends ListActivity {
 
     	super.onResume();
         intentInfo = getIntent().getExtras();
+
+        // Get the windows progress bar from the enclosing TabWidget
+        TabWidget parent = (TabWidget) this.getParent();
+        pg = parent.pg;
 
 		ListView lv = getListView();
 
@@ -77,7 +87,7 @@ public class TweetListActivity extends ListActivity {
 
     }
 
-	private List<String> getTimlineStringsFromTwitter(int timeline,int listId, String specialName) {
+	private List<Status> getTimlinesFromTwitter(int timeline, int listId, String specialName, boolean fromDbOnly) {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		Paging paging = new Paging().count(100);
 		TweetDB tdb = new TweetDB(this);
@@ -93,20 +103,20 @@ public class TweetListActivity extends ListActivity {
         	specialName = "mentions";
         	break;
         }
-		
+
     	long last = tdb.getLastRead(specialName);
     	if (last!=0 )//&& !Debug.isDebuggerConnected())
     		paging.sinceId(last);
 
         switch (timeline) {
         case R.string.home_timeline:
-        	myStatus = th.getTimeline(paging,R.string.home_timeline);
+        	myStatus = th.getTimeline(paging,R.string.home_timeline, fromDbOnly);
         	break;
         case R.string.mentions:
-        	myStatus = th.getTimeline(paging, R.string.mentions);
+        	myStatus = th.getTimeline(paging, R.string.mentions, fromDbOnly);
         	break;
         case R.string.list:
-        	myStatus = th.getUserList(paging,listId);
+        	myStatus = th.getUserList(paging,listId, fromDbOnly);
         	break;
         }
 
@@ -116,22 +126,23 @@ public class TweetListActivity extends ListActivity {
     		tdb.updateOrInsertLastRead(specialName, last);
     	}
 
-    	statuses = new ArrayList<Status>(); 
-		List<String> data = new ArrayList<String>(myStatus.size());
+    	statuses = new ArrayList<Status>();
+		List<Status> data = new ArrayList<Status>(myStatus.size());
+        String filter = getFilter();
 		for (Status status : myStatus) {
 			User user = status.getUser();
 			String item ="";
-			if (!status.getText().matches(".*http://4sq.com/.*")) { // TODO add configurable filters
-				item += user.getName() +  " (" + user.getScreenName() + "): " + status.getText();
-				data.add(item);
+			if ((filter==null) || (filter!= null && !status.getText().matches(filter))) {
+//				item += user.getName() +  " (" + user.getScreenName() + "): " + status.getText();
+				data.add(status);
 				statuses.add(status);
 			} else {
 				Log.i("TweetListActivity::filter",status.getUser().getScreenName() + " - " + status.getText());
-				
+
 			}
 		}
 		if (statuses.size()==0) { // No (new) tweet found
-			data.add(">>  Sorry, no tweets currently available, try later << ");
+			//data.add(">>  Sorry, no tweets currently available, try later << ");
 		}
 		return data;
 	}
@@ -140,54 +151,66 @@ public class TweetListActivity extends ListActivity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
     	if (item!=null && item.getItemId() == R.id.reload_item) {
-            fillListViewFromTimeline();
+            fillListViewFromTimeline(false);
     		return true;
     	}
 
     	return super.onMenuItemSelected(featureId, item);
     }
 
-    private void fillListViewFromTimeline() {
-/*        List<String> data;
-        if (intentInfo==null)
-            data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null);
-        else {
-            String listName = intentInfo.getString("listName");
-            int id = intentInfo.getInt("id");
-            data = getTimlineStringsFromTwitter(R.string.list,id, listName);
-        }
-        setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, data));
-        getListView().requestLayout();
-*/
-		getWindow().setFeatureInt(Window.FEATURE_PROGRESS, 100);
-    	new GetTimeLineTask().execute(new Void[]{});
+    private void fillListViewFromTimeline(boolean fromDbOnly) {
+    	new GetTimeLineTask().execute(new Boolean[]{fromDbOnly});
     }
 
-    private class GetTimeLineTask extends AsyncTask<Void, Void, List<String>> {
-    	
+    private class GetTimeLineTask extends AsyncTask<Boolean, Void, List<Status>> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pg.setVisibility(ProgressBar.VISIBLE);
+            titleTextBox.setText("Getting tweets...");
+        }
+
+
 		@Override
-		protected List<String> doInBackground(Void... params) {
-	        List<String> data;
+		protected List<twitter4j.Status> doInBackground(Boolean... params) {
+            boolean fromDbOnly = params[0];
+	        List<twitter4j.Status> data;
 	        if (intentInfo==null)
-	            data = getTimlineStringsFromTwitter(R.string.home_timeline,0, null);
+	            data = getTimlinesFromTwitter(R.string.home_timeline,0, null, fromDbOnly);
 	        else {
 	        	String timelineString = intentInfo.getString("timeline");
 				if (timelineString!=null && timelineString.contains("mentions")) {
-	        		data = getTimlineStringsFromTwitter(R.string.mentions, 0, null);
+	        		data = getTimlinesFromTwitter(R.string.mentions, 0, null, fromDbOnly);
 	        	} else {
-		        		
+
 		            String listName = intentInfo.getString("listName");
 		            int id = intentInfo.getInt("id");
-		            data = getTimlineStringsFromTwitter(R.string.list,id, listName);
+		            data = getTimlinesFromTwitter(R.string.list,id, listName, fromDbOnly);
 	        	}
 	        }
 	        return data;
 		}
 
 		@Override
-		protected void onPostExecute(List<String> result) {
-	        setListAdapter(new ArrayAdapter<String>(thisActivity, R.layout.list_item, result));
+		protected void onPostExecute(List<twitter4j.Status> result) {
+	        setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, R.layout.list_item, result));
+            pg.setVisibility(ProgressBar.INVISIBLE);
+            titleTextBox.setText("");
 	        getListView().requestLayout();
 		}
     }
+
+    // ".*(http://4sq.com/|http://shz.am/).*"
+    private String getFilter() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String exp = prefs.getString("filter",null);
+        if (exp==null)
+            return null;
+        String ret=".*(" + exp.replaceAll(",","|") + ").*";
+
+        Log.i("TweetListActivity::getFilter()","Filter is " + ret);
+        return ret;
+    }
+
 }

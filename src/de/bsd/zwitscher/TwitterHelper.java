@@ -11,6 +11,7 @@ import java.util.List;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -37,54 +38,52 @@ public class TwitterHelper {
         tweetDB = new TweetDB(context);
 	}
 
-	public List<Status> getTimeline(Paging paging, int timeline) {
+	public List<Status> getTimeline(Paging paging, int timeline, boolean fromDbOnly) {
         Twitter twitter = getTwitter();
 
-        List<Status> statuses;
+        List<Status> statuses = null;
+        int pseudoListId =0;
 		try {
 			switch (timeline) {
 			case R.string.home_timeline:
-			
-				statuses = twitter.getHomeTimeline(paging ); //like friends + including retweet
+                if (!fromDbOnly)
+				    statuses = twitter.getHomeTimeline(paging ); //like friends + including retweet
+                pseudoListId =0;
 				break;
 			case R.string.mentions:
-				statuses = twitter.getMentions(paging);
+                if (!fromDbOnly)
+				    statuses = twitter.getMentions(paging);
+                pseudoListId = -1;
 				break;
 			default:
 				statuses = new ArrayList<Status>();
-				
 			}
-			
+            if (statuses==null)
+                statuses=new ArrayList<Status>();
             TweetDB tdb = new TweetDB(context);
             for (Status status : statuses) {
-                persistStatus(tdb, status,0);
+                persistStatus(tdb, status,pseudoListId);
             }
-            int size = statuses.size();
-            Log.i("getFriendsTimeline","Got " + size + " statuses from Twitter");
-            if (size <MIN_TWEETS_TO_SHOW) {
-            	// TODO mentions ??
-                if (size==0)
-                    statuses.addAll(getStatuesFromDb(-1,MIN_TWEETS_TO_SHOW- size,0));
-                else
-                    statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,0));
-            }
-            Log.i("getFriendsTimeline","Now we have " + statuses.size());
 
-			return statuses;
-		}
-		catch (Exception e) {
-        	System.err.println("Got exception: " + e.getMessage() );
-        	if (e.getCause()!=null)
-        		System.err.println("   " + e.getCause().getMessage());
-            return new ArrayList<Status>();
-		}
+        }
+        catch (Exception e) {
+            System.err.println("Got exception: " + e.getMessage() );
+            if (e.getCause()!=null)
+                System.err.println("   " + e.getCause().getMessage());
+            statuses = new ArrayList<Status>();
+
+        }
+        fillUpStatusesFromDB(pseudoListId,statuses);
+        Log.i("getTimeline","Now we have " + statuses.size());
+
+        return statuses;
 	}
 
     private List<Status> getStatuesFromDb(long sinceId, int number, long list_id) {
-        List<Long> ids = tweetDB.getStatusesOlderThan(sinceId,number,list_id);
         List<Status> ret = new ArrayList<Status>();
-        for (Long id : ids) {
-            Status status = getStatusById(id,list_id);
+        List<byte[]> oStats = tweetDB.getStatusesObjsOlderThan(sinceId,number,list_id);
+        for (byte[] bytes : oStats) {
+            Status status = materializeStatus(bytes);
             ret.add(status);
         }
         return ret;
@@ -113,7 +112,7 @@ public class TwitterHelper {
         String accessTokenSecret = preferences.getString("accessTokenSecret",null);
         if (accessTokenToken!=null && accessTokenSecret!=null) {
         	Twitter twitter = new TwitterFactory().getOAuthAuthorizedInstance(
-        			TwitterConsumerToken.consumerKey, 
+        			TwitterConsumerToken.consumerKey,
         			TwitterConsumerToken.consumerSecret,
         			new AccessToken(accessTokenToken, accessTokenSecret));
         	return twitter;
@@ -207,7 +206,7 @@ public class TwitterHelper {
 
 	}
 
-	public List<Status> getUserList(Paging paging, int listId) {
+	public List<Status> getUserList(Paging paging, int listId, boolean fromDbOnly) {
         Twitter twitter = getTwitter();
 
         List<Status> statuses;
@@ -217,36 +216,41 @@ public class TwitterHelper {
 			statuses = twitter.getUserListStatuses(listOwnerScreenName, listId, paging);
 			int size = statuses.size();
             Log.i("getUserList","Got " + size + " statuses from Twitter");
-			
+
             TweetDB tdb = new TweetDB(context);
 
             for (Status status : statuses) {
                 persistStatus(tdb, status,listId);
             }
+        } catch (Exception e) {
+            statuses = new ArrayList<Status>();
 
-			if (size<MIN_TWEETS_TO_SHOW) {
-                if (size==0)
-                    statuses.addAll(getStatuesFromDb(-1,MIN_TWEETS_TO_SHOW- size,listId));
-                else
-                    statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,listId));
-			}
-            Log.i("getUserList","Now we have " + statuses.size());
+            System.err.println("Got exception: " + e.getMessage() );
+            if (e.getCause()!=null)
+                System.err.println("   " + e.getCause().getMessage());
+        }
 
-			return statuses;
-		}
-		catch (Exception e) {
-        	System.err.println("Got exception: " + e.getMessage() );
-        	if (e.getCause()!=null)
-        		System.err.println("   " + e.getCause().getMessage());
-            return new ArrayList<Status>();
-		}
+        fillUpStatusesFromDB(listId, statuses);
+        Log.i("getUserList","Now we have " + statuses.size());
+
+        return statuses;
 	}
 
+    private void fillUpStatusesFromDB(int listId, List<Status> statuses) {
+        int size = statuses.size();
+        if (size<MIN_TWEETS_TO_SHOW) {
+            if (size==0)
+                statuses.addAll(getStatuesFromDb(-1,MIN_TWEETS_TO_SHOW- size,listId));
+            else
+                statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,listId));
+        }
+    }
 
-    public Status getStatusById(long statusId,long list_id) {
+
+    public Status getStatusById(long statusId,Long list_id) {
         Status status = null;
 
-        byte[] obj  = tweetDB.getStatusObjectById(statusId);
+        byte[] obj  = tweetDB.getStatusObjectById(statusId,list_id);
         if (obj!=null) {
             status = materializeStatus(obj);
             if (status!=null)
@@ -255,8 +259,13 @@ public class TwitterHelper {
 
         Twitter twitter = getTwitter();
         try {
-             status = twitter.showStatus(statusId);
-            persistStatus(tweetDB,status,list_id);
+            status = twitter.showStatus(statusId);
+            long id;
+            if (list_id==null)
+                id = 0;
+            else
+                id = list_id;
+            persistStatus(tweetDB,status,id);
         } catch (Exception e) {
             e.printStackTrace();  // TODO: Customise this generated block
         }
@@ -265,7 +274,7 @@ public class TwitterHelper {
 
 
     private void persistStatus(TweetDB tdb, Status status, long list_id) throws IOException {
-        if (tdb.getStatusObjectById(status.getId())!=null)
+        if (tdb.getStatusObjectById(status.getId(),list_id)!=null)
             return; // This is already in DB, so do nothing
 
         // Serialize and then store in DB

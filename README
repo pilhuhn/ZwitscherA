@@ -1,19 +1,19 @@
-Welcome to ZwitscherA, a microblogging client for Android.
+Welcome to Zwitscher, a microblogging client for Android.
 I know that this is not the first one and far from working good.
-It is first a "real" project for me to get into Andriod programming.
+It is first a "real" project for me to get into Android programming.
 
 Currently the client uses the twitter4j library, but I think in the
-longer term, I will directly go to use REST/Json, as there is alredy
+longer term, I will directly go to use REST/Json, as there is already
 native Json support in the Android libraries
-- this lets me learn that part 
+- this lets me learn that part
 - it scales down the application size.
 
 I did not really set a target Android platform - at the end
-it has to work on my HTC Desire with Android 2.1.
+it has to work on my HTC Desire with Android 2.2.
 
-===== ATTENTION =========
+===== ATTENTION ON HACKING THE SOURCE =========
 
-As Twitter is not really ready to handle open source projects,
+As Twitter.com is not really ready to handle open source projects,
 you need to register the app at Twitter and then provide a class
 TwitterConsumerToken that looks like this with the values Twitter
 provided you with put in:
@@ -24,8 +24,19 @@ public class TwitterConsumerToken {
 
 	public static String consumerKey = "replaceWithKey";
 	public static String consumerSecret = "replaceWithSecret";
-		
+
 }
+
+To obtain this Token, go to http://twitter.com/apps and log in.
+Then click on "Register an Application" and give some details.
+When this is done you will end up on a page that lists application
+details including consumerKey and consumerSecret.
+
+When Zwitscher has progressed more, I will probably offer binary
+versions on the Android market store, so you do not need the consumer
+token to use it.
+I will also make some earlier binary version available at
+http://bsd.de/zwitscher
 
 ==========================
 

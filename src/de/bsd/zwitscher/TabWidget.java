@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import android.view.Window;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import twitter4j.UserList;
 
 import android.app.TabActivity;
@@ -19,12 +22,19 @@ public class TabWidget extends TabActivity {
 
 	TabHost tabHost;
 	TabHost.TabSpec homeSpec;
+    ProgressBar pg;
+    TextView titleTextBox;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.tabs);
+        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
+        pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+        titleTextBox = (TextView) findViewById(R.id.title_msg_box);
+
 
 		Resources res = getResources();
 		tabHost = getTabHost();
@@ -42,8 +52,8 @@ public class TabWidget extends TabActivity {
 				.setIndicator("Mentions",res.getDrawable(R.drawable.mentions))
 				.setContent(mentionsIntent);
 		tabHost.addTab(homeSpec);
-		
-		
+
+
   		TweetDB tdb = new TweetDB(getApplicationContext());
   		Map<String, Integer> userLists = tdb.getLists();
   		for (Entry<String, Integer> userList : userLists.entrySet()) {
@@ -60,7 +70,7 @@ public class TabWidget extends TabActivity {
 		intent = new Intent().setClass(this,TweetListActivity.class);
 		intent.putExtra("listName", listName);
 		intent.putExtra("id", listId);
-		
+
 		spec = tabHost.newTabSpec(listId.toString())
 		.setIndicator(listName,res.getDrawable(R.drawable.list))
 		.setContent(intent);
@@ -93,8 +103,17 @@ public class TabWidget extends TabActivity {
 	    case R.id.reloadLists:
 	  		syncLists();
 	  		break;
-	  		
-	    	
+        case R.id.DevelResetLastRead:
+            resetLastRead();
+            break;
+        case R.id.DevelCleanTweets:
+            cleanTweetDB();
+            break;
+        case R.id.DevelCleanImages:
+            cleanImages();
+            break;
+
+
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
@@ -102,7 +121,7 @@ public class TabWidget extends TabActivity {
 	}
 
 	/**
-	 * Synchronize lists between what is available in the db 
+	 * Synchronize lists between what is available in the db
 	 * and on twitter.
 	 * Unfortunately there is no easy way to just remove a tab from
 	 * a tabHost. So we need to clean out the tabs and add the remaining
@@ -118,7 +137,7 @@ public class TabWidget extends TabActivity {
 			if (storedLists.containsValue(userList.getId())) {
 				continue;
 			}
-			else { 
+			else {
 				tdb.addList(userList.getName(),userList.getId());
 				setUpTab(getResources(), userList.getName(), userList.getId());
 			}
@@ -149,6 +168,22 @@ public class TabWidget extends TabActivity {
 			}
 		}
 	}
+
+    private void resetLastRead() {
+        TweetDB tb = new TweetDB(this);
+        tb.resetLastRead();
+    }
+
+    private void cleanTweetDB() {
+        TweetDB tb = new TweetDB(this);
+        tb.cleanTweets();
+    }
+
+    private void cleanImages() {
+        PicHelper ph = new PicHelper();
+        ph.cleanup();
+    }
+
 }
 
 
