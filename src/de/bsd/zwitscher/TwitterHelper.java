@@ -27,8 +27,6 @@ import twitter4j.UserList;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
 
-import static android.text.format.DateUtils.*;
-import static android.text.format.DateUtils.getRelativeDateTimeString;
 
 public class TwitterHelper {
 
@@ -196,17 +194,24 @@ public class TwitterHelper {
 
 	}
 
-	public void favorite(Status status) {
+	public Status favorite(Status status) {
 		Twitter twitter = getTwitter();
 		try {
-			if (status.isFavorited())
+			if (status.isFavorited()) {
 				twitter.destroyFavorite(status.getId());
-			else
+            }
+			else {
 				twitter.createFavorite(status.getId());
+            }
+
+            // reload tweet and update in DB - twitter4j should have some status.setFav()..
+            status = getStatusById(status.getId(),0L, true); // TODO list_id ?
+            updateStatus(tweetDB,status,0); // TODO list id ???
 			Toast.makeText(context, "Fav sent" , 2500).show();
-		} catch (TwitterException e) {
+		} catch (Exception e) {
 			Toast.makeText(context, "Failed to (un)create a favorite: " + e.getLocalizedMessage(), 10000).show();
 		}
+        return status;
 
 	}
 
@@ -251,14 +256,24 @@ public class TwitterHelper {
     }
 
 
-    public Status getStatusById(long statusId,Long list_id) {
+    /**
+     * Get a single status. If directOnly is false, we first look in the local
+     * db if it is already present. Otherwise we directly go to the server.
+     * @param statusId
+     * @param list_id
+     * @param directOnly
+     * @return
+     */
+    public Status getStatusById(long statusId, Long list_id, boolean directOnly) {
         Status status = null;
 
-        byte[] obj  = tweetDB.getStatusObjectById(statusId,list_id);
-        if (obj!=null) {
-            status = materializeStatus(obj);
-            if (status!=null)
-                return status;
+        if (!directOnly) {
+            byte[] obj  = tweetDB.getStatusObjectById(statusId,list_id);
+            if (obj!=null) {
+                status = materializeStatus(obj);
+                if (status!=null)
+                    return status;
+            }
         }
 
         Twitter twitter = getTwitter();
@@ -321,7 +336,11 @@ public class TwitterHelper {
     public String getStatusDate(Status status) {
         Date date = status.getCreatedAt();
         long time = date.getTime();
-        return (String) DateUtils.getRelativeDateTimeString(context, time, SECOND_IN_MILLIS, DAY_IN_MILLIS, DateUtils.FORMAT_ABBREV_ALL);
-
+        
+        return (String) DateUtils.getRelativeDateTimeString(context,
+                time,
+                DateUtils.SECOND_IN_MILLIS,
+                DateUtils.DAY_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_ALL);
     }
 }

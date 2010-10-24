@@ -47,13 +47,13 @@ public class ThreadListActivity extends ListActivity {
 
         TwitterHelper th = new TwitterHelper(this);
 
-        Status status = th.getStatusById(id,null) ;
+        Status status = th.getStatusById(id,null, false) ;
         while (status!=null) {
             result.add(status);
 
             long inReplyToStatusId = status.getInReplyToStatusId();
             if (inReplyToStatusId!=-1)
-                status = th.getStatusById(inReplyToStatusId,null);
+                status = th.getStatusById(inReplyToStatusId,null, false);
             else
                 status=null;
         }

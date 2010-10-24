@@ -141,8 +141,15 @@ public class OneTweetActivity extends Activity {
     public void favorite(View v) {
         TwitterHelper th = new TwitterHelper(ctx);
 
-        th.favorite(status);
+        status = th.favorite(status);
         // TODO update button state
+        Button favoriteButton = (Button) findViewById(R.id.FavoriteButton);
+        if (status.isFavorited())
+            favoriteButton.setText("Un-favorite");
+        else
+            favoriteButton.setText("Favorite");
+
+
     }
 
     public void directMessage(View v) {
