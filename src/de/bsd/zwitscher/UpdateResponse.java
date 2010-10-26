@@ -74,4 +74,8 @@ public class UpdateResponse {
     public void setSuccess(boolean success) {
         this.success = success;
     }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 }

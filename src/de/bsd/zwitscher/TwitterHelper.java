@@ -200,7 +200,8 @@ public class TwitterHelper {
         return response;
 	}
 
-	public Status favorite(Status status) {
+	public UpdateResponse favorite(Status status) {
+        UpdateResponse updateResponse = new UpdateResponse(UpdateType.FAVORITE,status);
 		Twitter twitter = getTwitter();
 		try {
 			if (status.isFavorited()) {
@@ -213,11 +214,14 @@ public class TwitterHelper {
             // reload tweet and update in DB - twitter4j should have some status.setFav()..
             status = getStatusById(status.getId(),0L, true); // TODO list_id ?
             updateStatus(tweetDB,status,0); // TODO list id ???
-			Toast.makeText(context, "Fav sent" , 2500).show();
+			updateResponse.setSuccess(true);
+            updateResponse.setMessage("(Un)favorite set");
 		} catch (Exception e) {
-			Toast.makeText(context, "Failed to (un)create a favorite: " + e.getLocalizedMessage(), 10000).show();
+            updateResponse.setSuccess(false);
+            updateResponse.setMessage("Failed to (un)create a favorite: " + e.getLocalizedMessage());
 		}
-        return status;
+        updateResponse.setStatus(status);
+        return updateResponse;
 
 	}
 

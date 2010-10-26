@@ -141,8 +141,9 @@ public class OneTweetActivity extends Activity {
     public void favorite(View v) {
         TwitterHelper th = new TwitterHelper(ctx);
 
-        status = th.favorite(status);
-        // TODO update button state
+        UpdateResponse response = th.favorite(status);
+        status = response.status;
+        // update button state
         Button favoriteButton = (Button) findViewById(R.id.FavoriteButton);
         if (status.isFavorited())
             favoriteButton.setText("Un-favorite");
