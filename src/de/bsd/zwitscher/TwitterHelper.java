@@ -171,27 +171,33 @@ public class TwitterHelper {
 
 	}
 
-	public String updateStatus(StatusUpdate update) {
+	public UpdateResponse updateStatus(StatusUpdate update) {
 		Twitter twitter = getTwitter();
+        UpdateResponse updateResponse = new UpdateResponse(UpdateType.UPDATE,update);
 		Log.i("TwitterHelper", "Sending update: " + update);
 		try {
 			twitter.updateStatus(update);
-			return "Tweet sent";
+            updateResponse.setMessage("Tweet sent");
+            updateResponse.setSuccess(true);
 		} catch (TwitterException e) {
-			return "Failed to send tweet: " + e.getLocalizedMessage();
-		}
-
+            updateResponse.setMessage("Failed to send tweet: " + e.getLocalizedMessage());
+            updateResponse.setSuccess(false);
+        }
+        return updateResponse;
 	}
 
-	public String retweet(long id) {
+	public UpdateResponse retweet(long id) {
 		Twitter twitter = getTwitter();
+        UpdateResponse response = new UpdateResponse(UpdateType.RETWEET,id);
 		try {
 			twitter.retweetStatus(id);
-			return "Retweeted successfully";
+            response.setSuccess(true);
+			response.setMessage("Retweeted successfully");
 		} catch (TwitterException e) {
-			return "Failed to  retweet: " + e.getLocalizedMessage();
+            response.setSuccess(false);
+            response.setMessage("Failed to  retweet: " + e.getLocalizedMessage());
 		}
-
+        return response;
 	}
 
 	public Status favorite(Status status) {
@@ -336,7 +342,7 @@ public class TwitterHelper {
     public String getStatusDate(Status status) {
         Date date = status.getCreatedAt();
         long time = date.getTime();
-        
+
         return (String) DateUtils.getRelativeDateTimeString(context,
                 time,
                 DateUtils.SECOND_IN_MILLIS,

@@ -241,7 +241,7 @@ public class OneTweetActivity extends Activity {
         }
     }
 
-    private class RetweetTask extends AsyncTask<Long,Void,String> {
+    private class RetweetTask extends AsyncTask<Long,Void,UpdateResponse> {
 
         @Override
         protected void onPreExecute() {
@@ -251,14 +251,14 @@ public class OneTweetActivity extends Activity {
         }
 
         @Override
-        protected String doInBackground(Long... longs) {
+        protected UpdateResponse doInBackground(Long... longs) {
             TwitterHelper th = new TwitterHelper(ctx);
-            String ret = th.retweet(status.getId());
+            UpdateResponse ret = th.retweet(status.getId());
             return ret;
         }
 
         @Override
-        protected void onPostExecute(String s) {
+        protected void onPostExecute(UpdateResponse s) {
             pg.setVisibility(ProgressBar.INVISIBLE);
         }
     }

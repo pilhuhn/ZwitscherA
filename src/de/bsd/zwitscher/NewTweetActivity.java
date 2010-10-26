@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.view.Window;
 import android.widget.*;
@@ -180,28 +179,7 @@ public class NewTweetActivity extends Activity {
 
 
 	public void tweet(StatusUpdate update) {
-        new UpdateStatusTask().execute(update);
+        new UpdateStatusTask(this,pg).execute(update);
 	}
-
-    private class UpdateStatusTask extends AsyncTask<StatusUpdate,Void,String> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pg.setVisibility(ProgressBar.VISIBLE);
-        }
-
-        @Override
-        protected String doInBackground(StatusUpdate... statusUpdates) {
-            TwitterHelper th = new TwitterHelper(getApplicationContext());
-            String ret = th.updateStatus(statusUpdates[0]);
-            return ret;
-        }
-
-        protected void onPostExecute(String result) {
-            pg.setVisibility(ProgressBar.INVISIBLE);
-            Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
-        }
-    }
 
 }
