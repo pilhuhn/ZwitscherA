@@ -118,7 +118,9 @@ public class OneTweetActivity extends Activity {
 
 
 	public void retweet(View v) {
-        new RetweetTask().execute(status.getId());
+        UpdateRequest request = new UpdateRequest(UpdateType.RETWEET);
+        request.id = status.getId();
+        new UpdateStatusTask(this,pg).execute(request);
 	}
 
 
@@ -141,7 +143,9 @@ public class OneTweetActivity extends Activity {
     public void favorite(View v) {
         TwitterHelper th = new TwitterHelper(ctx);
 
-        UpdateResponse response = th.favorite(status);
+        UpdateRequest request = new UpdateRequest(UpdateType.FAVORITE);
+        request.status = status;
+        UpdateResponse response = th.favorite(request);
         status = response.status;
         // update button state
         Button favoriteButton = (Button) findViewById(R.id.FavoriteButton);
@@ -242,25 +246,4 @@ public class OneTweetActivity extends Activity {
         }
     }
 
-    private class RetweetTask extends AsyncTask<Long,Void,UpdateResponse> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pg.setVisibility(ProgressBar.VISIBLE);
-
-        }
-
-        @Override
-        protected UpdateResponse doInBackground(Long... longs) {
-            TwitterHelper th = new TwitterHelper(ctx);
-            UpdateResponse ret = th.retweet(status.getId());
-            return ret;
-        }
-
-        @Override
-        protected void onPostExecute(UpdateResponse s) {
-            pg.setVisibility(ProgressBar.INVISIBLE);
-        }
-    }
 }

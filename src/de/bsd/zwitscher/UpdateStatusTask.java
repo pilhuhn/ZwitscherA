@@ -13,7 +13,7 @@ import twitter4j.StatusUpdate;
 *
 * @author Heiko W. Rupp
 */
-class UpdateStatusTask extends AsyncTask<StatusUpdate,Void,UpdateResponse> {
+class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
     StatusUpdate update;
     private Context context;
@@ -32,10 +32,27 @@ class UpdateStatusTask extends AsyncTask<StatusUpdate,Void,UpdateResponse> {
     }
 
     @Override
-    protected UpdateResponse doInBackground(StatusUpdate... statusUpdates) {
-        update=statusUpdates[0];
+    protected UpdateResponse doInBackground(UpdateRequest... requests) {
         TwitterHelper th = new TwitterHelper(context.getApplicationContext());
-        UpdateResponse ret = th.updateStatus(update);
+
+        UpdateResponse ret;
+        UpdateRequest request = requests[0];
+        switch (request.updateType) {
+            case UPDATE:
+                ret = th.updateStatus(request);
+                break;
+            case FAVORITE:
+                ret = th.favorite(request);
+                break;
+            case DIRECT:
+                ret = th.direct(request);
+                break;
+            case RETWEET:
+                ret = th.retweet(request);
+                break;
+            default:
+                throw new IllegalArgumentException("Update type not supported yet : " + request.updateType);
+        }
         return ret;
     }
 

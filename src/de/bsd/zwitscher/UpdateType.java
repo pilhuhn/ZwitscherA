@@ -9,5 +9,5 @@ public enum UpdateType {
 
     UPDATE,
     RETWEET,
-    FAVORITE;
+    FAVORITE, DIRECT;
 }

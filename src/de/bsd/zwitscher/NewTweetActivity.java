@@ -20,6 +20,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
+import twitter4j.User;
 
 public class NewTweetActivity extends Activity {
 
@@ -27,6 +28,7 @@ public class NewTweetActivity extends Activity {
 	Status origStatus;
 	Pattern p = Pattern.compile(".*?(@\\w+ )*.*");
     ProgressBar pg;
+    User toUser = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +73,9 @@ public class NewTweetActivity extends Activity {
 					String msg = "RT @" + origStatus.getUser().getScreenName() + " ";
 					msg = msg + origStatus.getText();
 					edittext.setText(msg); // TODO limit to 140 chars
-				}
+				} else if (op.equals(getString(R.string.direct))) {
+                    toUser = origStatus.getUser();
+                }
 			}
 		}
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -120,7 +124,10 @@ public class NewTweetActivity extends Activity {
 	        	if (origStatus!=null) {
 	        		up.setInReplyToStatusId(origStatus.getId());
 	        	}
-	        	tweet(up);
+                if (toUser!=null)
+	        	    tweet(up);
+                else
+                    direct(toUser,edittext.getText().toString());
 	        	origStatus=null;
 	        	finish();
 
@@ -139,6 +146,7 @@ public class NewTweetActivity extends Activity {
 		});
 
 	}
+
 
 
     private Location getCurrentLocation() {
@@ -178,8 +186,26 @@ public class NewTweetActivity extends Activity {
 	}
 
 
+    /**
+     * Trigger an update (new tweet, reply )
+     * @param update Update to send
+     */
 	public void tweet(StatusUpdate update) {
-        new UpdateStatusTask(this,pg).execute(update);
+        UpdateRequest request = new UpdateRequest(UpdateType.UPDATE);
+        request.statusUpdate = update;
+        new UpdateStatusTask(this,pg).execute(request);
 	}
+
+    /**
+     * Trigger a direct message to the given user.
+     * @param toUser user to send a direct message to
+     * @param msg message to send
+     */
+    private void direct(User toUser, String msg) {
+        UpdateRequest request = new UpdateRequest(UpdateType.DIRECT);
+        request.message = msg;
+        request.id = toUser.getId();
+        new UpdateStatusTask(this,pg).execute(request);
+    }
 
 }

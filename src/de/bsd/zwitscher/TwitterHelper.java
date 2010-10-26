@@ -23,6 +23,7 @@ import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
+import twitter4j.User;
 import twitter4j.UserList;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
@@ -171,37 +172,38 @@ public class TwitterHelper {
 
 	}
 
-	public UpdateResponse updateStatus(StatusUpdate update) {
+	public UpdateResponse updateStatus(UpdateRequest request) {
 		Twitter twitter = getTwitter();
-        UpdateResponse updateResponse = new UpdateResponse(UpdateType.UPDATE,update);
-		Log.i("TwitterHelper", "Sending update: " + update);
+        UpdateResponse updateResponse = new UpdateResponse(request.updateType,request.statusUpdate);
+		Log.i("TwitterHelper", "Sending update: " + request.statusUpdate);
 		try {
-			twitter.updateStatus(update);
+			twitter.updateStatus(request.statusUpdate);
             updateResponse.setMessage("Tweet sent");
-            updateResponse.setSuccess(true);
+            updateResponse.setSuccess();
 		} catch (TwitterException e) {
             updateResponse.setMessage("Failed to send tweet: " + e.getLocalizedMessage());
-            updateResponse.setSuccess(false);
+            updateResponse.setFailure();
         }
         return updateResponse;
 	}
 
-	public UpdateResponse retweet(long id) {
+	public UpdateResponse retweet(UpdateRequest request) {
 		Twitter twitter = getTwitter();
-        UpdateResponse response = new UpdateResponse(UpdateType.RETWEET,id);
+        UpdateResponse response = new UpdateResponse(request.updateType,request.id);
 		try {
-			twitter.retweetStatus(id);
-            response.setSuccess(true);
+			twitter.retweetStatus(request.id);
+            response.setSuccess();
 			response.setMessage("Retweeted successfully");
 		} catch (TwitterException e) {
-            response.setSuccess(false);
+            response.setFailure();
             response.setMessage("Failed to  retweet: " + e.getLocalizedMessage());
 		}
         return response;
 	}
 
-	public UpdateResponse favorite(Status status) {
-        UpdateResponse updateResponse = new UpdateResponse(UpdateType.FAVORITE,status);
+	public UpdateResponse favorite(UpdateRequest request) {
+        Status status = request.status;
+        UpdateResponse updateResponse = new UpdateResponse(request.updateType, status);
 		Twitter twitter = getTwitter();
 		try {
 			if (status.isFavorited()) {
@@ -214,16 +216,30 @@ public class TwitterHelper {
             // reload tweet and update in DB - twitter4j should have some status.setFav()..
             status = getStatusById(status.getId(),0L, true); // TODO list_id ?
             updateStatus(tweetDB,status,0); // TODO list id ???
-			updateResponse.setSuccess(true);
+			updateResponse.setSuccess();
             updateResponse.setMessage("(Un)favorite set");
 		} catch (Exception e) {
-            updateResponse.setSuccess(false);
+            updateResponse.setFailure();
             updateResponse.setMessage("Failed to (un)create a favorite: " + e.getLocalizedMessage());
 		}
         updateResponse.setStatus(status);
         return updateResponse;
-
 	}
+
+
+    public UpdateResponse direct(UpdateRequest request) {
+        UpdateResponse updateResponse = new UpdateResponse(request.updateType, (Status) null); // TODO
+        Twitter twitter = getTwitter();
+        try {
+            twitter.sendDirectMessage((int)request.id,request.message);
+            updateResponse.setSuccess();
+            updateResponse.setMessage("Direct message sent");
+        } catch (TwitterException e) {
+            updateResponse.setFailure();
+            updateResponse.setMessage("Sending of direct tweet failes: " + e.getLocalizedMessage());
+        }
+        return updateResponse;
+    }
 
 	public List<Status> getUserList(Paging paging, int listId, boolean fromDbOnly) {
         Twitter twitter = getTwitter();

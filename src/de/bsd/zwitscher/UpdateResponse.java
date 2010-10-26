@@ -71,8 +71,12 @@ public class UpdateResponse {
         this.update = update;
     }
 
-    public void setSuccess(boolean success) {
-        this.success = success;
+    public void setSuccess() {
+        success = true;
+    }
+
+    public void setFailure() {
+        success = false;
     }
 
     public void setStatus(Status status) {
