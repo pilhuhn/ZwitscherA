@@ -94,8 +94,10 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
                     " retweeted by " + STRONG + status.getUser().getName() + STRONG_END;
         }
 
-        if (bi!=null)
+        if (bi!=null) {
+            bi = ph.decorate(bi,status.isFavorited(),status.getRetweetedStatus()!=null);
             iv.setImageBitmap(bi);
+        }
         else {
             // underlying view seems to be reused, so default image is not loaded when bi==null
             iv.setImageBitmap(BitmapFactory.decodeResource(extContext.getResources(), R.drawable.user_unknown));
