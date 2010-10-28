@@ -124,7 +124,7 @@ public class NewTweetActivity extends Activity {
 	        	if (origStatus!=null) {
 	        		up.setInReplyToStatusId(origStatus.getId());
 	        	}
-                if (toUser!=null)
+                if (toUser==null)
 	        	    tweet(up);
                 else
                     direct(toUser,edittext.getText().toString());
