@@ -32,7 +32,6 @@ import android.widget.TextView;
 import twitter4j.Status;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -90,7 +89,7 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
         }
         else {
             bi = ph.getBitMapForUserFromFile(status.getRetweetedStatus().getUser());
-            userName = STRONG + status.getRetweetedStatus().getUser().getName() + STRONG +
+            userName = STRONG + status.getRetweetedStatus().getUser().getName() + STRONG_END +
                     " retweeted by " + STRONG + status.getUser().getName() + STRONG_END;
         }
 
