@@ -24,6 +24,9 @@
 		  android:layout_width="fill_parent"
 		  android:layout_height="wrap_content"
           android:autoLink="all"
+          android:layout_margin="2dp"
+          android:padding="2dp"
+          android:textSize="16sp"
 		  android:text="@+id/TweetTextView"/>
 <TextView android:id="@+id/MiscTextView"
 		  android:layout_below="@+id/TweetTextView"
@@ -35,6 +38,7 @@
 		  android:layout_below="@+id/MiscTextView"
 		  android:layout_width="fill_parent"
 		  android:layout_height="wrap_content"
+          android:paddingBottom="10dp"
 		  />
 
 
