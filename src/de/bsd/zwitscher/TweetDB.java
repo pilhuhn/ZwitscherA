@@ -11,11 +11,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import de.bsd.zwitscher.account.Account;
 import twitter4j.Status;
 
 public class TweetDB {
 
     private static final String STATUSES = "statuses";
+    private static final String TABLE_ACCOUNTS = "accounts";
     private TweetDBOpenHelper tdHelper;
 
 	public TweetDB(Context context) {
@@ -28,7 +30,6 @@ public class TweetDB {
 		public TweetDBOpenHelper(Context context, String name,
 				CursorFactory factory, int version) {
 			super(context, name, factory, version);
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override
@@ -53,6 +54,15 @@ public class TweetDB {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (newVersion==2) {
+                db.execSQL("CREATE TABLE accounts (" +
+                            "name TEXT, " + // 0
+                            "tokenKey TEXT, "+ // 1
+                            "tokenSecret TEXT, "+ // 2
+                            "serverUrl TEXT, " + // 3
+                            "serverType )" // 4
+                );
+            }
 		}
 
 	}
@@ -214,4 +224,46 @@ public class TweetDB {
         db.close();
     }
 
+    public Account getAccount(String name,String type) {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        Cursor c;
+        Account account=null;
+        c = db.query(TABLE_ACCOUNTS,null,"name = ? AND serverType = ?", new String[]{name,type},null,null,null);
+        if (c.getColumnCount()>0) {
+            c.moveToFirst();
+            account = new Account(
+                    name,
+                    c.getString(1),
+                    c.getString(2),
+                    type,
+                    c.getString(4)
+            );
+        }
+        c.close();
+        db.close();
+        return account;
+    }
+
+    public void deleteAccount(Account account) {
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.delete(TABLE_ACCOUNTS,"name = ? AND type = ? ", new String[]{account.getName(),account.getServerType()});
+        db.close();
+    }
+
+    public void insertOrUpdateAccount(Account account) {
+        ContentValues cv = new ContentValues(5);
+        cv.put("name",account.getName());
+        cv.put("tokenKey",account.getAccessTokenKey());
+        cv.put("tokenSecret",account.getAccessTokenSecret());
+        cv.put("serverUrl",account.getServerUrl());
+        cv.put("serverType",account.getServerType());
+
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        if (getAccount(account.getName(),account.getServerType())==null)
+            db.insert(TABLE_ACCOUNTS, null, cv);
+        else
+            db.update(TABLE_ACCOUNTS,cv,"name = ? AND serverType = ?",new String[]{account.getName(),account.getServerType()});
+        db.close();
+
+    }
 }
