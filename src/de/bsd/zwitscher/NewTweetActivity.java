@@ -50,12 +50,15 @@ public class NewTweetActivity extends Activity {
 			origStatus = (Status) bundle.get("status");
 			Log.i("Replying..", "Orig is " + origStatus);
 			TextView textOben = (TextView) findViewById(R.id.textOben);
-			textOben.setText(origStatus.getText());
+
 			String op = (String) bundle.get("op");
 			if (op!=null) {
-				if (op.equals(getString(R.string.reply))) {
+                boolean isDirect = op.equals(getString(R.string.direct));
+                if (op.equals(getString(R.string.reply))) {
+                    textOben.setText(origStatus.getText());
 					edittext.setText("@"+origStatus.getUser().getScreenName()+" ");
 				} else if (op.equals(getString(R.string.replyall))) {
+                    textOben.setText(origStatus.getText());
 					String oText = origStatus.getText();
 //					Matcher m = p.matcher(oText);
 					StringBuilder sb = new StringBuilder();
@@ -70,11 +73,13 @@ public class NewTweetActivity extends Activity {
 					findUsers (sb,oText);
 					edittext.setText(sb.toString());
 				} else if (op.equals(getString(R.string.classicretweet))) {
+                    textOben.setText(origStatus.getText());
 					String msg = "RT @" + origStatus.getUser().getScreenName() + " ";
 					msg = msg + origStatus.getText();
 					edittext.setText(msg); // TODO limit to 140 chars
-				} else if (op.equals(getString(R.string.direct))) {
+				} else if (isDirect) {
                     toUser = origStatus.getUser();
+                    textOben.setText("Sending direct message to " + toUser.getScreenName());
                 }
 			}
 		}
