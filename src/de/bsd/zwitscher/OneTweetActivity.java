@@ -2,6 +2,7 @@ package de.bsd.zwitscher;
 
 
 import android.os.AsyncTask;
+import android.text.Html;
 import android.view.Window;
 import android.widget.*;
 import com.google.api.translate.Language;
@@ -80,6 +81,11 @@ public class OneTweetActivity extends Activity {
 			TextView tweetView = (TextView)findViewById(R.id.TweetTextView);
 			tweetView.setText(status.getText());
 
+            TextView timeCientView = (TextView)findViewById(R.id.TimeTextView);
+            TwitterHelper th = new TwitterHelper(this);
+            String text = th.getStatusDate(status) + " via " + status.getSource();
+            timeCientView.setText(Html.fromHtml(text));
+
 
             // Update Button state depending on Status' properties
 			Button threadButton = (Button) findViewById(R.id.ThreadButton);
@@ -112,7 +118,9 @@ public class OneTweetActivity extends Activity {
 
 
 	public void retweet(View v) {
-        new RetweetTask().execute(status.getId());
+        UpdateRequest request = new UpdateRequest(UpdateType.RETWEET);
+        request.id = status.getId();
+        new UpdateStatusTask(this,pg).execute(request);
 	}
 
 
@@ -135,8 +143,18 @@ public class OneTweetActivity extends Activity {
     public void favorite(View v) {
         TwitterHelper th = new TwitterHelper(ctx);
 
-        th.favorite(status);
-        // TODO update button state
+        UpdateRequest request = new UpdateRequest(UpdateType.FAVORITE);
+        request.status = status;
+        UpdateResponse response = th.favorite(request);
+        status = response.status;
+        // update button state
+        Button favoriteButton = (Button) findViewById(R.id.FavoriteButton);
+        if (status.isFavorited())
+            favoriteButton.setText("Un-favorite");
+        else
+            favoriteButton.setText("Favorite");
+
+
     }
 
     public void directMessage(View v) {
@@ -228,25 +246,4 @@ public class OneTweetActivity extends Activity {
         }
     }
 
-    private class RetweetTask extends AsyncTask<Long,Void,String> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pg.setVisibility(ProgressBar.VISIBLE);
-
-        }
-
-        @Override
-        protected String doInBackground(Long... longs) {
-            TwitterHelper th = new TwitterHelper(ctx);
-            String ret = th.retweet(status.getId());
-            return ret;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            pg.setVisibility(ProgressBar.INVISIBLE);
-        }
-    }
 }

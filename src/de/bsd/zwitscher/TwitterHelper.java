@@ -6,19 +6,19 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.os.Debug;
 import android.preference.PreferenceManager;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import twitter4j.Paging;
 import twitter4j.Status;
-import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -26,10 +26,10 @@ import twitter4j.UserList;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
 
+
 public class TwitterHelper {
 
 
-    private static final int MIN_TWEETS_TO_SHOW = 40;
 	Context context;
     TweetDB tweetDB;
 
@@ -169,42 +169,74 @@ public class TwitterHelper {
 
 	}
 
-	public String updateStatus(StatusUpdate update) {
+	public UpdateResponse updateStatus(UpdateRequest request) {
 		Twitter twitter = getTwitter();
-		Log.i("TwitterHelper", "Sending update: " + update);
+        UpdateResponse updateResponse = new UpdateResponse(request.updateType,request.statusUpdate);
+		Log.i("TwitterHelper", "Sending update: " + request.statusUpdate);
 		try {
-			twitter.updateStatus(update);
-			return "Tweet sent";
+			twitter.updateStatus(request.statusUpdate);
+            updateResponse.setMessage("Tweet sent");
+            updateResponse.setSuccess();
 		} catch (TwitterException e) {
-			return "Failed to send tweet: " + e.getLocalizedMessage();
-		}
-
+            updateResponse.setMessage("Failed to send tweet: " + e.getLocalizedMessage());
+            updateResponse.setFailure();
+        }
+        return updateResponse;
 	}
 
-	public String retweet(long id) {
+	public UpdateResponse retweet(UpdateRequest request) {
 		Twitter twitter = getTwitter();
+        UpdateResponse response = new UpdateResponse(request.updateType,request.id);
 		try {
-			twitter.retweetStatus(id);
-			return "Retweeted successfully";
+			twitter.retweetStatus(request.id);
+            response.setSuccess();
+			response.setMessage("Retweeted successfully");
 		} catch (TwitterException e) {
-			return "Failed to  retweet: " + e.getLocalizedMessage();
+            response.setFailure();
+            response.setMessage("Failed to  retweet: " + e.getLocalizedMessage());
 		}
-
+        return response;
 	}
 
-	public void favorite(Status status) {
+	public UpdateResponse favorite(UpdateRequest request) {
+        Status status = request.status;
+        UpdateResponse updateResponse = new UpdateResponse(request.updateType, status);
 		Twitter twitter = getTwitter();
 		try {
-			if (status.isFavorited())
+			if (status.isFavorited()) {
 				twitter.destroyFavorite(status.getId());
-			else
+            }
+			else {
 				twitter.createFavorite(status.getId());
-			Toast.makeText(context, R.string.tweet_sent , 2500).show();
-		} catch (TwitterException e) {
-			Toast.makeText(context, "Failed to (un)create a favorite: " + e.getLocalizedMessage(), 10000).show();
-		}
+            }
 
+            // reload tweet and update in DB - twitter4j should have some status.setFav()..
+            status = getStatusById(status.getId(),0L, true); // TODO list_id ?
+            updateStatus(tweetDB,status,0); // TODO list id ???
+			updateResponse.setSuccess();
+            updateResponse.setMessage("(Un)favorite set");
+		} catch (Exception e) {
+            updateResponse.setFailure();
+            updateResponse.setMessage("Failed to (un)create a favorite: " + e.getLocalizedMessage());
+		}
+        updateResponse.setStatus(status);
+        return updateResponse;
 	}
+
+
+    public UpdateResponse direct(UpdateRequest request) {
+        UpdateResponse updateResponse = new UpdateResponse(request.updateType, (Status) null); // TODO
+        Twitter twitter = getTwitter();
+        try {
+            twitter.sendDirectMessage((int)request.id,request.message);
+            updateResponse.setSuccess();
+            updateResponse.setMessage("Direct message sent");
+        } catch (TwitterException e) {
+            updateResponse.setFailure();
+            updateResponse.setMessage("Sending of direct tweet failed: " + e.getLocalizedMessage());
+        }
+        return updateResponse;
+    }
 
 	public List<Status> getUserList(Paging paging, int listId, boolean fromDbOnly) {
         Twitter twitter = getTwitter();
@@ -236,25 +268,53 @@ public class TwitterHelper {
         return statuses;
 	}
 
+    /**
+     * Fill the passed status list with old tweets from the DB. This is wanted in
+     * two occasions:<ul>
+     * <li>No tweets came from the server, so we want to show something</li>
+     * <li>A small number is fetched, we want to show more (to have some timely context)</li>
+     * </ul>
+     * For a given number of passed statuses, we
+     * <ul>
+     * <li>Always add minOld tweets from the DB</li>
+     * <li>If no incoming tweets, show maxOld</li>
+     * </ul>
+     * See also preferences.xml
+     * @param listId The list for which tweets are fetched
+     * @param statuses The list of incoming statuses to fill up
+     */
     private void fillUpStatusesFromDB(int listId, List<Status> statuses) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int minOld = Integer.valueOf(preferences.getString("minOldTweets","5"));
+        int maxOld = Integer.valueOf(preferences.getString("maxOldTweets","10"));
+
+
         int size = statuses.size();
-        if (size<MIN_TWEETS_TO_SHOW) {
-            if (size==0)
-                statuses.addAll(getStatuesFromDb(-1,MIN_TWEETS_TO_SHOW- size,listId));
-            else
-                statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,listId));
-        }
+        if (size==0)
+            statuses.addAll(getStatuesFromDb(-1,maxOld,listId));
+        else
+            statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),minOld,listId));
     }
 
 
-    public Status getStatusById(long statusId,Long list_id) {
+    /**
+     * Get a single status. If directOnly is false, we first look in the local
+     * db if it is already present. Otherwise we directly go to the server.
+     * @param statusId
+     * @param list_id
+     * @param directOnly
+     * @return
+     */
+    public Status getStatusById(long statusId, Long list_id, boolean directOnly) {
         Status status = null;
 
-        byte[] obj  = tweetDB.getStatusObjectById(statusId,list_id);
-        if (obj!=null) {
-            status = materializeStatus(obj);
-            if (status!=null)
-                return status;
+        if (!directOnly) {
+            byte[] obj  = tweetDB.getStatusObjectById(statusId,list_id);
+            if (obj!=null) {
+                status = materializeStatus(obj);
+                if (status!=null)
+                    return status;
+            }
         }
 
         Twitter twitter = getTwitter();
@@ -281,9 +341,21 @@ public class TwitterHelper {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream out = new ObjectOutputStream(bos);
         out.writeObject(status);
-        tdb.storeStatus(status.getId(),status.getInReplyToStatusId(),list_id,bos.toByteArray());
+        tdb.storeOrUpdateStatus(status.getId(), status.getInReplyToStatusId(), list_id, bos.toByteArray(), true);
     }
 
+    private void updateStatus(TweetDB tdb, Status status, long list_id) throws IOException {
+        if (tdb.getStatusObjectById(status.getId(),list_id)==null) {
+            persistStatus(tdb,status,list_id);
+            return;
+        }
+
+        // Serialize and then store in DB
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(bos);
+        out.writeObject(status);
+        tdb.storeOrUpdateStatus(status.getId(), status.getInReplyToStatusId(), list_id, bos.toByteArray(), false);
+    }
 
 
     private Status materializeStatus(byte[] obj) {
@@ -300,5 +372,16 @@ public class TwitterHelper {
 
         return status;
 
+    }
+
+    public String getStatusDate(Status status) {
+        Date date = status.getCreatedAt();
+        long time = date.getTime();
+
+        return (String) DateUtils.getRelativeDateTimeString(context,
+                time,
+                DateUtils.SECOND_IN_MILLIS,
+                DateUtils.DAY_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_ALL);
     }
 }
