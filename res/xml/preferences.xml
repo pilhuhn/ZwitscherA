@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference android:title="User Name"
-                        android:summary="Please provide the user name"
-                        android:key="username"/>
-
-    <EditTextPreference android:title="OAuth pin"
-                        android:key="pin"
-                        android:summary="Please provide the OAuth pin"/>
 
     <CheckBoxPreference android:title="Location enabled"
                         android:key="location"
@@ -17,5 +10,20 @@
                         android:summary="Provide Expressions, separated by Comma to filter tweets"
                         android:key="filter"
                         />
+    <ListPreference android:title="Min old tweets"
+                    android:summary="Minumum of old tweets to display after a reload with new tweets"
+                    android:defaultValue="5"
+                    android:entryValues="@array/min_o_tweets_preference"
+                    android:entries="@array/min_o_tweets_preference"
+                    android:key="minOldTweets"
+                    />
+
+    <ListPreference android:title="Default old tweets"
+                    android:summary="Number of old tweets to display when there are no new tweets on the server"
+                    android:defaultValue="10"
+                    android:entryValues="@array/max_o_tweets_preference"
+                    android:entries="@array/max_o_tweets_preference"
+                    android:key="maxOldTweets"
+                    />
 
 </PreferenceScreen>

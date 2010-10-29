@@ -19,11 +19,9 @@ import android.widget.Toast;
 
 import twitter4j.Paging;
 import twitter4j.Status;
-import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
-import twitter4j.User;
 import twitter4j.UserList;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
@@ -32,7 +30,6 @@ import twitter4j.http.RequestToken;
 public class TwitterHelper {
 
 
-    private static final int MIN_TWEETS_TO_SHOW = 40;
 	Context context;
     TweetDB tweetDB;
 
@@ -236,7 +233,7 @@ public class TwitterHelper {
             updateResponse.setMessage("Direct message sent");
         } catch (TwitterException e) {
             updateResponse.setFailure();
-            updateResponse.setMessage("Sending of direct tweet failes: " + e.getLocalizedMessage());
+            updateResponse.setMessage("Sending of direct tweet failed: " + e.getLocalizedMessage());
         }
         return updateResponse;
     }
@@ -271,14 +268,32 @@ public class TwitterHelper {
         return statuses;
 	}
 
+    /**
+     * Fill the passed status list with old tweets from the DB. This is wanted in
+     * two occasions:<ul>
+     * <li>No tweets came from the server, so we want to show something</li>
+     * <li>A small number is fetched, we want to show more (to have some timely context)</li>
+     * </ul>
+     * For a given number of passed statuses, we
+     * <ul>
+     * <li>Always add minOld tweets from the DB</li>
+     * <li>If no incoming tweets, show maxOld</li>
+     * </ul>
+     * See also preferences.xml
+     * @param listId The list for which tweets are fetched
+     * @param statuses The list of incoming statuses to fill up
+     */
     private void fillUpStatusesFromDB(int listId, List<Status> statuses) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int minOld = Integer.valueOf(preferences.getString("minOldTweets","5"));
+        int maxOld = Integer.valueOf(preferences.getString("maxOldTweets","10"));
+
+
         int size = statuses.size();
-        if (size<MIN_TWEETS_TO_SHOW) {
-            if (size==0)
-                statuses.addAll(getStatuesFromDb(-1,MIN_TWEETS_TO_SHOW- size,listId));
-            else
-                statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),MIN_TWEETS_TO_SHOW- size,listId));
-        }
+        if (size==0)
+            statuses.addAll(getStatuesFromDb(-1,maxOld,listId));
+        else
+            statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),minOld,listId));
     }
 
 
