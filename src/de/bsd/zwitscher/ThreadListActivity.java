@@ -47,11 +47,15 @@ public class ThreadListActivity extends ListActivity {
 
         TwitterHelper th = new TwitterHelper(this);
 
-        Status status = th.getStatusById(id,null) ;
+        Status status = th.getStatusById(id,null, false) ;
         while (status!=null) {
             result.add(status);
 
-            status = th.getStatusById(status.getInReplyToStatusId(),null);
+            long inReplyToStatusId = status.getInReplyToStatusId();
+            if (inReplyToStatusId!=-1)
+                status = th.getStatusById(inReplyToStatusId,null, false);
+            else
+                status=null;
         }
 
         setListAdapter(new StatusAdapter<twitter4j.Status>(this, R.layout.list_item, result));

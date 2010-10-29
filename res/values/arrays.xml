@@ -1,0 +1,14 @@
+<resources>
+    <string-array name="min_o_tweets_preference">
+        <item>1</item>
+        <item>2</item>
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="max_o_tweets_preference">
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+    </string-array>
+</resources>

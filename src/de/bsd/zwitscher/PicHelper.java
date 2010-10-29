@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 
+import android.graphics.Color;
 import twitter4j.User;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -88,6 +89,54 @@ public class PicHelper {
         return null;
     }
 
+    public Bitmap decorate(final Bitmap in, boolean isFav, boolean isRt) {
+        int transparent = Color.TRANSPARENT;
+        Bitmap out = in.copy(in.getConfig(),true);
+        out.setPixel(0,0,transparent);
+        out.setPixel(1,0,transparent);
+        out.setPixel(0,1,transparent);
+        out.setPixel(2,0,transparent);
+        out.setPixel(1,1,transparent);
+        out.setPixel(0,2,transparent);
+
+
+
+        int mx=in.getWidth()-1;
+        int my=in.getHeight()-1;
+
+        out.setPixel(mx,my,transparent);
+        out.setPixel(mx-1,my,transparent);
+        out.setPixel(mx, my - 1, transparent);
+        out.setPixel(mx-2,my,transparent);
+        out.setPixel(mx-1,my-1,transparent);
+        out.setPixel(mx, my - 2, transparent);
+
+        int color;
+        if (isFav)
+            color = Color.GREEN;
+        else
+            color = Color.TRANSPARENT;
+        out.setPixel(mx-1,0, color);
+        out.setPixel(mx,0, color);
+        out.setPixel(mx,1, color);
+        out.setPixel(mx-2,0, color);
+        out.setPixel(mx-1,1, color);
+        out.setPixel(mx,2, color);
+
+        if (isRt)
+            color = Color.YELLOW;
+        else
+            color = Color.TRANSPARENT;
+
+        out.setPixel(0,my,color);
+        out.setPixel(1,my,color);
+        out.setPixel(0,my-1,color);
+        out.setPixel(2,my,color);
+        out.setPixel(1,my-1,color);
+        out.setPixel(0,my-2,color);
+
+        return out;
+    }
 
 
     private File getPictureFileForUser(String username) {

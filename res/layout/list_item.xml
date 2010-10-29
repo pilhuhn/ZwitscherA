@@ -39,5 +39,13 @@
             android:textSize="14sp"
             android:autoLink="none"
          />
+        <TextView
+            android:id="@+id/ListTimeView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="2dp"
+            android:textSize="10sp"
+            android:autoLink="none"
+         />
         </LinearLayout>
 </LinearLayout>
