@@ -143,16 +143,12 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 			User user = status.getUser();
 			String item ="";
 			if ((filter==null) || (filter!= null && !status.getText().matches(filter))) {
-//				item += user.getName() +  " (" + user.getScreenName() + "): " + status.getText();
 				data.add(status);
 				statuses.add(status);
 			} else {
 				Log.i("TweetListActivity::filter",status.getUser().getScreenName() + " - " + status.getText());
 
 			}
-		}
-		if (statuses.size()==0) { // No (new) tweet found
-			//data.add(">>  Sorry, no tweets currently available, try later << ");
 		}
 		return data;
 	}
@@ -184,18 +180,15 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             firstVisible + visibleCount >= totalCount;
 
         ListAdapter adapter = absListView.getAdapter();
-System.out.println("onScroll: " + firstVisible + ", " + visibleCount + ", " +totalCount);
+        Log.d("onScroll: ",  firstVisible + ", " + visibleCount + ", " +totalCount);
         if(loadMore) {
-//            adapter.count += visibleCount; // or any other amount
-//            adapter.notifyDataSetChanged();
-            System.out.println("loadMore");
+            Log.d("onSroll:","loadMore");
             if (adapter instanceof StatusAdapter) {
                 StatusAdapter sta = (StatusAdapter) adapter;
-                System.out.println("status adapter");
                 Status last = (Status) sta.getItem(totalCount-1);
 
                 TwitterHelper th = new TwitterHelper(thisActivity);
-                List<Status> newStatuses = th.getStatuesFromDb(last.getId(),5,list_id); // TODO list id
+                List<Status> newStatuses = th.getStatuesFromDb(last.getId(),5,list_id);
 
                 int i = 0;
                 for (Status status : newStatuses ) {
