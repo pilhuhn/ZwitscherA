@@ -79,7 +79,7 @@ public class TwitterHelper {
         return statuses;
 	}
 
-    private List<Status> getStatuesFromDb(long sinceId, int number, long list_id) {
+    public List<Status> getStatuesFromDb(long sinceId, int number, long list_id) {
         List<Status> ret = new ArrayList<Status>();
         List<byte[]> oStats = tweetDB.getStatusesObjsOlderThan(sinceId,number,list_id);
         for (byte[] bytes : oStats) {

@@ -23,13 +23,15 @@ import twitter4j.User;
  * Show the list of tweets
  * @author Heiko W. Rupp
  */
-public class TweetListActivity extends ListActivity {
+public class TweetListActivity extends ListActivity implements AbsListView.OnScrollListener {
 
     List<Status> statuses;
     Bundle intentInfo;
     TweetListActivity thisActivity;
     ProgressBar pg;
     TextView titleTextBox;
+    int list_id;
+    int timeLine;
 
     /**
      * Called when the activity is first created.
@@ -54,12 +56,20 @@ public class TweetListActivity extends ListActivity {
 
     	super.onResume();
         intentInfo = getIntent().getExtras();
+        if (intentInfo==null) {
+            timeLine = R.string.home_timeline;
+            list_id = 0;
+        } else {
+            // TODO more
+        }
+
 
         // Get the windows progress bar from the enclosing TabWidget
         TabWidget parent = (TabWidget) this.getParent();
         pg = parent.pg;
 
 		ListView lv = getListView();
+        lv.setOnScrollListener(this);
 
 		lv.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -159,7 +169,43 @@ public class TweetListActivity extends ListActivity {
     }
 
     private void fillListViewFromTimeline(boolean fromDbOnly) {
-    	new GetTimeLineTask().execute(new Boolean[]{fromDbOnly});
+    	new GetTimeLineTask().execute(fromDbOnly);
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView absListView, int i) {
+        // TODO: Customise this generated block
+    }
+
+    @Override
+    public void onScroll(AbsListView absListView, int firstVisible, int visibleCount, int totalCount) {
+
+        boolean loadMore = /* maybe add a padding */
+            firstVisible + visibleCount >= totalCount;
+
+        ListAdapter adapter = absListView.getAdapter();
+System.out.println("onScroll: " + firstVisible + ", " + visibleCount + ", " +totalCount);
+        if(loadMore) {
+//            adapter.count += visibleCount; // or any other amount
+//            adapter.notifyDataSetChanged();
+            System.out.println("loadMore");
+            if (adapter instanceof StatusAdapter) {
+                StatusAdapter sta = (StatusAdapter) adapter;
+                System.out.println("status adapter");
+                Status last = (Status) sta.getItem(totalCount-1);
+
+                TwitterHelper th = new TwitterHelper(thisActivity);
+                List<Status> newStatuses = th.getStatuesFromDb(last.getId(),5,list_id); // TODO list id
+
+                int i = 0;
+                for (Status status : newStatuses ) {
+                    sta.insert(status,totalCount+i);
+                    statuses.add(status);
+                    i++;
+                }
+            }
+
+        }
     }
 
     private class GetTimeLineTask extends AsyncTask<Boolean, Void, List<Status>> {
