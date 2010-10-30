@@ -49,6 +49,11 @@ public class ThreadListActivity extends ListActivity {
 
         Status status = th.getStatusById(id,null, false) ;
         while (status!=null) {
+            List<Status> replies = th.getRepliesToStatus(status.getId());
+            for (Status reply : replies) {
+                if (!result.contains(reply))
+                    result.add(reply);
+            }
             result.add(status);
 
             long inReplyToStatusId = status.getInReplyToStatusId();

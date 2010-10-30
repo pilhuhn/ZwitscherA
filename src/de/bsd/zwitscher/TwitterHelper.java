@@ -337,6 +337,16 @@ public class TwitterHelper {
         return status;
     }
 
+    public List<Status> getRepliesToStatus(long statusId) {
+        List<Status> ret = new ArrayList<Status>();
+        List<byte[]> replies = tweetDB.getReplies(statusId);
+        for (byte[] reply : replies) {
+            Status status = materializeStatus(reply);
+            ret.add(status);
+        }
+        return ret;
+    }
+
 
     private void persistStatus(TweetDB tdb, Status status, long list_id) throws IOException {
         if (tdb.getStatusObjectById(status.getId(),list_id)!=null)

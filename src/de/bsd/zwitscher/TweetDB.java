@@ -156,6 +156,26 @@ public class TweetDB {
         return ret;
     }
 
+    public List<byte[]> getReplies(long inRepyId) {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+
+        List<byte[]> ret = new ArrayList<byte[]>();
+
+        Cursor c ;
+        c = db.query(TABLE_STATUSES,new String[]{"STATUS"},"i_rep_to = ?",new String[]{String.valueOf(inRepyId)},null,null,"ID DESC");
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            do {
+                byte[] bytes = c.getBlob(0);
+                ret.add(bytes);
+            } while (c.moveToNext());
+        }
+        c.close();
+        db.close();
+
+        return ret;
+    }
+
     public List<Long> getStatusesIdsOlderThan(long sinceId, int number, long list_id) {
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         List<Long> ret = new ArrayList<Long>(number);
