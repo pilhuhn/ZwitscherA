@@ -37,6 +37,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     ProgressBar pg;
     TextView titleTextBox;
     int list_id;
+    TweetDB tdb;
 
     /**
      * Called when the activity is first created.
@@ -52,20 +53,24 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         TabWidget parent = (TabWidget) this.getParent();
         pg = parent.pg;
         titleTextBox = parent.titleTextBox;
+        tdb = new TweetDB(this);
 
-        fillListViewFromTimeline(true); // Only get tweets from db to speed things up at start
-    }
 
-    @Override
-    public void onResume() {
-
-    	super.onResume();
         intentInfo = getIntent().getExtras();
         if (intentInfo==null) {
             list_id = 0;
         } else {
             list_id = intentInfo.getInt(TabWidget.LIST_ID);
         }
+
+        boolean fromDbOnly = tdb.getLastRead(list_id)!=-1 ? true : false;
+        fillListViewFromTimeline(fromDbOnly); // Only get tweets from db to speed things up at start
+    }
+
+    @Override
+    public void onResume() {
+
+    	super.onResume();
 
 
         // Get the windows progress bar from the enclosing TabWidget
@@ -104,7 +109,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 	private List<Status> getTimlinesFromTwitter(boolean fromDbOnly) {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		Paging paging = new Paging().count(100);
-		TweetDB tdb = new TweetDB(this);
+
 		List<Status> myStatuses = new ArrayList<Status>();
 
 
