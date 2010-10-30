@@ -38,23 +38,26 @@ public class TwitterHelper {
         tweetDB = new TweetDB(context);
 	}
 
-	public List<Status> getTimeline(Paging paging, int timeline, boolean fromDbOnly) {
+	public List<Status> getTimeline(Paging paging, int list_id, boolean fromDbOnly) {
         Twitter twitter = getTwitter();
 
         List<Status> statuses = null;
-        int pseudoListId =0;
 		try {
-			switch (timeline) {
-			case R.string.home_timeline:
+			switch (list_id) {
+			case 0:
                 if (!fromDbOnly)
 				    statuses = twitter.getHomeTimeline(paging ); //like friends + including retweet
-                pseudoListId =0;
 				break;
-			case R.string.mentions:
+			case -1:
                 if (!fromDbOnly)
 				    statuses = twitter.getMentions(paging);
-                pseudoListId = -1;
 				break;
+            case -2:
+                if (!fromDbOnly)
+//                    statuses = twitter.getDirectMessages(paging);
+                    // TODO implement -- why does twitter(4j) not return a status ?
+                break;
+
 			default:
 				statuses = new ArrayList<Status>();
 			}
@@ -62,7 +65,7 @@ public class TwitterHelper {
                 statuses=new ArrayList<Status>();
             TweetDB tdb = new TweetDB(context);
             for (Status status : statuses) {
-                persistStatus(tdb, status,pseudoListId);
+                persistStatus(tdb, status,list_id);
             }
 
         }
@@ -73,15 +76,15 @@ public class TwitterHelper {
             statuses = new ArrayList<Status>();
 
         }
-        fillUpStatusesFromDB(pseudoListId,statuses);
+        fillUpStatusesFromDB(list_id,statuses);
         Log.i("getTimeline","Now we have " + statuses.size());
 
         return statuses;
 	}
 
-    public List<Status> getStatuesFromDb(long sinceId, int number, long list_id) {
+    public List<Status> getStatuesFromDb(long sinceId, int howMany, long list_id) {
         List<Status> ret = new ArrayList<Status>();
-        List<byte[]> oStats = tweetDB.getStatusesObjsOlderThan(sinceId,number,list_id);
+        List<byte[]> oStats = tweetDB.getStatusesObjsOlderThan(sinceId,howMany,list_id);
         for (byte[] bytes : oStats) {
             Status status = materializeStatus(bytes);
             ret.add(status);

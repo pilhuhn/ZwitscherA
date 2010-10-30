@@ -55,6 +55,13 @@ public class TabWidget extends TabActivity {
 				.setContent(mentionsIntent);
 		tabHost.addTab(homeSpec);
 
+        Intent directIntent = new Intent().setClass(this,TweetListActivity.class);
+        directIntent.putExtra(LIST_ID, -2);
+		homeSpec = tabHost.newTabSpec("directs")
+				.setIndicator("Direct",res.getDrawable(R.drawable.direct))
+				.setContent(directIntent);
+		tabHost.addTab(homeSpec);
+
 
   		TweetDB tdb = new TweetDB(getApplicationContext());
   		Map<String, Integer> userLists = tdb.getLists();

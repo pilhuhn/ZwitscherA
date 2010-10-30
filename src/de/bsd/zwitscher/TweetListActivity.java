@@ -25,6 +25,7 @@ import twitter4j.User;
  * <ul>
  * <li>0 : home/friends timeline</li>
  * <li>-1 : mentions </li>
+ * <li>-2 : direct </li>
  * </ul>
  * @author Heiko W. Rupp
  */
@@ -104,35 +105,38 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		Paging paging = new Paging().count(100);
 		TweetDB tdb = new TweetDB(this);
-		List<Status> myStatus = new ArrayList<Status>();
+		List<Status> myStatuses = new ArrayList<Status>();
 
 
     	long last = tdb.getLastRead(list_id);
-    	if (last!=0 )//&& !Debug.isDebuggerConnected())
+    	if (last>0 )//&& !Debug.isDebuggerConnected())
     		paging.sinceId(last);
 
         switch (list_id) {
         case 0:
-        	myStatus = th.getTimeline(paging,R.string.home_timeline, fromDbOnly);
+        	myStatuses = th.getTimeline(paging,list_id, fromDbOnly);
         	break;
         case -1:
-        	myStatus = th.getTimeline(paging, R.string.mentions, fromDbOnly);
+        	myStatuses = th.getTimeline(paging, list_id, fromDbOnly);
         	break;
+        case -2:
+            // TODO directs
+            break;
         default:
-        	myStatus = th.getUserList(paging,list_id, fromDbOnly);
+        	myStatuses = th.getUserList(paging,list_id, fromDbOnly);
         	break;
         }
 
         // Update the 'since' id in the database
-    	if (myStatus.size()>0) {
-    		last = myStatus.get(0).getId(); // assumption is that twitter sends the newest (=highest id) first
+    	if (myStatuses.size()>0) {
+    		last = myStatuses.get(0).getId(); // assumption is that twitter sends the newest (=highest id) first
     		tdb.updateOrInsertLastRead(list_id, last);
     	}
 
     	statuses = new ArrayList<Status>();
-		List<Status> data = new ArrayList<Status>(myStatus.size());
+		List<Status> data = new ArrayList<Status>(myStatuses.size());
         String filter = getFilter();
-		for (Status status : myStatus) {
+		for (Status status : myStatuses) {
 			User user = status.getUser();
 			String item ="";
 			if ((filter==null) || (filter!= null && !status.getText().matches(filter))) {
@@ -178,16 +182,18 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             Log.d("onSroll:","loadMore");
             if (adapter instanceof StatusAdapter) {
                 StatusAdapter sta = (StatusAdapter) adapter;
-                Status last = (Status) sta.getItem(totalCount-1);
+                if (totalCount>0) {
+                    Status last = (Status) sta.getItem(totalCount-1);
 
-                TwitterHelper th = new TwitterHelper(thisActivity);
-                List<Status> newStatuses = th.getStatuesFromDb(last.getId(),5,list_id);
+                    TwitterHelper th = new TwitterHelper(thisActivity);
+                    List<Status> newStatuses = th.getStatuesFromDb(last.getId(),5,list_id);
 
-                int i = 0;
-                for (Status status : newStatuses ) {
-                    sta.insert(status,totalCount+i);
-                    statuses.add(status);
-                    i++;
+                    int i = 0;
+                    for (Status status : newStatuses ) {
+                        sta.insert(status,totalCount+i);
+                        statuses.add(status);
+                        i++;
+                    }
                 }
             }
 

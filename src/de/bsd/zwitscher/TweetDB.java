@@ -59,7 +59,7 @@ public class TweetDB {
 
 	long getLastRead(int list_id) {
 		SQLiteDatabase db = tdHelper.getReadableDatabase();
-		Cursor c = db.query(TABLE_LAST_READ, new String[] {"last_read_id"}, "item = ?", new String[] {String.valueOf(list_id)}, null, null, null);
+		Cursor c = db.query(TABLE_LAST_READ, new String[] {"last_read_id"}, "list_id = ?", new String[] {String.valueOf(list_id)}, null, null, null);
 		Long ret;
 		if (c.getCount()==0)
 			ret = -1L;
@@ -198,14 +198,14 @@ public class TweetDB {
         return ret;
     }
 
-    public List<byte[]> getStatusesObjsOlderThan(long sinceId, int number, long list_id) {
+    public List<byte[]> getStatusesObjsOlderThan(long sinceId, int howMany, long list_id) {
         List<byte[]> ret = new ArrayList<byte[]>();
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         if (sinceId>-1)
-            c = db.query(TABLE_STATUSES,new String[]{"STATUS"},"id < ? AND list_id = ?",new String[]{String.valueOf(sinceId),String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(number));
+            c = db.query(TABLE_STATUSES,new String[]{"STATUS"},"id < ? AND list_id = ?",new String[]{String.valueOf(sinceId),String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(howMany));
         else
-            c = db.query(TABLE_STATUSES,new String[]{"STATUS"},"list_id = ?",new String[]{String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(number));
+            c = db.query(TABLE_STATUSES,new String[]{"STATUS"},"list_id = ?",new String[]{String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(howMany));
 
         if (c.getCount()>0){
             c.moveToFirst();
