@@ -2,51 +2,38 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.bsd.zwitscher"
           android:versionName="Tick"
-          android:versionCode="28"
+          android:versionCode="29"
           >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application android:icon="@drawable/icon" android:label="Zwitscher"
     			android:debuggable="true"  android:allowBackup="true"
-    			>
+        >
 
+        <activity android:name=".TweetListActivity"/>
 
-        <activity android:name=".TweetListActivity">
-		</activity>
+		<activity android:name=".TabWidget"/>
 
-		<activity android:name=".TabWidget">
-		<!--
+		<activity android:name=".OneTweetActivity"/>
+
+        <activity android:name=".NewTweetActivity"/>
+
+        <activity android:name="Preferences" android:label="Preferences"/>
+
+	    <activity android:name="LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+    	</activity>
 
-		-->
-		</activity>
-
-		<activity android:name=".OneTweetActivity">
-		</activity>
-
-        <activity android:name=".NewTweetActivity">
-
-
-        </activity>
-    <activity android:name="Preferences" android:label="Preferences"/>
-	<activity android:name="LoginActivity">
-        <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-
-	</activity>
         <activity android:name=".ThreadListActivity"/>
+
     </application>
 
-<!--  <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>  -->
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-<uses-sdk android:minSdkVersion="7" />
+    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="7"/>
 </manifest>

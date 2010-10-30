@@ -42,8 +42,8 @@ public class TweetDB {
             );
 
 			db.execSQL("CREATE TABLE "+ TABLE_LAST_READ + " (" + //
-					"item TEXT, " + //
-					"time LONG )" //
+					"list_id LONG, " + //
+					"last_read_id LONG )" //
 			);
 			db.execSQL("CREATE TABLE " + TABLE_LISTS + " (" + //
 					"name TEXT, " + //
@@ -57,12 +57,12 @@ public class TweetDB {
 
 	}
 
-	long getLastRead(String name) {
+	long getLastRead(int list_id) {
 		SQLiteDatabase db = tdHelper.getReadableDatabase();
-		Cursor c = db.query(TABLE_LAST_READ, new String[] {"time"}, "item = ?", new String[] {name}, null, null, null);
+		Cursor c = db.query(TABLE_LAST_READ, new String[] {"last_read_id"}, "item = ?", new String[] {String.valueOf(list_id)}, null, null, null);
 		Long ret;
 		if (c.getCount()==0)
-			ret = 0L;
+			ret = -1L;
 		else {
 			c.moveToFirst();
 			ret = c.getLong(0);
@@ -72,13 +72,13 @@ public class TweetDB {
 		return ret;
 	}
 
-	void updateOrInsertLastRead(String item, long time) {
+	void updateOrInsertLastRead(int list_id, long last_read_id) {
 		ContentValues cv = new ContentValues();
-		cv.put("item", item);
-		cv.put("time", time);
+		cv.put("list_id", list_id);
+		cv.put("last_read_id", last_read_id);
 
 		SQLiteDatabase db = tdHelper.getWritableDatabase();
-		int updated = db.update(TABLE_LAST_READ, cv, "item = ?", new String[] {item});
+		int updated = db.update(TABLE_LAST_READ, cv, "list_id = ?", new String[] {String.valueOf(list_id)});
 		if (updated==0) {
 			// row not yet present
 			db.insert(TABLE_LAST_READ, null, cv);

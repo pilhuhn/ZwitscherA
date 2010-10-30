@@ -20,7 +20,12 @@ import twitter4j.Status;
 import twitter4j.User;
 
 /**
- * Show the list of tweets
+ * Show the list of tweets.
+ * To unify things a bit, we introduce pseudo list ids for timelines that are not lists:
+ * <ul>
+ * <li>0 : home/friends timeline</li>
+ * <li>-1 : mentions </li>
+ * </ul>
  * @author Heiko W. Rupp
  */
 public class TweetListActivity extends ListActivity implements AbsListView.OnScrollListener {
@@ -31,7 +36,6 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     ProgressBar pg;
     TextView titleTextBox;
     int list_id;
-    int timeLine;
 
     /**
      * Called when the activity is first created.
@@ -57,10 +61,9 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     	super.onResume();
         intentInfo = getIntent().getExtras();
         if (intentInfo==null) {
-            timeLine = R.string.home_timeline;
             list_id = 0;
         } else {
-            // TODO more
+            list_id = intentInfo.getInt(TabWidget.LIST_ID);
         }
 
 
@@ -97,43 +100,33 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
     }
 
-	private List<Status> getTimlinesFromTwitter(int timeline, int listId, String specialName, boolean fromDbOnly) {
+	private List<Status> getTimlinesFromTwitter(boolean fromDbOnly) {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		Paging paging = new Paging().count(100);
 		TweetDB tdb = new TweetDB(this);
 		List<Status> myStatus = new ArrayList<Status>();
 
-		// special name is set for lists - this is the list name
-		// Now fake it for other timelines
-        switch (timeline) {
-        case R.string.home_timeline:
-        	specialName = "home";
-        	break;
-        case R.string.mentions:
-        	specialName = "mentions";
-        	break;
-        }
 
-    	long last = tdb.getLastRead(specialName);
+    	long last = tdb.getLastRead(list_id);
     	if (last!=0 )//&& !Debug.isDebuggerConnected())
     		paging.sinceId(last);
 
-        switch (timeline) {
-        case R.string.home_timeline:
+        switch (list_id) {
+        case 0:
         	myStatus = th.getTimeline(paging,R.string.home_timeline, fromDbOnly);
         	break;
-        case R.string.mentions:
+        case -1:
         	myStatus = th.getTimeline(paging, R.string.mentions, fromDbOnly);
         	break;
-        case R.string.list:
-        	myStatus = th.getUserList(paging,listId, fromDbOnly);
+        default:
+        	myStatus = th.getUserList(paging,list_id, fromDbOnly);
         	break;
         }
 
         // Update the 'since' id in the database
     	if (myStatus.size()>0) {
     		last = myStatus.get(0).getId(); // assumption is that twitter sends the newest (=highest id) first
-    		tdb.updateOrInsertLastRead(specialName, last);
+    		tdb.updateOrInsertLastRead(list_id, last);
     	}
 
     	statuses = new ArrayList<Status>();
@@ -215,19 +208,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 		protected List<twitter4j.Status> doInBackground(Boolean... params) {
             boolean fromDbOnly = params[0];
 	        List<twitter4j.Status> data;
-	        if (intentInfo==null)
-	            data = getTimlinesFromTwitter(R.string.home_timeline,0, null, fromDbOnly);
-	        else {
-	        	String timelineString = intentInfo.getString("timeline");
-				if (timelineString!=null && timelineString.contains("mentions")) {
-	        		data = getTimlinesFromTwitter(R.string.mentions, 0, null, fromDbOnly);
-	        	} else {
-
-		            String listName = intentInfo.getString("listName");
-		            int id = intentInfo.getInt("id");
-		            data = getTimlinesFromTwitter(R.string.list,id, listName, fromDbOnly);
-	        	}
-	        }
+            data = getTimlinesFromTwitter(fromDbOnly);
 	        return data;
 		}
 
