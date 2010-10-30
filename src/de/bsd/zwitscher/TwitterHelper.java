@@ -242,25 +242,28 @@ public class TwitterHelper {
         Twitter twitter = getTwitter();
 
         List<Status> statuses;
-		try {
-	        String listOwnerScreenName = twitter.getScreenName();
+        if (!fromDbOnly) {
+            try {
+                String listOwnerScreenName = twitter.getScreenName();
 
-			statuses = twitter.getUserListStatuses(listOwnerScreenName, listId, paging);
-			int size = statuses.size();
-            Log.i("getUserList","Got " + size + " statuses from Twitter");
+                statuses = twitter.getUserListStatuses(listOwnerScreenName, listId, paging);
+                int size = statuses.size();
+                Log.i("getUserList","Got " + size + " statuses from Twitter");
 
-            TweetDB tdb = new TweetDB(context);
+                TweetDB tdb = new TweetDB(context);
 
-            for (Status status : statuses) {
-                persistStatus(tdb, status,listId);
+                for (Status status : statuses) {
+                    persistStatus(tdb, status,listId);
+                }
+            } catch (Exception e) {
+                statuses = new ArrayList<Status>();
+
+                System.err.println("Got exception: " + e.getMessage() );
+                if (e.getCause()!=null)
+                    System.err.println("   " + e.getCause().getMessage());
             }
-        } catch (Exception e) {
+        } else
             statuses = new ArrayList<Status>();
-
-            System.err.println("Got exception: " + e.getMessage() );
-            if (e.getCause()!=null)
-                System.err.println("   " + e.getCause().getMessage());
-        }
 
         fillUpStatusesFromDB(listId, statuses);
         Log.i("getUserList","Now we have " + statuses.size());
@@ -292,8 +295,10 @@ public class TwitterHelper {
         int size = statuses.size();
         if (size==0)
             statuses.addAll(getStatuesFromDb(-1,maxOld,listId));
-        else
-            statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),minOld,listId));
+        else {
+            int num = (size+minOld< maxOld) ? maxOld-size : minOld;
+            statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),num,listId));
+        }
     }
 
 
