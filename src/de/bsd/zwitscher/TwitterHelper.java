@@ -104,7 +104,7 @@ public class TwitterHelper {
 			Toast.makeText(context, "Getting lists failed: " + e.getMessage(), 15000).show();
 			e.printStackTrace();
 			return new ArrayList<UserList>();
-		} // TODO cursor?
+		}
 	}
 
 
@@ -214,8 +214,8 @@ public class TwitterHelper {
             }
 
             // reload tweet and update in DB - twitter4j should have some status.setFav()..
-            status = getStatusById(status.getId(),0L, true); // TODO list_id ?
-            updateStatus(tweetDB,status,0); // TODO list id ???
+            status = getStatusById(status.getId(),null, true, false); // no list id, don't persist
+            updateStatus(tweetDB,status); // explicitly update in DB - we know it is there.
 			updateResponse.setSuccess();
             updateResponse.setMessage("(Un)favorite set");
 		} catch (Exception e) {
@@ -308,16 +308,18 @@ public class TwitterHelper {
     /**
      * Get a single status. If directOnly is false, we first look in the local
      * db if it is already present. Otherwise we directly go to the server.
+     *
      * @param statusId
      * @param list_id
      * @param directOnly
+     * @param alsoPersist
      * @return
      */
-    public Status getStatusById(long statusId, Long list_id, boolean directOnly) {
+    public Status getStatusById(long statusId, Long list_id, boolean directOnly, boolean alsoPersist) {
         Status status = null;
 
         if (!directOnly) {
-            byte[] obj  = tweetDB.getStatusObjectById(statusId,list_id);
+            byte[] obj  = tweetDB.getStatusObjectById(statusId);
             if (obj!=null) {
                 status = materializeStatus(obj);
                 if (status!=null)
@@ -328,12 +330,15 @@ public class TwitterHelper {
         Twitter twitter = getTwitter();
         try {
             status = twitter.showStatus(statusId);
-            long id;
-            if (list_id==null)
-                id = 0;
-            else
-                id = list_id;
-            persistStatus(tweetDB,status,id);
+
+            if (alsoPersist) {
+                long id;
+                if (list_id==null)
+                    id = 0;
+                else
+                    id = list_id;
+                persistStatus(tweetDB,status,id);
+            }
         } catch (Exception e) {
             e.printStackTrace();  // TODO: Customise this generated block
         }
@@ -352,27 +357,30 @@ public class TwitterHelper {
 
 
     private void persistStatus(TweetDB tdb, Status status, long list_id) throws IOException {
-        if (tdb.getStatusObjectById(status.getId(),list_id)!=null)
+        if (tdb.getStatusObjectById(status.getId())!=null)
             return; // This is already in DB, so do nothing
 
         // Serialize and then store in DB
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream out = new ObjectOutputStream(bos);
         out.writeObject(status);
-        tdb.storeOrUpdateStatus(status.getId(), status.getInReplyToStatusId(), list_id, bos.toByteArray(), true);
+        tdb.storeStatus(status.getId(), status.getInReplyToStatusId(), list_id, bos.toByteArray());
     }
 
-    private void updateStatus(TweetDB tdb, Status status, long list_id) throws IOException {
-        if (tdb.getStatusObjectById(status.getId(),list_id)==null) {
-            persistStatus(tdb,status,list_id);
-            return;
-        }
+    /**
+     * Update an existing status object in the database with the passed one.
+     * @param tdb TweetDb to use
+     * @param status Updated status object
+     * @throws IOException
+     */
+    private void updateStatus(TweetDB tdb, Status status) throws IOException {
 
         // Serialize and then store in DB
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream out = new ObjectOutputStream(bos);
         out.writeObject(status);
-        tdb.storeOrUpdateStatus(status.getId(), status.getInReplyToStatusId(), list_id, bos.toByteArray(), false);
+
+        tdb.updateStatus(status.getId(), bos.toByteArray());
     }
 
 

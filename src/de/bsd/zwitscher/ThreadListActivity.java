@@ -47,7 +47,7 @@ public class ThreadListActivity extends ListActivity {
 
         TwitterHelper th = new TwitterHelper(this);
 
-        Status status = th.getStatusById(id,null, false) ;
+        Status status = th.getStatusById(id,null, false, true) ;
         while (status!=null) {
             List<Status> replies = th.getRepliesToStatus(status.getId());
             for (Status reply : replies) {
@@ -58,7 +58,7 @@ public class ThreadListActivity extends ListActivity {
 
             long inReplyToStatusId = status.getInReplyToStatusId();
             if (inReplyToStatusId!=-1)
-                status = th.getStatusById(inReplyToStatusId,null, false);
+                status = th.getStatusById(inReplyToStatusId,null, false, true);
             else
                 status=null;
         }

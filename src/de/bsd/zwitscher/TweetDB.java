@@ -120,32 +120,39 @@ public class TweetDB {
 		db.close();
 	}
 
-    public void storeOrUpdateStatus(long id, long i_reply_id, long list_id, byte[] statusObj, boolean doInsert) {
-        ContentValues cv = new ContentValues(3);
+    public void storeStatus(long id, long i_reply_id, long list_id, byte[] statusObj) {
+        ContentValues cv = new ContentValues(4);
         cv.put("ID", id);
         cv.put("I_REP_TO", i_reply_id);
         cv.put("LIST_ID", list_id);
         cv.put("STATUS",statusObj);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        if (doInsert)
-            db.insert(TABLE_STATUSES, null, cv);
-        else
-            db.update(TABLE_STATUSES,cv,"id = ?", new String[]{String.valueOf(id)});
+        db.insert(TABLE_STATUSES, null, cv);
         db.close();
     }
 
-    public byte[] getStatusObjectById(long statusId,Long listId) {
+    public void updateStatus(long id, byte[] statusObj) {
+        ContentValues cv = new ContentValues(1);
+        cv.put("STATUS",statusObj);
+
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.update(TABLE_STATUSES,cv,"id = ?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+
+    /**
+     * Return the blob of one stored status by its (unique) id.
+     * @param statusId The id of the status
+     * @return The blob if the status exists in the DB or null otherwise
+     */
+    public byte[] getStatusObjectById(long statusId) {
 
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         byte[] ret = null;
 
         Cursor c;
-        if (listId==null)
-            c= db.query(TABLE_STATUSES,new String[]{"STATUS"},"id = ?",new String[]{String.valueOf(statusId)},null,null,null);
-        else
-            c= db.query(TABLE_STATUSES,new String[]{"STATUS"},"id = ? AND list_id = ?",
-                       new String[]{String.valueOf(statusId),listId.toString()},null,null,null);
+        c= db.query(TABLE_STATUSES,new String[]{"STATUS"},"id = ?",new String[]{String.valueOf(statusId)},null,null,null);
         if (c.getCount()>0){
             c.moveToFirst();
             ret = c.getBlob(0);
