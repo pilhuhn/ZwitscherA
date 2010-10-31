@@ -7,12 +7,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.MalformedInputException;
 
-import android.graphics.Color;
+import android.graphics.*;
 import twitter4j.User;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Log;
 
@@ -89,7 +88,7 @@ public class PicHelper {
         return null;
     }
 
-    public Bitmap decorate(final Bitmap in, boolean isFav, boolean isRt) {
+    public Bitmap decorate(final Bitmap in, Context context , boolean isFav, boolean isRt) {
         int transparent = Color.TRANSPARENT;
         Bitmap out = in.copy(in.getConfig(),true);
         out.setPixel(0,0,transparent);
@@ -112,10 +111,8 @@ public class PicHelper {
         out.setPixel(mx, my - 2, transparent);
 
         int color;
-        if (isFav)
-            color = Color.GREEN;
-        else
-            color = Color.TRANSPARENT;
+
+        color = Color.TRANSPARENT;
         out.setPixel(mx-1,0, color);
         out.setPixel(mx,0, color);
         out.setPixel(mx,1, color);
@@ -123,17 +120,28 @@ public class PicHelper {
         out.setPixel(mx-1,1, color);
         out.setPixel(mx,2, color);
 
-        if (isRt)
-            color = Color.YELLOW;
-        else
-            color = Color.TRANSPARENT;
-
         out.setPixel(0,my,color);
         out.setPixel(1,my,color);
         out.setPixel(0,my-1,color);
         out.setPixel(2,my,color);
         out.setPixel(1,my-1,color);
         out.setPixel(0,my-2,color);
+
+
+        if (isFav || isRt) {
+            Canvas canvas = new Canvas(out);
+
+            if (isFav) {
+                Bitmap favMap = BitmapFactory.decodeResource(context.getResources(),R.drawable.yellow_f);
+                canvas.drawBitmap(favMap,new Matrix(),null);
+            }
+            if (isRt) {
+                Bitmap rtMap = BitmapFactory.decodeResource(context.getResources(),R.drawable.green_r);
+                float f = out.getWidth() - rtMap.getWidth();
+                canvas.drawBitmap(rtMap,f,f,null);
+            }
+        }
+
 
         return out;
     }

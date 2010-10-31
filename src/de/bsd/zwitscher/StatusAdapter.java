@@ -94,7 +94,7 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
         }
 
         if (bi!=null) {
-            bi = ph.decorate(bi,status.isFavorited(),status.getRetweetedStatus()!=null);
+            bi = ph.decorate(bi,extContext,status.isFavorited(),status.getRetweetedStatus()!=null);
             iv.setImageBitmap(bi);
         }
         else {
