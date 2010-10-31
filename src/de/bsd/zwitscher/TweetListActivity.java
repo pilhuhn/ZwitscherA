@@ -182,9 +182,8 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             firstVisible + visibleCount >= totalCount;
 
         ListAdapter adapter = absListView.getAdapter();
-        Log.d("onScroll: ",  firstVisible + ", " + visibleCount + ", " +totalCount);
         if(loadMore) {
-            Log.d("onSroll:","loadMore");
+            Log.d("onSroll:","loadMore f=" + firstVisible + ", vc=" + visibleCount + ", tc=" +totalCount);
             if (adapter instanceof StatusAdapter) {
                 StatusAdapter sta = (StatusAdapter) adapter;
                 if (totalCount>0) {
