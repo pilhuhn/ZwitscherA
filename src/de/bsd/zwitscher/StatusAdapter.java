@@ -110,8 +110,8 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
                 new TriggerPictureDownloadTask().execute(status.getRetweetedStatus().getUser());
 
         }
-//        userInfo.setText(Html.fromHtml(userName));
-        userInfo.setText((userName));
+        userInfo.setText(Html.fromHtml(userName)); // TODO replace with something better
+//        userInfo.setText((userName));
         statusText.setText(status.getText());
 
         DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM);

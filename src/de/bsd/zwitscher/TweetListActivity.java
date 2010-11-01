@@ -180,7 +180,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     public void onScroll(AbsListView absListView, int firstVisible, int visibleCount, int totalCount) {
 
         boolean loadMore = /* maybe add a padding */
-            firstVisible + visibleCount >= totalCount;
+            firstVisible + visibleCount >= totalCount-1;
 
         ListAdapter adapter = absListView.getAdapter();
         if(loadMore) {
@@ -191,7 +191,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
                     Status last = (Status) sta.getItem(totalCount-1);
 
                     TwitterHelper th = new TwitterHelper(thisActivity);
-                    List<Status> newStatuses = th.getStatuesFromDb(last.getId(),5,list_id);
+                    List<Status> newStatuses = th.getStatuesFromDb(last.getId(),4,list_id);
 
                     int i = 0;
                     for (Status status : newStatuses ) {
