@@ -12,12 +12,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import de.bsd.zwitscher.account.Account;
-import twitter4j.Status;
 
 public class TweetDB {
 
-    private static final String STATUSES = "statuses";
     private static final String TABLE_ACCOUNTS = "accounts";
+    private static final String TABLE_STATUSES = "statuses";
+    private static final String TABLE_LAST_READ = "lastRead";
+    private static final String TABLE_LISTS = "lists";
     private TweetDBOpenHelper tdHelper;
 
 	public TweetDB(Context context) {
@@ -34,7 +35,7 @@ public class TweetDB {
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE "+ STATUSES + " (" +
+            db.execSQL("CREATE TABLE "+ TABLE_STATUSES + " (" +
                     "ID LONG, " +
                     "LIST_ID LONG, " +
                     "I_REP_TO LONG, " +
@@ -42,11 +43,11 @@ public class TweetDB {
                     ")"
             );
 
-			db.execSQL("CREATE TABLE lastRead (" + //
-					"item TEXT, " + //
-					"time LONG )" //
+			db.execSQL("CREATE TABLE "+ TABLE_LAST_READ + " (" + //
+					"list_id LONG, " + //
+					"last_read_id LONG )" //
 			);
-			db.execSQL("CREATE TABLE lists (" + //
+			db.execSQL("CREATE TABLE " + TABLE_LISTS + " (" + //
 					"name TEXT, " + //
 					"id LONG )"
 			);
@@ -67,12 +68,12 @@ public class TweetDB {
 
 	}
 
-	long getLastRead(String name) {
+	long getLastRead(int list_id) {
 		SQLiteDatabase db = tdHelper.getReadableDatabase();
-		Cursor c = db.query("lastRead", new String[] {"time"}, "item = ?", new String[] {name}, null, null, null);
+		Cursor c = db.query(TABLE_LAST_READ, new String[] {"last_read_id"}, "list_id = ?", new String[] {String.valueOf(list_id)}, null, null, null);
 		Long ret;
 		if (c.getCount()==0)
-			ret = 0L;
+			ret = -1L;
 		else {
 			c.moveToFirst();
 			ret = c.getLong(0);
@@ -82,16 +83,16 @@ public class TweetDB {
 		return ret;
 	}
 
-	void updateOrInsertLastRead(String item, long time) {
+	void updateOrInsertLastRead(int list_id, long last_read_id) {
 		ContentValues cv = new ContentValues();
-		cv.put("item", item);
-		cv.put("time", time);
+		cv.put("list_id", list_id);
+		cv.put("last_read_id", last_read_id);
 
 		SQLiteDatabase db = tdHelper.getWritableDatabase();
-		int updated = db.update("lastRead", cv, "item = ?", new String[] {item});
+		int updated = db.update(TABLE_LAST_READ, cv, "list_id = ?", new String[] {String.valueOf(list_id)});
 		if (updated==0) {
 			// row not yet present
-			db.insert("lastRead", null, cv);
+			db.insert(TABLE_LAST_READ, null, cv);
 		}
 		db.close();
 	}
@@ -99,7 +100,7 @@ public class TweetDB {
 	Map<String, Integer> getLists() {
 		SQLiteDatabase db = tdHelper.getReadableDatabase();
 		Map<String,Integer> ret = new HashMap<String,Integer>();
-		Cursor c = db.query("lists", new String[] {"name","id"}, null, null, null, null, "name");
+		Cursor c = db.query(TABLE_LISTS, new String[] {"name","id"}, null, null, null, null, "name");
 		if (c.getCount()>0){
 			c.moveToFirst();
 			do {
@@ -119,46 +120,73 @@ public class TweetDB {
 		cv.put("id",id);
 
 		SQLiteDatabase db = tdHelper.getWritableDatabase();
-		db.insert("lists", null, cv);
+		db.insert(TABLE_LISTS, null, cv);
 		db.close();
 
 	}
 
 	public void removeList(Integer id) {
 		SQLiteDatabase db = tdHelper.getWritableDatabase();
-		db.delete("lists", "id = ?", new String[] {id.toString()});
+		db.delete(TABLE_LISTS, "id = ?", new String[]{id.toString()});
 		db.close();
 	}
 
-    public void storeOrUpdateStatus(long id, long i_reply_id, long list_id, byte[] statusObj, boolean doInsert) {
-        ContentValues cv = new ContentValues(3);
-        cv.put("ID",id);
-        cv.put("I_REP_TO",i_reply_id);
+    public void storeStatus(long id, long i_reply_id, long list_id, byte[] statusObj) {
+        ContentValues cv = new ContentValues(4);
+        cv.put("ID", id);
+        cv.put("I_REP_TO", i_reply_id);
         cv.put("LIST_ID", list_id);
         cv.put("STATUS",statusObj);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        if (doInsert)
-            db.insert(STATUSES, null, cv);
-        else
-            db.update(STATUSES,cv,"id = ?", new String[]{String.valueOf(id)});
+        db.insert(TABLE_STATUSES, null, cv);
         db.close();
     }
 
-    public byte[] getStatusObjectById(long statusId,Long listId) {
+    public void updateStatus(long id, byte[] statusObj) {
+        ContentValues cv = new ContentValues(1);
+        cv.put("STATUS",statusObj);
+
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.update(TABLE_STATUSES,cv,"id = ?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+
+    /**
+     * Return the blob of one stored status by its (unique) id.
+     * @param statusId The id of the status
+     * @return The blob if the status exists in the DB or null otherwise
+     */
+    public byte[] getStatusObjectById(long statusId) {
 
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         byte[] ret = null;
 
         Cursor c;
-        if (listId==null)
-            c= db.query(STATUSES,new String[]{"STATUS"},"id = ?",new String[]{String.valueOf(statusId)},null,null,null);
-        else
-            c= db.query(STATUSES,new String[]{"STATUS"},"id = ? AND list_id = ?",
-                       new String[]{String.valueOf(statusId),listId.toString()},null,null,null);
+        c= db.query(TABLE_STATUSES,new String[]{"STATUS"},"id = ?",new String[]{String.valueOf(statusId)},null,null,null);
         if (c.getCount()>0){
             c.moveToFirst();
             ret = c.getBlob(0);
+        }
+        c.close();
+        db.close();
+
+        return ret;
+    }
+
+    public List<byte[]> getReplies(long inRepyId) {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+
+        List<byte[]> ret = new ArrayList<byte[]>();
+
+        Cursor c ;
+        c = db.query(TABLE_STATUSES,new String[]{"STATUS"},"i_rep_to = ?",new String[]{String.valueOf(inRepyId)},null,null,"ID DESC");
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            do {
+                byte[] bytes = c.getBlob(0);
+                ret.add(bytes);
+            } while (c.moveToNext());
         }
         c.close();
         db.close();
@@ -172,9 +200,9 @@ public class TweetDB {
 
         Cursor c;
         if (sinceId>-1)
-            c = db.query(STATUSES,new String[]{"ID"},"id < ? AND list_id = ?",new String[]{String.valueOf(sinceId),String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(number));
+            c = db.query(TABLE_STATUSES,new String[]{"ID"},"id < ? AND list_id = ?",new String[]{String.valueOf(sinceId),String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(number));
         else
-            c = db.query(STATUSES,new String[]{"ID"},"list_id = ?",new String[]{String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(number));
+            c = db.query(TABLE_STATUSES,new String[]{"ID"},"list_id = ?",new String[]{String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(number));
 
         if (c.getCount()>0){
             c.moveToFirst();
@@ -188,14 +216,14 @@ public class TweetDB {
         return ret;
     }
 
-    public List<byte[]> getStatusesObjsOlderThan(long sinceId, int number, long list_id) {
+    public List<byte[]> getStatusesObjsOlderThan(long sinceId, int howMany, long list_id) {
         List<byte[]> ret = new ArrayList<byte[]>();
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         if (sinceId>-1)
-            c = db.query(STATUSES,new String[]{"STATUS"},"id < ? AND list_id = ?",new String[]{String.valueOf(sinceId),String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(number));
+            c = db.query(TABLE_STATUSES,new String[]{"STATUS"},"id < ? AND list_id = ?",new String[]{String.valueOf(sinceId),String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(howMany));
         else
-            c = db.query(STATUSES,new String[]{"STATUS"},"list_id = ?",new String[]{String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(number));
+            c = db.query(TABLE_STATUSES,new String[]{"STATUS"},"list_id = ?",new String[]{String.valueOf(list_id)},null,null,"ID DESC",String.valueOf(howMany));
 
         if (c.getCount()>0){
             c.moveToFirst();
@@ -220,7 +248,7 @@ public class TweetDB {
 
     public void cleanTweets() {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.execSQL("DELETE FROM " + STATUSES);
+        db.execSQL("DELETE FROM " + TABLE_STATUSES);
         db.close();
     }
 

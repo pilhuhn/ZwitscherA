@@ -38,23 +38,26 @@ public class TwitterHelper {
         tweetDB = new TweetDB(context);
 	}
 
-	public List<Status> getTimeline(Paging paging, int timeline, boolean fromDbOnly) {
+	public List<Status> getTimeline(Paging paging, int list_id, boolean fromDbOnly) {
         Twitter twitter = getTwitter();
 
         List<Status> statuses = null;
-        int pseudoListId =0;
 		try {
-			switch (timeline) {
-			case R.string.home_timeline:
+			switch (list_id) {
+			case 0:
                 if (!fromDbOnly)
 				    statuses = twitter.getHomeTimeline(paging ); //like friends + including retweet
-                pseudoListId =0;
 				break;
-			case R.string.mentions:
+			case -1:
                 if (!fromDbOnly)
 				    statuses = twitter.getMentions(paging);
-                pseudoListId = -1;
 				break;
+            case -2:
+                if (!fromDbOnly)
+//                    statuses = twitter.getDirectMessages(paging);
+                    // TODO implement -- why does twitter(4j) not return a status ?
+                break;
+
 			default:
 				statuses = new ArrayList<Status>();
 			}
@@ -62,7 +65,7 @@ public class TwitterHelper {
                 statuses=new ArrayList<Status>();
             TweetDB tdb = new TweetDB(context);
             for (Status status : statuses) {
-                persistStatus(tdb, status,pseudoListId);
+                persistStatus(tdb, status,list_id);
             }
 
         }
@@ -73,15 +76,15 @@ public class TwitterHelper {
             statuses = new ArrayList<Status>();
 
         }
-        fillUpStatusesFromDB(pseudoListId,statuses);
+        fillUpStatusesFromDB(list_id,statuses);
         Log.i("getTimeline","Now we have " + statuses.size());
 
         return statuses;
 	}
 
-    private List<Status> getStatuesFromDb(long sinceId, int number, long list_id) {
+    public List<Status> getStatuesFromDb(long sinceId, int howMany, long list_id) {
         List<Status> ret = new ArrayList<Status>();
-        List<byte[]> oStats = tweetDB.getStatusesObjsOlderThan(sinceId,number,list_id);
+        List<byte[]> oStats = tweetDB.getStatusesObjsOlderThan(sinceId,howMany,list_id);
         for (byte[] bytes : oStats) {
             Status status = materializeStatus(bytes);
             ret.add(status);
@@ -101,7 +104,7 @@ public class TwitterHelper {
 			Toast.makeText(context, "Getting lists failed: " + e.getMessage(), 15000).show();
 			e.printStackTrace();
 			return new ArrayList<UserList>();
-		} // TODO cursor?
+		}
 	}
 
 
@@ -211,8 +214,8 @@ public class TwitterHelper {
             }
 
             // reload tweet and update in DB - twitter4j should have some status.setFav()..
-            status = getStatusById(status.getId(),0L, true); // TODO list_id ?
-            updateStatus(tweetDB,status,0); // TODO list id ???
+            status = getStatusById(status.getId(),null, true, false); // no list id, don't persist
+            updateStatus(tweetDB,status); // explicitly update in DB - we know it is there.
 			updateResponse.setSuccess();
             updateResponse.setMessage("(Un)favorite set");
 		} catch (Exception e) {
@@ -242,25 +245,28 @@ public class TwitterHelper {
         Twitter twitter = getTwitter();
 
         List<Status> statuses;
-		try {
-	        String listOwnerScreenName = twitter.getScreenName();
+        if (!fromDbOnly) {
+            try {
+                String listOwnerScreenName = twitter.getScreenName();
 
-			statuses = twitter.getUserListStatuses(listOwnerScreenName, listId, paging);
-			int size = statuses.size();
-            Log.i("getUserList","Got " + size + " statuses from Twitter");
+                statuses = twitter.getUserListStatuses(listOwnerScreenName, listId, paging);
+                int size = statuses.size();
+                Log.i("getUserList","Got " + size + " statuses from Twitter");
 
-            TweetDB tdb = new TweetDB(context);
+                TweetDB tdb = new TweetDB(context);
 
-            for (Status status : statuses) {
-                persistStatus(tdb, status,listId);
+                for (Status status : statuses) {
+                    persistStatus(tdb, status,listId);
+                }
+            } catch (Exception e) {
+                statuses = new ArrayList<Status>();
+
+                System.err.println("Got exception: " + e.getMessage() );
+                if (e.getCause()!=null)
+                    System.err.println("   " + e.getCause().getMessage());
             }
-        } catch (Exception e) {
+        } else
             statuses = new ArrayList<Status>();
-
-            System.err.println("Got exception: " + e.getMessage() );
-            if (e.getCause()!=null)
-                System.err.println("   " + e.getCause().getMessage());
-        }
 
         fillUpStatusesFromDB(listId, statuses);
         Log.i("getUserList","Now we have " + statuses.size());
@@ -292,24 +298,28 @@ public class TwitterHelper {
         int size = statuses.size();
         if (size==0)
             statuses.addAll(getStatuesFromDb(-1,maxOld,listId));
-        else
-            statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),minOld,listId));
+        else {
+            int num = (size+minOld< maxOld) ? maxOld-size : minOld;
+            statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),num,listId));
+        }
     }
 
 
     /**
      * Get a single status. If directOnly is false, we first look in the local
      * db if it is already present. Otherwise we directly go to the server.
+     *
      * @param statusId
      * @param list_id
      * @param directOnly
+     * @param alsoPersist
      * @return
      */
-    public Status getStatusById(long statusId, Long list_id, boolean directOnly) {
+    public Status getStatusById(long statusId, Long list_id, boolean directOnly, boolean alsoPersist) {
         Status status = null;
 
         if (!directOnly) {
-            byte[] obj  = tweetDB.getStatusObjectById(statusId,list_id);
+            byte[] obj  = tweetDB.getStatusObjectById(statusId);
             if (obj!=null) {
                 status = materializeStatus(obj);
                 if (status!=null)
@@ -320,41 +330,57 @@ public class TwitterHelper {
         Twitter twitter = getTwitter();
         try {
             status = twitter.showStatus(statusId);
-            long id;
-            if (list_id==null)
-                id = 0;
-            else
-                id = list_id;
-            persistStatus(tweetDB,status,id);
+
+            if (alsoPersist) {
+                long id;
+                if (list_id==null)
+                    id = 0;
+                else
+                    id = list_id;
+                persistStatus(tweetDB,status,id);
+            }
         } catch (Exception e) {
             e.printStackTrace();  // TODO: Customise this generated block
         }
         return status;
     }
 
+    public List<Status> getRepliesToStatus(long statusId) {
+        List<Status> ret = new ArrayList<Status>();
+        List<byte[]> replies = tweetDB.getReplies(statusId);
+        for (byte[] reply : replies) {
+            Status status = materializeStatus(reply);
+            ret.add(status);
+        }
+        return ret;
+    }
+
 
     private void persistStatus(TweetDB tdb, Status status, long list_id) throws IOException {
-        if (tdb.getStatusObjectById(status.getId(),list_id)!=null)
+        if (tdb.getStatusObjectById(status.getId())!=null)
             return; // This is already in DB, so do nothing
 
         // Serialize and then store in DB
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream out = new ObjectOutputStream(bos);
         out.writeObject(status);
-        tdb.storeOrUpdateStatus(status.getId(), status.getInReplyToStatusId(), list_id, bos.toByteArray(), true);
+        tdb.storeStatus(status.getId(), status.getInReplyToStatusId(), list_id, bos.toByteArray());
     }
 
-    private void updateStatus(TweetDB tdb, Status status, long list_id) throws IOException {
-        if (tdb.getStatusObjectById(status.getId(),list_id)==null) {
-            persistStatus(tdb,status,list_id);
-            return;
-        }
+    /**
+     * Update an existing status object in the database with the passed one.
+     * @param tdb TweetDb to use
+     * @param status Updated status object
+     * @throws IOException
+     */
+    private void updateStatus(TweetDB tdb, Status status) throws IOException {
 
         // Serialize and then store in DB
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream out = new ObjectOutputStream(bos);
         out.writeObject(status);
-        tdb.storeOrUpdateStatus(status.getId(), status.getInReplyToStatusId(), list_id, bos.toByteArray(), false);
+
+        tdb.updateStatus(status.getId(), bos.toByteArray());
     }
 
 

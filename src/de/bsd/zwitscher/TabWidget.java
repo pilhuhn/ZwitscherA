@@ -20,7 +20,8 @@ import android.widget.TabHost;
 
 public class TabWidget extends TabActivity {
 
-	TabHost tabHost;
+    static final String LIST_ID = "list_id";
+    TabHost tabHost;
 	TabHost.TabSpec homeSpec;
     ProgressBar pg;
     TextView titleTextBox;
@@ -39,6 +40,7 @@ public class TabWidget extends TabActivity {
 		Resources res = getResources();
 		tabHost = getTabHost();
 		Intent homeIntent = new Intent().setClass(this,TweetListActivity.class);
+        homeIntent.putExtra(LIST_ID, 0);
 
 		homeSpec = tabHost.newTabSpec("home")
 				.setIndicator("Home",res.getDrawable(R.drawable.home))
@@ -46,11 +48,18 @@ public class TabWidget extends TabActivity {
 		tabHost.addTab(homeSpec);
 
 		Intent mentionsIntent = new Intent().setClass(this,TweetListActivity.class);
-		mentionsIntent.putExtra("timeline", "mentions");
+		mentionsIntent.putExtra(LIST_ID, -1);
 
 		homeSpec = tabHost.newTabSpec("mentions")
 				.setIndicator("Mentions",res.getDrawable(R.drawable.mentions))
 				.setContent(mentionsIntent);
+		tabHost.addTab(homeSpec);
+
+        Intent directIntent = new Intent().setClass(this,TweetListActivity.class);
+        directIntent.putExtra(LIST_ID, -2);
+		homeSpec = tabHost.newTabSpec("directs")
+				.setIndicator("Direct",res.getDrawable(R.drawable.direct))
+				.setContent(directIntent);
 		tabHost.addTab(homeSpec);
 
 
@@ -68,8 +77,7 @@ public class TabWidget extends TabActivity {
 		TabHost.TabSpec spec;
 		Intent intent;
 		intent = new Intent().setClass(this,TweetListActivity.class);
-		intent.putExtra("listName", listName);
-		intent.putExtra("id", listId);
+		intent.putExtra(LIST_ID, listId);
 
 		spec = tabHost.newTabSpec(listId.toString())
 		.setIndicator(listName,res.getDrawable(R.drawable.list))
@@ -185,5 +193,3 @@ public class TabWidget extends TabActivity {
     }
 
 }
-
-
