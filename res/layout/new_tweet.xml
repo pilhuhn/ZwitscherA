@@ -18,12 +18,14 @@
         android:inputType="textMultiLine"
         android:maxLength="140"
         android:layout_below="@id/textOben"
+        android:gravity="top|left"
        />
     <TextView
     	android:id="@+id/CharCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
     	android:layout_below="@id/edittext"
+        android:text="140"
     	android:minEms="3"
     />
 
@@ -34,7 +36,7 @@
 			android:layout_below="@id/CharCount"
 			android:layout_alignParentRight="true"
 		/>
-	
+
 	<Button android:id="@+id/ClearButton"
 			android:text="@string/ClearButton"
 			android:layout_width="wrap_content"
@@ -42,7 +44,7 @@
 			android:layout_alignBaseline="@id/TweetButton"
 		/>
 
-	<CheckBox android:id="@+id/GeoCheckBox" 
+	<CheckBox android:id="@+id/GeoCheckBox"
 			  android:checked="false"
 			  android:enabled="false"
 			  android:text="Geo?"
