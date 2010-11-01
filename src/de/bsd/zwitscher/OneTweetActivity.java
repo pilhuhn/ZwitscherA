@@ -63,16 +63,18 @@ public class OneTweetActivity extends Activity {
 				tv01.setText(status.getUser().getName());
 			}
 			else {
-				StringBuilder sb = new StringBuilder(status.getRetweetedStatus().getUser().getName());
+				StringBuilder sb = new StringBuilder("<strong>");
+                sb.append(status.getRetweetedStatus().getUser().getName());
 				sb.append(" (");
 				sb.append(status.getRetweetedStatus().getUser().getScreenName());
-				sb.append(" ) retweeted by  ");
+				sb.append(" </strong>) retweeted by  <strong>");
 				sb.append(status.getUser().getName());
-				tv01.setText(sb.toString());
+                sb.append("</strong>");
+				tv01.setText(Html.fromHtml(sb.toString()));
 			}
 			TextView mtv = (TextView) findViewById(R.id.MiscTextView);
 			if (status.getInReplyToScreenName()!=null) {
-				mtv.setText("In reply to: " + status.getInReplyToScreenName());
+				mtv.setText(Html.fromHtml("In reply to: <strong>" + status.getInReplyToScreenName() + "</strong>"));
 			}
 			else {
 				mtv.setText("");
@@ -234,7 +236,7 @@ public class OneTweetActivity extends Activity {
 
             User user = users[0];
             PicHelper picHelper = new PicHelper();
-            Bitmap bi = picHelper.getUserPic(user,ctx);
+            Bitmap bi = picHelper.fetchUserPic(user);
             return bi;
         }
 

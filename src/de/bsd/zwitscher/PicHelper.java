@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.MalformedInputException;
 
 import android.graphics.*;
 import twitter4j.User;
@@ -26,12 +25,15 @@ public class PicHelper {
 
 	private static final long ONE_DAY = 24 * 60 * 60 * 1000L;
 
-	public Bitmap getUserPic(User user,Context context) {
+	public Bitmap fetchUserPic(User user) {
+
+        if (user==null)
+            return null;
 
 		URL imageUrl = user.getProfileImageURL();
 
 		String username = user.getScreenName();
-        Log.i("getUserPic","Looking for pic of user '" + username + "' from '" + imageUrl.toString() + "'");
+        Log.i("fetchUserPic","Looking for pic of user '" + username + "' from '" + imageUrl.toString() + "'");
 		boolean found = false;
 		// TODO use v8 methods when we require v8 in the manifest. Is probably too early yet.
 		try {
@@ -41,7 +43,7 @@ public class PicHelper {
 					found = true;
 			}
 			if (found)
-				Log.i("getUserPic","Picture was on file system");
+				Log.i("fetchUserPic","Picture was on file system");
 		}
 		catch (Exception ioe) {
 			Log.i("PicHelper", ioe.getMessage());
@@ -49,7 +51,7 @@ public class PicHelper {
 
 		if (!found) {
 			try {
-                Log.i("getUserPic","Downloading image and persisting it locally");
+                Log.i("fetchUserPic","Downloading image and persisting it locally");
                 BufferedInputStream in = new BufferedInputStream(imageUrl.openStream());
                 Bitmap bitmap = BitmapFactory.decodeStream(in);
                 bitmap = biteCornersOff(bitmap);
