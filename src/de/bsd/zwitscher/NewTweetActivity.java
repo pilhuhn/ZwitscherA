@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Window;
 import android.widget.*;
 import twitter4j.GeoLocation;
@@ -16,10 +18,8 @@ import twitter4j.StatusUpdate;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
 import twitter4j.User;
 
 public class NewTweetActivity extends Activity {
@@ -29,6 +29,7 @@ public class NewTweetActivity extends Activity {
 	Pattern p = Pattern.compile(".*?(@\\w+ )*.*");
     ProgressBar pg;
     User toUser = null;
+    TextView charCountView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,7 @@ public class NewTweetActivity extends Activity {
 	    setContentView(R.layout.new_tweet);
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+        charCountView = (TextView) findViewById(R.id.CharCount);
 
 
 	    final Button tweetButton = (Button) findViewById(R.id.TweetButton);
@@ -76,7 +78,7 @@ public class NewTweetActivity extends Activity {
                     textOben.setText(origStatus.getText());
 					String msg = "RT @" + origStatus.getUser().getScreenName() + " ";
 					msg = msg + origStatus.getText();
-					edittext.setText(msg); // TODO limit to 140 chars
+					edittext.setText(msg); // limit to 140 chars is done by the edittext via maxLength attribute
 				} else if (isDirect) {
                     toUser = origStatus.getUser();
                     textOben.setText("Sending direct message to " + toUser.getScreenName());
@@ -91,24 +93,32 @@ public class NewTweetActivity extends Activity {
 			box.setChecked(true);
 		}
 
+        // Add a listener to count the text length.
+        edittext.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Not needed
+            }
 
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Not needed
+            }
 
-		edittext.setOnKeyListener(new OnKeyListener() {
-		    public boolean onKey(View v, int keyCode, KeyEvent event) {
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
 
-		        if ((event.getAction() == KeyEvent.ACTION_UP) && edittext.getText().length() >0 ) {
-		        	tweetButton.setEnabled(true);
-		        }
+                int tlen = edittext.getText().length();
 
-		        if (event.getAction() == KeyEvent.ACTION_UP || event.getAction() == KeyEvent.ACTION_DOWN) {
-		        	int len = edittext.getText().length();
-		        	TextView tv = (TextView) findViewById(R.id.CharCount);
-		        	tv.setText(String.valueOf(140-len));
-		        }
+                if (tlen >0 ) {
+                    tweetButton.setEnabled(true);
+                }
+                else
+                    tweetButton.setEnabled(false);
 
-		        return false;
-		    }
-		});
+                charCountView.setText(String.valueOf(140-tlen));
+            }
+        });
 
 
 		tweetButton.setOnClickListener(new OnClickListener() {
