@@ -54,7 +54,7 @@ public class PicHelper {
                 Bitmap bitmap = BitmapFactory.decodeStream(in);
                 bitmap = biteCornersOff(bitmap);
 
-    			if (externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
+    			if (bitmap!=null && externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
     				File iconFile = getPictureFileForUser(username);
     				BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(iconFile));
                     bitmap.compress(Bitmap.CompressFormat.PNG, 0, out);
@@ -75,10 +75,13 @@ public class PicHelper {
      * Take a square bitmap as input and bite the four corners off -
      * This means those pixels are set to Color.TRANSPARENT
      * @param bitmap Original bitmap
-     * @return modified bitmap
+     * @return modified bitmap or null if original was null
      */
     private Bitmap biteCornersOff(final Bitmap bitmap) {
         int transparent = Color.TRANSPARENT;
+        if (bitmap==null)
+            return null;
+
         Bitmap out = bitmap.copy(bitmap.getConfig(), true);
         out.setPixel(0,0,transparent);
         out.setPixel(1,0,transparent);
