@@ -38,6 +38,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     TextView titleTextBox;
     int list_id;
     TweetDB tdb;
+    TwitterHelper th;
 
     /**
      * Called when the activity is first created.
@@ -54,6 +55,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         pg = parent.pg;
         titleTextBox = parent.titleTextBox;
         tdb = new TweetDB(this);
+        th = new TwitterHelper(thisActivity);
 
 
         intentInfo = getIntent().getExtras();
@@ -107,7 +109,6 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     }
 
 	private List<Status> getTimlinesFromTwitter(boolean fromDbOnly) {
-		TwitterHelper th = new TwitterHelper(getApplicationContext());
 		Paging paging = new Paging().count(100);
 
 		List<Status> myStatuses = new ArrayList<Status>();

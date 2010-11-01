@@ -12,7 +12,6 @@
 <TextView android:text="@+id/TextView01"
 			android:id="@+id/TextView01"
 			android:layout_width="wrap_content"
-			android:textStyle="bold"
 			android:minLines="2"
             android:paddingLeft="5px"
             android:paddingRight="5px"
@@ -112,6 +111,11 @@
         android:layout_height="wrap_content"
         android:onClick="done"
 		android:text="Done!"/>
+<ImageView android:id="@+id/OTImageView"
+           android:layout_below="@id/DoneButton"
+           android:layout_height="256px"
+           android:layout_width="256px"
+           />
 
 
 </RelativeLayout>

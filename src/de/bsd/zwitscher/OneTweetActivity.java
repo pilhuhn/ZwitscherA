@@ -1,6 +1,7 @@
 package de.bsd.zwitscher;
 
 
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.view.Window;
@@ -23,7 +24,9 @@ import android.util.Log;
 import android.view.View;
 import twitter4j.User;
 
-import java.util.Locale;
+import java.io.BufferedInputStream;
+import java.net.URL;
+import java.util.*;
 
 public class OneTweetActivity extends Activity {
 
@@ -31,6 +34,7 @@ public class OneTweetActivity extends Activity {
 	Status status ;
     ImageView userPictureView;
     ProgressBar pg;
+    ImageView thumbnailView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,7 @@ public class OneTweetActivity extends Activity {
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
 
         userPictureView = (ImageView) findViewById(R.id.UserPictureImageView);
+        thumbnailView = (ImageView) findViewById(R.id.OTImageView);
 
 		Bundle bundle = getIntent().getExtras();
 		if (bundle!=null) {
@@ -57,6 +62,7 @@ public class OneTweetActivity extends Activity {
             else
                 new DownloadImageTask().execute(status.getRetweetedStatus().getUser());
 
+            new DownloadThumbnailTask().execute(status);
 
 			TextView tv01 = (TextView) findViewById(R.id.TextView01);
 			if (status.getRetweetedStatus()==null) {
@@ -216,6 +222,63 @@ public class OneTweetActivity extends Activity {
 		}
 	}
 
+    private Bitmap loadThumbnail(Status status) {
+        URL[] urlArray = status.getURLs();
+        Set<String> urls = new HashSet<String>();
+        if (urlArray!=null) {
+            for (URL url : urlArray) {
+                urls.add(url.toString());
+            }
+        }
+
+        // Nothing provided by twitter, so parse the text
+        if (urls.size()==0) {
+            String[] tokens = status.getText().split(" ");
+            for (String token : tokens) {
+                if (token.startsWith("http://") || token.startsWith("https://")) {
+                    urls.add(token);
+                }
+            }
+        }
+        if (urls.size()==0)
+            return null;
+
+        // We have urls, so check for picture services
+        // TODO implement preview of multiple pictures.
+        for (String url :  urls) {
+            Log.d("One tweet","Url = " + url);
+            String finalUrlString = null;
+            if (url.contains("yfrog.com")) {
+                finalUrlString = url + ".th.jpg";
+            }
+            else if (url.contains("twitpic.com")) {
+                String tmp = url;
+                tmp = tmp.substring(tmp.lastIndexOf("/")+1);
+                finalUrlString = "http://twitpic.com/show/thumb/" + tmp;
+            }
+            else if (url.contains("plixi.com")) {
+                finalUrlString = "http://api.plixi.com/api/tpapi.svc/imagefromurl?size=thumbnail&url=" +  url;
+            }
+            else
+                return null;
+
+            Log.i("loadThumbail","URL to load is " + finalUrlString);
+
+            try {
+                URL picUrl = new URL(finalUrlString);
+                BufferedInputStream in = new BufferedInputStream(picUrl.openStream());
+                Bitmap bitmap = BitmapFactory.decodeStream(in);
+                in.close();
+                return bitmap;
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        return null;
+    }
+
 
 	public void done(View v) {
 		finish();
@@ -245,6 +308,22 @@ public class OneTweetActivity extends Activity {
         	if (result!=null)
         		userPictureView.setImageBitmap(result);
             pg.setVisibility(ProgressBar.INVISIBLE);
+        }
+    }
+
+    private class DownloadThumbnailTask extends AsyncTask<Status,Void,Bitmap> {
+
+        @Override
+        protected Bitmap doInBackground(twitter4j.Status... statuses) {
+            Bitmap b = loadThumbnail(statuses[0]);
+            return b;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            if (bitmap!=null)
+                thumbnailView.setImageBitmap(bitmap);
         }
     }
 
