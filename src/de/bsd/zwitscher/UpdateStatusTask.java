@@ -2,7 +2,9 @@ package de.bsd.zwitscher;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -69,12 +71,19 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
         String ns = Context.NOTIFICATION_SERVICE;
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(ns);
         int icon = R.drawable.icon; // TODO create small version for status bar
-        Notification notification = new Notification(icon,result.getUpdateType().toString(),System.currentTimeMillis());
+        Notification notification = new Notification(icon,result.getUpdateType().toString() + " failed",System.currentTimeMillis());
+
+        Intent intent = new Intent(context,OneTweetActivity.class);
+        PendingIntent pintent = PendingIntent.getActivity(context,0,intent,0);
+
+        String text = result.getMessage() + "<br/>";
+        if (result.getUpdateType()==UpdateType.UPDATE)
+            text += result.getUpdate().getStatus();
 
         notification.setLatestEventInfo(context,
                 result.getUpdateType() + " failed",
-                result.getMessage() + " <br/> ",
-                null); // TODO pending ...
+                text,
+                pintent);
 
         mNotificationManager.notify(1,notification); // TODO better id generation ?
     }
