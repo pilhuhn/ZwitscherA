@@ -81,8 +81,10 @@ public class PicHelper {
      */
     private Bitmap biteCornersOff(final Bitmap bitmap) {
         int transparent = Color.TRANSPARENT;
-        if (bitmap==null)
+        if (bitmap==null || bitmap.getConfig()==null) {
+            Log.d("BiteCornersOff", "bitmap or config was null");
             return null;
+        }
 
         Bitmap out = bitmap.copy(bitmap.getConfig(), true);
         out.setPixel(0,0,transparent);
