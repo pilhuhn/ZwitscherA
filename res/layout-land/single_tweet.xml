@@ -3,11 +3,12 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="wrap_content"
   android:layout_height="wrap_content">
-<ImageView android:layout_width="80px"
+<ImageButton android:layout_width="80px"
 			android:layout_height="80px"
 			android:src="@drawable/user_unknown"
 			android:scaleType="fitXY"
 			android:padding="4px"
+            android:onClick="displayUserDetail"
 			android:id="@+id/UserPictureImageView"/>
 <TextView android:text="@+id/TextView01"
 			android:id="@+id/TextView01"

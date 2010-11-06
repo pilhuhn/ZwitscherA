@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.bsd.zwitscher"
           android:versionName="Tick"
-          android:versionCode="30"
+          android:versionCode="31"
           >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -33,6 +33,7 @@
     	</activity>
 
         <activity android:name=".ThreadListActivity"/>
+        <activity android:name=".UserDetailActivity"/>
 
     </application>
 

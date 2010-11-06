@@ -111,6 +111,15 @@ public class OneTweetActivity extends Activity {
 		}
 	}
 
+    public void displayUserDetail(View v) {
+        Intent i = new Intent(getApplicationContext(), UserDetailActivity.class);
+        // TODO distinguish user / retweeted by user (?)
+        i.putExtra("userName", status.getUser().getName());
+        i.putExtra("userId",status.getUser().getId());
+        startActivity(i);
+
+    }
+
 	public void reply(View v) {
 		Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
 		i.putExtra(getString(R.string.status), status);

@@ -17,12 +17,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import twitter4j.Paging;
-import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.UserList;
+import twitter4j.*;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
 
@@ -353,6 +348,17 @@ public class TwitterHelper {
             ret.add(status);
         }
         return ret;
+    }
+
+    public User getUserById(int userid) {
+        Twitter twitter = getTwitter();
+        User user = null;
+        try {
+            user = twitter.showUser(userid);
+        } catch (TwitterException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+        return user;
     }
 
 
