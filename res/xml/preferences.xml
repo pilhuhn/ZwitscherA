@@ -26,4 +26,16 @@
                     android:key="maxOldTweets"
                     />
 
+    <ListPreference android:title="Picture loading"
+                    android:summary="Network configuration required for picture loading"
+                    android:defaultValue="Always"
+                    android:entryValues="@array/network_config_vals"
+                    android:entries="@array/network_config"
+                    android:key="networkConfig"/>
+
+    <CheckBoxPreference android:title="Roaming"
+                        android:key="roaming"
+                        android:summary="Allow downloading images when Roaming"
+                        android:defaultValue="false"/>
+
 </PreferenceScreen>

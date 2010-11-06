@@ -33,6 +33,7 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
     PicHelper ph;
     TwitterHelper th;
     private Context extContext;
+    boolean downloadImages;
 
     public StatusAdapter(Context context, int textViewResourceId, List<Status> objects) {
         super(context, textViewResourceId, objects);
@@ -40,6 +41,7 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
         items = objects;
         ph = new PicHelper();
         th = new TwitterHelper(context);
+        downloadImages = new NetworkHelper(context).mayDownloadImages();
 
     }
 
@@ -86,10 +88,12 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
             // underlying view seems to be reused, so default image is not loaded when bi==null
             iv.setImageBitmap(BitmapFactory.decodeResource(extContext.getResources(), R.drawable.user_unknown));
             // Trigger fetching of user pic in background
-            if (status.getRetweetedStatus()==null)
-                new TriggerPictureDownloadTask().execute(status.getUser());
-            else
-                new TriggerPictureDownloadTask().execute(status.getRetweetedStatus().getUser());
+            if (downloadImages) {
+                if (status.getRetweetedStatus()==null)
+                    new TriggerPictureDownloadTask().execute(status.getUser());
+                else
+                    new TriggerPictureDownloadTask().execute(status.getRetweetedStatus().getUser());
+            }
 
         }
         userInfo.setText(Html.fromHtml(userName)); // TODO replace with something better

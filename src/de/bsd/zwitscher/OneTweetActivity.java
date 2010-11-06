@@ -35,6 +35,7 @@ public class OneTweetActivity extends Activity {
     ImageView userPictureView;
     ProgressBar pg;
     ImageView thumbnailView;
+    boolean downloadPictures=false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +50,8 @@ public class OneTweetActivity extends Activity {
 
         userPictureView = (ImageView) findViewById(R.id.UserPictureImageView);
         thumbnailView = (ImageView) findViewById(R.id.OTImageView);
+
+        downloadPictures = new NetworkHelper(this).mayDownloadImages();
 
 		Bundle bundle = getIntent().getExtras();
 		if (bundle!=null) {
@@ -299,7 +302,11 @@ public class OneTweetActivity extends Activity {
 
             User user = users[0];
             PicHelper picHelper = new PicHelper();
-            Bitmap bi = picHelper.fetchUserPic(user);
+            Bitmap bi = null;
+            if (downloadPictures)
+                bi = picHelper.fetchUserPic(user);
+            else
+                bi = picHelper.getBitMapForUserFromFile(user);
             return bi;
         }
 
@@ -315,7 +322,9 @@ public class OneTweetActivity extends Activity {
 
         @Override
         protected Bitmap doInBackground(twitter4j.Status... statuses) {
-            Bitmap b = loadThumbnail(statuses[0]);
+            Bitmap b=null;
+            if (downloadPictures)
+                b = loadThumbnail(statuses[0]);
             return b;
         }
 
