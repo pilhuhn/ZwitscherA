@@ -34,6 +34,10 @@ public class NetworkHelper {
         boolean whenRoaming = preferences.getBoolean("roaming", false);
 
         NetworkInfo info = cManager.getActiveNetworkInfo();
+        if (info==null) {
+            Log.i("NetworkHelper","Can't get info about active network, blocking image load");
+            return false;
+        }
         int type = info.getType();
         int subType = info.getSubtype();
         /*
