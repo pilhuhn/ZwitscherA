@@ -69,21 +69,21 @@ public class OneTweetActivity extends Activity {
 
 			TextView tv01 = (TextView) findViewById(R.id.TextView01);
 			if (status.getRetweetedStatus()==null) {
-				tv01.setText(status.getUser().getName());
+				tv01.setText("<b>" + status.getUser().getName() + "</b>");
 			}
 			else {
-				StringBuilder sb = new StringBuilder("<strong>");
+				StringBuilder sb = new StringBuilder("<b>");
                 sb.append(status.getRetweetedStatus().getUser().getName());
 				sb.append(" (");
 				sb.append(status.getRetweetedStatus().getUser().getScreenName());
-				sb.append(" </strong>) retweeted by  <strong>");
+				sb.append(" </b>) retweeted by  <b>");
 				sb.append(status.getUser().getName());
-                sb.append("</strong>");
+                sb.append("</b>");
 				tv01.setText(Html.fromHtml(sb.toString()));
 			}
 			TextView mtv = (TextView) findViewById(R.id.MiscTextView);
 			if (status.getInReplyToScreenName()!=null) {
-				mtv.setText(Html.fromHtml("In reply to: <strong>" + status.getInReplyToScreenName() + "</strong>"));
+				mtv.setText(Html.fromHtml("In reply to: <b>" + status.getInReplyToScreenName() + "</b>"));
 			}
 			else {
 				mtv.setText("");
@@ -113,11 +113,15 @@ public class OneTweetActivity extends Activity {
 
     public void displayUserDetail(View v) {
         Intent i = new Intent(getApplicationContext(), UserDetailActivity.class);
-        // TODO distinguish user / retweeted by user (?)
-        i.putExtra("userName", status.getUser().getName());
-        i.putExtra("userId",status.getUser().getId());
+        User theUser;
+        if (status.getRetweetedStatus()==null) {
+            theUser = status.getUser();
+        } else {
+            theUser = status.getRetweetedStatus().getUser();
+        }
+        i.putExtra("userName", theUser.getName());
+        i.putExtra("userId",theUser.getId());
         startActivity(i);
-
     }
 
 	public void reply(View v) {
