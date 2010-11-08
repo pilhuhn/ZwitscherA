@@ -23,88 +23,61 @@
     <TableLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:stretchColumns="1"
+            android:shrinkColumns="1"
             >
         <TableRow>
             <TextView android:text="Location:"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_location"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
                     />
         </TableRow>
         <TableRow>
             <TextView android:text="Web:"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_web"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
                       android:autoLink="web"
                     />
         </TableRow>
         <TableRow>
             <TextView android:text="Bio:"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_bio"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:minLines="1"
-                      android:singleLine="false"
+
                     />
         </TableRow>
         <TableRow>
             <TextView android:text="Tweet count:"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_tweetCount"
-                      android:layout_width="wrap_content"
-                      android:layout_height="fill_parent"
                     />
         </TableRow>
         <TableRow>
 
             <TextView android:text="Follower count:"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_followerCount"
-                      android:layout_width="wrap_content"
-                      android:layout_height="fill_parent"
                     />
         </TableRow>
         <TableRow>
 
             <TextView android:text="Following count:"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_followingCount"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
                     />
         </TableRow>
         <TableRow>
 
             <TextView android:text="Listed count:"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_listedCount"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
                     />
         </TableRow>
     </TableLayout>
