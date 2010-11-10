@@ -316,7 +316,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 		ttsParams.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "tweet_status_msg" + status.getUser().getScreenName());
 		tts.speak(status.getText(), TextToSpeech.QUEUE_FLUSH, ttsParams);
 
-        tts.shutdown();
 	}
 
     private void checkforSpeechServices() {
@@ -363,6 +362,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     @SuppressWarnings("unused")
 	public void done(View v) {
+        tts.shutdown();
 		finish();
 	}
 
