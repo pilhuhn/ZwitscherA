@@ -33,8 +33,14 @@ public class ListOfListsActivity extends ListActivity {
 
         th = new TwitterHelper(this);
         tdb = new TweetDB(this);
+    }
 
-        List<String> result = new ArrayList<String>();
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    List<String> result = new ArrayList<String>();
 
         userListsEntries = tdb.getLists().entrySet();
   		for (Map.Entry<String, Integer> userList : userListsEntries) {
@@ -72,7 +78,5 @@ public class ListOfListsActivity extends ListActivity {
 
             startActivity(intent);
         }
-
-//        super.onListItemClick(l, v, position, id);    // TODO: Customise this generated block
     }
 }

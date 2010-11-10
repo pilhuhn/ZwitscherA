@@ -71,18 +71,6 @@ public class TabWidget extends TabActivity {
 
 	}
 
-	private void setUpTab(Resources res, String listName, Integer listId) {
-		TabHost.TabSpec spec;
-		Intent intent;
-		intent = new Intent().setClass(this,TweetListActivity.class);
-		intent.putExtra(LIST_ID, listId);
-
-		spec = tabHost.newTabSpec(listId.toString())
-		.setIndicator(listName,res.getDrawable(R.drawable.list))
-		.setContent(intent);
-		tabHost.addTab(spec);
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		 MenuInflater inflater = getMenuInflater();
@@ -145,7 +133,6 @@ public class TabWidget extends TabActivity {
 			}
 			else {
 				tdb.addList(userList.getName(),userList.getId());
-				setUpTab(getResources(), userList.getName(), userList.getId());
 			}
 		}
 		// check for outdated lists and remove them
@@ -161,16 +148,6 @@ public class TabWidget extends TabActivity {
 			}
 			if (!found) {
 				tdb.removeList(id);
-				needsReload = true;
-			}
-		}
-		if (needsReload) {
-			tabHost.setCurrentTab(0);
-			tabHost.clearAllTabs();
-			tabHost.addTab(homeSpec);
-			storedLists = tdb.getLists();
-			for (Entry<String, Integer> entry : storedLists.entrySet()) {
-				setUpTab(getResources(), entry.getKey(), entry.getValue());
 			}
 		}
 	}
