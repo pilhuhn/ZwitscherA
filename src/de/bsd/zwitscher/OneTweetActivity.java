@@ -1,11 +1,8 @@
 package de.bsd.zwitscher;
 
 
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.speech.RecognizerIntent;
 import android.text.Html;
 import android.view.Window;
 import android.widget.*;
@@ -30,8 +27,6 @@ import twitter4j.User;
 import java.io.BufferedInputStream;
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This Activity displays one individual status.
@@ -47,7 +42,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     ProgressBar pg;
     ImageView thumbnailView;
     boolean downloadPictures=false;
-    boolean isLockedOnInit;
     TextToSpeech tts;
 
 	@Override
@@ -65,7 +59,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         userPictureView = (ImageView) findViewById(R.id.UserPictureImageView);
         thumbnailView = (ImageView) findViewById(R.id.OTImageView);
 
-        downloadPictures = new NetworkHelper(this).mayDownloadImages();
+        NetworkHelper networkHelper = new NetworkHelper(this);
+        downloadPictures = networkHelper.mayDownloadImages();
 
 		Bundle bundle = getIntent().getExtras();
 		if (bundle!=null) {
@@ -87,7 +82,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 sb.append(status.getUser().getName());
                 sb.append(" (");
                 sb.append(status.getUser().getScreenName());
-                sb.append(" )");
+                sb.append(")");
                 sb.append("</b>");
 			}
 			else {
@@ -127,6 +122,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 			if (status.isFavorited())
 				favoriteButton.setText("Un-Favorite");
 
+            Button translateButon = (Button) findViewById(R.id.TranslateButton);
+            translateButon.setEnabled(networkHelper.isOnline());
 		}
 	}
 
@@ -259,9 +256,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     public void onInit(int status) {
         String statusString = status == 0 ? "Success" : "Failure";
         System.out.println("speak"+" onInit " + statusString);
-        System.out.flush();
-        isLockedOnInit = false;
-
     }
 
     @Override
@@ -277,28 +271,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
 	public void setupspeak() {
 
-        checkforSpeechServices();
-        isLockedOnInit = true;
-        System.out.println("Lock is now locked? " + isLockedOnInit);
-
 		tts = new TextToSpeech(this,this);
-
-        System.out.println("Before lock");
-        int i = 10;
-
-        while (isLockedOnInit && i>0) {
-            System.out.println("   Still locked");
-            try {
-                Thread.sleep(200);
-            }
-            catch (InterruptedException e)
-            {
-                Log.e("speaker", "interrupted");
-            }
-            i--;
-        }
-        System.out.println("After lock");
-
         tts.setLanguage(Locale.US);
     }
 
@@ -329,7 +302,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     /**
      * Translate the current status by calling Google translate
-     * TODO: disable the button if offline
      * @param v
      */
     @SuppressWarnings("unused")

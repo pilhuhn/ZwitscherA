@@ -85,4 +85,13 @@ public class NetworkHelper {
 
      //   return true; // TODO fix
     }
+
+    public boolean isOnline() {
+        NetworkInfo info = cManager.getActiveNetworkInfo();
+
+        if (info==null)
+            return false;
+
+        return true;
+    }
 }
