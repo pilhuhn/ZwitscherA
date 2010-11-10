@@ -62,13 +62,11 @@ public class TabWidget extends TabActivity {
 				.setContent(directIntent);
 		tabHost.addTab(homeSpec);
 
-
-  		TweetDB tdb = new TweetDB(getApplicationContext());
-  		Map<String, Integer> userLists = tdb.getLists();
-  		for (Entry<String, Integer> userList : userLists.entrySet()) {
-  			setUpTab(res, userList.getKey(),userList.getValue());
-		}
-		tabHost.setVerticalScrollBarEnabled(true);
+        Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
+        homeSpec = tabHost.newTabSpec("lists")
+                .setIndicator("Lists",res.getDrawable(R.drawable.list))
+                .setContent(listsIntent);
+        tabHost.addTab(homeSpec);
 		tabHost.setCurrentTab(0); // Home tab, tabs start at 0
 
 	}

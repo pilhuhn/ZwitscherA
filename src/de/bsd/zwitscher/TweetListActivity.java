@@ -51,9 +51,10 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         intentInfo = getIntent().getExtras();
         thisActivity = this;
         // Get the windows progress bar from the enclosing TabWidget
-        TabWidget parent = (TabWidget) this.getParent();
-        pg = parent.pg;
-        titleTextBox = parent.titleTextBox;
+        // TODO parent is not the TabWidget in case of lists
+//        TabWidget parent = (TabWidget) this.getParent();
+//        pg = parent.pg;
+//        titleTextBox = parent.titleTextBox;
         tdb = new TweetDB(this);
         th = new TwitterHelper(thisActivity);
 
@@ -76,8 +77,9 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
 
         // Get the windows progress bar from the enclosing TabWidget
-        TabWidget parent = (TabWidget) this.getParent();
-        pg = parent.pg;
+        // TODO parent is not necessarily the TabWidget
+//        TabWidget parent = (TabWidget) this.getParent();
+//        pg = parent.pg;
 
 		ListView lv = getListView();
         lv.setOnScrollListener(this);
@@ -210,8 +212,10 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pg.setVisibility(ProgressBar.VISIBLE);
-            titleTextBox.setText("Getting tweets...");
+            if (pg!=null)
+                pg.setVisibility(ProgressBar.VISIBLE);
+            if(titleTextBox!=null)
+                titleTextBox.setText("Getting tweets...");
         }
 
 
@@ -226,8 +230,10 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 		@Override
 		protected void onPostExecute(List<twitter4j.Status> result) {
 	        setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, R.layout.list_item, result));
-            pg.setVisibility(ProgressBar.INVISIBLE);
-            titleTextBox.setText("");
+            if (pg!=null)
+                pg.setVisibility(ProgressBar.INVISIBLE);
+            if (titleTextBox!=null)
+                titleTextBox.setText("");
 	        getListView().requestLayout();
 		}
     }
