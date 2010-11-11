@@ -3,6 +3,7 @@ package de.bsd.zwitscher;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -48,13 +49,18 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.tweet_list_layout);
+
         intentInfo = getIntent().getExtras();
         thisActivity = this;
         // Get the windows progress bar from the enclosing TabWidget
-        // TODO parent is not the TabWidget in case of lists
-//        TabWidget parent = (TabWidget) this.getParent();
-//        pg = parent.pg;
-//        titleTextBox = parent.titleTextBox;
+        // TODO parent is not the TabWidget in case of user lists
+        Activity theParent = getParent();
+        if (theParent instanceof TabWidget) {
+            TabWidget parent = (TabWidget) theParent;
+            pg = parent.pg;
+            titleTextBox = parent.titleTextBox;
+        }
         tdb = new TweetDB(this);
         th = new TwitterHelper(thisActivity);
 
@@ -169,6 +175,15 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     	return super.onMenuItemSelected(featureId, item);
     }
 
+    /**
+     * Called from the reload button
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void reload(View v) {
+        fillListViewFromTimeline(false);
+    }
+
     private void fillListViewFromTimeline(boolean fromDbOnly) {
     	new GetTimeLineTask().execute(fromDbOnly);
     }
@@ -186,7 +201,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
         ListAdapter adapter = absListView.getAdapter();
         if(loadMore) {
-            Log.d("onSroll:","loadMore f=" + firstVisible + ", vc=" + visibleCount + ", tc=" +totalCount);
+            Log.d("onScroll:","loadMore f=" + firstVisible + ", vc=" + visibleCount + ", tc=" +totalCount);
             if (adapter instanceof StatusAdapter) {
                 StatusAdapter sta = (StatusAdapter) adapter;
                 if (totalCount>0) {
