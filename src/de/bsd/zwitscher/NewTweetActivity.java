@@ -223,4 +223,13 @@ public class NewTweetActivity extends Activity {
         new UpdateStatusTask(this,pg).execute(request);
     }
 
+    /**
+     * Called from the Back button
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void done(View v) {
+        finish();
+    }
+
 }

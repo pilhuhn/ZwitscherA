@@ -31,18 +31,30 @@
     <LinearLayout android:layout_height="wrap_content"
                   android:layout_width="fill_parent"
                   android:orientation="horizontal">
-        <Button
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="left"
+            android:onClick="done"
+            android:src="@drawable/back_button"
+            android:visibility="gone"
+                />
+        <ImageButton
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:onClick="reload"
-            android:text="Reload"
+            android:src="@drawable/reload_button"
+            android:layout_gravity="right"
                 />
-        <Button
+        <ImageButton
+            android:id="@+id/post_button"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:onClick="post"
-            android:enabled="false"
-            android:text="Post"
+            android:enabled="true"
+            android:src="@drawable/post_button"
+            android:layout_gravity="right"
                 />
     </LinearLayout>
 

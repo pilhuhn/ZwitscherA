@@ -61,6 +61,11 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             pg = parent.pg;
             titleTextBox = parent.titleTextBox;
         }
+        else {
+            ImageButton imageButton = (ImageButton) findViewById(R.id.back_button);
+            imageButton.setVisibility(View.VISIBLE);
+
+        }
         tdb = new TweetDB(this);
         th = new TwitterHelper(thisActivity);
 
@@ -182,6 +187,25 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     @SuppressWarnings("unused")
     public void reload(View v) {
         fillListViewFromTimeline(false);
+    }
+
+    /**
+     * Called from the Back button
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void done(View v) {
+        finish();
+    }
+
+    /**
+     * Called from the post button
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void post(View v) {
+        Intent i = new Intent(this, NewTweetActivity.class);
+        startActivity(i);
     }
 
     private void fillListViewFromTimeline(boolean fromDbOnly) {
