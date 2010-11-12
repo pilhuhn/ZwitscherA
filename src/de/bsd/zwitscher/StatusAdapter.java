@@ -4,19 +4,18 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
-import android.os.Debug;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import de.bsd.zwitscher.helper.SpannableBuilder;
 import twitter4j.Status;
 import twitter4j.User;
 
-import java.text.DateFormat;
 import java.util.List;
 
 /**
@@ -27,13 +26,12 @@ import java.util.List;
  */
 class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
 
-    private static final String STRONG = "<b>";
-    private static final String STRONG_END = "</b>";
     private List<Status> items;
     PicHelper ph;
     TwitterHelper th;
     private Context extContext;
     boolean downloadImages;
+
 
     public StatusAdapter(Context context, int textViewResourceId, List<Status> objects) {
         super(context, textViewResourceId, objects);
@@ -47,46 +45,59 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View view = convertView; //= super.getView(position, convertView, parent);
-        if (view==null) {
+
+        ViewHolder viewHolder;
+//        Debug.startMethodTracing("sta");
+
+        // Use ViewHolder pattern to only inflate once
+        if (convertView ==null) {
             LayoutInflater li = (LayoutInflater) extContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = li.inflate(R.layout.list_item,null);
+            convertView = li.inflate(R.layout.list_item,null);
+
+            viewHolder = new ViewHolder();
+            viewHolder.iv = (ImageView) convertView.findViewById(R.id.ListImageView);
+            viewHolder.statusText = (TextView) convertView.findViewById(R.id.ListTextView);
+            viewHolder.userInfo = (TextView) convertView.findViewById(R.id.ListUserView);
+            viewHolder.timeClientInfo = (TextView) convertView.findViewById(R.id.ListTimeView);
+            convertView.setTag(viewHolder);
         }
-//Debug.startMethodTracing("sta");
+        else {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+
         if (position %2 == 0)
-            view.setBackgroundColor(Color.BLACK);
+            convertView.setBackgroundColor(Color.BLACK);
         else
-            view.setBackgroundColor(Color.DKGRAY);
+            convertView.setBackgroundColor(Color.DKGRAY);
+
 
         Status status = items.get(position);
-
-        ImageView iv = (ImageView) view.findViewById(R.id.ListImageView);
-        TextView statusText = (TextView) view.findViewById(R.id.ListTextView);
-        TextView userInfo = (TextView) view.findViewById(R.id.ListUserView);
-        TextView timeClientInfo = (TextView) view.findViewById(R.id.ListTimeView);
-
         Bitmap bi;
-        String userName ;
+
+        SpannableBuilder builder = new SpannableBuilder();
         if (status.getRetweetedStatus()==null) {
             bi = ph.getBitMapForUserFromFile(status.getUser());
-            userName = STRONG + status.getUser().getName() + STRONG_END;
+            builder.append(status.getUser().getName(), Typeface.BOLD);
             if (status.getInReplyToScreenName()!=null) {
-                userName += " in reply to " + STRONG + status.getInReplyToScreenName() + STRONG_END;
+                builder.append(" in reply to ",Typeface.NORMAL)
+                    .append(status.getInReplyToScreenName(),Typeface.BOLD);
             }
         }
         else {
             bi = ph.getBitMapForUserFromFile(status.getRetweetedStatus().getUser());
-            userName = STRONG + status.getRetweetedStatus().getUser().getName() + STRONG_END +
-                    " resent by " + STRONG + status.getUser().getName() + STRONG_END;
+             builder.append(status.getRetweetedStatus().getUser().getName(),Typeface.BOLD)
+                .append(" resent by ", Typeface.NORMAL)
+                .append(status.getUser().getName(),Typeface.BOLD);
         }
 
         if (bi!=null) {
-            bi = ph.decorate(bi,extContext,status.isFavorited(),status.getRetweetedStatus()!=null);
-            iv.setImageBitmap(bi);
+            // TODO find an alternative for decoration of images, as this is expensive
+//            bi = ph.decorate(bi,extContext,status.isFavorited(),status.getRetweetedStatus()!=null);
+            viewHolder.iv.setImageBitmap(bi);
         }
         else {
-            // underlying view seems to be reused, so default image is not loaded when bi==null
-            iv.setImageBitmap(BitmapFactory.decodeResource(extContext.getResources(), R.drawable.user_unknown));
+            // underlying convertView seems to be reused, so default image is not loaded when bi==null
+            viewHolder.iv.setImageBitmap(BitmapFactory.decodeResource(extContext.getResources(), R.drawable.user_unknown));
             // Trigger fetching of user pic in background
             if (downloadImages) {
                 if (status.getRetweetedStatus()==null)
@@ -94,17 +105,21 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
                 else
                     new TriggerPictureDownloadTask().execute(status.getRetweetedStatus().getUser());
             }
-
         }
-        userInfo.setText(Html.fromHtml(userName)); // TODO replace with something better
-//        userInfo.setText((userName));
-        statusText.setText(status.getText());
+        viewHolder.userInfo.setText(builder.toSpannableString());
+        viewHolder.statusText.setText(status.getText());
 
-        DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM);
         String text = th.getStatusDate(status) ;
-        timeClientInfo.setText((text));
+        viewHolder.timeClientInfo.setText((text));
 //Debug.stopMethodTracing();
-        return view;
+        return convertView;
+    }
+
+    static class ViewHolder {
+        ImageView iv;
+        TextView statusText;
+        TextView userInfo;
+        TextView timeClientInfo;
     }
 
     private class TriggerPictureDownloadTask extends AsyncTask<User,Void,Void> {
