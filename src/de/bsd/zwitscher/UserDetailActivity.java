@@ -66,7 +66,8 @@ public class UserDetailActivity extends Activity {
             bioView.setText(user.getDescription());
 
             TextView webView = (TextView) findViewById(R.id.userDetail_web);
-            webView.setText(user.getURL().toString());
+            if (user.getURL()!=null)
+                webView.setText(user.getURL().toString());
 
             TextView tweetView = (TextView) findViewById(R.id.userDetail_tweetCount);
             tweetView.setText(""+user.getStatusesCount());
