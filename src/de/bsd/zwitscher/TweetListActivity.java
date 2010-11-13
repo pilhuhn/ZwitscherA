@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -48,28 +49,38 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+        thisActivity = this;
 
+        Activity theParent = getParent();
+        if (!(theParent instanceof TabWidget)) {
+            // We have no enclosing TabWidget, so we need to request the custom title
+            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+        }
+
+        // Set the layout of the list activity
         setContentView(R.layout.tweet_list_layout);
 
-        intentInfo = getIntent().getExtras();
-        thisActivity = this;
+
         // Get the windows progress bar from the enclosing TabWidget
-        // TODO parent is not the TabWidget in case of user lists
-        Activity theParent = getParent();
         if (theParent instanceof TabWidget) {
             TabWidget parent = (TabWidget) theParent;
             pg = parent.pg;
             titleTextBox = parent.titleTextBox;
         }
         else {
+            // We have no enclosing TabWidget, so we need our window here
+            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
+            pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+            titleTextBox = (TextView) findViewById(R.id.title_msg_box);
+
+
             ImageButton imageButton = (ImageButton) findViewById(R.id.back_button);
             imageButton.setVisibility(View.VISIBLE);
 
         }
-        tdb = new TweetDB(this);
-        th = new TwitterHelper(thisActivity);
+
+        th = new TwitterHelper(this);
         lv = getListView();
         lv.setOnScrollListener(this);
 		lv.setOnItemClickListener(this);
@@ -247,7 +258,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
                     Status last = (Status) sta.getItem(totalCount-1);
 
                     TwitterHelper th = new TwitterHelper(thisActivity);
-                    List<Status> newStatuses = th.getStatuesFromDb(last.getId(),4,list_id);
+                    List<Status> newStatuses = th.getStatuesFromDb(last.getId(),7,list_id);
 
                     int i = 0;
                     for (Status status : newStatuses ) {
