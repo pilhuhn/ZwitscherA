@@ -110,11 +110,12 @@
         android:onClick="translate"
 		android:text="Translate"/>
 
-<Button android:id="@+id/DoneButton"
+<ImageButton android:id="@+id/DoneButton"
 		android:layout_below="@id/SpeakButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="done"
+        android:src="@drawable/back_button"
 		android:text="Done!"/>
 
 <ImageView android:id="@+id/OTImageView"
