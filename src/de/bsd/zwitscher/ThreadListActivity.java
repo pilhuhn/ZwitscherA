@@ -3,6 +3,8 @@ package de.bsd.zwitscher;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import twitter4j.Status;
 
@@ -18,6 +20,14 @@ public class ThreadListActivity extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set the layout of the list activity
+        setContentView(R.layout.tweet_list_layout);
+        ImageButton backButton = (ImageButton) findViewById(R.id.back_button);
+        backButton.setVisibility(View.VISIBLE);
+        ImageButton reloadButton = (ImageButton) findViewById(R.id.tweet_list_reload_button);
+        reloadButton.setVisibility(View.GONE);
+
 
         List<Status> result = new ArrayList<Status>();
 
@@ -50,6 +60,34 @@ public class ThreadListActivity extends ListActivity {
         ListView lv = getListView();
         lv.requestLayout();
 
+    }
+
+    /**
+     * Called from the Back button
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void done(View v) {
+        finish();
+    }
+
+    /**
+     * Scrolls to top, called from the ToTop button
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void scrollToTop(View v) {
+        getListView().setSelection(0);
+    }
+
+    /**
+     * Called from the post button
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void post(View v) {
+        Intent i = new Intent(this, NewTweetActivity.class);
+        startActivity(i);
     }
 
 }
