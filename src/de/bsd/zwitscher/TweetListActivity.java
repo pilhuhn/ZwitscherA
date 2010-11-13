@@ -40,6 +40,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     int list_id;
     TweetDB tdb;
     TwitterHelper th;
+    ListView lv;
 
     /**
      * Called when the activity is first created.
@@ -68,31 +69,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         }
         tdb = new TweetDB(this);
         th = new TwitterHelper(thisActivity);
-
-
-        intentInfo = getIntent().getExtras();
-        if (intentInfo==null) {
-            list_id = 0;
-        } else {
-            list_id = intentInfo.getInt(TabWidget.LIST_ID);
-        }
-
-        boolean fromDbOnly = tdb.getLastRead(list_id)!=-1 ? true : false;
-        fillListViewFromTimeline(fromDbOnly); // Only get tweets from db to speed things up at start
-    }
-
-    @Override
-    public void onResume() {
-
-    	super.onResume();
-
-
-        // Get the windows progress bar from the enclosing TabWidget
-        // TODO parent is not necessarily the TabWidget
-//        TabWidget parent = (TabWidget) this.getParent();
-//        pg = parent.pg;
-
-		ListView lv = getListView();
+        lv = getListView();
         lv.setOnScrollListener(this);
 
 		lv.setOnItemClickListener(new OnItemClickListener() {
@@ -118,6 +95,32 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 				return true; // We've consumed the long click
 			}
 		});
+
+
+
+        intentInfo = getIntent().getExtras();
+        if (intentInfo==null) {
+            list_id = 0;
+        } else {
+            list_id = intentInfo.getInt(TabWidget.LIST_ID);
+        }
+
+        boolean fromDbOnly = tdb.getLastRead(list_id)!=-1 ? true : false;
+        fillListViewFromTimeline(fromDbOnly); // Only get tweets from db to speed things up at start
+    }
+
+    @Override
+    public void onResume() {
+
+    	super.onResume();
+
+
+        // Get the windows progress bar from the enclosing TabWidget
+        // TODO parent is not necessarily the TabWidget
+//        TabWidget parent = (TabWidget) this.getParent();
+//        pg = parent.pg;
+
+
 
     }
 
@@ -199,6 +202,15 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     }
 
     /**
+     * Scrolls to top, called from the ToTop button
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void scrollToTop(View v) {
+        getListView().setSelection(0);
+    }
+
+    /**
      * Called from the post button
      * @param v
      */
@@ -248,6 +260,8 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
     private class GetTimeLineTask extends AsyncTask<Boolean, Void, List<Status>> {
 
+        boolean fromDbOnly = false;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -260,7 +274,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
 		@Override
 		protected List<twitter4j.Status> doInBackground(Boolean... params) {
-            boolean fromDbOnly = params[0];
+            fromDbOnly = params[0];
 	        List<twitter4j.Status> data;
             data = getTimlinesFromTwitter(fromDbOnly);
 	        return data;
@@ -274,6 +288,10 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             if (titleTextBox!=null)
                 titleTextBox.setText("");
 	        getListView().requestLayout();
+
+            // Only do the next if we actually did an update from twitter
+            if (!fromDbOnly)
+                getListView().setSelection(result.size()-3); // TODO consider min_tweets/max_tweets
 		}
     }
 
