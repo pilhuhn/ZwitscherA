@@ -9,6 +9,8 @@ import android.widget.*;
 import com.google.api.translate.Language;
 import com.google.api.translate.Translate;
 
+import de.bsd.zwitscher.helper.NetworkHelper;
+import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.Status;
 import android.app.Activity;
 import android.app.AlertDialog;

@@ -7,9 +7,9 @@ import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import de.bsd.zwitscher.helper.NetworkHelper;
+import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.User;
-
-import javax.xml.soap.Text;
 
 
 /**

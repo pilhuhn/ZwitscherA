@@ -1,4 +1,4 @@
-package de.bsd.zwitscher;
+package de.bsd.zwitscher.helper;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import android.graphics.*;
+import de.bsd.zwitscher.R;
 import twitter4j.User;
 import android.content.Context;
 import android.os.Environment;
@@ -160,7 +161,7 @@ public class PicHelper {
             Canvas canvas = new Canvas(out);
 
             if (isFav) {
-                Bitmap favMap = BitmapFactory.decodeResource(context.getResources(),R.drawable.yellow_f);
+                Bitmap favMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.yellow_f);
                 canvas.drawBitmap(favMap,new Matrix(),null);
             }
             if (isRt) {

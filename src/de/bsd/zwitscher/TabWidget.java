@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.UserList;
 
 import android.app.TabActivity;

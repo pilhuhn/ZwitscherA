@@ -30,7 +30,8 @@ import twitter4j.User;
  * </ul>
  * @author Heiko W. Rupp
  */
-public class TweetListActivity extends ListActivity implements AbsListView.OnScrollListener {
+public class TweetListActivity extends ListActivity implements AbsListView.OnScrollListener,
+        OnItemClickListener, OnItemLongClickListener {
 
     List<Status> statuses;
     Bundle intentInfo;
@@ -71,31 +72,8 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         th = new TwitterHelper(thisActivity);
         lv = getListView();
         lv.setOnScrollListener(this);
-
-		lv.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				Intent i = new Intent(parent.getContext(),OneTweetActivity.class);
-				i.putExtra(getString(R.string.status), statuses.get(position));
-				startActivity(i);
-
-			}
-		});
-		lv.setOnItemLongClickListener(new OnItemLongClickListener() { // directly go to reply.
-
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				Log.i("TLA","Long click, pos=" + position + ",id="+id);
-				Intent i = new Intent(parent.getContext(), NewTweetActivity.class);
-				i.putExtra(getString(R.string.status), statuses.get(position));
-				i.putExtra("op",getString(R.string.reply));
-				startActivity(i);
-
-				return true; // We've consumed the long click
-			}
-		});
-
+		lv.setOnItemClickListener(this);
+		lv.setOnItemLongClickListener(this); // Directly got to reply
 
 
         intentInfo = getIntent().getExtras();
@@ -111,9 +89,12 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
     @Override
     public void onResume() {
+     	super.onResume();
 
-    	super.onResume();
-
+        lv = getListView();
+        lv.setOnScrollListener(this);
+		lv.setOnItemClickListener(this);
+		lv.setOnItemLongClickListener(this); // Directly got to reply
 
         // Get the windows progress bar from the enclosing TabWidget
         // TODO parent is not necessarily the TabWidget
@@ -123,6 +104,28 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
 
     }
+
+    public void onItemClick(AdapterView<?> parent, View view,
+            int position, long id) {
+        Intent i = new Intent(parent.getContext(),OneTweetActivity.class);
+        i.putExtra(getString(R.string.status), statuses.get(position));
+        startActivity(i);
+
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view,
+            int position, long id) {
+        Log.i("TLA","Long click, pos=" + position + ",id="+id);
+        Intent i = new Intent(parent.getContext(), NewTweetActivity.class);
+        i.putExtra(getString(R.string.status), statuses.get(position));
+        i.putExtra("op",getString(R.string.reply));
+        startActivity(i);
+
+        return true; // We've consumed the long click
+    }
+
+
 
 	private List<Status> getTimlinesFromTwitter(boolean fromDbOnly) {
 		Paging paging = new Paging().count(100);

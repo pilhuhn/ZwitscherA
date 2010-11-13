@@ -1,4 +1,4 @@
-package de.bsd.zwitscher;
+package de.bsd.zwitscher.helper;
 
 import android.content.Context;
 import android.content.SharedPreferences;

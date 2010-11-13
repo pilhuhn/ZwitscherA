@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import de.bsd.zwitscher.helper.NetworkHelper;
+import de.bsd.zwitscher.helper.PicHelper;
 import de.bsd.zwitscher.helper.SpannableBuilder;
 import twitter4j.Status;
 import twitter4j.User;
@@ -80,14 +82,14 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
             builder.append(status.getUser().getName(), Typeface.BOLD);
             if (status.getInReplyToScreenName()!=null) {
                 builder.append(" in reply to ",Typeface.NORMAL)
-                    .append(status.getInReplyToScreenName(),Typeface.BOLD);
+                    .append(status.getInReplyToScreenName(), Typeface.BOLD);
             }
         }
         else {
             bi = ph.getBitMapForUserFromFile(status.getRetweetedStatus().getUser());
              builder.append(status.getRetweetedStatus().getUser().getName(),Typeface.BOLD)
                 .append(" resent by ", Typeface.NORMAL)
-                .append(status.getUser().getName(),Typeface.BOLD);
+                .append(status.getUser().getName(), Typeface.BOLD);
         }
 
         if (bi!=null) {
