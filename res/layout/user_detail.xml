@@ -81,5 +81,13 @@
                     />
         </TableRow>
     </TableLayout>
+    <ImageButton
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="left"
+        android:onClick="done"
+        android:src="@drawable/back_button"
+        />
+
 
 </LinearLayout>

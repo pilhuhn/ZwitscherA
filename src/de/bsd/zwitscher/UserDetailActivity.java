@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import twitter4j.User;
@@ -79,5 +80,14 @@ public class UserDetailActivity extends Activity {
             TextView listedView = (TextView) findViewById(R.id.userDetail_listedCount);
             listedView.setText(""+user.getListedCount());
         }
+    }
+
+    /**
+     * Called from the back button to finish the activity
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void done(View v) {
+        finish();
     }
 }
