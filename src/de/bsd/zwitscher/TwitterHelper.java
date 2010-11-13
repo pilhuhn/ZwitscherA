@@ -17,6 +17,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.*;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
@@ -33,7 +34,7 @@ public class TwitterHelper {
         tweetDB = new TweetDB(context);
 	}
 
-	public List<Status> getTimeline(Paging paging, int list_id, boolean fromDbOnly) {
+	public MetaList<Status> getTimeline(Paging paging, int list_id, boolean fromDbOnly) {
         Twitter twitter = getTwitter();
 
         List<Status> statuses = null;
@@ -71,10 +72,13 @@ public class TwitterHelper {
             statuses = new ArrayList<Status>();
 
         }
-        fillUpStatusesFromDB(list_id,statuses);
+        int numStatuses = statuses.size();
+        int filled = fillUpStatusesFromDB(list_id,statuses);
         Log.i("getTimeline","Now we have " + statuses.size());
 
-        return statuses;
+        MetaList<Status> metaList = new MetaList<Status>(statuses,numStatuses,filled);
+        Log.i("getTimeline","returning  " + metaList);
+        return metaList ;
 	}
 
     public List<Status> getStatuesFromDb(long sinceId, int howMany, long list_id) {
@@ -236,7 +240,7 @@ public class TwitterHelper {
         return updateResponse;
     }
 
-	public List<Status> getUserList(Paging paging, int listId, boolean fromDbOnly) {
+	public MetaList<Status> getUserList(Paging paging, int listId, boolean fromDbOnly) {
         Twitter twitter = getTwitter();
 
         List<Status> statuses;
@@ -263,10 +267,13 @@ public class TwitterHelper {
         } else
             statuses = new ArrayList<Status>();
 
-        fillUpStatusesFromDB(listId, statuses);
+        int numOriginal = statuses.size();
+        int filled = fillUpStatusesFromDB(listId, statuses);
         Log.i("getUserList","Now we have " + statuses.size());
 
-        return statuses;
+        MetaList<Status> metaList = new MetaList<Status>(statuses,numOriginal,filled);
+Log.d("getUsetList","Returning " + metaList);
+        return metaList;
 	}
 
     /**
@@ -283,13 +290,14 @@ public class TwitterHelper {
      * See also preferences.xml
      * @param listId The list for which tweets are fetched
      * @param statuses The list of incoming statuses to fill up
+     * @return number of added statuses
      */
-    private void fillUpStatusesFromDB(int listId, List<Status> statuses) {
+    private int fillUpStatusesFromDB(int listId, List<Status> statuses) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         int minOld = Integer.valueOf(preferences.getString("minOldTweets","5"));
         int maxOld = Integer.valueOf(preferences.getString("maxOldTweets","10"));
 
-
+Log.d("FillUp","Incoming: " + statuses.size());
         int size = statuses.size();
         if (size==0)
             statuses.addAll(getStatuesFromDb(-1,maxOld,listId));
@@ -297,6 +305,12 @@ public class TwitterHelper {
             int num = (size+minOld< maxOld) ? maxOld-size : minOld;
             statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),num,listId));
         }
+        int size2 = statuses.size();
+Log.d("FillUp","Now: " + size2);
+
+        int i = size2 - size;
+Log.d("FillUp","Return: " + i);
+        return i;
     }
 
 

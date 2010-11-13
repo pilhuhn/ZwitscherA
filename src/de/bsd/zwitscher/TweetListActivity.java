@@ -17,6 +17,7 @@ import android.view.Window;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.Paging;
 import twitter4j.Status;
 import twitter4j.User;
@@ -79,7 +80,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             imageButton.setVisibility(View.VISIBLE);
 
         }
-
+        tdb = new TweetDB(this);
         th = new TwitterHelper(this);
         lv = getListView();
         lv.setOnScrollListener(this);
@@ -138,10 +139,10 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
 
 
-	private List<Status> getTimlinesFromTwitter(boolean fromDbOnly) {
+	private MetaList<Status> getTimlinesFromTwitter(boolean fromDbOnly) {
 		Paging paging = new Paging().count(100);
 
-		List<Status> myStatuses = new ArrayList<Status>();
+		MetaList<Status> myStatuses; // = new ArrayList<Status>();
 
 
     	long last = tdb.getLastRead(list_id);
@@ -157,6 +158,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         	break;
         case -2:
             // TODO directs
+            myStatuses = new MetaList<Status>();
             break;
         default:
         	myStatuses = th.getUserList(paging,list_id, fromDbOnly);
@@ -164,15 +166,15 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         }
 
         // Update the 'since' id in the database
-    	if (myStatuses.size()>0) {
-    		last = myStatuses.get(0).getId(); // assumption is that twitter sends the newest (=highest id) first
+    	if (myStatuses.getList().size()>0) {
+    		last = myStatuses.getList().get(0).getId(); // assumption is that twitter sends the newest (=highest id) first
     		tdb.updateOrInsertLastRead(list_id, last);
     	}
 
     	statuses = new ArrayList<Status>();
-		List<Status> data = new ArrayList<Status>(myStatuses.size());
+		List<Status> data = new ArrayList<Status>(myStatuses.getList().size());
         String filter = getFilter();
-		for (Status status : myStatuses) {
+		for (Status status : myStatuses.getList()) {
 			User user = status.getUser();
 			String item ="";
 			if ((filter==null) || (filter!= null && !status.getText().matches(filter))) {
@@ -183,7 +185,10 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
 			}
 		}
-		return data;
+
+        MetaList metaList = new MetaList(data,myStatuses.getNumOriginal(),myStatuses.getNumAdded());
+
+		return metaList;
 	}
 
     @Override
@@ -240,7 +245,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
     @Override
     public void onScrollStateChanged(AbsListView absListView, int i) {
-        // TODO: Customise this generated block
+        // nothing to do for us
     }
 
     @Override
@@ -272,7 +277,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         }
     }
 
-    private class GetTimeLineTask extends AsyncTask<Boolean, Void, List<Status>> {
+    private class GetTimeLineTask extends AsyncTask<Boolean, Void, MetaList<Status>> {
 
         boolean fromDbOnly = false;
 
@@ -287,16 +292,17 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
 
 		@Override
-		protected List<twitter4j.Status> doInBackground(Boolean... params) {
+		protected MetaList<twitter4j.Status> doInBackground(Boolean... params) {
             fromDbOnly = params[0];
-	        List<twitter4j.Status> data;
+	        MetaList<twitter4j.Status> data;
             data = getTimlinesFromTwitter(fromDbOnly);
+            Log.i("GTLTask", "got " + data.toString());
 	        return data;
 		}
 
 		@Override
-		protected void onPostExecute(List<twitter4j.Status> result) {
-	        setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, R.layout.list_item, result));
+		protected void onPostExecute(MetaList<twitter4j.Status> result) {
+	        setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, R.layout.list_item, result.getList()));
             if (pg!=null)
                 pg.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)
@@ -304,8 +310,10 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 	        getListView().requestLayout();
 
             // Only do the next if we actually did an update from twitter
-            if (!fromDbOnly)
-                getListView().setSelection(result.size()-3); // TODO consider min_tweets/max_tweets
+            if (!fromDbOnly) {
+                Log.i("GTLTask"," scroll to " + result.getNumOriginal());
+                getListView().setSelection(result.getNumOriginal()-1);
+            }
 		}
     }
 
