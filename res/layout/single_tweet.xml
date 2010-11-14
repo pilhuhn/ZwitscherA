@@ -92,11 +92,12 @@
         android:onClick="favorite"
 		android:text="Favorite"/>
 
-<Button android:id="@+id/SpeakButton"
+<ImageButton android:id="@+id/SpeakButton"
 		android:layout_below="@id/ThreadButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="speak"
+        android:src="@drawable/speaker"
 		android:text="Speak"/>
 <Button android:id="@+id/TranslateButton"
 		android:layout_below="@id/ThreadButton"
