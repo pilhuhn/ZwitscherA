@@ -122,9 +122,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 				threadButton.setEnabled(false);
 			}
 
-			Button favoriteButton = (Button) findViewById(R.id.FavoriteButton);
+			ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
 			if (status.isFavorited())
-				favoriteButton.setText("Un-Favorite");
+				favoriteButton.setImageResource(R.drawable.favorite_on);
 
             Button translateButon = (Button) findViewById(R.id.TranslateButton);
             translateButon.setEnabled(networkHelper.isOnline());
@@ -230,11 +230,11 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         UpdateResponse response = th.favorite(request);
         status = response.status;
         // update button state
-        Button favoriteButton = (Button) findViewById(R.id.FavoriteButton);
+        ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
         if (status.isFavorited())
-            favoriteButton.setText("Un-favorite");
+            favoriteButton.setImageResource(R.drawable.favorite_on);
         else
-            favoriteButton.setText("Favorite");
+            favoriteButton.setImageResource(R.drawable.favorite_off);
 
 
     }

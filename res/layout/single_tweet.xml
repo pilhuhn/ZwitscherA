@@ -42,18 +42,20 @@
 		  />
 
 
-<Button android:id="@+id/ReplyButton"
+<ImageButton android:id="@+id/ReplyButton"
 		android:layout_below="@id/TimeTextView"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="reply"
+        android:src="@drawable/reply_button"
         android:text="Reply"/>
-<Button android:id="@+id/ReplyAllButton"
+<ImageButton android:id="@+id/ReplyAllButton"
 		android:layout_below="@id/TimeTextView"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/ReplyButton"
         android:onClick="replyAll"
+        android:src="@drawable/reply_all_button"
         android:text="Reply All"/>
 
 <Button android:id="@+id/RetweetButton"
@@ -84,12 +86,13 @@
 		android:layout_toRightOf="@id/ThreadButton"
         android:onClick="directMessage"
 		android:text="Direct"/>
-<Button android:id="@+id/FavoriteButton"
+<ImageButton android:id="@+id/FavoriteButton"
 		android:layout_below="@id/ReplyButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 		android:layout_toRightOf="@id/DirectButton"
         android:onClick="favorite"
+        android:src="@drawable/favorite_off"
 		android:text="Favorite"/>
 
 <ImageButton android:id="@+id/SpeakButton"
