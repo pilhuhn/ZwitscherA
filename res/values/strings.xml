@@ -25,4 +25,5 @@
     <string name="resent_by"> resent by </string>
     <string name="in_reply_to"> in reply to </string>
     <string name="via">" via "</string>
+    <string name="send_direct_to">Sending direct message to </string>
 </resources>

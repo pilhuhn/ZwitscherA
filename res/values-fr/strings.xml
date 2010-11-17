@@ -2,4 +2,5 @@
 <resources>
 <string name="TweetButton">Envoyer!</string>
     <string name="location">Location:</string>
+    <string name="send_direct_to">Envoie courier privée à </string>
 </resources>

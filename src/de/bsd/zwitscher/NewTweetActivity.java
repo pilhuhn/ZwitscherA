@@ -81,7 +81,8 @@ public class NewTweetActivity extends Activity {
 					edittext.setText(msg); // limit to 140 chars is done by the edittext via maxLength attribute
 				} else if (isDirect) {
                     toUser = origStatus.getUser();
-                    textOben.setText("Sending direct message to " + toUser.getScreenName());
+                    String s = getString(R.string.send_direct_to);
+                    textOben.setText(s + toUser.getScreenName());
                 }
 			}
 		}

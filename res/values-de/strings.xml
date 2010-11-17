@@ -14,5 +14,6 @@
 <string name="mentions">mentions</string>
     <string name="location">Ort:</string>
     <string name="in_reply_to"> als Antwort auf </string>
+    <string name="send_direct_to">Sende private Nachricht an </string>
 
 </resources>
