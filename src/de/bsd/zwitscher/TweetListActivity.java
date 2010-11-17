@@ -286,8 +286,10 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             super.onPreExecute();
             if (pg!=null)
                 pg.setVisibility(ProgressBar.VISIBLE);
-            if(titleTextBox!=null)
-                titleTextBox.setText("Getting tweets...");
+            if(titleTextBox!=null) {
+                String s = getString(R.string.getting_tweets)+ "...";
+                titleTextBox.setText(s);
+            }
         }
 
 

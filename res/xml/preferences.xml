@@ -2,40 +2,41 @@
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <CheckBoxPreference android:title="Location enabled"
+    <CheckBoxPreference android:title="@string/prefs_location_enabled"
                         android:key="location"
-                        android:summary="Shall Zwitscher add location to status updates?"/>
+                        android:summary="@string/prefs_location_enabled_descr"/>
 
-    <EditTextPreference android:title="Filter"
-                        android:summary="Provide Expressions, separated by Comma to filter tweets"
+    <EditTextPreference android:title="@string/prefs_filter"
+                        android:summary="@string/prefs_filter_descr"
                         android:key="filter"
+                        android:hint="http://4sq.com/|http://shz.am/"
                         />
-    <ListPreference android:title="Min old tweets"
-                    android:summary="Minumum of old tweets to display after a reload with new tweets"
+    <ListPreference android:title="@string/prefs_min_old"
+                    android:summary="@string/prefs_min_old_descr"
                     android:defaultValue="5"
                     android:entryValues="@array/min_o_tweets_preference"
                     android:entries="@array/min_o_tweets_preference"
                     android:key="minOldTweets"
                     />
 
-    <ListPreference android:title="Default old tweets"
-                    android:summary="Number of old tweets to display when there are no new tweets on the server"
+    <ListPreference android:title="@string/prefs_max_old"
+                    android:summary="@string/prefs_max_old_descr"
                     android:defaultValue="10"
                     android:entryValues="@array/max_o_tweets_preference"
                     android:entries="@array/max_o_tweets_preference"
                     android:key="maxOldTweets"
                     />
 
-    <ListPreference android:title="Picture loading"
-                    android:summary="Network configuration required for picture loading"
+    <ListPreference android:title="@string/prefs_pic_loading"
+                    android:summary="@string/prefs_pic_loading_descr"
                     android:defaultValue="Always"
                     android:entryValues="@array/network_config_vals"
                     android:entries="@array/network_config"
                     android:key="networkConfig"/>
 
-    <CheckBoxPreference android:title="Roaming"
+    <CheckBoxPreference android:title="@string/prefs_pic_roaming"
                         android:key="roaming"
-                        android:summary="Allow downloading images when Roaming"
+                        android:summary="@string/prefs_pic_roaming_descr"
                         android:defaultValue="false"/>
 
 </PreferenceScreen>

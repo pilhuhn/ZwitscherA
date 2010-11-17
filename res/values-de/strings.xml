@@ -15,5 +15,22 @@
     <string name="location">Ort:</string>
     <string name="in_reply_to"> als Antwort auf </string>
     <string name="send_direct_to">Sende private Nachricht an </string>
+    <string name="getting_tweets">Lade Tweets</string>
+
+    <!-- preferences -->
+    <string name="prefs_location_enabled">Position senden</string>
+    <string name="prefs_location_enabled_descr">Soll Zwitscher die pPosition bei neuen Nachrichten mitsenden?</string>
+    <string name="prefs_filter">Filter</string>
+    <string name="prefs_filter_descr">Geben Sie durch Komma getrennte Ausdrücke an, um Tweets zu filtern.</string>
+    <string name="prefs_min_old">Minimum alte Tweets</string>
+    <string name="prefs_min_old_descr">Minimum an alten Tweets,die nach einem Reload zu neuen Tweets angezeigt werden.</string>
+    <string name="prefs_max_old">Standardanzahl alte Tweets</string>
+    <string name="prefs_max_old_descr">Anzahl an alten Tweets, die angezeigt werden, wenn keine neuen Tweets empfangen wurden.</string>
+    <string name="prefs_pic_loading">Laden von Bildern</string>
+    <string name="prefs_pic_loading_descr">Netzwerkkonfiguration, die nötig ist, um Bilder zu laden.</string>
+    <string name="prefs_pic_roaming">Roaming</string>
+    <string name="prefs_pic_roaming_descr">Dürfen während des Roamings Bilder geladen werden?</string>
+    <!-- preferences -->
+
 
 </resources>

@@ -3,4 +3,24 @@
 <string name="TweetButton">Envoyer!</string>
     <string name="location">Location:</string>
     <string name="send_direct_to">Envoie courier privée à </string>
+    <string name="getting_tweets">Obtenir de messages</string>
+
+
+    <!-- preferences -->
+<!--
+    <string name="prefs_location_enabled">Location enabled</string>
+    <string name="prefs_location_enabled_descr">Shall Zwitscher add location to status updates?</string>
+    <string name="prefs_filter">Filter</string>
+    <string name="prefs_filter_descr">Provide Expressions, separated by Comma to filter tweets</string>
+    <string name="prefs_min_old">Min old tweets</string>
+    <string name="prefs_min_old_descr">Minumum of old tweets to display after a reload with new tweets</string>
+    <string name="prefs_max_old">Default old tweets</string>
+    <string name="prefs_max_old_descr">Number of old tweets to display when there are no new tweets on the server</string>
+    <string name="prefs_pic_loading">Picture loading</string>
+    <string name="prefs_pic_loading_descr">Network configuration required for picture loading</string>
+    <string name="prefs_pic_roaming">Roaming</string>
+    <string name="prefs_pic_roaming_descr">Allow downloading images when Roaming</string>
+-->
+    <!-- preferences -->
+
 </resources>
