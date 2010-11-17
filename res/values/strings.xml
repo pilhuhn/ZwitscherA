@@ -15,4 +15,14 @@
 <string name="list">list</string>
 <string name="direct">Direct</string>
 <string name="mentions">mentions</string>
+    <string name="location">Location:</string>
+    <string name="geo">Geo?</string>
+    <string name="web">Web:</string>
+    <string name="tweet_count">Tweet count:</string>
+    <string name="follower_count">Follower count:</string>
+    <string name="following_count">Following count:</string>
+    <string name="listed_count">Listed count:</string>
+    <string name="resent_by"> resent by </string>
+    <string name="in_reply_to"> in reply to </string>
+    <string name="via">" via "</string>
 </resources>

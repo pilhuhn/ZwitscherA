@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="status">status</string>
+    <string name="tweet_sent">Tweet gesendet</string>
+    <string name="hello">Geben Sie hieren Text ein:</string>
+    <string name="app_name">Zwitscher</string>
+<string name="loading">Lade Tweets ...</string>
+<string name="no_connect">Knann Twitter nicht erreichen</string>
+<string name="TweetButton">Absenden</string>
+<string name="ClearButton">Löschen</string>
+<string name="home_timeline">Home</string>
+<string name="list">list</string>
+<string name="direct">Direkt</string>
+<string name="mentions">mentions</string>
+    <string name="location">Ort:</string>
+    <string name="in_reply_to"> als Antwort auf </string>
+
+</resources>

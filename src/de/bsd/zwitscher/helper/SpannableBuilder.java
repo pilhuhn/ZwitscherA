@@ -1,5 +1,6 @@
 package de.bsd.zwitscher.helper;
 
+import android.content.Context;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -26,29 +27,42 @@ public class SpannableBuilder {
 
     private int position = 0;
     List<Holder> holderList;
+    private Context context;
 
 
     /**
      * Create a new empty SpannableBuilder
+     * @param context Context of caller
      */
-    public SpannableBuilder() {
+    public SpannableBuilder(Context context) {
+        this.context = context;
         holderList = new ArrayList<Holder>();
     }
 
     /**
      * Create a SpannableBuilder with some text and style
+     * @param context Context of caller
      * @param text Text to render
      * @param typeface Style to use - typically a {@link  android.graphics.Typeface} constant
-     * like Typeface.BOLD
      */
-    public SpannableBuilder(String text,int typeface) {
-        this();
-        append(text,typeface);
+    public SpannableBuilder(Context context, String text, int typeface) {
+        this(context);
+        append(text, typeface);
+    }
+
+    /**
+     * Create a SpannableBuilder from a string resource and stype
+     * @param context Context of caller
+     * @param resourceId Id of a string resource in res/strings.xml
+     * @param typeface Style to use - typicalla a {@link android.graphics.Typeface} constant
+     */
+    public SpannableBuilder(Context context, int resourceId, int typeface) {
+        this(context);
     }
 
     /**
      * Append text to the existing one
-     * @param text new text
+     * @param text New text to append
      * @param typeface Style to use - typically a {@link  android.graphics.Typeface} constant
      * like Typeface.BOLD
      * @return this SpannableBuilder
@@ -59,7 +73,20 @@ public class SpannableBuilder {
         holderList.add(h);
 
         return this;
+    }
 
+    /**
+     * Append text to the existing one
+     * @param resourceId Id of a string resource
+     * @param typeface Style to use - typically a {@link  android.graphics.Typeface} constant
+     * @return this SpannableBuilder
+     */
+    public SpannableBuilder append(int resourceId, int typeface) {
+        String s = context.getString(resourceId);
+
+        append(s,typeface);
+
+        return this;
     }
 
     /**
@@ -82,6 +109,10 @@ public class SpannableBuilder {
     }
 
 
+    /**
+     * Private class to store information about a span, until the string gets
+     * finally assembled.
+     */
     private static class Holder {
         String text;
         int style;

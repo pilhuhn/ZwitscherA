@@ -25,6 +25,7 @@ public class ThreadListActivity extends ListActivity {
         setContentView(R.layout.tweet_list_layout);
         ImageButton backButton = (ImageButton) findViewById(R.id.back_button);
         backButton.setVisibility(View.VISIBLE);
+        // Disable the reload button
         ImageButton reloadButton = (ImageButton) findViewById(R.id.tweet_list_reload_button);
         reloadButton.setVisibility(View.GONE);
 

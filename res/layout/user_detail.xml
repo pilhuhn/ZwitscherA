@@ -27,14 +27,14 @@
             android:shrinkColumns="1"
             >
         <TableRow>
-            <TextView android:text="Location:"
+            <TextView android:text="@string/location"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_location"
                     />
         </TableRow>
         <TableRow>
-            <TextView android:text="Web:"
+            <TextView android:text="@string/web"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_web"
@@ -50,7 +50,7 @@
                     />
         </TableRow>
         <TableRow>
-            <TextView android:text="Tweet count:"
+            <TextView android:text="@string/tweet_count"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_tweetCount"
@@ -58,7 +58,7 @@
         </TableRow>
         <TableRow>
 
-            <TextView android:text="Follower count:"
+            <TextView android:text="@string/follower_count"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_followerCount"
@@ -66,7 +66,7 @@
         </TableRow>
         <TableRow>
 
-            <TextView android:text="Following count:"
+            <TextView android:text="@string/following_count"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_followingCount"
@@ -74,7 +74,7 @@
         </TableRow>
         <TableRow>
 
-            <TextView android:text="Listed count:"
+            <TextView android:text="@string/listed_count"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_listedCount"

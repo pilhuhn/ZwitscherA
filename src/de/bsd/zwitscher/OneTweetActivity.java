@@ -91,7 +91,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 sb.append(status.getRetweetedStatus().getUser().getName());
 				sb.append(" (");
 				sb.append(status.getRetweetedStatus().getUser().getScreenName());
-				sb.append(" )</b> retweeted by  <b>");
+				sb.append(" )</b>").append(getString(R.string.resent_by)).append("<b>");
 				sb.append(status.getUser().getName());
                 sb.append("</b>");
 			}
@@ -99,7 +99,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
 			TextView mtv = (TextView) findViewById(R.id.MiscTextView);
 			if (status.getInReplyToScreenName()!=null) {
-				mtv.setText(Html.fromHtml("In reply to: <b>" + status.getInReplyToScreenName() + "</b>"));
+                String s = getString(R.string.in_reply_to);
+                mtv.setText(Html.fromHtml(s + " <b>" + status.getInReplyToScreenName() + "</b>"));
 			}
 			else {
 				mtv.setText("");
@@ -110,7 +111,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
             TextView timeCientView = (TextView)findViewById(R.id.TimeTextView);
             TwitterHelper th = new TwitterHelper(this);
-            String text = th.getStatusDate(status) + " via " + status.getSource();
+            String s = getString(R.string.via);
+            String text = th.getStatusDate(status) + s + status.getSource();
             timeCientView.setText(Html.fromHtml(text));
 
 

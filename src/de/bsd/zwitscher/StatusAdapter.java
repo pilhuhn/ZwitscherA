@@ -76,19 +76,19 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
         Status status = items.get(position);
         Bitmap bi;
 
-        SpannableBuilder builder = new SpannableBuilder();
+        SpannableBuilder builder = new SpannableBuilder(extContext);
         if (status.getRetweetedStatus()==null) {
             bi = ph.getBitMapForUserFromFile(status.getUser());
             builder.append(status.getUser().getName(), Typeface.BOLD);
             if (status.getInReplyToScreenName()!=null) {
-                builder.append(" in reply to ",Typeface.NORMAL)
+                builder.append(R.string.in_reply_to,Typeface.NORMAL)
                     .append(status.getInReplyToScreenName(), Typeface.BOLD);
             }
         }
         else {
             bi = ph.getBitMapForUserFromFile(status.getRetweetedStatus().getUser());
              builder.append(status.getRetweetedStatus().getUser().getName(),Typeface.BOLD)
-                .append(" resent by ", Typeface.NORMAL)
+                .append(R.string.resent_by, Typeface.NORMAL)
                 .append(status.getUser().getName(), Typeface.BOLD);
         }
 
