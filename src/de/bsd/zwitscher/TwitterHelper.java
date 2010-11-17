@@ -22,6 +22,8 @@ import twitter4j.*;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
 
+import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
+
 
 public class TwitterHelper {
 
@@ -375,6 +377,44 @@ Log.d("FillUp","Return: " + i);
         return user;
     }
 
+    /**
+     * Send a request to follow or unfollow a user
+     * @param userId Id of the user to follow
+     * @param doFollow If true, send a follow request; unfollow otherwise.
+     * @return True in case of success
+     * @todo make async
+     */
+    public boolean followUnfollowUser(int userId, boolean doFollow ) {
+        Twitter twitter = getTwitter();
+        try {
+            if (doFollow)
+                twitter.createFriendship(userId);
+            else
+                twitter.destroyFriendship(userId);
+
+            return true;
+        } catch (TwitterException e) {
+            Log.w("followUnfollowUser",e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Add a user to some of our user lists
+     * @param userId User to add
+     * @param listId ids of the list to put the user on
+     * @return true if successful
+     */
+    public boolean addUserToLists(int userId, int listId) {
+        Twitter twitter = getTwitter();
+        try {
+            twitter.addUserListMember(listId,userId);
+        } catch (TwitterException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+            return false;
+        }
+        return true;
+    }
 
     private void persistStatus(TweetDB tdb, Status status, long list_id) throws IOException {
         if (tdb.getStatusObjectById(status.getId())!=null)

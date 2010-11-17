@@ -7,12 +7,20 @@ import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.User;
+import twitter4j.UserList;
+
+import java.beans.Visibility;
+import java.util.List;
 
 
 /**
@@ -20,12 +28,13 @@ import twitter4j.User;
  *
  * @author Heiko W. Rupp
  */
-public class UserDetailActivity extends Activity {
+public class UserDetailActivity extends Activity implements View.OnClickListener {
 
     Bundle bundle;
     TwitterHelper thTwitterHelper;
     ProgressBar pg;
     TextView titleTextBox;
+    User theUser;
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -36,6 +45,10 @@ public class UserDetailActivity extends Activity {
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
+        Button followButton = (Button) findViewById(R.id.userDetail_follow_button);
+        followButton.setEnabled(false);
+        Button add2 = (Button) findViewById(R.id.user_list_add2);
+        add2.setVisibility(View.GONE);
 
 
         bundle = getIntent().getExtras();
@@ -98,6 +111,13 @@ public class UserDetailActivity extends Activity {
 
             TextView listedView = (TextView) findViewById(R.id.userDetail_listedCount);
             listedView.setText(""+user.getListedCount());
+
+            Button followButton = (Button) findViewById(R.id.userDetail_follow_button);
+            followButton.setEnabled(true);
+            if (user.isFollowRequestSent())
+                followButton.setText(R.string.unfollow_user);
+            else
+                followButton.setText(R.string.follow_user);
         }
     }
 
@@ -108,6 +128,63 @@ public class UserDetailActivity extends Activity {
     @SuppressWarnings("unused")
     public void done(View v) {
         finish();
+    }
+
+    /**
+     * Called from the followUser button
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void followUser(View v) {
+
+        thTwitterHelper.followUnfollowUser(theUser.getId(),!theUser.isFollowRequestSent());
+
+    }
+
+
+    /**
+     * Called from the addToList button
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void addToList(View v) {
+
+        List<UserList> lists = thTwitterHelper.getUserLists();
+        ListView someView = (ListView) findViewById(R.id.user_detail_scroll_view);
+        Button add2 = (Button) findViewById(R.id.user_list_add2);
+        for (UserList list : lists) {
+            CheckBox cb = new CheckBox(this);
+            cb.setText(list.getName());
+            someView.addView(cb);
+        }
+        someView.setVisibility(View.VISIBLE);
+        add2.setVisibility(View.VISIBLE);
+
+
+    }
+
+    /**
+     * Finally add the user to the selcted lists
+     * @param view
+     */
+    public void add2(View view) {
+        ListView someView = (ListView) findViewById(R.id.user_detail_scroll_view);
+        someView.setVisibility(View.GONE);
+        view.setVisibility(View.GONE);
+        // TODO how to get the children ?
+        long[] checked = someView.getCheckedItemIds();
+        List<UserList> lists = thTwitterHelper.getUserLists();
+        for (long id : checked) {
+            UserList list = lists.get((int) id);
+            // TODO optimize this - most of the time a user
+            // is only added to one list anyway
+            thTwitterHelper.addUserToLists(theUser.getId(),list.getId());
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        // TODO: Customise this generated block
     }
 
     /**
@@ -136,6 +213,7 @@ public class UserDetailActivity extends Activity {
         @Override
         protected void onPostExecute(User user) {
             super.onPostExecute(user);
+            theUser = user;
             fillDetails(user);
             pg.setVisibility(ProgressBar.INVISIBLE);
             titleTextBox.setText("");
