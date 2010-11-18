@@ -1,9 +1,11 @@
 package de.bsd.zwitscher.helper;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
+import com.sun.corba.se.impl.orbutil.ObjectWriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,6 +92,16 @@ public class SpannableBuilder {
     }
 
     /**
+     * Append a single space character in normal type
+     * @return this SpannableBuilder
+     */
+    public SpannableBuilder appendSpace() {
+        append(" ", Typeface.NORMAL);
+        return this;
+    }
+
+
+    /**
      * Render a SpannableString from this SpannableBuilder
      * @return a SpannableString containing all the Spans appended.
      */
@@ -107,6 +119,7 @@ public class SpannableBuilder {
         }
         return spannableString;
     }
+
 
 
     /**

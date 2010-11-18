@@ -81,14 +81,18 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
             bi = ph.getBitMapForUserFromFile(status.getUser());
             builder.append(status.getUser().getName(), Typeface.BOLD);
             if (status.getInReplyToScreenName()!=null) {
+                builder.appendSpace();
                 builder.append(R.string.in_reply_to,Typeface.NORMAL)
+                    .appendSpace()
                     .append(status.getInReplyToScreenName(), Typeface.BOLD);
             }
         }
         else {
             bi = ph.getBitMapForUserFromFile(status.getRetweetedStatus().getUser());
              builder.append(status.getRetweetedStatus().getUser().getName(),Typeface.BOLD)
+                .appendSpace()
                 .append(R.string.resent_by, Typeface.NORMAL)
+                .appendSpace()
                 .append(status.getUser().getName(), Typeface.BOLD);
         }
 
