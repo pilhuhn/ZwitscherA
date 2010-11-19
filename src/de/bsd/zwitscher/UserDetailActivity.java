@@ -172,14 +172,12 @@ public class UserDetailActivity extends Activity implements View.OnClickListener
         someView.setVisibility(View.GONE);
         view.setVisibility(View.GONE);
         // TODO how to get the children ?
-        long[] checked = someView.getCheckedItemIds();
+        long checked = someView.getCheckedItemPosition();
         List<UserList> lists = thTwitterHelper.getUserLists();
-        for (long id : checked) {
-            UserList list = lists.get((int) id);
+            UserList list = lists.get((int) checked);
             // TODO optimize this - most of the time a user
             // is only added to one list anyway
             thTwitterHelper.addUserToLists(theUser.getId(),list.getId());
-        }
     }
 
     @Override
