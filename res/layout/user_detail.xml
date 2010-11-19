@@ -89,6 +89,7 @@
         <TableRow>
             <ImageButton android:src="@drawable/add_list"
                          android:onClick="addToList"
+                         android:visibility="gone"
                     />
         </TableRow>
     </TableLayout>
@@ -99,6 +100,8 @@
           android:visibility="gone"
       />
     <Button android:id="@+id/user_list_add2"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
             android:text="@string/add"
             android:onClick="add2"
     />
