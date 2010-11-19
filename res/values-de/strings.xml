@@ -2,10 +2,10 @@
 <resources>
     <string name="status">status</string>
     <string name="tweet_sent">Tweet gesendet</string>
-    <string name="hello">Geben Sie hieren Text ein:</string>
+    <string name="hello">Geben Sie den Text ein:</string>
     <string name="app_name">Zwitscher</string>
 <string name="loading">Lade Tweets ...</string>
-<string name="no_connect">Knann Twitter nicht erreichen</string>
+<string name="no_connect">Kann Twitter nicht erreichen</string>
 <string name="TweetButton">Absenden</string>
 <string name="ClearButton">Löschen</string>
 <string name="home_timeline">Home</string>
@@ -24,7 +24,7 @@
 
     <!-- preferences -->
     <string name="prefs_location_enabled">Position senden</string>
-    <string name="prefs_location_enabled_descr">Soll Zwitscher die pPosition bei neuen Nachrichten mitsenden?</string>
+    <string name="prefs_location_enabled_descr">Soll Zwitscher die Position bei neuen Nachrichten mitsenden?</string>
     <string name="prefs_filter">Filter</string>
     <string name="prefs_filter_descr">Geben Sie durch Komma getrennte Ausdrücke an, um Tweets zu filtern.</string>
     <string name="prefs_min_old">Minimum alte Tweets</string>
