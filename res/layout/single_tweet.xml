@@ -58,33 +58,37 @@
         android:src="@drawable/reply_all_button"
         android:text="Reply All"/>
 
-<Button android:id="@+id/RetweetButton"
+<ImageButton android:id="@+id/RetweetButton"
 		android:layout_below="@id/TimeTextView"
 		android:layout_toRightOf="@id/ReplyAllButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="retweet"
+        android:src="@drawable/rt_button"
 		android:text="Retweet"/>
-<Button android:id="@+id/ClassicRetweetButton"
+<ImageButton android:id="@+id/ClassicRetweetButton"
 		android:layout_below="@id/TimeTextView"
 		android:layout_toRightOf="@id/RetweetButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="classicRetweet"
+        android:src="@drawable/rt_button_cl"
 		android:text="Classic Retweet"/>
 
-<Button android:id="@+id/ThreadButton"
+<ImageButton android:id="@+id/ThreadButton"
 		android:layout_below="@id/ReplyButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="threadView"
+        android:src="@drawable/threads"
 		android:text="Thread"/>
-<Button android:id="@+id/DirectButton"
+<ImageButton android:id="@+id/DirectButton"
 		android:layout_below="@id/ReplyButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 		android:layout_toRightOf="@id/ThreadButton"
         android:onClick="directMessage"
+        android:src="@drawable/direct_button"
 		android:text="Direct"/>
 <ImageButton android:id="@+id/FavoriteButton"
 		android:layout_below="@id/ReplyButton"
@@ -102,12 +106,13 @@
         android:onClick="speak"
         android:src="@drawable/speaker"
 		android:text="Speak"/>
-<Button android:id="@+id/TranslateButton"
+<ImageButton android:id="@+id/TranslateButton"
 		android:layout_below="@id/ThreadButton"
 		android:layout_toRightOf="@id/SpeakButton"
 		android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="translate"
+        android:src="@drawable/translate"
 		android:text="Translate"/>
 
 <ImageButton android:id="@+id/DoneButton"

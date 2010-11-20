@@ -123,7 +123,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
 
             // Update Button state depending on Status' properties
-			Button threadButton = (Button) findViewById(R.id.ThreadButton);
+			ImageButton threadButton = (ImageButton) findViewById(R.id.ThreadButton);
 			if (status.getInReplyToScreenName()==null) {
 				threadButton.setEnabled(false);
 			}
@@ -132,7 +132,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 			if (status.isFavorited())
 				favoriteButton.setImageResource(R.drawable.favorite_on);
 
-            Button translateButon = (Button) findViewById(R.id.TranslateButton);
+            ImageButton translateButon = (ImageButton) findViewById(R.id.TranslateButton);
             translateButon.setEnabled(networkHelper.isOnline());
 		}
 	}
@@ -237,8 +237,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         request.status = status;
         request.view = favoriteButton;
 
-//        UpdateResponse response = th.favorite(request);
-//        status = response.status;
         new UpdateStatusTask(this,pg).execute(request);
 
     }
