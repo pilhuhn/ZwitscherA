@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -80,7 +81,15 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
             text = result.getMessage() + " " + text;
             textView.setText(text);
 
+        } else if (result.getUpdateType() == UpdateType.FAVORITE) {
+            ImageButton favoriteButton = (ImageButton) result.view;
+            if (result.status.isFavorited())
+                favoriteButton.setImageResource(R.drawable.favorite_on);
+            else
+                favoriteButton.setImageResource(R.drawable.favorite_off);
         }
+
+
         if (result.isSuccess())
             Toast.makeText(context.getApplicationContext(), result.getMessage(), Toast.LENGTH_LONG).show();
         else

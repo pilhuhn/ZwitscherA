@@ -225,17 +225,15 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     public void favorite(View v) {
         TwitterHelper th = new TwitterHelper(ctx);
 
+        ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
+
         UpdateRequest request = new UpdateRequest(UpdateType.FAVORITE);
         request.status = status;
-        UpdateResponse response = th.favorite(request);
-        status = response.status;
-        // update button state
-        ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
-        if (status.isFavorited())
-            favoriteButton.setImageResource(R.drawable.favorite_on);
-        else
-            favoriteButton.setImageResource(R.drawable.favorite_off);
+        request.view = favoriteButton;
 
+//        UpdateResponse response = th.favorite(request);
+//        status = response.status;
+        new UpdateStatusTask(this,pg).execute(request);
 
     }
 

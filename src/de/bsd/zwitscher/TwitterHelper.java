@@ -203,6 +203,7 @@ public class TwitterHelper {
 	public UpdateResponse favorite(UpdateRequest request) {
         Status status = request.status;
         UpdateResponse updateResponse = new UpdateResponse(request.updateType, status);
+        updateResponse.view = request.view;
 		Twitter twitter = getTwitter();
 		try {
 			if (status.isFavorited()) {
