@@ -11,6 +11,7 @@ import com.google.api.translate.Translate;
 
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
+import twitter4j.Place;
 import twitter4j.Status;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -113,6 +114,11 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             TwitterHelper th = new TwitterHelper(this);
             String s = getString(R.string.via);
             String text = th.getStatusDate(status) + s + status.getSource();
+            String from = getString(R.string.from);
+            if (status.getPlace()!=null) {
+                Place place = status.getPlace();
+                text += " " + from + " " + place.getFullName();
+            }
             timeCientView.setText(Html.fromHtml(text));
 
 
