@@ -1,7 +1,7 @@
 package de.bsd.zwitscher;
 
 /**
- * // TODO: Document this
+ * Different types of uploads
  *
  * @author Heiko W. Rupp
  */
@@ -9,5 +9,7 @@ public enum UpdateType {
 
     UPDATE,
     RETWEET,
-    FAVORITE, DIRECT;
+    FAVORITE,
+    DIRECT,
+    UPLOAD_PIC;
 }

@@ -1,5 +1,7 @@
 package de.bsd.zwitscher;
 
+import android.view.View;
+import android.widget.TextView;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
 
@@ -17,6 +19,7 @@ public class UpdateResponse {
     boolean success;
     UpdateType updateType;
     Status status;
+    View view;
 
     public UpdateResponse(UpdateType updateType, boolean success, String message) {
         this.message = message;
@@ -37,6 +40,12 @@ public class UpdateResponse {
     public UpdateResponse(UpdateType updateType, long id) {
         this.updateType = updateType;
         this.id = id;
+    }
+
+    public UpdateResponse(UpdateType updateType, View view, String url) {
+        this.updateType = updateType;
+        this.view = view;
+        this.message = url;
     }
 
     public UpdateType getUpdateType() {

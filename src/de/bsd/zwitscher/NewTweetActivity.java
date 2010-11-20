@@ -4,7 +4,9 @@ package de.bsd.zwitscher;
 import java.util.regex.Pattern;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
 import android.preference.PreferenceManager;
@@ -12,6 +14,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Window;
 import android.widget.*;
+import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.GeoLocation;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
@@ -30,6 +33,7 @@ public class NewTweetActivity extends Activity {
     ProgressBar pg;
     User toUser = null;
     TextView charCountView;
+    String picturePath;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -209,6 +213,7 @@ public class NewTweetActivity extends Activity {
 	public void tweet(StatusUpdate update) {
         UpdateRequest request = new UpdateRequest(UpdateType.UPDATE);
         request.statusUpdate = update;
+        request.picturePath = picturePath;
         new UpdateStatusTask(this,pg).execute(request);
 	}
 
@@ -225,12 +230,51 @@ public class NewTweetActivity extends Activity {
     }
 
     /**
-     * Called from the Back button
+     * Called from the Back button to finish (abort) the activity
      * @param v
      */
     @SuppressWarnings("unused")
     public void done(View v) {
         finish();
+    }
+
+    /**
+     * Trigger taking a picture
+     * Called from the camera button.
+     * Image size is small
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void takePicture(View v) {
+
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, 1);
+    }
+
+
+    /**
+     * Process the result when the picture has been taken.
+     * @param requestCode Code of the started activity
+     * @param resultCode Indicator of success
+     * @param data Values passed from the started activity
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode,Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // code 1 = take picture
+        if(requestCode==1  && resultCode==RESULT_OK) {
+            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            PicHelper picHelper = new PicHelper();
+            picturePath = picHelper.storeBitmap(bitmap, "tmp-pic", Bitmap.CompressFormat.JPEG, 100); // TODO adjust quality per network
+            Log.d("NewTweetActivity.onActivityResult","path: " + picturePath);
+
+            UpdateRequest req = new UpdateRequest(UpdateType.UPLOAD_PIC);
+            req.picturePath = picturePath;
+            req.view = edittext;
+
+            new UpdateStatusTask(this,pg).execute(req);
+        }
     }
 
 }

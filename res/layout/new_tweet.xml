@@ -58,12 +58,19 @@
 			  android:layout_alignBaseline="@id/ClearButton"
 			  android:layout_toRightOf="@id/ClearButton"/>
 
+    <ImageButton android:id="@+id/nt_CameraButton"
+                 android:src="@drawable/camera"
+                 android:onClick="takePicture"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_below="@id/CharCount"
+			     android:layout_toRightOf="@id/GeoCheckBox"
+                 />
     <Button android:id="@+id/TweetButton"
             android:text="@string/TweetButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/CharCount"
-            android:layout_alignBaseline="@id/ClearButton"
+            android:layout_below="@id/nt_CameraButton"
             android:layout_alignParentRight="true"
         />
 

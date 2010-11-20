@@ -15,6 +15,10 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+/**
+ * Helper class that deals with handling of pictures and storing
+ * them on local file system.
+ */
 public class PicHelper {
 
     String externalStorageState;
@@ -26,6 +30,14 @@ public class PicHelper {
 
 	private static final long ONE_DAY = 24 * 60 * 60 * 1000L;
 
+    /**
+     * Load the user picture for the passed user.
+     * If this is on file system, it is checked if it has changed on the server.
+     * If it is not yet on filesystem, it is fetched from remote and stored locally.
+     * After fetching the corners are bitten off
+     * @param user User for which to obtain the picture
+     * @return Bitmap of the picture of null if loading failed.
+     */
 	public Bitmap fetchUserPic(User user) {
 
         if (user==null)
@@ -95,8 +107,6 @@ public class PicHelper {
         out.setPixel(1,1,transparent);
         out.setPixel(0,2,transparent);
 
-
-
         int mx=bitmap.getWidth()-1;
         int my=bitmap.getHeight()-1;
 
@@ -125,6 +135,11 @@ public class PicHelper {
         return out;
     }
 
+    /**
+     * Load the bitmap of the user icon for the given user
+     * @param user Screen name of the user
+     * @return Bitmap if present on file system or null if not found
+     */
     public Bitmap getBitMapForUserFromFile(User user) {
         String username = user.getScreenName();
         Log.d("getBitMapForUserFromFile","user = " +username);
@@ -144,41 +159,12 @@ public class PicHelper {
         return null;
     }
 
+
     /**
-     * Put decorators (=little images) for favorites and retweets on the passed bitmap
-     * @param in bitmap to decorate
-     * @param context Context object
-     * @param isFav Should a favorite decorator be painted?
-     * @param isRt Shout the retweet decorator be painted?
-     * @return The decorated bitmap or the original one.
+     * Locate the file for the passed screen name
+     * @param username Screen name to lookup
+     * @return File object of the matching file
      */
-    public Bitmap decorate(final Bitmap in, Context context , boolean isFav, boolean isRt) {
-
-
-        Bitmap out;
-        if (isFav || isRt) {
-            out = in.copy(in.getConfig(), true);
-            Canvas canvas = new Canvas(out);
-
-            if (isFav) {
-                Bitmap favMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.yellow_f);
-                canvas.drawBitmap(favMap,new Matrix(),null);
-            }
-            if (isRt) {
-                Bitmap rtMap = BitmapFactory.decodeResource(context.getResources(),R.drawable.green_r);
-                float f = out.getWidth() - rtMap.getWidth();
-                canvas.drawBitmap(rtMap,f,f,null);
-            }
-        }
-        else {
-            out = in;
-        }
-
-
-        return out;
-    }
-
-
     private File getPictureFileForUser(String username) {
 		File baseDir = Environment.getExternalStorageDirectory();
 		File iconDir = new File(baseDir,"/Android/data/de.bsd.zwitscher/files/user_profiles");
@@ -188,6 +174,9 @@ public class PicHelper {
 		return iconFile;
 	}
 
+    /**
+     * Remove the stored user pictures
+     */
     public void cleanup() {
         File baseDir = Environment.getExternalStorageDirectory();
         File iconDir = new File(baseDir,"/Android/data/de.bsd.zwitscher/files/user_profiles");
@@ -195,6 +184,34 @@ public class PicHelper {
         File[] files = iconDir.listFiles();
         for (File file : files) {
             file.delete();
+        }
+    }
+
+
+    /**
+     * Store the passed bitmap on the file system
+     * @param bitmap Bitmap to store
+     * @param fileName Name to store under
+     * @param compressFormat File kind (PNG / JPEG)
+     * @param quality compression factor (for jpeg)
+     * @return Path where the file was stored or null on error
+     */
+    public String storeBitmap(Bitmap bitmap, String fileName, Bitmap.CompressFormat compressFormat, int quality) {
+
+        try {
+            File baseDir = Environment.getExternalStorageDirectory();
+            File tmpDir = new File(baseDir,"/Android/data/de.bsd.zwitscher/pictures");
+            if (!tmpDir.exists())
+                tmpDir.mkdirs();
+            File file = new File(tmpDir,fileName);
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+            bitmap.compress(compressFormat, quality, out);
+            out.flush();
+            out.close();
+            return file.getAbsolutePath();
+        } catch (IOException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+            return null;
         }
     }
 }

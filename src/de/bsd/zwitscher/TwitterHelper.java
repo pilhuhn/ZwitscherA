@@ -1,10 +1,6 @@
 package de.bsd.zwitscher;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,6 +8,7 @@ import java.util.List;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -21,6 +18,7 @@ import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.*;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
+import twitter4j.util.ImageUpload;
 
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
@@ -444,6 +442,11 @@ Log.d("FillUp","Return: " + i);
     }
 
 
+    /**
+     * Create a Status object from the passed byte array
+     * @param obj Byte array to convert
+     * @return new Satus object
+     */
     private Status materializeStatus(byte[] obj) {
 
         Status status = null;
@@ -460,6 +463,11 @@ Log.d("FillUp","Return: " + i);
 
     }
 
+    /**
+     * Return the date/time when the status was posted.
+     * @param status
+     * @return
+     */
     public String getStatusDate(Status status) {
         Date date = status.getCreatedAt();
         long time = date.getTime();
@@ -469,5 +477,24 @@ Log.d("FillUp","Return: " + i);
                 DateUtils.SECOND_IN_MILLIS,
                 DateUtils.DAY_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_ALL);
+    }
+
+    /**
+     * Upload a picture to a remote picture service like yfrog.
+     * @param fileName Path on file system to the picture
+     * @return Url where this was stored on the remote service or null on error
+     */
+    public String postPicture(String fileName) {
+        Twitter twitter = getTwitter();
+
+        try {
+            File file = new File(fileName);
+            ImageUpload upload = ImageUpload.getYFrogUploader(twitter); // TODO allow user selection of service
+            String url = upload.upload(file);
+            return url;
+        } catch (Exception e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+        return null;
     }
 }
