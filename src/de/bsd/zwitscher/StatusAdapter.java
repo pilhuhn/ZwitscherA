@@ -54,7 +54,7 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
         // Use ViewHolder pattern to only inflate once
         if (convertView ==null) {
             LayoutInflater li = (LayoutInflater) extContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = li.inflate(R.layout.list_item,null);
+            convertView = li.inflate(R.layout.tweet_list_item,null);
 
             viewHolder = new ViewHolder();
             viewHolder.iv = (ImageView) convertView.findViewById(R.id.ListImageView);

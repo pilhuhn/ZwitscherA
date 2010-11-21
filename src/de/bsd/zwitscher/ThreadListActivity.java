@@ -56,7 +56,7 @@ public class ThreadListActivity extends ListActivity {
                 status=null;
         }
 
-        setListAdapter(new StatusAdapter<twitter4j.Status>(this, R.layout.list_item, result));
+        setListAdapter(new StatusAdapter<twitter4j.Status>(this, R.layout.tweet_list_item, result));
 
         ListView lv = getListView();
         lv.requestLayout();
