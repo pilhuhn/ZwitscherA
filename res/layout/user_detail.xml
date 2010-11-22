@@ -80,37 +80,30 @@
             <TextView android:id="@+id/userDetail_listedCount"
                     />
         </TableRow>
-        <TableRow>
-            <Button android:id="@+id/userDetail_follow_button"
-                    android:text="@string/follow_user"
-                    android:onClick="followUser"
-                    />
-        </TableRow>
-        <TableRow>
-            <ImageButton android:src="@drawable/add_list"
-                         android:onClick="addToList"
-                         android:visibility="gone"
-                    />
-        </TableRow>
     </TableLayout>
-    <!-- add list TODO better implement via some popup dialog ? -->
-    <ListView android:id="@+id/user_detail_scroll_view"
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:visibility="gone"
-      />
-    <Button android:id="@+id/user_list_add2"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="@string/add"
-            android:onClick="add2"
-    />
     <ImageButton
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_gravity="left"
         android:onClick="done"
         android:src="@drawable/back_button"
+        />
+    <Button android:id="@+id/userDetail_follow_button"
+            android:text="@string/follow_user"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="right"
+            android:onClick="followUser"
+            android:enabled="false"
+            />
+    <ImageButton
+            android:id="@+id/userDetail_addListButton"
+            android:src="@drawable/add_list"
+            android:onClick="addToList"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="right"
+            android:enabled="false"
         />
 
 

@@ -1,6 +1,7 @@
 package de.bsd.zwitscher;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,23 +13,25 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
+import twitter4j.Twitter;
 import twitter4j.User;
 import twitter4j.UserList;
 
-import java.beans.Visibility;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
- * TODO: Document this
+ * Show details about a user and allow to follow
  *
  * @author Heiko W. Rupp
  */
-public class UserDetailActivity extends Activity implements View.OnClickListener {
+public class UserDetailActivity extends Activity  {
 
     Bundle bundle;
     TwitterHelper thTwitterHelper;
@@ -47,8 +50,6 @@ public class UserDetailActivity extends Activity implements View.OnClickListener
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
         Button followButton = (Button) findViewById(R.id.userDetail_follow_button);
         followButton.setEnabled(false);
-        Button add2 = (Button) findViewById(R.id.user_list_add2);
-        add2.setVisibility(View.GONE);
 
 
         bundle = getIntent().getExtras();
@@ -118,6 +119,8 @@ public class UserDetailActivity extends Activity implements View.OnClickListener
                 followButton.setText(R.string.unfollow_user);
             else
                 followButton.setText(R.string.follow_user);
+            Button addToListButton = (Button) findViewById(R.id.userDetail_addListButton);
+            addToListButton.setEnabled(true);
         }
     }
 
@@ -149,40 +152,44 @@ public class UserDetailActivity extends Activity implements View.OnClickListener
     @SuppressWarnings("unused")
     public void addToList(View v) {
 
-        List<UserList> lists = thTwitterHelper.getUserLists();
-        ListView someView = (ListView) findViewById(R.id.user_detail_scroll_view);
-        Button add2 = (Button) findViewById(R.id.user_list_add2);
-        for (UserList list : lists) {
-            CheckBox cb = new CheckBox(this);
-            cb.setText(list.getName());
-            someView.addView(cb);
+        TweetDB tdb = new TweetDB(this);
+
+        List<String> data = new ArrayList<String>();
+        Set<Map.Entry<String, Integer>> userListsEntries;
+
+        userListsEntries = tdb.getLists().entrySet();
+        for (Map.Entry<String, Integer> userList : userListsEntries) {
+            data.add(userList.getKey());
         }
-        someView.setVisibility(View.VISIBLE);
-        add2.setVisibility(View.VISIBLE);
 
+        Intent intent = new Intent(this,MultiSelectListActivity.class);
+        intent.putStringArrayListExtra("data", (ArrayList<String>) data);
+        intent.putExtra("mode","single");
 
-    }
-
-    /**
-     * Finally add the user to the selcted lists
-     * @param view
-     */
-    public void add2(View view) {
-        ListView someView = (ListView) findViewById(R.id.user_detail_scroll_view);
-        someView.setVisibility(View.GONE);
-        view.setVisibility(View.GONE);
-        // TODO how to get the children ?
-        long checked = someView.getCheckedItemPosition();
-        List<UserList> lists = thTwitterHelper.getUserLists();
-            UserList list = lists.get((int) checked);
-            // TODO optimize this - most of the time a user
-            // is only added to one list anyway
-            thTwitterHelper.addUserToLists(theUser.getId(),list.getId());
+        startActivityForResult(intent, 1);
     }
 
     @Override
-    public void onClick(View view) {
-        // TODO: Customise this generated block
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode==1 && resultCode==RESULT_OK) {
+            Object o = data.getExtras().get("data");
+            System.out.println("res : " + o);
+
+
+            TweetDB tdb = new TweetDB(this);
+            Set<Map.Entry<String, Integer>> userListsEntries;
+
+            int listId =-1;
+            userListsEntries = tdb.getLists().entrySet();
+            for (Map.Entry<String, Integer> userList : userListsEntries) {
+                if (userList.getKey().equals((String)o)) {
+                    listId = userList.getValue();
+                    thTwitterHelper.addUserToLists(theUser.getId(),listId);
+                }
+            }
+        }
     }
 
     /**
@@ -195,7 +202,8 @@ public class UserDetailActivity extends Activity implements View.OnClickListener
         protected void onPreExecute() {
             super.onPreExecute();
             pg.setVisibility(ProgressBar.VISIBLE);
-            titleTextBox.setText("Getting user details ...");
+            String s = getString(R.string.get_user_detail);
+            titleTextBox.setText(s);
         }
 
 
@@ -203,7 +211,7 @@ public class UserDetailActivity extends Activity implements View.OnClickListener
         protected User doInBackground(Integer... params) {
 
             Integer userId = params[0];
-            User user = thTwitterHelper.getUserById(userId);
+            User user = thTwitterHelper.getUserById(userId, false);
             return user;
         }
 

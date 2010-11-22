@@ -31,6 +31,7 @@
     <string name="unfollow_user">Unfollow user</string>
     <string name="add">Add</string>
     <string name="from">from</string>
+    <string name="get_user_detail">Getting user details ...</string>
 
 
     <!-- preferences -->

@@ -1,5 +1,6 @@
 package de.bsd.zwitscher;
 
+import java.lang.String;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,16 +12,25 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import com.sun.org.apache.xpath.internal.operations.*;
+import twitter4j.User;
 
+/**
+ * This class is interfacing with the SQLite3 database on the
+ * handset to store statuses, lists, users and so on.
+ *
+ * @author Heiko W. Rupp
+ */
 public class TweetDB {
 
     private static final String TABLE_STATUSES = "statuses";
     private static final String TABLE_LAST_READ = "lastRead";
     private static final String TABLE_LISTS = "lists";
+    private static final String TABLE_USERS = "users";
     private TweetDBOpenHelper tdHelper;
 
 	public TweetDB(Context context) {
-		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 1);
+		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 2);
 	}
 
 
@@ -49,10 +59,23 @@ public class TweetDB {
 					"name TEXT, " + //
 					"id LONG )"
 			);
+
+            db.execSQL("CREATE TABLE " + TABLE_USERS + " (" +
+                    "userId LONG, " + //
+                    "accountId LONG, " + //
+                    "user_json STRING )"
+            );
 		}
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (newVersion==2)
+                db.execSQL("CREATE TABLE " + TABLE_USERS + " (" +
+                        "userId LONG, " + //
+                        "accountId LONG, " + //
+                        "user_json STRING )"
+                );
+
 		}
 
 	}
@@ -238,6 +261,59 @@ public class TweetDB {
     public void cleanTweets() {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_STATUSES);
+        db.close();
+    }
+
+    /**
+     * Returns a user by its ID from the database if it exists or null.
+     * @param userId Id of the user
+     * @param accountId Id of the account to use
+     * @return Basic JSON string of the user info or null.
+     */
+    public String getUserById(int userId, int accountId) {
+
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        String ret = null;
+
+        Cursor c;
+        c = db.query(TABLE_USERS,new String[]{"user_json"},"userId = ? AND accountId = ?",new String[] { String.valueOf(userId), String.valueOf(accountId)},null, null, null);
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            ret = c.getString(0);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Insert a user into the database.
+     * @param userId The Id of the user to insert
+     * @param accountId The id of the account to use
+     * @param json JSON representation of the User object
+     */
+    public void insertUser(int userId, int accountId, String json) {
+        ContentValues cv = new ContentValues(3);
+        cv.put("userId",userId);
+        cv.put("accountId",accountId);
+        cv.put("user_json",json);
+
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.insert(TABLE_USERS,null,cv);
+        db.close();
+    }
+
+    /**
+     * Update an existing user in the database.
+     * @param userId
+     * @param accountId
+     * @param json
+     */
+    public void updateUser(int userId, int accountId, String json) {
+        ContentValues cv = new ContentValues(1);
+        cv.put("user_json",json);
+
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.update(TABLE_USERS,cv,"userId = ? AND accountId = ?",new String[] { String.valueOf(userId), String.valueOf(accountId)});
         db.close();
     }
 

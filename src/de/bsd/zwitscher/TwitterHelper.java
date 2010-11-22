@@ -1,6 +1,11 @@
 package de.bsd.zwitscher;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,7 +13,6 @@ import java.util.List;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -18,9 +22,8 @@ import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.*;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
+import twitter4j.json.DataObjectFactory;
 import twitter4j.util.ImageUpload;
-
-import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
 
 public class TwitterHelper {
@@ -365,11 +368,28 @@ Log.d("FillUp","Return: " + i);
         return ret;
     }
 
-    public User getUserById(int userid) {
+    /**
+     * Retrieve a User object for the passed userId.
+     * @param userId Id of the user to look up
+     * @param cachedOnly If true, only a cached version of the object or null is returned. Otherwise a request to the server is made
+     * @return User object or null, if it can not be obtained.
+     */
+    public User getUserById(int userId, boolean cachedOnly) {
         Twitter twitter = getTwitter();
         User user = null;
         try {
-            user = twitter.showUser(userid);
+
+            String userJson = tweetDB.getUserById(userId,0); // TODO fix account
+            if (userJson==null) {
+                if (!cachedOnly) {
+                    user = twitter.showUser(userId);
+                    userJson = DataObjectFactory.getRawJSON(user);
+                    tweetDB.insertUser(userId,0,userJson);
+                }
+            } else {
+                user = DataObjectFactory.createUser(userJson);
+            }
+
         } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
         }
@@ -464,11 +484,26 @@ Log.d("FillUp","Return: " + i);
 
     }
 
-    /**
-     * Return the date/time when the status was posted.
-     * @param status
-     * @return
-     */
+    private TwitterResponse materialize(String json,JsonType type) throws TwitterException {
+
+        TwitterResponse response;
+        switch (type) {
+            case DIRECT:
+                response = DataObjectFactory.createDirectMessage(json);
+                break;
+            case STATUS:
+                response = DataObjectFactory.createStatus(json);
+                break;
+            case USER:
+                response = DataObjectFactory.createUser(json);
+                break;
+            default:
+                throw new IllegalArgumentException("Type " + type + " unknown");
+        }
+
+        return response;
+    }
+
     public String getStatusDate(Status status) {
         Date date = status.getCreatedAt();
         long time = date.getTime();

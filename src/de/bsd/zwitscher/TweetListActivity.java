@@ -304,7 +304,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
 		@Override
 		protected void onPostExecute(MetaList<twitter4j.Status> result) {
-	        setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, R.layout.list_item, result.getList()));
+	        setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, R.layout.tweet_list_item, result.getList()));
             if (pg!=null)
                 pg.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)
