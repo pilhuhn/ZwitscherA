@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -119,7 +120,7 @@ public class UserDetailActivity extends Activity  {
                 followButton.setText(R.string.unfollow_user);
             else
                 followButton.setText(R.string.follow_user);
-            Button addToListButton = (Button) findViewById(R.id.userDetail_addListButton);
+            ImageButton addToListButton = (ImageButton) findViewById(R.id.userDetail_addListButton);
             addToListButton.setEnabled(true);
         }
     }
