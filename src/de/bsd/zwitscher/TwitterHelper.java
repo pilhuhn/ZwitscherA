@@ -533,4 +533,22 @@ Log.d("FillUp","Return: " + i);
         }
         return null;
     }
+
+    /**
+     * Determine if the current user is following the passed one
+     * @param userId id of the user to verify
+     * @return true if we are following, false otherwise
+     */
+    public boolean areWeFollowing(Integer userId) {
+
+        Twitter twitter = getTwitter();
+        try {
+            int myId = twitter.getId();
+            Relationship rel = twitter.showFriendship(myId,userId);
+            return rel.isSourceFollowingTarget();
+        } catch (TwitterException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+            return false;
+        }
+    }
 }

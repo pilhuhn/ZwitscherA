@@ -39,6 +39,8 @@ public class UserDetailActivity extends Activity  {
     ProgressBar pg;
     TextView titleTextBox;
     User theUser;
+    boolean weAreFollowing = false;
+    Button followButton ;
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -49,7 +51,7 @@ public class UserDetailActivity extends Activity  {
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
-        Button followButton = (Button) findViewById(R.id.userDetail_follow_button);
+        followButton = (Button) findViewById(R.id.userDetail_follow_button);
         followButton.setEnabled(false);
 
 
@@ -74,7 +76,7 @@ public class UserDetailActivity extends Activity  {
      * Fill data of the passwd user in the form fields.
      * @param user
      */
-    private void fillDetails(User user) {
+    private void fillDetails(User user, boolean weAreFollowing) {
         if (user!=null) {
             TextView userNameView = (TextView) findViewById(R.id.UserName);
             String uName = "<b>" + user.getName() + "</b>" + " (" + user.getScreenName() + ")";
@@ -114,15 +116,23 @@ public class UserDetailActivity extends Activity  {
             TextView listedView = (TextView) findViewById(R.id.userDetail_listedCount);
             listedView.setText(""+user.getListedCount());
 
-            Button followButton = (Button) findViewById(R.id.userDetail_follow_button);
+
             followButton.setEnabled(true);
-            if (user.isFollowRequestSent())
-                followButton.setText(R.string.unfollow_user);
-            else
-                followButton.setText(R.string.follow_user);
+            setFollowingButton(weAreFollowing);
             ImageButton addToListButton = (ImageButton) findViewById(R.id.userDetail_addListButton);
             addToListButton.setEnabled(true);
         }
+    }
+
+    /**
+     * Set the appropriate text on the follow button
+     * @param weAreFollowing Are we folloing that user (show 'unfollow' message in this case).
+     */
+    private void setFollowingButton(boolean weAreFollowing) {
+        if (weAreFollowing)
+            followButton.setText(R.string.unfollow_user);
+        else
+            followButton.setText(R.string.follow_user);
     }
 
     /**
@@ -141,8 +151,11 @@ public class UserDetailActivity extends Activity  {
     @SuppressWarnings("unused")
     public void followUser(View v) {
 
-        thTwitterHelper.followUnfollowUser(theUser.getId(),!theUser.isFollowRequestSent());
-
+        boolean success = thTwitterHelper.followUnfollowUser(theUser.getId(),!weAreFollowing);
+        if (success) {
+            weAreFollowing = !weAreFollowing;
+            setFollowingButton(weAreFollowing);
+        }
     }
 
 
@@ -197,7 +210,7 @@ public class UserDetailActivity extends Activity  {
      * Async task to download the userdata from server (or db) and
      * trigger its display.
      */
-    private class UserDetailDownloadTask extends AsyncTask<Integer,Void, User> {
+    private class UserDetailDownloadTask extends AsyncTask<Integer,Void, Object[]> {
 
         @Override
         protected void onPreExecute() {
@@ -209,19 +222,26 @@ public class UserDetailActivity extends Activity  {
 
 
         @Override
-        protected User doInBackground(Integer... params) {
+        protected Object[] doInBackground(Integer... params) {
 
             Integer userId = params[0];
             User user = thTwitterHelper.getUserById(userId, false);
-            return user;
+            Boolean isFriend = thTwitterHelper.areWeFollowing(userId);
+            weAreFollowing = isFriend;
+            Object[] res = new Object[2];
+            res[0] = user;
+            res[1] = isFriend;
+            return res;
         }
 
 
         @Override
-        protected void onPostExecute(User user) {
-            super.onPostExecute(user);
+        protected void onPostExecute(Object[] params) {
+            super.onPostExecute(params);
+            User user = (User) params[0];
+            Boolean isFriend = (Boolean) params[1];
             theUser = user;
-            fillDetails(user);
+            fillDetails(user,isFriend);
             pg.setVisibility(ProgressBar.INVISIBLE);
             titleTextBox.setText("");
         }

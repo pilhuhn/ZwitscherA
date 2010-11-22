@@ -81,30 +81,35 @@
                     />
         </TableRow>
     </TableLayout>
-    <ImageButton
+    <LinearLayout
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_gravity="left"
-        android:onClick="done"
-        android:src="@drawable/back_button"
-        />
-    <Button android:id="@+id/userDetail_follow_button"
-            android:text="@string/follow_user"
+        android:layout_width="fill_parent"
+        android:orientation="horizontal"
+        >
+        <ImageButton
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:layout_gravity="right"
-            android:onClick="followUser"
-            android:enabled="false"
+            android:layout_gravity="left"
+            android:onClick="done"
+            android:src="@drawable/back_button"
             />
-    <ImageButton
-            android:id="@+id/userDetail_addListButton"
-            android:src="@drawable/add_list"
-            android:onClick="addToList"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_gravity="right"
-            android:enabled="false"
-        />
-
+        <Button android:id="@+id/userDetail_follow_button"
+                android:text="@string/follow_user"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="right"
+                android:onClick="followUser"
+                android:enabled="false"
+                />
+        <ImageButton
+                android:id="@+id/userDetail_addListButton"
+                android:src="@drawable/add_list"
+                android:onClick="addToList"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="right"
+                android:enabled="false"
+            />
+    </LinearLayout>
 
 </LinearLayout>
