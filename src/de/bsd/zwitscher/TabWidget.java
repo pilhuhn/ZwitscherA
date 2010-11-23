@@ -44,7 +44,7 @@ public class TabWidget extends TabActivity {
         homeIntent.putExtra(LIST_ID, 0);
 
 		homeSpec = tabHost.newTabSpec("home")
-				.setIndicator("Home",res.getDrawable(R.drawable.home))
+				.setIndicator("Home",res.getDrawable(R.drawable.ic_tab_home))
 				.setContent(homeIntent);
 		tabHost.addTab(homeSpec);
 
@@ -52,20 +52,20 @@ public class TabWidget extends TabActivity {
 		mentionsIntent.putExtra(LIST_ID, -1);
 
 		homeSpec = tabHost.newTabSpec("mentions")
-				.setIndicator("Mentions",res.getDrawable(R.drawable.mentions))
+				.setIndicator("Mentions",res.getDrawable(R.drawable.ic_tab_mention))
 				.setContent(mentionsIntent);
 		tabHost.addTab(homeSpec);
 
         Intent directIntent = new Intent().setClass(this,TweetListActivity.class);
         directIntent.putExtra(LIST_ID, -2);
 		homeSpec = tabHost.newTabSpec("directs")
-				.setIndicator("Direct",res.getDrawable(R.drawable.direct))
+				.setIndicator("Direct",res.getDrawable(R.drawable.ic_tab_direct))
 				.setContent(directIntent);
 		tabHost.addTab(homeSpec);
 
         Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
         homeSpec = tabHost.newTabSpec("lists")
-                .setIndicator("Lists",res.getDrawable(R.drawable.list))
+                .setIndicator("Lists",res.getDrawable(R.drawable.ic_tab_list))
                 .setContent(listsIntent);
         tabHost.addTab(homeSpec);
 		tabHost.setCurrentTab(0); // Home tab, tabs start at 0
