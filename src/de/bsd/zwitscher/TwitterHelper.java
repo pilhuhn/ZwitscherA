@@ -1,11 +1,7 @@
 package de.bsd.zwitscher;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,9 +30,17 @@ public class TwitterHelper {
 
 	public TwitterHelper(Context context) {
 		this.context = context;
-        tweetDB = new TweetDB(context);
+        tweetDB = new TweetDB(context,0); // TODO set real account
 	}
 
+    /**
+     * Get a timeline for Status (Home time line, mentions) or lists
+     * @param paging paging object to control fetching
+     * @param list_id The list to fetch (0 = home time line , -1 = mentions
+     * @param fromDbOnly Should fetching only come from the DB or should a remote server be contacted?
+     * @return List of Status objects
+     * @see twitter4j.Status
+     */
 	public MetaList<Status> getTimeline(Paging paging, int list_id, boolean fromDbOnly) {
         Twitter twitter = getTwitter();
 
@@ -51,20 +55,14 @@ public class TwitterHelper {
                 if (!fromDbOnly)
 				    statuses = twitter.getMentions(paging);
 				break;
-            case -2:
-                if (!fromDbOnly)
-//                    statuses = twitter.getDirectMessages(paging);
-                    // TODO implement -- why does twitter(4j) not return a status ?
-                break;
 
 			default:
 				statuses = new ArrayList<Status>();
 			}
             if (statuses==null)
                 statuses=new ArrayList<Status>();
-            TweetDB tdb = new TweetDB(context);
             for (Status status : statuses) {
-                persistStatus(tdb, status,list_id);
+                persistStatus(tweetDB, status,list_id);
             }
 
         }
@@ -72,7 +70,7 @@ public class TwitterHelper {
             System.err.println("Got exception: " + e.getMessage() );
             if (e.getCause()!=null)
                 System.err.println("   " + e.getCause().getMessage());
-            statuses = new ArrayList<Status>();
+            statuses = new ArrayList<>();
 
         }
         int numStatuses = statuses.size();
@@ -84,11 +82,18 @@ public class TwitterHelper {
         return metaList ;
 	}
 
+    /**
+     * Read status objects from the database only.
+     * @param sinceId The oldest Id that should
+     * @param howMany
+     * @param list_id
+     * @return
+     */
     public List<Status> getStatuesFromDb(long sinceId, int howMany, long list_id) {
-        List<Status> ret = new ArrayList<Status>();
-        List<byte[]> oStats = tweetDB.getStatusesObjsOlderThan(sinceId,howMany,list_id);
-        for (byte[] bytes : oStats) {
-            Status status = materializeStatus(bytes);
+        List<Status> ret = new ArrayList<>();
+        List<String> responseList = tweetDB.getStatusesObjsOlderThan(sinceId,howMany,list_id);
+        for (String json : responseList) {
+            Status status = materializeStatus(json);
             ret.add(status);
         }
         return ret;
@@ -98,15 +103,17 @@ public class TwitterHelper {
     public List<UserList> getUserLists() {
 		Twitter twitter = getTwitter();
 
+        List<UserList> userLists;
 		try {
 			String username = twitter.getScreenName();
-			List<UserList> userLists = twitter.getUserLists(username, -1);
+			userLists = twitter.getUserLists(username, -1);
 			return userLists;
 		} catch (Exception e) {
 			Toast.makeText(context, "Getting lists failed: " + e.getMessage(), 15000).show();
 			e.printStackTrace();
-			return new ArrayList<UserList>();
+			userLists = new ArrayList<>();
 		}
+        return userLists;
 	}
 
 
@@ -256,10 +263,8 @@ public class TwitterHelper {
                 int size = statuses.size();
                 Log.i("getUserList","Got " + size + " statuses from Twitter");
 
-                TweetDB tdb = new TweetDB(context);
-
                 for (Status status : statuses) {
-                    persistStatus(tdb, status,listId);
+                    persistStatus(tweetDB, status,listId);
                 }
             } catch (Exception e) {
                 statuses = new ArrayList<Status>();
@@ -332,7 +337,7 @@ Log.d("FillUp","Return: " + i);
         Status status = null;
 
         if (!directOnly) {
-            byte[] obj  = tweetDB.getStatusObjectById(statusId);
+            String obj  = tweetDB.getStatusObjectById(statusId);
             if (obj!=null) {
                 status = materializeStatus(obj);
                 if (status!=null)
@@ -360,8 +365,8 @@ Log.d("FillUp","Return: " + i);
 
     public List<Status> getRepliesToStatus(long statusId) {
         List<Status> ret = new ArrayList<Status>();
-        List<byte[]> replies = tweetDB.getReplies(statusId);
-        for (byte[] reply : replies) {
+        List<String> replies = tweetDB.getReplies(statusId);
+        for (String reply : replies) {
             Status status = materializeStatus(reply);
             ret.add(status);
         }
@@ -379,12 +384,12 @@ Log.d("FillUp","Return: " + i);
         User user = null;
         try {
 
-            String userJson = tweetDB.getUserById(userId,0); // TODO fix account
+            String userJson = tweetDB.getUserById(userId,0);
             if (userJson==null) {
                 if (!cachedOnly) {
                     user = twitter.showUser(userId);
                     userJson = DataObjectFactory.getRawJSON(user);
-                    tweetDB.insertUser(userId,0,userJson);
+                    tweetDB.insertUser(userId,userJson);
                 }
             } else {
                 user = DataObjectFactory.createUser(userJson);
@@ -440,10 +445,8 @@ Log.d("FillUp","Return: " + i);
             return; // This is already in DB, so do nothing
 
         // Serialize and then store in DB
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream out = new ObjectOutputStream(bos);
-        out.writeObject(status);
-        tdb.storeStatus(status.getId(), status.getInReplyToStatusId(), list_id, bos.toByteArray());
+        String json = DataObjectFactory.getRawJSON(status);
+        tdb.storeStatus(status.getId(), status.getInReplyToStatusId(), list_id, json);
     }
 
     /**
@@ -455,52 +458,47 @@ Log.d("FillUp","Return: " + i);
     private void updateStatus(TweetDB tdb, Status status) throws IOException {
 
         // Serialize and then store in DB
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream out = new ObjectOutputStream(bos);
-        out.writeObject(status);
-
-        tdb.updateStatus(status.getId(), bos.toByteArray());
+        String json = DataObjectFactory.getRawJSON(status);
+        tdb.updateStatus(status.getId(), json);
     }
 
 
-    /**
-     * Create a Status object from the passed byte array
-     * @param obj Byte array to convert
-     * @return new Satus object
-     */
-    private Status materializeStatus(byte[] obj) {
 
-        Status status = null;
+    private Status materializeStatus(String obj) {
+
+        Status response;
         try {
-            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(obj));
-            status = (Status) ois.readObject();
-        } catch (IOException e) {
+            response = DataObjectFactory.createStatus(obj);
+        } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();  // TODO: Customise this generated block
+            response = null;
         }
-
-        return status;
-
+        return response;
     }
 
-    private TwitterResponse materialize(String json,JsonType type) throws TwitterException {
 
-        TwitterResponse response;
-        switch (type) {
-            case DIRECT:
-                response = DataObjectFactory.createDirectMessage(json);
-                break;
-            case STATUS:
-                response = DataObjectFactory.createStatus(json);
-                break;
-            case USER:
-                response = DataObjectFactory.createUser(json);
-                break;
-            default:
-                throw new IllegalArgumentException("Type " + type + " unknown");
+    private User materializeUser(String obj) {
+
+        User response;
+        try {
+            response = DataObjectFactory.createUser(obj);
+        } catch (TwitterException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+            response = null;
         }
 
+        return response;
+    }
+
+    private DirectMessage materializeDirect(String obj) {
+
+        DirectMessage response;
+        try {
+            response = DataObjectFactory.createDirectMessage(obj);
+        } catch (TwitterException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+            response = null;
+        }
         return response;
     }
 
