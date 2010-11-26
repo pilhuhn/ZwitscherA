@@ -16,6 +16,7 @@
     <string name="in_reply_to"> als Antwort auf </string>
     <string name="send_direct_to">Sende private Nachricht an </string>
     <string name="getting_tweets">Lade Tweets</string>
+    <string name="getting_conversation">Lade Konversation</string>
     <string name="follow_user">Benutzer folgen</string>
     <string name="unfollow_user">Benutzer nicht folgen</string>
     <string name="add">Hinzufügen</string>

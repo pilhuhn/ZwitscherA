@@ -27,6 +27,7 @@
     <string name="via">" via "</string>
     <string name="send_direct_to">Sending direct message to </string>
     <string name="getting_tweets">Getting tweets</string>
+    <string name="getting_conversation">Getting conversation</string>
     <string name="follow_user">Follow user</string>
     <string name="unfollow_user">Unfollow user</string>
     <string name="add">Add</string>
