@@ -141,6 +141,9 @@ public class PicHelper {
      * @return Bitmap if present on file system or null if not found
      */
     public Bitmap getBitMapForUserFromFile(User user) {
+        if (user==null)
+            return null;
+
         String username = user.getScreenName();
         Log.d("getBitMapForUserFromFile","user = " +username);
         try {
