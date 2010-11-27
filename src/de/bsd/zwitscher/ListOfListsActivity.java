@@ -1,15 +1,11 @@
 package de.bsd.zwitscher;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-import twitter4j.Status;
-import twitter4j.UserList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * TODO: Document this
+ * Display the list of user lists
  *
  * @author Heiko W. Rupp
  */
@@ -32,7 +28,7 @@ public class ListOfListsActivity extends ListActivity {
         super.onCreate(savedInstanceState);
 
         th = new TwitterHelper(this);
-        tdb = new TweetDB(this);
+        tdb = new TweetDB(this,0); // TODO set correct account
     }
 
 
