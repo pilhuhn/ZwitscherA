@@ -80,7 +80,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             imageButton.setVisibility(View.VISIBLE);
 
         }
-        tdb = new TweetDB(this);
+        tdb = new TweetDB(this,0); // TODO set correct account
         th = new TwitterHelper(this);
         lv = getListView();
         lv.setOnScrollListener(this);
@@ -95,7 +95,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             list_id = intentInfo.getInt(TabWidget.LIST_ID);
         }
 
-        boolean fromDbOnly = tdb.getLastRead(list_id)!=-1 ? true : false;
+        boolean fromDbOnly = tdb.getLastRead(list_id) != -1;
         fillListViewFromTimeline(fromDbOnly); // Only get tweets from db to speed things up at start
     }
 
@@ -108,15 +108,15 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 		lv.setOnItemClickListener(this);
 		lv.setOnItemLongClickListener(this); // Directly got to reply
 
-        // Get the windows progress bar from the enclosing TabWidget
-        // TODO parent is not necessarily the TabWidget
-//        TabWidget parent = (TabWidget) this.getParent();
-//        pg = parent.pg;
-
-
-
     }
 
+    /**
+     * Handle click on a list item which triggers the detail view of that item
+     * @param parent Parent view
+     * @param view Clicked view
+     * @param position Position in the list that was clicked
+     * @param id
+     */
     public void onItemClick(AdapterView<?> parent, View view,
             int position, long id) {
         Intent i = new Intent(parent.getContext(),OneTweetActivity.class);
@@ -125,6 +125,14 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
     }
 
+    /**
+     * Handle a long click on a list item - by directly jumping into reply mode
+     * @param parent Parent view
+     * @param view Clicked view
+     * @param position Position in the List that was clicked
+     * @param id
+     * @return true as the click was consumed
+     */
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view,
             int position, long id) {
@@ -138,11 +146,22 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     }
 
 
-
+    /**
+     * Retrieve a list of statuses. Depending on list_id, this is taken from
+     * different sources:
+     * <ul>
+     * <li>0 : home timeline</li>
+     * <li>-1 : mentions</li>
+     * <li>>0 : User list</li>
+     * </ul>
+     * This method may trigger a network call if fromDbOnly is false.
+     * @param fromDbOnly If true only statuses already in the DB are returned
+     * @return List of status items along with some counts
+     */
 	private MetaList<Status> getTimlinesFromTwitter(boolean fromDbOnly) {
 		Paging paging = new Paging().count(100);
 
-		MetaList<Status> myStatuses; // = new ArrayList<Status>();
+		MetaList<Status> myStatuses;
 
 
     	long last = tdb.getLastRead(list_id);
