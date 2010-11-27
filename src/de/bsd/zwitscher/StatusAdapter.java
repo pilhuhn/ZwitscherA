@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +14,8 @@ import android.widget.TextView;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
 import de.bsd.zwitscher.helper.SpannableBuilder;
+import de.bsd.zwitscher.helper.TriggerPictureDownloadTask;
 import twitter4j.Status;
-import twitter4j.User;
 
 import java.util.List;
 
@@ -128,15 +127,4 @@ class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
         TextView timeClientInfo;
     }
 
-    private class TriggerPictureDownloadTask extends AsyncTask<User,Void,Void> {
-
-        @Override
-        protected Void doInBackground(User... users) {
-            User user = users[0];
-            PicHelper ph = new PicHelper();
-            ph.fetchUserPic(user);
-
-            return null;
-        }
-    }
 }
