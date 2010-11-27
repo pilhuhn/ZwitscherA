@@ -25,4 +25,12 @@
         <item>4</item>
         <item>5</item>
     </string-array>
+    <string-array name="pictureService">
+        <item>YFrog</item>
+        <item>TwitPic</item>
+    </string-array>
+    <string-array name="pictureServiceVals">
+        <item>yfrog</item>
+        <item>twitpic</item>
+    </string-array>
 </resources>

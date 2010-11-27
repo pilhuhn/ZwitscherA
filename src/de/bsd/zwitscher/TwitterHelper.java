@@ -502,8 +502,19 @@ Log.d("FillUp","Return: " + i);
         return response;
     }
 
-    public String getStatusDate(Status status) {
-        Date date = status.getCreatedAt();
+    /**
+     * Return a string representation of the date the passed status was created.
+     * @param status Response object from the server (Status or DirectMessage)
+     * @return String showing the date
+     */
+    public String getStatusDate(TwitterResponse status) {
+        Date date;
+        if (status instanceof Status)
+            date = ((Status)status).getCreatedAt();
+        else if (status instanceof DirectMessage)
+            date = ((DirectMessage)status).getCreatedAt();
+        else
+            throw new IllegalArgumentException("Type of " + status + " unknown");
         long time = date.getTime();
 
         return (String) DateUtils.getRelativeDateTimeString(context,
@@ -521,9 +532,18 @@ Log.d("FillUp","Return: " + i);
     public String postPicture(String fileName) {
         Twitter twitter = getTwitter();
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String provider = preferences.getString("pictureService","yfrog");
+
         try {
             File file = new File(fileName);
-            ImageUpload upload = ImageUpload.getYFrogUploader(twitter); // TODO allow user selection of service
+            ImageUpload upload;
+            if (provider.equals("yfrog"))
+                upload= ImageUpload.getYFrogUploader(twitter);
+            else if (provider.equals("twitpic"))
+                upload= ImageUpload.getTwitpicUploader(twitter);
+            else
+                throw new IllegalArgumentException("Picture provider " + provider + " unknown");
             String url = upload.upload(file);
             return url;
         } catch (Exception e) {

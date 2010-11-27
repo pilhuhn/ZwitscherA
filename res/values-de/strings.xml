@@ -38,6 +38,8 @@
     <string name="prefs_pic_loading_descr">Netzwerkkonfiguration, die nötig ist, um Bilder zu laden.</string>
     <string name="prefs_pic_roaming">Roaming</string>
     <string name="prefs_pic_roaming_descr">Dürfen während des Roamings Bilder geladen werden?</string>
+    <string name="prefs_pictureService">Picture Service</string>
+    <string name="prefs_pictureService_descr">Choose a service for picture uploading</string>
     <!-- preferences -->
 
 

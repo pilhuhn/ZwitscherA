@@ -48,5 +48,7 @@
     <string name="prefs_pic_loading_descr">Network configuration required for picture loading</string>
     <string name="prefs_pic_roaming">Roaming</string>
     <string name="prefs_pic_roaming_descr">Allow downloading images when Roaming</string>
+    <string name="prefs_pictureService">Picture Service</string>
+    <string name="prefs_pictureService_descr">Choose a service for picture uploading</string>
     <!-- preferences -->
 </resources>
