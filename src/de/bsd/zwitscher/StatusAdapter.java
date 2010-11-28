@@ -114,6 +114,7 @@ class StatusAdapter<T extends TwitterResponse> extends ArrayAdapter<T> {
                 .append(msg.getSender().getName(),Typeface.BOLD)
                 .appendSpace()
                 .append(R.string.to,Typeface.NORMAL)
+                .appendSpace()
                 .append(msg.getRecipient().getName(),Typeface.BOLD);
         }
         else

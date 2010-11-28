@@ -70,7 +70,7 @@ public class TwitterHelper {
             System.err.println("Got exception: " + e.getMessage() );
             if (e.getCause()!=null)
                 System.err.println("   " + e.getCause().getMessage());
-            statuses = new ArrayList<>();
+            statuses = new ArrayList<Status>();
 
         }
         int numStatuses = statuses.size();
@@ -82,6 +82,27 @@ public class TwitterHelper {
         return metaList ;
 	}
 
+
+    /**
+     * Return direct messages
+     * @param fromDbOnly
+     * @return
+     */
+    public List<DirectMessage> getDirectMessages(boolean fromDbOnly) {
+
+        Twitter twitter = getTwitter();
+
+        try {
+            List<DirectMessage> ret = twitter.getDirectMessages();
+            return ret;
+        } catch (TwitterException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+
+        return null;  // TODO: Customise this generated block
+    }
+
+
     /**
      * Read status objects from the database only.
      * @param sinceId The oldest Id that should
@@ -90,7 +111,7 @@ public class TwitterHelper {
      * @return
      */
     public List<Status> getStatuesFromDb(long sinceId, int howMany, long list_id) {
-        List<Status> ret = new ArrayList<>();
+        List<Status> ret = new ArrayList<Status>();
         List<String> responseList = tweetDB.getStatusesObjsOlderThan(sinceId,howMany,list_id);
         for (String json : responseList) {
             Status status = materializeStatus(json);
@@ -111,7 +132,7 @@ public class TwitterHelper {
 		} catch (Exception e) {
 			Toast.makeText(context, "Getting lists failed: " + e.getMessage(), 15000).show();
 			e.printStackTrace();
-			userLists = new ArrayList<>();
+			userLists = new ArrayList<UserList>();
 		}
         return userLists;
 	}

@@ -69,7 +69,7 @@ public class TweetDB {
 					"list_id LONG, " + //
 					"last_read_id LONG, " +  // Last Id read by the user
                     "last_fetched_id LONG, " +  // last Id fetched from the server
-                    ACCOUNT_ID + " LONG, " +
+                    ACCOUNT_ID + " LONG " +
                     ")"
 			);
 			db.execSQL(CREATE_TABLE + TABLE_LISTS + " (" + //
@@ -408,7 +408,7 @@ public class TweetDB {
      */
     public List<String> getDirects(int number) {
         SQLiteDatabase db = tdHelper.getReadableDatabase();
-        List<String > ret = new ArrayList<>();
+        List<String > ret = new ArrayList<String>();
 
         Cursor c;
         c = db.query(TABLE_DIRECTS,new String[]{"message_json"},ACCOUNT_ID_IS,new String[] { account},null, null, "ID DESC",String.valueOf(number));

@@ -18,9 +18,9 @@ import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import de.bsd.zwitscher.helper.MetaList;
+import twitter4j.DirectMessage;
 import twitter4j.Paging;
 import twitter4j.Status;
-import twitter4j.User;
 
 /**
  * Show the list of tweets.
@@ -176,7 +176,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         	myStatuses = th.getTimeline(paging, list_id, fromDbOnly);
         	break;
         case -2:
-            // TODO directs
+            // see below at getDirectsFromTwitter
             myStatuses = new MetaList<Status>();
             break;
         default:
@@ -194,8 +194,6 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 		List<Status> data = new ArrayList<Status>(myStatuses.getList().size());
         String filter = getFilter();
 		for (Status status : myStatuses.getList()) {
-			User user = status.getUser();
-			String item ="";
 			if ((filter==null) || (filter!= null && !status.getText().matches(filter))) {
 				data.add(status);
 				statuses.add(status);
@@ -205,10 +203,21 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 			}
 		}
 
-        MetaList metaList = new MetaList(data,myStatuses.getNumOriginal(),myStatuses.getNumAdded());
+        MetaList<Status> metaList = new MetaList<Status>(data,myStatuses.getNumOriginal(),myStatuses.getNumAdded());
 
 		return metaList;
 	}
+
+    private MetaList getDirectsFromTwitter(boolean fromDbOnly) {
+        List<DirectMessage> messages;
+
+        messages = th.getDirectMessages(fromDbOnly);
+
+        MetaList<DirectMessage> metaList = new MetaList<DirectMessage>(messages,messages.size(),0); // TODO fix count
+
+        return metaList;
+    }
+
 
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
@@ -274,11 +283,14 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             firstVisible + visibleCount >= totalCount-1;
 
         ListAdapter adapter = absListView.getAdapter();
+        Log.d("onScroll:","loadMore f=" + firstVisible + ", vc=" + visibleCount + ", tc=" +totalCount);
         if(loadMore) {
-            Log.d("onScroll:","loadMore f=" + firstVisible + ", vc=" + visibleCount + ", tc=" +totalCount);
             if (adapter instanceof StatusAdapter) {
                 StatusAdapter sta = (StatusAdapter) adapter;
                 if (totalCount>0) {
+                    if (sta.getItem(totalCount-1) instanceof  DirectMessage) // TODO
+                        return;
+
                     Status last = (Status) sta.getItem(totalCount-1);
 
                     TwitterHelper th = new TwitterHelper(thisActivity);
@@ -296,7 +308,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         }
     }
 
-    private class GetTimeLineTask extends AsyncTask<Boolean, Void, MetaList<Status>> {
+    private class GetTimeLineTask extends AsyncTask<Boolean, Void, MetaList> {
 
         boolean fromDbOnly = false;
 
@@ -315,15 +327,18 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 		@Override
 		protected MetaList<twitter4j.Status> doInBackground(Boolean... params) {
             fromDbOnly = params[0];
-	        MetaList<twitter4j.Status> data;
-            data = getTimlinesFromTwitter(fromDbOnly);
+	        MetaList data;
+            if (list_id!=-2)
+                data = getTimlinesFromTwitter(fromDbOnly);
+            else
+                data = getDirectsFromTwitter(fromDbOnly);
             Log.i("GTLTask", "got " + data.toString());
 	        return data;
 		}
 
 		@Override
-		protected void onPostExecute(MetaList<twitter4j.Status> result) {
-	        setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, R.layout.tweet_list_item, result.getList()));
+		protected void onPostExecute(MetaList result) {
+	        setListAdapter(new StatusAdapter(thisActivity, R.layout.tweet_list_item, result.getList()));
             if (pg!=null)
                 pg.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)
@@ -337,6 +352,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             }
 		}
     }
+
 
     // ".*(http://4sq.com/|http://shz.am/).*"
     private String getFilter() {

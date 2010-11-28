@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TabHost;
+import twitter4j.json.DataObjectFactory;
 
 public class TabWidget extends TabActivity {
 
@@ -26,6 +27,7 @@ public class TabWidget extends TabActivity {
 	TabHost.TabSpec homeSpec;
     ProgressBar pg;
     TextView titleTextBox;
+    int accountId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,7 @@ public class TabWidget extends TabActivity {
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
 
+        accountId = 0; // TODO select correct account
 
 		Resources res = getResources();
 		tabHost = getTabHost();
@@ -68,7 +71,16 @@ public class TabWidget extends TabActivity {
                 .setIndicator("Lists",res.getDrawable(R.drawable.ic_tab_list))
                 .setContent(listsIntent);
         tabHost.addTab(homeSpec);
+
+/*
+        Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
+        homeSpec = tabHost.newTabSpec("searches")
+                .setIndicator("Search")//,res.getDrawable(R.drawable.ic_tab_list))
+                .setContent(searchIntent);
+        tabHost.addTab(homeSpec);
+
 		tabHost.setCurrentTab(0); // Home tab, tabs start at 0
+*/
 
 	}
 
@@ -124,7 +136,7 @@ public class TabWidget extends TabActivity {
 	 */
 	private void syncLists() {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
-		TweetDB tdb = new TweetDB(getApplicationContext());
+        TweetDB tdb = new TweetDB(this,accountId);
 		List<UserList> userLists = th.getUserLists();
 		Map<String,Integer> storedLists = tdb.getLists();
 		// Check for lists to add
@@ -133,7 +145,7 @@ public class TabWidget extends TabActivity {
 				continue;
 			}
 			else {
-				tdb.addList(userList.getName(),userList.getId());
+				tdb.addList(userList.getName(),userList.getId(), DataObjectFactory.getRawJSON(userList));
 			}
 		}
 		// check for outdated lists and remove them
@@ -154,12 +166,12 @@ public class TabWidget extends TabActivity {
 	}
 
     private void resetLastRead() {
-        TweetDB tb = new TweetDB(this);
+        TweetDB tb = new TweetDB(this,accountId);
         tb.resetLastRead();
     }
 
     private void cleanTweetDB() {
-        TweetDB tb = new TweetDB(this);
+        TweetDB tb = new TweetDB(this,accountId);
         tb.cleanTweets();
     }
 
