@@ -104,6 +104,9 @@ public class TwitterHelper {
         }
 
         // TODO persist directs
+        for (DirectMessage msg : ret) {
+            persistDirects(msg);
+        }
 
         int numDirects = ret.size();
         int filled = fillUpDirectsFromDb(ret);
@@ -509,6 +512,14 @@ Log.d("FillUp","Return: " + i);
         tdb.storeStatus(status.getId(), status.getInReplyToStatusId(), list_id, json);
     }
 
+    private void persistDirects(DirectMessage message) {
+        if (tweetDB.getDirectById(message.getId())!=null)
+            return;
+
+        String json = DataObjectFactory.getRawJSON(message);
+
+        tweetDB.insertDirect(message.getId(),json);
+    }
     /**
      * Update an existing status object in the database with the passed one.
      * @param tdb TweetDb to use
