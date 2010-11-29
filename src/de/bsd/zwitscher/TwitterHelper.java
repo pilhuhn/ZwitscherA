@@ -3,6 +3,9 @@ package de.bsd.zwitscher;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -61,7 +64,7 @@ public class TwitterHelper {
 			}
             if (statuses==null)
                 statuses=new ArrayList<Status>();
-            for (Status status : statuses) {
+            for (Status status : statuses) { // TODO persist in one go
                 persistStatus(tweetDB, status,list_id);
             }
 
@@ -88,18 +91,25 @@ public class TwitterHelper {
      * @param fromDbOnly
      * @return
      */
-    public List<DirectMessage> getDirectMessages(boolean fromDbOnly) {
+    public MetaList<DirectMessage> getDirectMessages(boolean fromDbOnly) {
 
         Twitter twitter = getTwitter();
 
+        List<DirectMessage> ret;
         try {
-            List<DirectMessage> ret = twitter.getDirectMessages();
-            return ret;
+            ret = twitter.getDirectMessages();
         } catch (TwitterException e) {
-            e.printStackTrace();  // TODO: Customise this generated block
+            Log.e("getDirects", "Got exception: " + e.getMessage());
+            ret = Collections.emptyList();
         }
 
-        return null;  // TODO: Customise this generated block
+        // TODO persist directs
+
+        int numDirects = ret.size();
+        int filled = fillUpDirectsFromDb(ret);
+
+        MetaList<DirectMessage> result = new MetaList<DirectMessage>(ret,numDirects,filled);
+        return result;
     }
 
 
@@ -117,6 +127,17 @@ public class TwitterHelper {
             Status status = materializeStatus(json);
             ret.add(status);
         }
+        return ret;
+    }
+
+    private List<DirectMessage> getDirectsFromDb(int sinceId, int num) {
+        List<DirectMessage> ret = new ArrayList<DirectMessage>();
+        List<String> responses = tweetDB.getDirectsOlderThan(sinceId,num);
+        for (String json : responses) {
+            DirectMessage msg = materializeDirect(json);
+            ret.add(msg);
+        }
+        Log.i("Get directs","Got " + ret.size() + " messages");
         return ret;
     }
 
@@ -342,6 +363,24 @@ Log.d("FillUp","Now: " + size2);
 Log.d("FillUp","Return: " + i);
         return i;
     }
+
+    private int fillUpDirectsFromDb(List<DirectMessage> messages) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int minOld = Integer.valueOf(preferences.getString("minOldTweets","5"));
+        int maxOld = Integer.valueOf(preferences.getString("maxOldTweets","10"));
+
+        int size = messages.size();
+        if (size==0)
+            messages.addAll(getDirectsFromDb(-1,maxOld));
+        else {
+            int num = (size+minOld < maxOld) ? maxOld-size : minOld;
+            messages.addAll(getDirectsFromDb(messages.get(size-1).getId(),num));
+        }
+        int size2 = messages.size();
+
+        return  size2 - size;
+    }
+
 
 
     /**

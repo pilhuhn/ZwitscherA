@@ -209,13 +209,13 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 	}
 
     private MetaList getDirectsFromTwitter(boolean fromDbOnly) {
-        List<DirectMessage> messages;
+        MetaList<DirectMessage> messages;
 
         messages = th.getDirectMessages(fromDbOnly);
 
-        MetaList<DirectMessage> metaList = new MetaList<DirectMessage>(messages,messages.size(),0); // TODO fix count
+//        MetaList<DirectMessage> metaList = new MetaList<DirectMessage>(messages,messages.getNumOriginal(),messages.getNumAdded());
 
-        return metaList;
+        return messages;
     }
 
 

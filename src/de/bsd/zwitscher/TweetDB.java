@@ -279,7 +279,7 @@ public class TweetDB {
     public List<String> getStatusesObjsOlderThan(long sinceId, int howMany, long list_id) {
         List<String> ret = new ArrayList<String>();
         SQLiteDatabase db = tdHelper.getReadableDatabase();
-        Cursor c; // TODO ACCOUNT
+        Cursor c;
         if (sinceId>-1)
             c = db.query(TABLE_STATUSES,new String[]{STATUS},"id < ? AND list_id = ? AND " +ACCOUNT_ID_IS,new String[]{String.valueOf(sinceId),String.valueOf(list_id),account},null,null,"ID DESC",String.valueOf(howMany));
         else
@@ -296,6 +296,29 @@ public class TweetDB {
         db.close();
         return ret;
     }
+
+    public List<String> getDirectsOlderThan(int sinceId, int howMany) {
+        List<String> ret = new ArrayList<String>();
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        Cursor c;
+        if (sinceId>-1)
+            c = db.query(TABLE_DIRECTS,new String[]{"MESSAGE_JSON"},"id < ? AND " +ACCOUNT_ID_IS,new String[]{String.valueOf(sinceId),account},null,null,"ID DESC",String.valueOf(howMany));
+        else
+            c = db.query(TABLE_DIRECTS,new String[]{"MESSAGE_JSON"},  ACCOUNT_ID_IS,new String[]{account},null,null,"ID DESC",String.valueOf(howMany));
+
+        if (c.getCount()>0){
+            c.moveToFirst();
+            do {
+                String json = c.getString(0);
+                ret.add(json);
+            } while (c.moveToNext());
+        }
+        c.close();
+        db.close();
+        return ret;
+
+    }
+
 
     /**
      * Purge the last read table.
