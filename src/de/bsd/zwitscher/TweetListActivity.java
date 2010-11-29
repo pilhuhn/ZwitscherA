@@ -219,17 +219,6 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     }
 
 
-    @Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
-
-    	if (item!=null && item.getItemId() == R.id.reload_item) {
-            fillListViewFromTimeline(false);
-    		return true;
-    	}
-
-    	return super.onMenuItemSelected(featureId, item);
-    }
-
     /**
      * Called from the reload button
      * @param v

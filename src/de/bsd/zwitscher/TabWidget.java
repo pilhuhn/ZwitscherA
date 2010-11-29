@@ -96,13 +96,6 @@ public class TabWidget extends TabActivity {
 		Intent i;
 	    // Handle item selection
 	    switch (item.getItemId()) {
-	    case R.id.reload_item:
-	    	// Handled within TweetListActivity
-	    	break;
-	    case R.id.post_item:
-	    	i = new Intent(TabWidget.this, NewTweetActivity.class);
-	    	startActivity(i);
-	        break;
 	    case R.id.preferences:
 	    	i = new Intent(TabWidget.this, Preferences.class);
 			startActivity(i);
