@@ -67,20 +67,22 @@ public class TabWidget extends TabActivity {
 		tabHost.addTab(homeSpec);
 
         Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
+        listsIntent.putExtra("list",0);
         homeSpec = tabHost.newTabSpec("lists")
                 .setIndicator("Lists",res.getDrawable(R.drawable.ic_tab_list))
                 .setContent(listsIntent);
         tabHost.addTab(homeSpec);
 
-/*
+
         Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
+        searchIntent.putExtra("list",1);
         homeSpec = tabHost.newTabSpec("searches")
                 .setIndicator("Search")//,res.getDrawable(R.drawable.ic_tab_list))
                 .setContent(searchIntent);
         tabHost.addTab(homeSpec);
 
 		tabHost.setCurrentTab(0); // Home tab, tabs start at 0
-*/
+
 
 	}
 

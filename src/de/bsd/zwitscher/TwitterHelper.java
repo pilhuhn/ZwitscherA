@@ -640,4 +640,18 @@ Log.d("FillUp","Return: " + i);
             return false;
         }
     }
+
+    public List<SavedSearch> getSavedSearches() {
+
+        Twitter twitter = getTwitter();
+        List<SavedSearch> searches;
+        try {
+            searches = twitter.getSavedSearches();
+        } catch (TwitterException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+            searches = Collections.emptyList();
+        }
+
+        return searches;  // TODO: Customise this generated block
+    }
 }
