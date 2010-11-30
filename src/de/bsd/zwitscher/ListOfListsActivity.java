@@ -7,9 +7,11 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+import de.bsd.zwitscher.helper.CaseInsensitiveStringComparator;
 import twitter4j.SavedSearch;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,6 +67,8 @@ public class ListOfListsActivity extends ListActivity {
         }
         else
             throw new IllegalArgumentException("Unknown mode " + mode);
+
+        Collections.sort(result, new CaseInsensitiveStringComparator());
         setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, result));
 
     }
