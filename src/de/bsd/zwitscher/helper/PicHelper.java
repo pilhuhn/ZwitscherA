@@ -9,9 +9,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import android.graphics.*;
-import de.bsd.zwitscher.R;
 import twitter4j.User;
-import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
@@ -76,8 +74,9 @@ public class PicHelper {
                     out.flush();
                     out.close();
     			}
-                in.close();
-
+            in.close();
+            if (bitmap!=null)
+               bitmap.recycle();
 			}
 			catch (IOException ioe) {
 				ioe.printStackTrace();
@@ -132,6 +131,7 @@ public class PicHelper {
         out.setPixel(1,my-1,transparent);
         out.setPixel(0,my-2,transparent);
 
+        bitmap.recycle();
         return out;
     }
 
@@ -211,6 +211,7 @@ public class PicHelper {
             bitmap.compress(compressFormat, quality, out);
             out.flush();
             out.close();
+            bitmap.recycle();
             return file.getAbsolutePath();
         } catch (IOException e) {
             e.printStackTrace();  // TODO: Customise this generated block
