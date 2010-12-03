@@ -60,6 +60,7 @@ public class TweetDB {
 
             db.execSQL(CREATE_TABLE + TABLE_DIRECTS + " (" +
                     "ID LONG, " +
+                    "created_at LONG, " +
                     ACCOUNT_ID + " LONG, " +
                     "MESSAGE_JSON STRING " +
                     ")"
@@ -302,9 +303,9 @@ public class TweetDB {
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         if (sinceId>-1)
-            c = db.query(TABLE_DIRECTS,new String[]{"MESSAGE_JSON"},"id < ? AND " +ACCOUNT_ID_IS,new String[]{String.valueOf(sinceId),account},null,null,"ID DESC",String.valueOf(howMany));
+            c = db.query(TABLE_DIRECTS,new String[]{"MESSAGE_JSON"},"id < ? AND " +ACCOUNT_ID_IS,new String[]{String.valueOf(sinceId),account},null,null,"CREATED_AT DESC",String.valueOf(howMany));
         else
-            c = db.query(TABLE_DIRECTS,new String[]{"MESSAGE_JSON"},  ACCOUNT_ID_IS,new String[]{account},null,null,"ID DESC",String.valueOf(howMany));
+            c = db.query(TABLE_DIRECTS,new String[]{"MESSAGE_JSON"},  ACCOUNT_ID_IS,new String[]{account},null,null,"CREATED_AT DESC",String.valueOf(howMany));
 
         if (c.getCount()>0){
             c.moveToFirst();
@@ -335,6 +336,8 @@ public class TweetDB {
     public void cleanTweets() {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_STATUSES);
+        db.execSQL("DELETE FROM " + TABLE_DIRECTS);
+        db.execSQL("DELETE FROM " + TABLE_USERS);
         db.close();
     }
 
@@ -392,16 +395,18 @@ public class TweetDB {
     /**
      * Insert a direct message into the DB
      * @param id ID of the message
+     * @param time creation time
      * @param json Json string of the message
      */
-    public void insertDirect(int id , String json) {
-        ContentValues cv = new ContentValues(3);
+    public void insertDirect(int id, long time, String json) {
+        ContentValues cv = new ContentValues(4);
         cv.put("id",id);
+        cv.put("created_at", time);
         cv.put(ACCOUNT_ID,account);
         cv.put("user_json",json);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.insert(TABLE_USERS,null,cv);
+        db.insert(TABLE_DIRECTS,null,cv);
         db.close();
     }
 

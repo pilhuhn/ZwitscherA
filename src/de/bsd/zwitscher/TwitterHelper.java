@@ -3,9 +3,8 @@ package de.bsd.zwitscher;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -88,24 +87,39 @@ public class TwitterHelper {
 
     /**
      * Return direct messages
+     *
      * @param fromDbOnly
+     * @param paging
      * @return
      */
-    public MetaList<DirectMessage> getDirectMessages(boolean fromDbOnly) {
+    public MetaList<DirectMessage> getDirectMessages(boolean fromDbOnly, Paging paging) {
 
         Twitter twitter = getTwitter();
 
         List<DirectMessage> ret;
         try {
-            ret = twitter.getDirectMessages();
+            ret = twitter.getDirectMessages(paging);
+            List<DirectMessage> ret2 = twitter.getSentDirectMessages(paging);
+            ret.addAll(ret2);
         } catch (TwitterException e) {
             Log.e("getDirects", "Got exception: " + e.getMessage());
             ret = Collections.emptyList();
         }
 
-        // TODO persist directs
+        //  persist directs
+       if (ret.size()>0) {
+          Collections.sort(ret,new Comparator<DirectMessage>() {
+             @Override
+             public int compare(DirectMessage directMessage, DirectMessage directMessage1) {
+                return directMessage1.getId() - directMessage.getId();
+             }
+          });
         for (DirectMessage msg : ret) {
             persistDirects(msg);
+        }
+
+
+        tweetDB.updateOrInsertLastRead(-2,ret.get(0).getId());
         }
 
         int numDirects = ret.size();
@@ -518,7 +532,7 @@ Log.d("FillUp","Return: " + i);
 
         String json = DataObjectFactory.getRawJSON(message);
 
-        tweetDB.insertDirect(message.getId(),json);
+        tweetDB.insertDirect(message.getId(), message.getCreatedAt().getTime(), json);
     }
     /**
      * Update an existing status object in the database with the passed one.

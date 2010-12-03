@@ -11,7 +11,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.*;
@@ -120,7 +119,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     public void onItemClick(AdapterView<?> parent, View view,
             int position, long id) {
         Intent i = new Intent(parent.getContext(),OneTweetActivity.class);
-        i.putExtra(getString(R.string.status), statuses.get(position));
+        i.putExtra(getString(R.string.status), statuses.get(position)); //TODO directs
         startActivity(i);
 
     }
@@ -138,7 +137,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             int position, long id) {
         Log.i("TLA","Long click, pos=" + position + ",id="+id);
         Intent i = new Intent(parent.getContext(), NewTweetActivity.class);
-        i.putExtra(getString(R.string.status), statuses.get(position));
+        i.putExtra(getString(R.string.status), statuses.get(position)); //TODO directs
         i.putExtra("op",getString(R.string.reply));
         startActivity(i);
 
@@ -211,9 +210,14 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     private MetaList getDirectsFromTwitter(boolean fromDbOnly) {
         MetaList<DirectMessage> messages;
 
-        messages = th.getDirectMessages(fromDbOnly);
 
-//        MetaList<DirectMessage> metaList = new MetaList<DirectMessage>(messages,messages.getNumOriginal(),messages.getNumAdded());
+        long last = tdb.getLastRead(-2);
+        Paging paging = new Paging();
+        if (last>-1)
+         paging.setSinceId(last);
+
+
+        messages = th.getDirectMessages(fromDbOnly, paging);
 
         return messages;
     }
@@ -277,7 +281,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             if (adapter instanceof StatusAdapter) {
                 StatusAdapter sta = (StatusAdapter) adapter;
                 if (totalCount>0) {
-                    if (sta.getItem(totalCount-1) instanceof  DirectMessage) // TODO
+                    if (sta.getItem(totalCount-1) instanceof  DirectMessage) // TODO directs
                         return;
 
                     Status last = (Status) sta.getItem(totalCount-1);
