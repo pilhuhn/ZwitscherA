@@ -92,7 +92,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 sb.append(status.getRetweetedStatus().getUser().getName());
 				sb.append(" (");
 				sb.append(status.getRetweetedStatus().getUser().getScreenName());
-				sb.append(" )</b>").append(getString(R.string.resent_by)).append("<b>");
+				sb.append(" )</b> ").append(getString(R.string.resent_by)).append(" <b>");
 				sb.append(status.getUser().getName());
                 sb.append("</b>");
 			}
