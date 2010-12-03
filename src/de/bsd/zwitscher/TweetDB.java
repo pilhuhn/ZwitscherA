@@ -416,7 +416,7 @@ public class TweetDB {
         String ret = null;
 
         Cursor c;
-        c = db.query(TABLE_DIRECTS,new String[]{"message_json"},"userId = ? AND " + ACCOUNT_ID_IS,new String[] { String.valueOf(id), account},null, null, null);
+        c = db.query(TABLE_DIRECTS,new String[]{"message_json"},"id = ? AND " + ACCOUNT_ID_IS,new String[] { String.valueOf(id), account},null, null, null);
         if (c.getCount()>0) {
             c.moveToFirst();
             ret = c.getString(0);
