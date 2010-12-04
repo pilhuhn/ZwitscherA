@@ -91,7 +91,7 @@ public class NewTweetActivity extends Activity {
                   toUser = origStatus.getUser();
                 }
                 String s = getString(R.string.send_direct_to);
-                textOben.setText(s + toUser.getScreenName());
+                textOben.setText(s + " "+ toUser.getScreenName());
                 }
 			}
 		}
