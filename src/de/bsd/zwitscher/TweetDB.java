@@ -403,7 +403,7 @@ public class TweetDB {
         cv.put("id",id);
         cv.put("created_at", time);
         cv.put(ACCOUNT_ID,account);
-        cv.put("user_json",json);
+        cv.put("message_json",json);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.insert(TABLE_DIRECTS,null,cv);
