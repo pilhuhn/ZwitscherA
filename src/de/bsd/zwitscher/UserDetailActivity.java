@@ -166,7 +166,7 @@ public class UserDetailActivity extends Activity  {
     @SuppressWarnings("unused")
     public void addToList(View v) {
 
-        TweetDB tdb = new TweetDB(this);
+        TweetDB tdb = new TweetDB(this,0); // TODO correct account
 
         List<String> data = new ArrayList<String>();
         Set<Map.Entry<String, Integer>> userListsEntries;
@@ -192,7 +192,7 @@ public class UserDetailActivity extends Activity  {
             System.out.println("res : " + o);
 
 
-            TweetDB tdb = new TweetDB(this);
+            TweetDB tdb = new TweetDB(this,0); // TODO correct account
             Set<Map.Entry<String, Integer>> userListsEntries;
 
             int listId =-1;

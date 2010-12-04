@@ -16,11 +16,18 @@
     <string name="in_reply_to"> als Antwort auf </string>
     <string name="send_direct_to">Sende private Nachricht an </string>
     <string name="getting_tweets">Lade Tweets</string>
+    <string name="getting_conversation">Lade Konversation</string>
     <string name="follow_user">Benutzer folgen</string>
     <string name="unfollow_user">Benutzer nicht folgen</string>
     <string name="add">Hinzufügen</string>
     <string name="from">von</string>
     <string name="get_user_detail">Lade Benutzerdaten ...</string>
+    <string name="From">Von</string>
+    <string name="to">an</string>
+    <string name="please_sync_lists">Bitte synchronisieren Sie die Listen</string>
+    <string name="no_searches_found">Keine gespeicherten Suchen gefunden</string>
+
+
 
 
 
@@ -37,6 +44,8 @@
     <string name="prefs_pic_loading_descr">Netzwerkkonfiguration, die nötig ist, um Bilder zu laden.</string>
     <string name="prefs_pic_roaming">Roaming</string>
     <string name="prefs_pic_roaming_descr">Dürfen während des Roamings Bilder geladen werden?</string>
+    <string name="prefs_pictureService">Picture Service</string>
+    <string name="prefs_pictureService_descr">Choose a service for picture uploading</string>
     <!-- preferences -->
 
 
