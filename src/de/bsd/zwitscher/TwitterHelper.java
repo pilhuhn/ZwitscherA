@@ -336,6 +336,7 @@ public class TwitterHelper {
         } catch (TwitterException e) {
             updateResponse.setFailure();
             updateResponse.setMessage("Sending of direct tweet failed: " + e.getLocalizedMessage());
+            updateResponse.setOrigMessage(request.message);
         }
         return updateResponse;
     }

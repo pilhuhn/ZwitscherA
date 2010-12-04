@@ -6,9 +6,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.view.View;
+import android.text.Html;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 import twitter4j.StatusUpdate;
@@ -102,17 +103,22 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
         int icon = R.drawable.icon; // TODO create small version for status bar
         Notification notification = new Notification(icon,result.getUpdateType().toString() + " failed",System.currentTimeMillis());
 
-        Intent intent = new Intent(context,OneTweetActivity.class);
-        PendingIntent pintent = PendingIntent.getActivity(context,0,intent,0);
-
-        String text = result.getMessage() + "<br/>";
+        String head = "<b>" + result.getUpdateType() + " failed:</b> ";
+        String text =  result.getMessage() + "<br/>";
         if (result.getUpdateType()==UpdateType.UPDATE)
             text += result.getUpdate().getStatus();
+        if (result.getUpdateType()==UpdateType.DIRECT)
+            text += result.getOrigMessage();
 
-        notification.setLatestEventInfo(context,
-                result.getUpdateType() + " failed",
-                text,
-                pintent);
+        RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.error_layout);
+        //contentView.setImageViewResource(R.id.image, R.drawable.notification_image);
+        contentView.setTextViewText(R.id.error_head, Html.fromHtml(head));
+        contentView.setTextViewText(R.id.error_text, Html.fromHtml(text));
+        notification.contentView = contentView;
+
+        Intent intent = new Intent(context,LoginActivity.class);
+        PendingIntent pintent = PendingIntent.getActivity(context,0,intent,0);
+        notification.contentIntent =pintent;
 
         mNotificationManager.notify(1,notification); // TODO better id generation ?
     }
