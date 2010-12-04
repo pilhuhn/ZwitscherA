@@ -338,6 +338,7 @@ public class TweetDB {
         db.execSQL("DELETE FROM " + TABLE_STATUSES);
         db.execSQL("DELETE FROM " + TABLE_DIRECTS);
         db.execSQL("DELETE FROM " + TABLE_USERS);
+        db.execSQL("DELETE FROM " + TABLE_LAST_READ);
         db.close();
     }
 

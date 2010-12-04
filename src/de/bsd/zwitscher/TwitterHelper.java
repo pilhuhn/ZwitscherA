@@ -86,7 +86,10 @@ public class TwitterHelper {
 
 
     /**
-     * Return direct messages
+     * Return direct messages.
+     * The "fetch from the server" part is a bit tricky. as Twitter4J keeps
+     * the JSON representation of the objects in a ThreadLocal. So to obtain
+     * it, it must be accessed before the next call to twitter.
      *
      * @param fromDbOnly
      * @param paging
@@ -94,39 +97,66 @@ public class TwitterHelper {
      */
     public MetaList<DirectMessage> getDirectMessages(boolean fromDbOnly, Paging paging) {
 
-        Twitter twitter = getTwitter();
+       Twitter twitter = getTwitter();
 
-        List<DirectMessage> ret;
-        try {
-            ret = twitter.getDirectMessages(paging);
-            List<DirectMessage> ret2 = twitter.getSentDirectMessages(paging);
-            ret.addAll(ret2);
-        } catch (TwitterException e) {
-            Log.e("getDirects", "Got exception: " + e.getMessage());
-            ret = Collections.emptyList();
-        }
+       List<DirectMessage> ret;
+       List<DirectMessage> ret2 = new ArrayList<DirectMessage>();
 
-        //  persist directs
-       if (ret.size()>0) {
-          Collections.sort(ret,new Comparator<DirectMessage>() {
-             @Override
+       if (!fromDbOnly) {
+          // Get direct messages sent to us
+          try {
+             ret = twitter.getDirectMessages(paging);
+          } catch (TwitterException e) {
+             Log.e("getDirects", "Got exception: " + e.getMessage());
+             ret = Collections.emptyList();
+          }
+
+          long max = -1;
+          //  persist directs
+
+          if (ret.size()>0) {
+             for (DirectMessage msg : ret) {
+                persistDirects(msg);
+             }
+             if (ret.get(0).getId()>max)
+                max = ret.get(0).getId();
+
+             ret2.addAll(ret);
+          }
+
+          // get direct messages we sent
+          try {
+             ret = twitter.getSentDirectMessages(paging);
+          } catch (TwitterException e) {
+             Log.e("getDirects", "Got exception: " + e.getMessage());
+             ret = Collections.emptyList();
+          }
+          if (ret.size()>0) {
+             for (DirectMessage msg : ret) {
+                persistDirects(msg);
+             }
+             if (ret.get(0).getId()>max)
+                max = ret.get(0).getId();
+
+             ret2.addAll(ret);
+          }
+
+          // Now sort the two collections we've got to form a linear
+          // timeline.
+          Collections.sort(ret2,new Comparator<DirectMessage>() {
              public int compare(DirectMessage directMessage, DirectMessage directMessage1) {
                 return directMessage1.getId() - directMessage.getId();
              }
           });
-        for (DirectMessage msg : ret) {
-            persistDirects(msg);
-        }
 
 
-        tweetDB.updateOrInsertLastRead(-2,ret.get(0).getId());
-        }
+          tweetDB.updateOrInsertLastRead(-2,max);
+       }
+       int numDirects = ret2.size();
+       int filled = fillUpDirectsFromDb(ret2);
 
-        int numDirects = ret.size();
-        int filled = fillUpDirectsFromDb(ret);
-
-        MetaList<DirectMessage> result = new MetaList<DirectMessage>(ret,numDirects,filled);
-        return result;
+       MetaList<DirectMessage> result = new MetaList<DirectMessage>(ret2,numDirects,filled);
+       return result;
     }
 
 
