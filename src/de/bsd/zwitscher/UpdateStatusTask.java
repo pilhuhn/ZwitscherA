@@ -6,7 +6,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import twitter4j.StatusUpdate;
 
@@ -37,8 +40,9 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
     protected UpdateResponse doInBackground(UpdateRequest... requests) {
         TwitterHelper th = new TwitterHelper(context.getApplicationContext());
 
-        UpdateResponse ret;
         UpdateRequest request = requests[0];
+        UpdateResponse ret=null;
+
         switch (request.updateType) {
             case UPDATE:
                 ret = th.updateStatus(request);
@@ -52,6 +56,15 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
             case RETWEET:
                 ret = th.retweet(request);
                 break;
+            case UPLOAD_PIC:
+                if (request.picturePath!=null) {
+                    String url = th.postPicture(request.picturePath);
+                    if (url!=null) {
+                        ret = new UpdateResponse(request.updateType,request.view,url);
+                        ret.setSuccess();
+                    }
+                }
+                break;
             default:
                 throw new IllegalArgumentException("Update type not supported yet : " + request.updateType);
         }
@@ -61,6 +74,22 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
     protected void onPostExecute(UpdateResponse result) {
         if (progressBar!=null)
             progressBar.setVisibility(ProgressBar.INVISIBLE);
+
+        if (result.getUpdateType()==UpdateType.UPLOAD_PIC) {
+            TextView textView = (TextView) result.view;
+            CharSequence text = textView.getText();
+            text = result.getMessage() + " " + text;
+            textView.setText(text);
+
+        } else if (result.getUpdateType() == UpdateType.FAVORITE) {
+            ImageButton favoriteButton = (ImageButton) result.view;
+            if (result.status.isFavorited())
+                favoriteButton.setImageResource(R.drawable.favorite_on);
+            else
+                favoriteButton.setImageResource(R.drawable.favorite_off);
+        }
+
+
         if (result.isSuccess())
             Toast.makeText(context.getApplicationContext(), result.getMessage(), Toast.LENGTH_LONG).show();
         else

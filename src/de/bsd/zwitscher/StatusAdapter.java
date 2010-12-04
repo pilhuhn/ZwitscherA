@@ -1,40 +1,25 @@
-/*
- * RHQ Management Platform
- * Copyright (C) 2005-2009 Red Hat, Inc.
- * All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation version 2 of the License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- */
 package de.bsd.zwitscher;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.AsyncTask;
-import android.os.Debug;
-import android.text.Html;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import de.bsd.zwitscher.helper.NetworkHelper;
+import de.bsd.zwitscher.helper.PicHelper;
+import de.bsd.zwitscher.helper.SpannableBuilder;
+import de.bsd.zwitscher.helper.TriggerPictureDownloadTask;
+import twitter4j.DirectMessage;
 import twitter4j.Status;
+import twitter4j.TwitterResponse;
 import twitter4j.User;
 
-import java.text.DateFormat;
 import java.util.List;
 
 /**
@@ -43,93 +28,127 @@ import java.util.List;
  *
  * @author Heiko W. Rupp
  */
-class StatusAdapter<T extends Status> extends ArrayAdapter<Status> {
+class StatusAdapter<T extends TwitterResponse> extends ArrayAdapter<T> {
 
-    private static final String STRONG = "<b>";
-    private static final String STRONG_END = "</b>";
-    private List<Status> items;
+    private List<T> items;
     PicHelper ph;
     TwitterHelper th;
     private Context extContext;
+    boolean downloadImages;
 
-    public StatusAdapter(Context context, int textViewResourceId, List<Status> objects) {
+
+    public StatusAdapter(Context context, int textViewResourceId, List<T> objects) {
         super(context, textViewResourceId, objects);
         extContext = context;
         items = objects;
         ph = new PicHelper();
         th = new TwitterHelper(context);
+        downloadImages = new NetworkHelper(context).mayDownloadImages();
 
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View view = convertView; //= super.getView(position, convertView, parent);
-        if (view==null) {
+
+        ViewHolder viewHolder;
+//        Debug.startMethodTracing("sta");
+
+        // Use ViewHolder pattern to only inflate once
+        if (convertView ==null) {
             LayoutInflater li = (LayoutInflater) extContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = li.inflate(R.layout.list_item,null);
+            convertView = li.inflate(R.layout.tweet_list_item,null);
+
+            viewHolder = new ViewHolder();
+            viewHolder.iv = (ImageView) convertView.findViewById(R.id.ListImageView);
+            viewHolder.statusText = (TextView) convertView.findViewById(R.id.ListTextView);
+            viewHolder.userInfo = (TextView) convertView.findViewById(R.id.ListUserView);
+            viewHolder.timeClientInfo = (TextView) convertView.findViewById(R.id.ListTimeView);
+            convertView.setTag(viewHolder);
         }
-//Debug.startMethodTracing("sta");
+        else {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+
         if (position %2 == 0)
-            view.setBackgroundColor(Color.BLACK);
+            convertView.setBackgroundColor(Color.BLACK);
         else
-            view.setBackgroundColor(Color.DKGRAY);
+            convertView.setBackgroundColor(Color.DKGRAY);
 
-        Status status = items.get(position);
 
-        ImageView iv = (ImageView) view.findViewById(R.id.ListImageView);
-        TextView statusText = (TextView) view.findViewById(R.id.ListTextView);
-        TextView userInfo = (TextView) view.findViewById(R.id.ListUserView);
-        TextView timeClientInfo = (TextView) view.findViewById(R.id.ListTimeView);
-
+        T response = items.get(position);
         Bitmap bi;
-        String userName ;
-        if (status.getRetweetedStatus()==null) {
-            bi = ph.getBitMapForUserFromFile(status.getUser());
-            userName = STRONG + status.getUser().getName() + STRONG_END;
-            if (status.getInReplyToScreenName()!=null) {
-                userName += " in reply to " + STRONG + status.getInReplyToScreenName() + STRONG_END;
+
+        SpannableBuilder builder = new SpannableBuilder(extContext);
+        User userOnPicture;
+        String statusText;
+
+        if (response instanceof Status) {
+            Status status = (Status)response;
+            if (status.getRetweetedStatus()==null) {
+                userOnPicture =status.getUser();
+                builder.append(status.getUser().getName(), Typeface.BOLD);
+                if (status.getInReplyToScreenName()!=null) {
+                    builder.appendSpace();
+                    builder.append(R.string.in_reply_to,Typeface.NORMAL)
+                        .appendSpace()
+                        .append(status.getInReplyToScreenName(), Typeface.BOLD);
+                }
+            }
+            else {
+                userOnPicture = status.getRetweetedStatus().getUser();
+                builder.append(status.getRetweetedStatus().getUser().getName(),Typeface.BOLD)
+                    .appendSpace()
+                    .append(R.string.resent_by, Typeface.NORMAL)
+                    .appendSpace()
+                    .append(status.getUser().getName(), Typeface.BOLD);
+            }
+            statusText = status.getText();
+
+        }
+        else if (response instanceof DirectMessage) {
+            DirectMessage msg = (DirectMessage) response;
+            userOnPicture = msg.getSender();
+            statusText=msg.getText();
+            builder.append(R.string.From,Typeface.NORMAL)
+                .appendSpace()
+                .append(msg.getSender().getName(),Typeface.BOLD)
+                .appendSpace()
+                .append(R.string.to,Typeface.NORMAL)
+                .appendSpace()
+                .append(msg.getRecipient().getName(),Typeface.BOLD);
+        }
+        else
+            throw new IllegalArgumentException("Unknown type " + response);
+
+
+        bi = ph.getBitMapForUserFromFile(userOnPicture);
+        if (bi!=null) {
+            // TODO find an alternative for decoration of images, as this is expensive
+//            bi = ph.decorate(bi,extContext,status.isFavorited(),status.getRetweetedStatus()!=null);
+            viewHolder.iv.setImageBitmap(bi);
+        }
+        else {
+            // underlying convertView seems to be reused, so default image is not loaded when bi==null
+            viewHolder.iv.setImageBitmap(BitmapFactory.decodeResource(extContext.getResources(), R.drawable.user_unknown));
+            // Trigger fetching of user pic in background
+            if (downloadImages) {
+                new TriggerPictureDownloadTask().execute(userOnPicture);
             }
         }
-        else {
-            bi = ph.getBitMapForUserFromFile(status.getRetweetedStatus().getUser());
-            userName = STRONG + status.getRetweetedStatus().getUser().getName() + STRONG_END +
-                    " resent by " + STRONG + status.getUser().getName() + STRONG_END;
-        }
 
-        if (bi!=null) {
-            bi = ph.decorate(bi,extContext,status.isFavorited(),status.getRetweetedStatus()!=null);
-            iv.setImageBitmap(bi);
-        }
-        else {
-            // underlying view seems to be reused, so default image is not loaded when bi==null
-            iv.setImageBitmap(BitmapFactory.decodeResource(extContext.getResources(), R.drawable.user_unknown));
-            // Trigger fetching of user pic in background
-            if (status.getRetweetedStatus()==null)
-                new TriggerPictureDownloadTask().execute(status.getUser());
-            else
-                new TriggerPictureDownloadTask().execute(status.getRetweetedStatus().getUser());
-
-        }
-        userInfo.setText(Html.fromHtml(userName)); // TODO replace with something better
-//        userInfo.setText((userName));
-        statusText.setText(status.getText());
-
-        DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM);
-        String text = th.getStatusDate(status) ;
-        timeClientInfo.setText((text));
+        viewHolder.userInfo.setText(builder.toSpannableString());
+        viewHolder.statusText.setText(statusText);
+        String text = th.getStatusDate(response) ;
+        viewHolder.timeClientInfo.setText((text));
 //Debug.stopMethodTracing();
-        return view;
+        return convertView;
     }
 
-    private class TriggerPictureDownloadTask extends AsyncTask<User,Void,Void> {
-
-        @Override
-        protected Void doInBackground(User... users) {
-            User user = users[0];
-            PicHelper ph = new PicHelper();
-            ph.fetchUserPic(user);
-
-            return null;
-        }
+    static class ViewHolder {
+        ImageView iv;
+        TextView statusText;
+        TextView userInfo;
+        TextView timeClientInfo;
     }
+
 }

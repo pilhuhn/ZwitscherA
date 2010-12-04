@@ -1,6 +1,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:title="Reload" android:enabled="true" android:id="@+id/reload_item"></item>
-	<item android:title="Post" android:enabled="true" android:id="@+id/post_item"></item>
 	<item android:alphabeticShortcut="P"
 		  android:id="@+id/preferences"
 		  android:titleCondensed="Prefs"

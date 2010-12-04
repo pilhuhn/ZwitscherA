@@ -1,0 +1,28 @@
+<resources>
+    <string-array name="min_o_tweets_preference">
+        <item>1</item>
+        <item>2</item>
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="max_o_tweets_preference">
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="network_config">
+        <item>Toujours (WiFi)</item>
+        <item>3G (UMTS)</item>
+        <item>Edge</item>
+        <item>Gprs</item>
+        <item>Jamais</item>
+    </string-array>
+    <string-array name="network_config_vals">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+</resources>

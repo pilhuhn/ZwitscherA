@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import android.content.ComponentName;
-import android.content.Context;
 import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.UserList;
 
 import android.app.TabActivity;
@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TabHost;
+import twitter4j.json.DataObjectFactory;
 
 public class TabWidget extends TabActivity {
 
@@ -28,6 +29,7 @@ public class TabWidget extends TabActivity {
     ProgressBar pg;
     TextView titleTextBox;
     ComponentName sComponentName;
+    int accountId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,7 @@ public class TabWidget extends TabActivity {
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
 
+        accountId = 0; // TODO select correct account
 
 		Resources res = getResources();
 		tabHost = getTabHost();
@@ -49,7 +52,7 @@ public class TabWidget extends TabActivity {
         homeIntent.putExtra(LIST_ID, 0);
 
 		homeSpec = tabHost.newTabSpec("home")
-				.setIndicator("Home",res.getDrawable(R.drawable.home))
+				.setIndicator("Home",res.getDrawable(R.drawable.ic_tab_home))
 				.setContent(homeIntent);
 		tabHost.addTab(homeSpec);
 
@@ -57,38 +60,35 @@ public class TabWidget extends TabActivity {
 		mentionsIntent.putExtra(LIST_ID, -1);
 
 		homeSpec = tabHost.newTabSpec("mentions")
-				.setIndicator("Mentions",res.getDrawable(R.drawable.mentions))
+				.setIndicator("Mentions",res.getDrawable(R.drawable.ic_tab_mention))
 				.setContent(mentionsIntent);
 		tabHost.addTab(homeSpec);
 
         Intent directIntent = new Intent().setClass(this,TweetListActivity.class);
         directIntent.putExtra(LIST_ID, -2);
 		homeSpec = tabHost.newTabSpec("directs")
-				.setIndicator("Direct",res.getDrawable(R.drawable.direct))
+				.setIndicator("Direct",res.getDrawable(R.drawable.ic_tab_direct))
 				.setContent(directIntent);
 		tabHost.addTab(homeSpec);
 
+        Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
+        listsIntent.putExtra("list",0);
+        homeSpec = tabHost.newTabSpec("lists")
+                .setIndicator("Lists",res.getDrawable(R.drawable.ic_tab_list))
+                .setContent(listsIntent);
+        tabHost.addTab(homeSpec);
 
-  		TweetDB tdb = new TweetDB(getApplicationContext());
-  		Map<String, Integer> userLists = tdb.getLists();
-  		for (Entry<String, Integer> userList : userLists.entrySet()) {
-  			setUpTab(res, userList.getKey(),userList.getValue());
-		}
-		tabHost.setVerticalScrollBarEnabled(true);
+
+        Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
+        searchIntent.putExtra("list",1);
+        homeSpec = tabHost.newTabSpec("searches")
+                .setIndicator("Search")//,res.getDrawable(R.drawable.ic_tab_list))
+                .setContent(searchIntent);
+        tabHost.addTab(homeSpec);
+
 		tabHost.setCurrentTab(0); // Home tab, tabs start at 0
 
-	}
 
-	private void setUpTab(Resources res, String listName, Integer listId) {
-		TabHost.TabSpec spec;
-		Intent intent;
-		intent = new Intent().setClass(this,TweetListActivity.class);
-		intent.putExtra(LIST_ID, listId);
-
-		spec = tabHost.newTabSpec(listId.toString())
-		.setIndicator(listName,res.getDrawable(R.drawable.list))
-		.setContent(intent);
-		tabHost.addTab(spec);
 	}
 
 	@Override
@@ -103,13 +103,6 @@ public class TabWidget extends TabActivity {
 		Intent i;
 	    // Handle item selection
 	    switch (item.getItemId()) {
-	    case R.id.reload_item:
-	    	// Handled within TweetListActivity
-	    	break;
-	    case R.id.post_item:
-	    	i = new Intent(TabWidget.this, NewTweetActivity.class);
-	    	startActivity(i);
-	        break;
 	    case R.id.preferences:
 	    	i = new Intent(TabWidget.this, Preferences.class);
 			startActivity(i);
@@ -146,7 +139,7 @@ public class TabWidget extends TabActivity {
 	 */
 	private void syncLists() {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
-		TweetDB tdb = new TweetDB(getApplicationContext());
+        TweetDB tdb = new TweetDB(this,accountId);
 		List<UserList> userLists = th.getUserLists();
 		Map<String,Integer> storedLists = tdb.getLists();
 		// Check for lists to add
@@ -155,8 +148,7 @@ public class TabWidget extends TabActivity {
 				continue;
 			}
 			else {
-				tdb.addList(userList.getName(),userList.getId());
-				setUpTab(getResources(), userList.getName(), userList.getId());
+				tdb.addList(userList.getName(),userList.getId(), DataObjectFactory.getRawJSON(userList));
 			}
 		}
 		// check for outdated lists and remove them
@@ -172,27 +164,17 @@ public class TabWidget extends TabActivity {
 			}
 			if (!found) {
 				tdb.removeList(id);
-				needsReload = true;
-			}
-		}
-		if (needsReload) {
-			tabHost.setCurrentTab(0);
-			tabHost.clearAllTabs();
-			tabHost.addTab(homeSpec);
-			storedLists = tdb.getLists();
-			for (Entry<String, Integer> entry : storedLists.entrySet()) {
-				setUpTab(getResources(), entry.getKey(), entry.getValue());
 			}
 		}
 	}
 
     private void resetLastRead() {
-        TweetDB tb = new TweetDB(this);
+        TweetDB tb = new TweetDB(this,accountId);
         tb.resetLastRead();
     }
 
     private void cleanTweetDB() {
-        TweetDB tb = new TweetDB(this);
+        TweetDB tb = new TweetDB(this,accountId);
         tb.cleanTweets();
     }
 

@@ -9,6 +9,9 @@ import android.widget.*;
 import com.google.api.translate.Language;
 import com.google.api.translate.Translate;
 
+import de.bsd.zwitscher.helper.NetworkHelper;
+import de.bsd.zwitscher.helper.PicHelper;
+import twitter4j.Place;
 import twitter4j.Status;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -28,13 +31,21 @@ import java.io.BufferedInputStream;
 import java.net.URL;
 import java.util.*;
 
-public class OneTweetActivity extends Activity {
+/**
+ * This Activity displays one individual status.
+ * Layout definition is in res/layout/single_tweet
+ *
+ * @author Heiko W. Rupp
+ */
+public class OneTweetActivity extends Activity implements OnInitListener, OnUtteranceCompletedListener {
 
 	Context ctx = this;
 	Status status ;
     ImageView userPictureView;
     ProgressBar pg;
     ImageView thumbnailView;
+    boolean downloadPictures=false;
+    TextToSpeech tts;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +54,16 @@ public class OneTweetActivity extends Activity {
         requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 
 		setContentView(R.layout.single_tweet);
+        setupspeak();
 
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
 
         userPictureView = (ImageView) findViewById(R.id.UserPictureImageView);
         thumbnailView = (ImageView) findViewById(R.id.OTImageView);
+
+        NetworkHelper networkHelper = new NetworkHelper(this);
+        downloadPictures = networkHelper.mayDownloadImages();
 
 		Bundle bundle = getIntent().getExtras();
 		if (bundle!=null) {
@@ -65,22 +80,28 @@ public class OneTweetActivity extends Activity {
             new DownloadThumbnailTask().execute(status);
 
 			TextView tv01 = (TextView) findViewById(R.id.TextView01);
+            StringBuilder sb = new StringBuilder("<b>");
 			if (status.getRetweetedStatus()==null) {
-				tv01.setText(status.getUser().getName());
+                sb.append(status.getUser().getName());
+                sb.append(" (");
+                sb.append(status.getUser().getScreenName());
+                sb.append(")");
+                sb.append("</b>");
 			}
 			else {
-				StringBuilder sb = new StringBuilder("<strong>");
                 sb.append(status.getRetweetedStatus().getUser().getName());
 				sb.append(" (");
 				sb.append(status.getRetweetedStatus().getUser().getScreenName());
-				sb.append(" </strong>) retweeted by  <strong>");
+				sb.append(" )</b> ").append(getString(R.string.resent_by)).append(" <b>");
 				sb.append(status.getUser().getName());
-                sb.append("</strong>");
-				tv01.setText(Html.fromHtml(sb.toString()));
+                sb.append("</b>");
 			}
+            tv01.setText(Html.fromHtml(sb.toString()));
+
 			TextView mtv = (TextView) findViewById(R.id.MiscTextView);
 			if (status.getInReplyToScreenName()!=null) {
-				mtv.setText(Html.fromHtml("In reply to: <strong>" + status.getInReplyToScreenName() + "</strong>"));
+                String s = getString(R.string.in_reply_to);
+                mtv.setText(Html.fromHtml(s + " <b>" + status.getInReplyToScreenName() + "</b>"));
 			}
 			else {
 				mtv.setText("");
@@ -91,23 +112,55 @@ public class OneTweetActivity extends Activity {
 
             TextView timeCientView = (TextView)findViewById(R.id.TimeTextView);
             TwitterHelper th = new TwitterHelper(this);
-            String text = th.getStatusDate(status) + " via " + status.getSource();
+            String s = getString(R.string.via);
+            String text = th.getStatusDate(status) + s + status.getSource();
+            String from = getString(R.string.from);
+            if (status.getPlace()!=null) {
+                Place place = status.getPlace();
+                text += " " + from + " " + place.getFullName();
+            }
             timeCientView.setText(Html.fromHtml(text));
 
 
             // Update Button state depending on Status' properties
-			Button threadButton = (Button) findViewById(R.id.ThreadButton);
+			ImageButton threadButton = (ImageButton) findViewById(R.id.ThreadButton);
 			if (status.getInReplyToScreenName()==null) {
 				threadButton.setEnabled(false);
 			}
 
-			Button favoriteButton = (Button) findViewById(R.id.FavoriteButton);
+			ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
 			if (status.isFavorited())
-				favoriteButton.setText("Un-Favorite");
+				favoriteButton.setImageResource(R.drawable.favorite_on);
 
+            ImageButton translateButon = (ImageButton) findViewById(R.id.TranslateButton);
+            translateButon.setEnabled(networkHelper.isOnline());
 		}
 	}
 
+    /**
+     * Display display of the details of a user from pressing
+     * the user icon button.
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void displayUserDetail(View v) {
+        Intent i = new Intent(getApplicationContext(), UserDetailActivity.class);
+        User theUser;
+        if (status.getRetweetedStatus()==null) {
+            theUser = status.getUser();
+        } else {
+            theUser = status.getRetweetedStatus().getUser();
+        }
+        i.putExtra("userName", theUser.getName());
+        i.putExtra("userId",theUser.getId());
+        startActivity(i);
+    }
+
+    /**
+     * Trigger replying to the current status.
+     * @param v
+     */
+    @SuppressWarnings("unused")
 	public void reply(View v) {
 		Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
 		i.putExtra(getString(R.string.status), status);
@@ -116,6 +169,12 @@ public class OneTweetActivity extends Activity {
 
 	}
 
+    /**
+     * Trigger replying to all users mentioned via @xxx in the
+     * current status. Opens an editor Window first
+     * @param v
+     */
+    @SuppressWarnings("unused")
 	public void replyAll(View v) {
 		Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
 		i.putExtra(getString(R.string.status), status);
@@ -124,7 +183,11 @@ public class OneTweetActivity extends Activity {
 
 	}
 
-
+    /**
+     * Trigger a resent of the current status
+     * @param v
+     */
+    @SuppressWarnings("unused")
 	public void retweet(View v) {
         UpdateRequest request = new UpdateRequest(UpdateType.RETWEET);
         request.id = status.getId();
@@ -132,6 +195,12 @@ public class OneTweetActivity extends Activity {
 	}
 
 
+    /**
+     * Do the classical re-send thing by prefixing with 'RT'.
+     * Opens an editor window first.
+     * @param v
+     */
+    @SuppressWarnings("unused")
 	public void classicRetweet(View v) {
 		Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
 		i.putExtra(getString(R.string.status), status);
@@ -140,6 +209,12 @@ public class OneTweetActivity extends Activity {
 
 	}
 
+    /**
+     * Starts a view that shows the conversation around the current
+     * status.
+     * @param v
+     */
+    @SuppressWarnings("unused")
     public void threadView(View v) {
         TwitterHelper th = new TwitterHelper(ctx);
 
@@ -148,23 +223,30 @@ public class OneTweetActivity extends Activity {
         startActivity(i);
     }
 
+    /**
+     * Marks the current status as (non) favorite
+     * @param v
+     */
+    @SuppressWarnings("unused")
     public void favorite(View v) {
         TwitterHelper th = new TwitterHelper(ctx);
 
+        ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
+
         UpdateRequest request = new UpdateRequest(UpdateType.FAVORITE);
         request.status = status;
-        UpdateResponse response = th.favorite(request);
-        status = response.status;
-        // update button state
-        Button favoriteButton = (Button) findViewById(R.id.FavoriteButton);
-        if (status.isFavorited())
-            favoriteButton.setText("Un-favorite");
-        else
-            favoriteButton.setText("Favorite");
+        request.view = favoriteButton;
 
+        new UpdateStatusTask(this,pg).execute(request);
 
     }
 
+    /**
+     * Start sending a direct message to the user that sent this
+     * status.
+     * @param v
+     */
+    @SuppressWarnings("unused")
     public void directMessage(View v) {
         Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
         i.putExtra(getString(R.string.status), status);
@@ -174,31 +256,61 @@ public class OneTweetActivity extends Activity {
     }
 
 
+    //////////////// speak related stuff ////////////////////
 
-	public void speak(View v) {
-		TextToSpeech tts = new TextToSpeech(getApplicationContext(),new OnInitListener() {
+    @Override
+    public void onInit(int status) {
+        String statusString = status == 0 ? "Success" : "Failure";
+        System.out.println("speak"+" onInit " + statusString);
+    }
 
-			@Override
-			public void onInit(int status) {
-				Log.i("speak","onInit " + status);
+    @Override
+    public void onUtteranceCompleted(String utteranceId) {
+        Log.i("speak", "Utterance done: " + utteranceId);
 
-			}
+    }
 
-		});
+    /**
+     * Setup speak just in case we may need it.
+     * If directly called from within speak() it will not work
+     * because the onInit() listener is no ready early enough
+     */
+	public void setupspeak() {
+
+		tts = new TextToSpeech(this,this);
         tts.setLanguage(Locale.US);
-		tts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
+    }
 
-			@Override
-			public void onUtteranceCompleted(String utteranceId) {
-				Log.i("speak","Utterance done");
+    /**
+     * Speak the current status via TTS
+     */
+    public void speak(View v)
+    {
+        int res = tts.setOnUtteranceCompletedListener(this);
+        if (res==TextToSpeech.ERROR) {
+            Log.e("1TA", "Failed to set on utterance listener");
+        }
 
-			}
-		});
-		tts.speak(status.getText(), TextToSpeech.QUEUE_ADD, null);
+        HashMap<String, String> ttsParams = new HashMap<String, String>();
+		ttsParams.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "tweet_status_msg" + status.getUser().getScreenName());
+		tts.speak(status.getText(), TextToSpeech.QUEUE_FLUSH, ttsParams);
 
 	}
 
+    private void checkforSpeechServices() {
+		Intent checkIntent = new Intent();
+		checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+		startActivityForResult(checkIntent, 1);
 
+    }
+
+    //////////////// speak related stuff end ////////////////////
+
+    /**
+     * Translate the current status by calling Google translate
+     * @param v
+     */
+    @SuppressWarnings("unused")
 	public void translate(View v) {
 		Translate.setHttpReferrer("http://bsd.de/zwitscher");
 		try {
@@ -222,6 +334,24 @@ public class OneTweetActivity extends Activity {
 		}
 	}
 
+    /**
+     * Finishes this screen and returns to the list of statuses
+     * @param v
+     */
+    @SuppressWarnings("unused")
+	public void done(View v) {
+        tts.shutdown();
+		finish();
+	}
+
+
+    /**
+     * Load thumbnails of linked images if the url in the status is recognized
+     * as an image service
+     * @param status Status to analyze
+     * @return Bitmap to display
+     * @todo Support multiple images in one status
+     */
     private Bitmap loadThumbnail(Status status) {
         URL[] urlArray = status.getURLs();
         Set<String> urls = new HashSet<String>();
@@ -280,9 +410,6 @@ public class OneTweetActivity extends Activity {
     }
 
 
-	public void done(View v) {
-		finish();
-	}
 
     /**
      * Background task to download the user profile images.
@@ -299,7 +426,11 @@ public class OneTweetActivity extends Activity {
 
             User user = users[0];
             PicHelper picHelper = new PicHelper();
-            Bitmap bi = picHelper.fetchUserPic(user);
+            Bitmap bi = null;
+            if (downloadPictures)
+                bi = picHelper.fetchUserPic(user);
+            else
+                bi = picHelper.getBitMapForUserFromFile(user);
             return bi;
         }
 
@@ -311,11 +442,16 @@ public class OneTweetActivity extends Activity {
         }
     }
 
+    /**
+     * Background task to download the thumbnails of linked images
+     */
     private class DownloadThumbnailTask extends AsyncTask<Status,Void,Bitmap> {
 
         @Override
         protected Bitmap doInBackground(twitter4j.Status... statuses) {
-            Bitmap b = loadThumbnail(statuses[0]);
+            Bitmap b=null;
+            if (downloadPictures)
+                b = loadThumbnail(statuses[0]);
             return b;
         }
 

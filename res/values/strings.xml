@@ -15,4 +15,44 @@
 <string name="list">list</string>
 <string name="direct">Direct</string>
 <string name="mentions">mentions</string>
+    <string name="location">Location:</string>
+    <string name="geo">Geo?</string>
+    <string name="web">Web:</string>
+    <string name="tweet_count">Tweet count:</string>
+    <string name="follower_count">Follower count:</string>
+    <string name="following_count">Following count:</string>
+    <string name="listed_count">Listed count:</string>
+    <string name="resent_by"> resent by </string>
+    <string name="in_reply_to"> in reply to </string>
+    <string name="via">" via "</string>
+    <string name="send_direct_to">Sending direct message to </string>
+    <string name="getting_tweets">Getting tweets</string>
+    <string name="getting_conversation">Getting conversation</string>
+    <string name="follow_user">Follow user</string>
+    <string name="unfollow_user">Unfollow user</string>
+    <string name="add">Add</string>
+    <string name="from">from</string>
+    <string name="get_user_detail">Getting user details ...</string>
+    <string name="From">From</string>
+    <string name="to">to</string>
+    <string name="please_sync_lists">Please sync lists</string>
+    <string name="no_searches_found">No saved searches found</string>
+
+
+    <!-- preferences -->
+    <string name="prefs_location_enabled">Location enabled</string>
+    <string name="prefs_location_enabled_descr">Shall Zwitscher add location to status updates?</string>
+    <string name="prefs_filter">Filter</string>
+    <string name="prefs_filter_descr">Provide Expressions, separated by Comma to filter tweets</string>
+    <string name="prefs_min_old">Min old tweets</string>
+    <string name="prefs_min_old_descr">Minumum of old tweets to display after a reload with new tweets</string>
+    <string name="prefs_max_old">Default old tweets</string>
+    <string name="prefs_max_old_descr">Number of old tweets to display when there are no new tweets on the server</string>
+    <string name="prefs_pic_loading">Picture loading</string>
+    <string name="prefs_pic_loading_descr">Network configuration required for picture loading</string>
+    <string name="prefs_pic_roaming">Roaming</string>
+    <string name="prefs_pic_roaming_descr">Allow downloading images when Roaming</string>
+    <string name="prefs_pictureService">Picture Service</string>
+    <string name="prefs_pictureService_descr">Choose a service for picture uploading</string>
+    <!-- preferences -->
 </resources>
