@@ -35,6 +35,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         OnItemClickListener, OnItemLongClickListener {
 
     List<Status> statuses;
+    List<DirectMessage> directs;
     Bundle intentInfo;
     TweetListActivity thisActivity;
     ProgressBar pg;
@@ -118,9 +119,19 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
      */
     public void onItemClick(AdapterView<?> parent, View view,
             int position, long id) {
-        Intent i = new Intent(parent.getContext(),OneTweetActivity.class);
-        i.putExtra(getString(R.string.status), statuses.get(position)); //TODO directs
-        startActivity(i);
+
+        if (statuses!=null) {
+         Intent i = new Intent(parent.getContext(),OneTweetActivity.class);
+         i.putExtra(getString(R.string.status), statuses.get(position));
+         startActivity(i);
+        }
+        else {
+           Intent i = new Intent(parent.getContext(), NewTweetActivity.class);
+           i.putExtra("user",directs.get(position).getSender());
+           i.putExtra("op",getString(R.string.direct));
+           startActivity(i);
+        }
+
 
     }
 
@@ -137,8 +148,14 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             int position, long id) {
         Log.i("TLA","Long click, pos=" + position + ",id="+id);
         Intent i = new Intent(parent.getContext(), NewTweetActivity.class);
-        i.putExtra(getString(R.string.status), statuses.get(position)); //TODO directs
-        i.putExtra("op",getString(R.string.reply));
+        if (statuses!=null) {
+           i.putExtra(getString(R.string.status), statuses.get(position));
+           i.putExtra("op",getString(R.string.reply));
+        }
+        else if (directs!=null) {
+         i.putExtra("user",directs.get(position).getSender());
+         i.putExtra("op",getString(R.string.direct));
+        }
         startActivity(i);
 
         return true; // We've consumed the long click
@@ -218,6 +235,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
 
         messages = th.getDirectMessages(fromDbOnly, paging);
+        directs = messages.getList();
 
         return messages;
     }

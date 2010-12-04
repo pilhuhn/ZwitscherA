@@ -258,13 +258,11 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     //////////////// speak related stuff ////////////////////
 
-    @Override
     public void onInit(int status) {
         String statusString = status == 0 ? "Success" : "Failure";
         System.out.println("speak"+" onInit " + statusString);
     }
 
-    @Override
     public void onUtteranceCompleted(String utteranceId) {
         Log.i("speak", "Utterance done: " + utteranceId);
 
@@ -284,6 +282,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Speak the current status via TTS
      */
+    @SuppressWarnings("unused")
     public void speak(View v)
     {
         int res = tts.setOnUtteranceCompletedListener(this);
@@ -297,12 +296,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
 	}
 
-    private void checkforSpeechServices() {
-		Intent checkIntent = new Intent();
-		checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-		startActivityForResult(checkIntent, 1);
-
-    }
 
     //////////////// speak related stuff end ////////////////////
 
@@ -320,7 +313,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 			builder.setMessage(result);
 			builder.setTitle("Translation result");
 			builder.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 				}

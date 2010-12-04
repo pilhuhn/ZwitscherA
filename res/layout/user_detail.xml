@@ -110,6 +110,14 @@
                 android:layout_gravity="right"
                 android:enabled="false"
             />
+        <ImageButton android:id="@+id/DirectButton"
+                android:layout_below="@id/ReplyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/ThreadButton"
+                android:onClick="directMessage"
+                android:src="@drawable/direct_button"
+                android:text="Direct"/>
     </LinearLayout>
 
 </LinearLayout>

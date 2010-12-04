@@ -338,6 +338,7 @@ public class TweetDB {
         db.execSQL("DELETE FROM " + TABLE_STATUSES);
         db.execSQL("DELETE FROM " + TABLE_DIRECTS);
         db.execSQL("DELETE FROM " + TABLE_USERS);
+        db.execSQL("DELETE FROM " + TABLE_LAST_READ);
         db.close();
     }
 
@@ -403,7 +404,7 @@ public class TweetDB {
         cv.put("id",id);
         cv.put("created_at", time);
         cv.put(ACCOUNT_ID,account);
-        cv.put("user_json",json);
+        cv.put("message_json",json);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.insert(TABLE_DIRECTS,null,cv);
