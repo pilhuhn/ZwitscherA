@@ -144,6 +144,20 @@ public class UserDetailActivity extends Activity  {
         finish();
     }
 
+   /**
+    * Allow sending a direct message to the user.
+    * Calles from the direct button.
+    * @todo check if he follows us and thus sending is possible at all.
+    * @param v
+    */
+    @SuppressWarnings("unused")
+    public void directMessage(View v) {
+       Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
+       i.putExtra("user",theUser);
+       i.putExtra("op", getString(R.string.direct));
+       startActivity(i);
+
+    }
     /**
      * Called from the followUser button
      * @param v

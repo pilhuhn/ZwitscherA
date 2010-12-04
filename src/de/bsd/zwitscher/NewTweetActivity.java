@@ -53,14 +53,14 @@ public class NewTweetActivity extends Activity {
 
 		Bundle bundle = getIntent().getExtras();
 		if (bundle!=null) {
-			origStatus = (Status) bundle.get("status");
-			Log.i("Replying..", "Orig is " + origStatus);
 			TextView textOben = (TextView) findViewById(R.id.textOben);
 
 			String op = (String) bundle.get("op");
+         User directUser = (User) bundle.get("user"); // set when coming from user detail view
 			if (op!=null) {
-                boolean isDirect = op.equals(getString(R.string.direct));
-                if (op.equals(getString(R.string.reply))) {
+            origStatus = (Status) bundle.get("status");
+            Log.i("Replying..", "Orig is " + origStatus);
+             if (op.equals(getString(R.string.reply))) {
                     textOben.setText(origStatus.getText());
 					edittext.setText("@"+origStatus.getUser().getScreenName()+" ");
 				} else if (op.equals(getString(R.string.replyall))) {
@@ -83,10 +83,15 @@ public class NewTweetActivity extends Activity {
 					String msg = "RT @" + origStatus.getUser().getScreenName() + " ";
 					msg = msg + origStatus.getText();
 					edittext.setText(msg); // limit to 140 chars is done by the edittext via maxLength attribute
-				} else if (isDirect) {
-                    toUser = origStatus.getUser();
-                    String s = getString(R.string.send_direct_to);
-                    textOben.setText(s + toUser.getScreenName());
+				} else if (op.equals(getString(R.string.direct))) {
+
+                if (directUser!=null)
+                  toUser = directUser;
+                else if (origStatus!=null) {
+                  toUser = origStatus.getUser();
+                }
+                String s = getString(R.string.send_direct_to);
+                textOben.setText(s + toUser.getScreenName());
                 }
 			}
 		}
