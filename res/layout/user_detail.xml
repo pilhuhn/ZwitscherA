@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
+
+    <TextView android:id="@+id/UserName"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:textSize="16dp"
+              />
+
+    <ImageView android:layout_width="80px"
+                android:layout_height="80px"
+                android:src="@drawable/user_unknown"
+                android:scaleType="fitXY"
+                android:padding="4px"
+                android:id="@+id/UserPictureImageView"/>
+
+
+    <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="1"
+            android:shrinkColumns="1"
+            >
+        <TableRow>
+            <TextView android:text="@string/location"
+                      android:layout_gravity="left"
+                    />
+            <TextView android:id="@+id/userDetail_location"
+                    />
+        </TableRow>
+        <TableRow>
+            <TextView android:text="@string/web"
+                      android:layout_gravity="left"
+                    />
+            <TextView android:id="@+id/userDetail_web"
+                      android:autoLink="web"
+                    />
+        </TableRow>
+        <TableRow>
+            <TextView android:text="Bio:"
+                      android:layout_gravity="left"
+                    />
+            <TextView android:id="@+id/userDetail_bio"
+
+                    />
+        </TableRow>
+        <TableRow>
+            <TextView android:text="@string/tweet_count"
+                      android:layout_gravity="left"
+                    />
+            <TextView android:id="@+id/userDetail_tweetCount"
+                    />
+        </TableRow>
+        <TableRow>
+
+            <TextView android:text="@string/follower_count"
+                      android:layout_gravity="left"
+                    />
+            <TextView android:id="@+id/userDetail_followerCount"
+                    />
+        </TableRow>
+        <TableRow>
+
+            <TextView android:text="@string/following_count"
+                      android:layout_gravity="left"
+                    />
+            <TextView android:id="@+id/userDetail_followingCount"
+                    />
+        </TableRow>
+        <TableRow>
+
+            <TextView android:text="@string/listed_count"
+                      android:layout_gravity="left"
+                    />
+            <TextView android:id="@+id/userDetail_listedCount"
+                    />
+        </TableRow>
+    </TableLayout>
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:orientation="horizontal"
+        >
+        <ImageButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="left"
+            android:onClick="done"
+            android:src="@drawable/back_button"
+            />
+        <Button android:id="@+id/userDetail_follow_button"
+                android:text="@string/follow_user"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="right"
+                android:onClick="followUser"
+                android:enabled="false"
+                />
+        <ImageButton
+                android:id="@+id/userDetail_addListButton"
+                android:src="@drawable/add_list"
+                android:onClick="addToList"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="right"
+                android:enabled="false"
+            />
+    </LinearLayout>
+
+</LinearLayout>

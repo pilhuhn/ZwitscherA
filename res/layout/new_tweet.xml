@@ -9,6 +9,7 @@
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:text="@string/hello"
+        android:padding="5dp"
 	    />
 	<EditText
         android:id="@+id/edittext"
@@ -29,29 +30,49 @@
     	android:minEms="3"
     />
 
-	<Button android:id="@+id/TweetButton"
-			android:text="@string/TweetButton"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_below="@id/CharCount"
-			android:layout_alignParentRight="true"
-		/>
+    <ImageButton
+        android:id="@+id/new_tweet_back_button"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="left"
+        android:onClick="done"
+        android:src="@drawable/back_button"
+        android:layout_below="@id/CharCount"
+            />
 
 	<Button android:id="@+id/ClearButton"
 			android:text="@string/ClearButton"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_alignBaseline="@id/TweetButton"
+            android:layout_below="@id/CharCount"
+            android:layout_toRightOf="@id/new_tweet_back_button"
 		/>
 
 	<CheckBox android:id="@+id/GeoCheckBox"
 			  android:checked="false"
 			  android:enabled="false"
-			  android:text="Geo?"
+			  android:text="@string/geo"
 			  android:layout_below="@id/CharCount"
 			  android:layout_width="128px"
 			  android:layout_height="128px"
-			  android:layout_alignBaseline="@id/TweetButton"
+			  android:layout_alignBaseline="@id/ClearButton"
 			  android:layout_toRightOf="@id/ClearButton"/>
+
+    <ImageButton android:id="@+id/nt_CameraButton"
+                 android:src="@drawable/camera"
+                 android:onClick="takePicture"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_below="@id/CharCount"
+			     android:layout_toRightOf="@id/GeoCheckBox"
+                 />
+    <Button android:id="@+id/TweetButton"
+            android:text="@string/TweetButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/nt_CameraButton"
+            android:layout_alignParentRight="true"
+        />
+
 
 </RelativeLayout>

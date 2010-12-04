@@ -11,4 +11,26 @@
         <item>10</item>
         <item>20</item>
     </string-array>
+    <string-array name="network_config">
+        <item>Always (WiFi)</item>
+        <item>3G (UMTS)</item>
+        <item>Edge</item>
+        <item>Gprs</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="network_config_vals">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    <string-array name="pictureService">
+        <item>YFrog</item>
+        <item>TwitPic</item>
+    </string-array>
+    <string-array name="pictureServiceVals">
+        <item>yfrog</item>
+        <item>twitpic</item>
+    </string-array>
 </resources>

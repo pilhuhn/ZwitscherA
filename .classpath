@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="lib" path="libs/twitter4j-core-2.1.4.jar"/>
+	<classpathentry kind="lib" path="libs/twitter4j-core.jar"/>
 	<classpathentry kind="lib" path="libs/google-api-translate-java-0.92.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

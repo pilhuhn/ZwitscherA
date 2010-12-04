@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.bsd.zwitscher"
-          android:versionName="Tick"
-          android:versionCode="30"
+          android:versionName="0.41"
+          android:versionCode="41"
           >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application android:icon="@drawable/icon" android:label="Zwitscher"
     			android:debuggable="true"  android:allowBackup="true"
@@ -37,6 +38,9 @@
 
 
         <activity android:name=".ThreadListActivity"/>
+        <activity android:name=".UserDetailActivity"/>
+        <activity android:name=".ListOfListsActivity"/>
+        <activity android:name=".MultiSelectListActivity"/>
 
     </application>
 
