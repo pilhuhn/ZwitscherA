@@ -20,6 +20,7 @@ import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.DirectMessage;
 import twitter4j.Paging;
 import twitter4j.Status;
+import twitter4j.Tweet;
 
 /**
  * Show the list of tweets.
@@ -36,6 +37,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
     List<Status> statuses;
     List<DirectMessage> directs;
+    List<Tweet> tweets;
     Bundle intentInfo;
     TweetListActivity thisActivity;
     ProgressBar pg;
@@ -231,7 +233,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         long last = tdb.getLastRead(-2);
         Paging paging = new Paging();
         if (last>-1)
-         paging.setSinceId(last);
+            paging.setSinceId(last);
 
 
         messages = th.getDirectMessages(fromDbOnly, paging);
@@ -240,6 +242,18 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         return messages;
     }
 
+    private MetaList getSavedSearchFromTwitter(int searchId, boolean fromDbOnly) {
+        MetaList<Tweet> messages;
+
+        Paging paging = new Paging();
+        paging.setCount(20);
+
+        messages = th.getSavedSearchesTweets(searchId, fromDbOnly,paging);
+
+        tweets = messages.getList();
+
+        return messages;
+    }
 
     /**
      * Called from the reload button
@@ -344,20 +358,25 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
 
 		@Override
-		protected MetaList<twitter4j.Status> doInBackground(Boolean... params) {
+		protected MetaList doInBackground(Boolean... params) {
             fromDbOnly = params[0];
 	        MetaList data;
-            if (list_id!=-2)
+            if (list_id>-2)
                 data = getTimlinesFromTwitter(fromDbOnly);
-            else
+            else if (list_id==-2)
                 data = getDirectsFromTwitter(fromDbOnly);
-            Log.i("GTLTask", "got " + data.toString());
+            else // list id < -2 ==> saved search
+                data = getSavedSearchFromTwitter(-list_id,fromDbOnly);
 	        return data;
 		}
 
 		@Override
 		protected void onPostExecute(MetaList result) {
-	        setListAdapter(new StatusAdapter(thisActivity, R.layout.tweet_list_item, result.getList()));
+            if (list_id<-2)
+	            setListAdapter(new TweetAdapter(thisActivity, R.layout.tweet_list_item, result.getList()));
+            else
+	            setListAdapter(new StatusAdapter(thisActivity, R.layout.tweet_list_item, result.getList()));
+
             if (pg!=null)
                 pg.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)

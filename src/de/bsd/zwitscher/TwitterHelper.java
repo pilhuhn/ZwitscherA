@@ -713,4 +713,28 @@ Log.d("FillUp","Return: " + i);
         }
         return users;
     }
+
+    public MetaList<Tweet> getSavedSearchesTweets(int searchId, boolean fromDbOnly, Paging paging) {
+        Twitter twitter = getTwitter();
+
+        List<SavedSearch> searches = getSavedSearches();
+        for (SavedSearch search : searches) {
+            if (search.getId()==searchId) {
+                String queryString = search.getQuery();
+                Query query = new Query(queryString); // TODO paging - probably not needed as default is 15
+                   // TODO set some restriction like language or such
+                try {
+                    QueryResult queryResult = twitter.search(query);
+                    List<Tweet> tweets = queryResult.getTweets();
+                    MetaList metaList = new MetaList(tweets,tweets.size(),0);
+                    return metaList;
+                } catch (TwitterException e) {
+                    e.printStackTrace();  // TODO: Customise this generated block
+                    return new MetaList<Tweet>();
+                }
+            }
+        }
+
+        return null;  // TODO: Customise this generated block
+    }
 }

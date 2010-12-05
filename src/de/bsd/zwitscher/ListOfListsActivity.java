@@ -3,6 +3,7 @@ package de.bsd.zwitscher;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -106,7 +107,11 @@ public class ListOfListsActivity extends ListActivity {
             List<SavedSearch> searches = th.getSavedSearches();
             for (SavedSearch search : searches) {
                 if (text.equals(search.getName())) {
-                    Toast.makeText(this,"Not yet implemented", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent().setClass(this,TweetListActivity.class);
+                    intent.putExtra(TabWidget.LIST_ID, (-search.getId()));
+                    Log.d("ListsOfLists", "Saved search with id " + search.getId());
+
+                    startActivity(intent);
                 }
             }
         }
