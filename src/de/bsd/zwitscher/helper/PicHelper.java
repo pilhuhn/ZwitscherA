@@ -145,7 +145,10 @@ public class PicHelper {
             return null;
 
         String username = user.getScreenName();
-        Log.d("getBitMapForUserFromFile","user = " +username);
+        return getBitMapForScreenNameFromFile(username);
+    }
+
+    public Bitmap getBitMapForScreenNameFromFile(String username) {
         try {
             if (externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
                 File iconFile = getPictureFileForUser(username);
@@ -156,12 +159,10 @@ public class PicHelper {
             }
         }
         catch (Exception e) {
-            Log.w("getBitMapForUserFromFile", "Picture for " + username + " not found: " + e.getMessage());
             return null;
         }
         return null;
     }
-
 
     /**
      * Locate the file for the passed screen name

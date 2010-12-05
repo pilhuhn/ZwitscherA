@@ -79,7 +79,6 @@ class TweetAdapter<T extends Tweet> extends ArrayAdapter<T> {
         User userOnPicture=null;
         String statusText;
 
-//        userOnPicture = tweet.getUser();
         builder.append(tweet.getFromUser(), Typeface.BOLD);
         if (tweet.getToUser()!=null) {
             builder.appendSpace();
@@ -91,7 +90,7 @@ class TweetAdapter<T extends Tweet> extends ArrayAdapter<T> {
 
 
 
-        bi = ph.getBitMapForUserFromFile(userOnPicture);
+        bi = ph.getBitMapForScreenNameFromFile(tweet.getFromUser());
         if (bi!=null) {
             viewHolder.iv.setImageBitmap(bi);
         }

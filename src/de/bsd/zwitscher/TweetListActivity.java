@@ -127,11 +127,13 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
          i.putExtra(getString(R.string.status), statuses.get(position));
          startActivity(i);
         }
-        else {
+        else if (directs!=null) {
            Intent i = new Intent(parent.getContext(), NewTweetActivity.class);
            i.putExtra("user",directs.get(position).getSender());
            i.putExtra("op",getString(R.string.direct));
            startActivity(i);
+        } else {
+            // Tweets; TODO
         }
 
 
@@ -153,12 +155,16 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         if (statuses!=null) {
            i.putExtra(getString(R.string.status), statuses.get(position));
            i.putExtra("op",getString(R.string.reply));
+           startActivity(i);
         }
         else if (directs!=null) {
          i.putExtra("user",directs.get(position).getSender());
          i.putExtra("op",getString(R.string.direct));
+         startActivity(i);
+        } else {
+            // Tweets TODO
         }
-        startActivity(i);
+
 
         return true; // We've consumed the long click
     }
