@@ -177,7 +177,7 @@ public class TwitterHelper {
         return ret;
     }
 
-    private List<DirectMessage> getDirectsFromDb(int sinceId, int num) {
+    public List<DirectMessage> getDirectsFromDb(int sinceId, int num) {
         List<DirectMessage> ret = new ArrayList<DirectMessage>();
         List<String> responses = tweetDB.getDirectsOlderThan(sinceId,num);
         for (String json : responses) {

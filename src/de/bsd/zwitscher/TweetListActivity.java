@@ -299,19 +299,27 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             if (adapter instanceof StatusAdapter) {
                 StatusAdapter sta = (StatusAdapter) adapter;
                 if (totalCount>0) {
-                    if (sta.getItem(totalCount-1) instanceof  DirectMessage) // TODO directs
-                        return;
-
-                    Status last = (Status) sta.getItem(totalCount-1);
-
                     TwitterHelper th = new TwitterHelper(thisActivity);
-                    List<Status> newStatuses = th.getStatuesFromDb(last.getId(),7,list_id);
-
+                    Object item = sta.getItem(totalCount - 1);
                     int i = 0;
-                    for (Status status : newStatuses ) {
-                        sta.insert(status,totalCount+i);
-                        statuses.add(status);
-                        i++;
+                    if (item instanceof  DirectMessage) {
+                        DirectMessage message = (DirectMessage) item;
+
+                        List<DirectMessage> messages = th.getDirectsFromDb(message.getId(),7);
+                        for (DirectMessage direct : messages) {
+                            sta.insert(direct,totalCount+i);
+                            directs.add(direct);
+                            i++;
+                        }
+                    } else if (item instanceof Status) {
+                        Status last = (Status) item;
+
+                        List<Status> newStatuses = th.getStatuesFromDb(last.getId(),7,list_id);
+                        for (Status status : newStatuses ) {
+                            sta.insert(status,totalCount+i);
+                            statuses.add(status);
+                            i++;
+                        }
                     }
                 }
             }
