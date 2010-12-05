@@ -78,9 +78,10 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
         if (result.getUpdateType()==UpdateType.UPLOAD_PIC) {
             TextView textView = (TextView) result.view;
-            CharSequence text = textView.getText();
-            text = result.getMessage() + " " + text;
-            textView.setText(text);
+            if (textView.getText().length()==0)
+                textView.setText(result.getMessage());
+            else
+                textView.append(" " + result.getMessage());
 
         } else if (result.getUpdateType() == UpdateType.FAVORITE) {
             ImageButton favoriteButton = (ImageButton) result.view;

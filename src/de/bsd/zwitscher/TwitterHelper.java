@@ -699,4 +699,18 @@ Log.d("FillUp","Return: " + i);
 
         return searches;  // TODO: Customise this generated block
     }
+
+    public List<User> getUsersFromDb() {
+        List<String> jsons = tweetDB.getUsers();
+        List<User> users = new ArrayList<User>(jsons.size());
+        for (String json : jsons) {
+            try {
+                User user = DataObjectFactory.createUser(json);
+                users.add(user);
+            } catch (TwitterException e) {
+                e.printStackTrace();  // TODO: Customise this generated block
+            }
+        }
+        return users;
+    }
 }

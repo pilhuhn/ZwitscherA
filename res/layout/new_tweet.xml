@@ -66,6 +66,13 @@
                  android:layout_below="@id/CharCount"
 			     android:layout_toRightOf="@id/GeoCheckBox"
                  />
+    <ImageButton android:src="@drawable/user_unknown"
+                 android:onClick="selectUser"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_below="@id/CharCount"
+                 android:layout_toRightOf="@id/nt_CameraButton"
+                 />
     <Button android:id="@+id/TweetButton"
             android:text="@string/TweetButton"
             android:layout_width="wrap_content"

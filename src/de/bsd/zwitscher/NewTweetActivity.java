@@ -1,6 +1,10 @@
 package de.bsd.zwitscher;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import android.content.Context;
@@ -8,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.preference.PreferenceManager;
 import android.text.Editable;
@@ -25,7 +30,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import twitter4j.User;
 
-public class NewTweetActivity extends Activity {
+public class NewTweetActivity extends Activity implements LocationListener {
 
 	EditText edittext;
 	Status origStatus;
@@ -34,6 +39,7 @@ public class NewTweetActivity extends Activity {
     User toUser = null;
     TextView charCountView;
     String picturePath;
+    LocationManager locationManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +107,12 @@ public class NewTweetActivity extends Activity {
 		if (locationEnabled) {
 			box.setEnabled(true);
 			box.setChecked(true);
+
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1,1,this);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1,1,this);
+
+
 		}
 
         // Add a listener to count the text length.
@@ -154,6 +166,7 @@ public class NewTweetActivity extends Activity {
                 else
                     direct(toUser,edittext.getText().toString());
 	        	origStatus=null;
+                switchOffLocationUpdates();
 	        	finish();
 
 			}
@@ -235,6 +248,32 @@ public class NewTweetActivity extends Activity {
     }
 
     /**
+     * Trigger a list of usernames to pick one from and to insert
+     * into the tweet
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void selectUser(View v) {
+
+        TwitterHelper th = new TwitterHelper(this);
+        List<User> users = th.getUsersFromDb();
+        List<String> data = new ArrayList<String>(users.size());
+
+        for (User user : users) {
+            String item = user.getScreenName() + ", " + user.getName();
+            data.add(item);
+        }
+
+        Intent intent = new Intent(this,MultiSelectListActivity.class);
+        intent.putStringArrayListExtra("data", (ArrayList<String>) data);
+        intent.putExtra("mode","single");
+
+        startActivityForResult(intent, 2);
+
+    }
+
+
+    /**
      * Called from the Back button to finish (abort) the activity
      * @param v
      */
@@ -279,7 +318,47 @@ public class NewTweetActivity extends Activity {
             req.view = edittext;
 
             new UpdateStatusTask(this,pg).execute(req);
+        } else if (requestCode==2 && resultCode==RESULT_OK) {
+            String item = (String) data.getExtras().get("data");
+            if (item.contains(", ")) {
+                String user = item.substring(0,item.indexOf(", "));
+                edittext.append("@" + user + " ");
+            }
         }
+    }
+
+
+    protected void onPause() {
+        super.onPause();
+        switchOffLocationUpdates();
+    }
+
+    private void switchOffLocationUpdates() {
+        System.out.println("Switch off updates");
+        if (locationManager!=null) {
+            locationManager.removeUpdates(this);
+        }
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+        // TODO: Customise this generated block
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        // TODO: Customise this generated block
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        // TODO: Customise this generated block
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        // TODO: Customise this generated block
     }
 
 }

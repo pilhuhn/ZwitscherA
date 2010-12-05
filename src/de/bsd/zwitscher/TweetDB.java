@@ -359,9 +359,34 @@ public class TweetDB {
             c.moveToFirst();
             ret = c.getString(0);
         }
+        c.close();
+        db.close();
+        return ret;
+    }
+
+    /**
+     * Return a list of all users stored
+     * @return
+     */
+    public List<String> getUsers() {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        List<String> ret = new ArrayList<String>();
+
+        Cursor c;
+        c = db.query(TABLE_USERS,new String[]{"user_json"}, ACCOUNT_ID_IS ,new String[] { String.valueOf(account)},null, null, null);
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            do {
+                String json = c.getString(0);
+                ret.add(json);
+            } while (c.moveToNext());
+        }
+        c.close();
+        db.close();
 
         return ret;
     }
+
 
     /**
      * Insert a user into the database.
