@@ -254,7 +254,7 @@ public class TweetDB {
         List<String> ret = new ArrayList<String>();
 
         Cursor c ;
-        c = db.query(TABLE_STATUSES,new String[]{STATUS}, "i_rep_to = ? && " + ACCOUNT_ID_IS
+        c = db.query(TABLE_STATUSES,new String[]{STATUS}, "i_rep_to = ? & " + ACCOUNT_ID_IS
                 ,new String[]{String.valueOf(inRepyId),account},null,null,"ID DESC");
         if (c.getCount()>0) {
             c.moveToFirst();
