@@ -125,9 +125,6 @@ public class TabWidget extends TabActivity {
 	/**
 	 * Synchronize lists between what is available in the db
 	 * and on twitter.
-	 * Unfortunately there is no easy way to just remove a tab from
-	 * a tabHost. So we need to clean out the tabs and add the remaining
-	 * ones again
 	 */
 	private void syncLists() {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
@@ -136,15 +133,11 @@ public class TabWidget extends TabActivity {
 		Map<String,Integer> storedLists = tdb.getLists();
 		// Check for lists to add
 		for (UserList userList : userLists) {
-			if (storedLists.containsValue(userList.getId())) {
-				continue;
-			}
-			else {
+			if (!storedLists.containsValue(userList.getId())) {
 				tdb.addList(userList.getName(),userList.getId(), DataObjectFactory.getRawJSON(userList));
 			}
 		}
 		// check for outdated lists and remove them
-		boolean needsReload = false;
 		for (Entry<String, Integer> entry : storedLists.entrySet()) {
 			Integer id = entry.getValue();
 			boolean found = false;
