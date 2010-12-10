@@ -25,7 +25,7 @@
     <string name="From">Von</string>
     <string name="to">an</string>
     <string name="please_sync_lists">Bitte synchronisieren Sie die Listen</string>
-    <string name="no_searches_found">Keine gespeicherten Suchen gefunden</string>
+    <string name="no_searches_found">Keine gespeicherten Suchen gefunden - Bitte synchronisieren Sie</string>
 
 
 

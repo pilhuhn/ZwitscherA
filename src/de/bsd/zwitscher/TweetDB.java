@@ -91,7 +91,8 @@ public class TweetDB {
                     "name STRING, "+
                     "id LONG, " +
                     ACCOUNT_ID + " LONG, " +
-                    "query STRING "
+                    "query STRING, " +
+                    "json STRING )"
             );
 		}
 
@@ -480,21 +481,52 @@ public class TweetDB {
                 ret.add(json);
             } while ((c.moveToNext()));
         }
+
+        c.close();
+        db.close();
+
         return ret;
     }
 
 
-    public void storeSavedSearch(String name, String query, int id) {
-        ContentValues cv = new ContentValues(4);
+    public void storeSavedSearch(String name, String query, int id, String json) {
+        ContentValues cv = new ContentValues(5);
         cv.put("id",id);
         cv.put("name", name);
         cv.put(ACCOUNT_ID,account);
         cv.put("query",query);
+        cv.put("json",json);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.insert(TABLE_SEARCHES,null,cv);
         db.close();
 
     }
+
+    public List<String> getSavedSearches() {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        List<String > ret = new ArrayList<String>();
+
+        Cursor c;
+        c = db.query(TABLE_SEARCHES,new String[]{"json"},ACCOUNT_ID_IS,new String[] { account},null, null, "ID DESC");
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            do {
+                String json = c.getString(0);
+                ret.add(json);
+            } while ((c.moveToNext()));
+        }
+        c.close();
+        db.close();
+
+        return ret;
+    }
+
+    public void deleteSearch(int id) {
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.delete(TABLE_SEARCHES,ACCOUNT_ID_IS + " AND id = ?",new String[]{account,String.valueOf(id)});
+        db.close();
+    }
+
 
 }

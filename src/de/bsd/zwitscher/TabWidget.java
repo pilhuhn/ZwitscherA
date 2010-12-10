@@ -8,6 +8,7 @@ import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.bsd.zwitscher.helper.PicHelper;
+import twitter4j.SavedSearch;
 import twitter4j.UserList;
 
 import android.app.TabActivity;
@@ -156,7 +157,29 @@ public class TabWidget extends TabActivity {
 				tdb.removeList(id);
 			}
 		}
+
+        syncSearches(th,tdb);
 	}
+
+    private void syncSearches(TwitterHelper th, TweetDB tdb) {
+        List<SavedSearch> searches = th.getSavedSearchesFromServer();
+        List<SavedSearch> storedSearches = th.getSavedSearchesFromDb();
+
+        for (SavedSearch search : searches) {
+            if (!storedSearches.contains(search)) {
+                th.persistSavedSearch(search);
+            }
+        }
+
+        for (SavedSearch search : storedSearches) {
+            if (!searches.contains(search)) {
+                tdb.deleteSearch(search.getId());
+            }
+        }
+
+    }
+
+
 
     private void resetLastRead() {
         TweetDB tb = new TweetDB(this,accountId);

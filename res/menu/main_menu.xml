@@ -6,11 +6,11 @@
 		  android:enabled="true"
 		  android:visible="true"/>
     <item android:enabled="true" android:id="@+id/reloadLists"
-      android:titleCondensed="Sync Lists" android:title="Synchronize Lists"/>
+      android:titleCondensed="Sync L and S" android:title="Synchronize Lists and Searches..."/>
     <item android:enabled="true" android:id="@+id/helpMenu"
       android:titleCondensed="@string/help" android:title="@string/help"/>
     <item android:id="@+id/DevelMenu"
-          android:title="Devel"
+          android:title="Devel..."
           android:enabled="true"  >
         <menu>
             <item android:id="@+id/DevelResetLastRead"

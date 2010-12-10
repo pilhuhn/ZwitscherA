@@ -1,0 +1,6 @@
+<resources>
+    <style name="helpIcon">
+        <item name="android:background">@android:color/darker_gray</item>
+        <item name="android:padding">5dp</item>
+    </style>
+</resources>

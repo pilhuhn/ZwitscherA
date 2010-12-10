@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 import de.bsd.zwitscher.helper.CaseInsensitiveStringComparator;
 import twitter4j.SavedSearch;
 
@@ -56,7 +55,7 @@ public class ListOfListsActivity extends ListActivity {
             }
         }
         else if (mode==1) {
-            List<SavedSearch> searches = th.getSavedSearches();
+            List<SavedSearch> searches = th.getSavedSearchesFromDb();
             for (SavedSearch search : searches) {
                 result.add(search.getName());
             }
@@ -104,7 +103,7 @@ public class ListOfListsActivity extends ListActivity {
                 startActivity(intent);
             }
         } else if (mode ==1) {
-            List<SavedSearch> searches = th.getSavedSearches();
+            List<SavedSearch> searches = th.getSavedSearchesFromDb();
             for (SavedSearch search : searches) {
                 if (text.equals(search.getName())) {
                     Intent intent = new Intent().setClass(this,TweetListActivity.class);

@@ -686,7 +686,7 @@ Log.d("FillUp","Return: " + i);
         }
     }
 
-    public List<SavedSearch> getSavedSearches() {
+    public List<SavedSearch> getSavedSearchesFromServer() {
 
         Twitter twitter = getTwitter();
         List<SavedSearch> searches;
@@ -698,6 +698,21 @@ Log.d("FillUp","Return: " + i);
         }
 
         return searches;  // TODO: Customise this generated block
+    }
+
+    public List<SavedSearch> getSavedSearchesFromDb() {
+        List<String> jsons = tweetDB.getSavedSearches();
+        List<SavedSearch> searches = new ArrayList<SavedSearch>(jsons.size());
+
+        for (String json : jsons) {
+            try {
+                SavedSearch search = DataObjectFactory.createSavedSearch(json);
+                searches.add(search);
+            } catch (TwitterException e) {
+                e.printStackTrace(); // TODO Customize ...
+            }
+        }
+        return searches;
     }
 
     public List<User> getUsersFromDb() {
@@ -717,7 +732,7 @@ Log.d("FillUp","Return: " + i);
     public MetaList<Tweet> getSavedSearchesTweets(int searchId, boolean fromDbOnly, Paging paging) {
         Twitter twitter = getTwitter();
 
-        List<SavedSearch> searches = getSavedSearches();
+        List<SavedSearch> searches = getSavedSearchesFromDb();
         for (SavedSearch search : searches) {
             if (search.getId()==searchId) {
                 String queryString = search.getQuery();
@@ -736,5 +751,11 @@ Log.d("FillUp","Return: " + i);
         }
 
         return null;  // TODO: Customise this generated block
+    }
+
+    public void persistSavedSearch(SavedSearch search) {
+        String json = DataObjectFactory.getRawJSON(search);
+
+        tweetDB.storeSavedSearch(search.getName(),search.getQuery(),search.getId(),json);
     }
 }
