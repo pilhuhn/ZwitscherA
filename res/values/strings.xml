@@ -55,4 +55,25 @@
     <string name="prefs_pictureService">Picture Service</string>
     <string name="prefs_pictureService_descr">Choose a service for picture uploading</string>
     <!-- preferences -->
+    <string name="help">Help</string>
+    <string name="help_common">This page shows all the icons used with in Zwitscher</string>
+    <string name="help_add_list">Add the user to a list</string>
+    <string name="help_back_button">Go back to the previous page</string>
+    <string name="help_camera">Take a picture with the camera. See preferences for picture upload services.</string>
+    <string name="help_direct_button">Send a direct message to the user</string>
+    <string name="help_favorite">Add/remote the status as/from favorite(s)</string>
+    <string name="help_post_button">Send the status update or direct message</string>
+    <string name="help_reload_button">Reload the timeline (from the server)</string>
+    <string name="help_reply_button">Reply to the current status</string>
+    <string name="help_reply_all_button">Reply to the current status with all users listed in the message</string>
+    <string name="help_rt_button">Retweet the current status</string>
+    <string name="help_rt_button_cl">Classical retweet of the current status</string>
+    <string name="help_speaker">Speak the current status message</string>
+    <string name="help_threads">Show the conversation this thread is involved in</string>
+    <string name="help_to_top">Jump to top of the list</string>
+    <string name="help_translate">Translate the current status</string>
+    <string name="help_user_unknown">No picture for the user loaded</string>
+    <string name="help_select_user">Select a user</string>
+
+
 </resources>

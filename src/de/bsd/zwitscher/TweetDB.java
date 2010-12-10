@@ -25,11 +25,12 @@ public class TweetDB {
     private static final String TABLE_LAST_READ = "lastRead";
     private static final String TABLE_LISTS = "lists";
     private static final String TABLE_USERS = "users";
+    private static final String TABLE_SEARCHES = "searches";
+    private static final String TABLE_DIRECTS = "directs";
     static final String STATUS = "STATUS";
     static final String ACCOUNT_ID = "ACCOUNT_ID";
     static final String ACCOUNT_ID_IS = ACCOUNT_ID + "=?";
     private TweetDBOpenHelper tdHelper;
-    private static final String TABLE_DIRECTS = "directs";
     private final String account;
 
 	public TweetDB(Context context, int accountId) {
@@ -85,6 +86,12 @@ public class TweetDB {
                     "userId LONG, " + //
                     ACCOUNT_ID + " LONG, " +
                     "user_json STRING )"
+            );
+            db.execSQL(CREATE_TABLE + TABLE_SEARCHES + " ("+
+                    "name STRING, "+
+                    "id LONG, " +
+                    ACCOUNT_ID + " LONG, " +
+                    "query STRING "
             );
 		}
 
@@ -477,5 +484,17 @@ public class TweetDB {
     }
 
 
+    public void storeSavedSearch(String name, String query, int id) {
+        ContentValues cv = new ContentValues(4);
+        cv.put("id",id);
+        cv.put("name", name);
+        cv.put(ACCOUNT_ID,account);
+        cv.put("query",query);
+
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.insert(TABLE_SEARCHES,null,cv);
+        db.close();
+
+    }
 
 }

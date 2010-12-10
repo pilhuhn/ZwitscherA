@@ -114,6 +114,11 @@ public class TabWidget extends TabActivity {
         case R.id.DevelCleanImages:
             cleanImages();
             break;
+        case R.id.helpMenu:
+            i = new Intent(TabWidget.this, HelpActivity.class);
+            startActivity(i);
+            break;
+
 
 
 	    default:

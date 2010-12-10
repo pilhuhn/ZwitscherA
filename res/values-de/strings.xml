@@ -47,6 +47,26 @@
     <string name="prefs_pictureService">Picture Service</string>
     <string name="prefs_pictureService_descr">Choose a service for picture uploading</string>
     <!-- preferences -->
+    <string name="help">Hilfe</string>
+    <string name="help_common">Diese Seite zeigt alle in Zwitscher verwendeten Icons</string>
+    <string name="help_add_list">Benutzer zu einer Liste hinzufügen</string>
+    <string name="help_back_button">Gehe zurück zur vorherigen Seite</string>
+    <string name="help_camera">Bild mit der Kamer aufnemen und an den Tweet anhängen. Siehe auch die Voresinstellungen für einen Upload-Dienst.</string>
+    <string name="help_direct_button">Dem Benutzer eine direkte Nachricht senden</string>
+    <string name="help_favorite">Status als Favorit hinzufügen/löschen</string>
+    <string name="help_post_button">Nachricht absenden</string>
+    <string name="help_reload_button">Zeitstrahl neu (vom Server) laden</string>
+    <string name="help_reply_button">Dem aktuellen Status antworten</string>
+    <string name="help_reply_all_button">Allen Benutzern im Status antworten</string>
+    <string name="help_rt_button">Den aktuellen Status retweeten</string>
+    <string name="help_rt_button_cl">Den aktuellen Status klassisch retweeten</string>
+    <string name="help_speaker">Den aktuellen Status vorlesen</string>
+    <string name="help_threads">Konversation anzeigen</string>
+    <string name="help_to_top">An den Anfang der Liste springen</string>
+    <string name="help_translate">Aktuellen Status übersetzen</string>
+    <string name="help_user_unknown">Kein Bild für den Benutzer geladen</string>
+    <string name="help_select_user">Benutzer auswählen</string>
+
 
 
 </resources>

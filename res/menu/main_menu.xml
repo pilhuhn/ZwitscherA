@@ -7,6 +7,8 @@
 		  android:visible="true"/>
     <item android:enabled="true" android:id="@+id/reloadLists"
       android:titleCondensed="Sync Lists" android:title="Synchronize Lists"/>
+    <item android:enabled="true" android:id="@+id/helpMenu"
+      android:titleCondensed="@string/help" android:title="@string/help"/>
     <item android:id="@+id/DevelMenu"
           android:title="Devel"
           android:enabled="true"  >
