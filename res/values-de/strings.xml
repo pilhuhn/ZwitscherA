@@ -27,9 +27,13 @@
     <string name="please_sync_lists">Bitte synchronisieren Sie die Listen</string>
     <string name="no_searches_found">Keine gespeicherten Suchen gefunden - Bitte synchronisieren Sie</string>
 
-
-
-
+    <string name="login_common">
+        Sie müssen sich bei Twitter anmelden, um Zwitscher zu authorisieren.<br/><br/>
+        Um dies zu tun, klicken Sie auf "Get pin from Twitter", geben dann im Browser den Login an
+        und klicken auf "Akzeptieren". Danach müssen Sie sich die PIN merken. Gehen Sie dann zum Home-Screen
+        und starten von dort Zwitscher erneut. Geben Sie die PIN ein und klicken auf "Set pin".<br/><br/>
+        Sie müssen dies nur einmal machen.
+    </string>
 
     <!-- preferences -->
     <string name="prefs_location_enabled">Position senden</string>
@@ -54,7 +58,7 @@
     <string name="help_camera">Bild mit der Kamer aufnemen und an den Tweet anhängen. Siehe auch die Voresinstellungen für einen Upload-Dienst.</string>
     <string name="help_direct_button">Dem Benutzer eine direkte Nachricht senden</string>
     <string name="help_favorite">Status als Favorit hinzufügen/löschen</string>
-    <string name="help_post_button">Nachricht absenden</string>
+    <string name="help_post_button">Neue Nachricht schreiben</string>
     <string name="help_reload_button">Zeitstrahl neu (vom Server) laden</string>
     <string name="help_reply_button">Dem aktuellen Status antworten</string>
     <string name="help_reply_all_button">Allen Benutzern im Status antworten</string>
@@ -66,7 +70,7 @@
     <string name="help_translate">Aktuellen Status übersetzen</string>
     <string name="help_user_unknown">Kein Bild für den Benutzer geladen</string>
     <string name="help_select_user">Benutzer auswählen</string>
-
+    <string name="help_more">Um mehr zu erfahren, gehen Sie zu http://bsd.de/zwitscher . Um Bugs zu melden, Wünsche aufzuschreiben oder den Quellcode anzusehen, gehen Sie zu https://github.com/pilhuhn/ZwitscherA</string>
 
 
 </resources>

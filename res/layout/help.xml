@@ -30,6 +30,7 @@
                         />
                 <TextView
                         android:text="@string/help_add_list"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -39,6 +40,7 @@
                         />
                 <TextView
                         android:text="@string/help_back_button"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -48,6 +50,7 @@
                         />
                 <TextView
                         android:text="@string/help_camera"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -57,6 +60,7 @@
                         />
                 <TextView
                         android:text="@string/help_direct_button"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -66,6 +70,7 @@
                         />
                 <TextView
                         android:text="@string/help_favorite"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -75,6 +80,7 @@
                         />
                 <TextView
                         android:text="@string/help_post_button"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -84,6 +90,7 @@
                         />
                 <TextView
                         android:text="@string/help_reload_button"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -93,6 +100,7 @@
                         />
                 <TextView
                         android:text="@string/help_reply_button"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -102,6 +110,7 @@
                         />
                 <TextView
                         android:text="@string/help_reply_all_button"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -111,6 +120,7 @@
                         />
                 <TextView
                         android:text="@string/help_rt_button"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -120,6 +130,7 @@
                         />
                 <TextView
                         android:text="@string/help_rt_button_cl"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -129,6 +140,7 @@
                         />
                 <TextView
                         android:text="@string/help_speaker"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -138,6 +150,7 @@
                         />
                 <TextView
                         android:text="@string/help_threads"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -147,6 +160,7 @@
                         />
                 <TextView
                         android:text="@string/help_to_top"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -156,6 +170,7 @@
                         />
                 <TextView
                         android:text="@string/help_translate"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -165,6 +180,7 @@
                         />
                 <TextView
                         android:text="@string/help_user_unknown"
+                        style="@style/helpText"
                     />
             </TableRow>
             <TableRow>
@@ -174,10 +190,17 @@
                         />
                 <TextView
                         android:text="@string/help_select_user"
+                        style="@style/helpText"
                     />
             </TableRow>
 
         </TableLayout>
+
+        <TextView android:text="@string/help_more"
+                  android:layout_height="wrap_content"
+                  android:layout_width="fill_parent"
+                  android:autoLink="all"
+                  />
 
     </LinearLayout>
 </ScrollView>

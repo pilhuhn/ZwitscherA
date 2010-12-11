@@ -38,6 +38,12 @@
     <string name="please_sync_lists">Please sync lists</string>
     <string name="no_searches_found">No saved searches found - do you need to sync?</string>
 
+    <string name="login_common">You need to log into Twitter to authorize Zwitscher. <br/><br/>
+        To do this, click on "Get pin from Twitter", then log in in the Browser, write down the PIN and then
+        from the home screen start Zwitscher again and enter the pin. Then click on "Set pin"
+        <br/><br/>
+        You only have to do this once at initial login
+    </string>
 
     <!-- preferences -->
     <string name="prefs_location_enabled">Location enabled</string>
@@ -62,7 +68,7 @@
     <string name="help_camera">Take a picture with the camera. See preferences for picture upload services.</string>
     <string name="help_direct_button">Send a direct message to the user</string>
     <string name="help_favorite">Add/remote the status as/from favorite(s)</string>
-    <string name="help_post_button">Send the status update or direct message</string>
+    <string name="help_post_button">Write new message</string>
     <string name="help_reload_button">Reload the timeline (from the server)</string>
     <string name="help_reply_button">Reply to the current status</string>
     <string name="help_reply_all_button">Reply to the current status with all users listed in the message</string>
@@ -74,6 +80,7 @@
     <string name="help_translate">Translate the current status</string>
     <string name="help_user_unknown">No picture for the user loaded</string>
     <string name="help_select_user">Select a user</string>
+    <string name="help_more">To learn more, go to http://bsd.de/zwitscher . To report bugs, write feature requests or browse the source, go to https://github.com/pilhuhn/ZwitscherA</string>
 
 
 </resources>
