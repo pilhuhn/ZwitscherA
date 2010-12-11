@@ -65,76 +65,98 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         NetworkHelper networkHelper = new NetworkHelper(this);
         downloadPictures = networkHelper.mayDownloadImages();
 
-		Bundle bundle = getIntent().getExtras();
-		if (bundle!=null) {
-			status = (Status) bundle.get(getString(R.string.status));
-			Log.i("OneTweetActivity","Showing status: " + status.toString());
+        Intent intent = getIntent();
+        String dataString = intent.getDataString();
+        Bundle bundle = intent.getExtras();
 
-            // Download the user profile image in a background task, as this may
-            // mean a network call.
-            if (status.getRetweetedStatus()==null)
-                new DownloadImageTask().execute(status.getUser());
-            else
-                new DownloadImageTask().execute(status.getRetweetedStatus().getUser());
-
-            new DownloadThumbnailTask().execute(status);
-
-			TextView tv01 = (TextView) findViewById(R.id.TextView01);
-            StringBuilder sb = new StringBuilder("<b>");
-			if (status.getRetweetedStatus()==null) {
-                sb.append(status.getUser().getName());
-                sb.append(" (");
-                sb.append(status.getUser().getScreenName());
-                sb.append(")");
-                sb.append("</b>");
-			}
-			else {
-                sb.append(status.getRetweetedStatus().getUser().getName());
-				sb.append(" (");
-				sb.append(status.getRetweetedStatus().getUser().getScreenName());
-				sb.append(" )</b> ").append(getString(R.string.resent_by)).append(" <b>");
-				sb.append(status.getUser().getName());
-                sb.append("</b>");
-			}
-            tv01.setText(Html.fromHtml(sb.toString()));
-
-			TextView mtv = (TextView) findViewById(R.id.MiscTextView);
-			if (status.getInReplyToScreenName()!=null) {
-                String s = getString(R.string.in_reply_to);
-                mtv.setText(Html.fromHtml(s + " <b>" + status.getInReplyToScreenName() + "</b>"));
-			}
-			else {
-				mtv.setText("");
-			}
-
-			TextView tweetView = (TextView)findViewById(R.id.TweetTextView);
-			tweetView.setText(status.getText());
-
-            TextView timeCientView = (TextView)findViewById(R.id.TimeTextView);
-            TwitterHelper th = new TwitterHelper(this);
-            String s = getString(R.string.via);
-            String text = th.getStatusDate(status) + s + status.getSource();
-            String from = getString(R.string.from);
-            if (status.getPlace()!=null) {
-                Place place = status.getPlace();
-                text += " " + from + " " + place.getFullName();
+        // If this is not null, we are called from another app
+        if ( dataString!=null) {
+            if (dataString.matches("http://twitter.com/.*/status/.*$")) {
+                String tids = dataString.substring(dataString.lastIndexOf("/")+1);
+                Long tid = Long.parseLong(tids);
+                TwitterHelper th = new TwitterHelper(this);
+                status = th.getStatusById(tid,0L,false,false);
             }
-            timeCientView.setText(Html.fromHtml(text));
+        } else {
+            // Called from within Zwitscher
+            status = (Status) bundle.get(getString(R.string.status));
+        }
 
 
-            // Update Button state depending on Status' properties
-			ImageButton threadButton = (ImageButton) findViewById(R.id.ThreadButton);
-			if (status.getInReplyToScreenName()==null) {
-				threadButton.setEnabled(false);
-			}
+        if (status==null) {
+            // e.g. when called from HTC Mail, which fails to forward the full
+            // http://twitter.com/#!/.../status/.. url, but only sends http://twitter.com
+            Log.w("OneTweetActivity","Status was null for Intent " + intent );
+            finish();
+            return;
+        }
 
-			ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
-			if (status.isFavorited())
-				favoriteButton.setImageResource(R.drawable.favorite_on);
+        Log.i("OneTweetActivity","Showing status: " + status.toString());
 
-            ImageButton translateButon = (ImageButton) findViewById(R.id.TranslateButton);
-            translateButon.setEnabled(networkHelper.isOnline());
-		}
+        // Download the user profile image in a background task, as this may
+        // mean a network call.
+        if (status.getRetweetedStatus()==null)
+            new DownloadImageTask().execute(status.getUser());
+        else
+            new DownloadImageTask().execute(status.getRetweetedStatus().getUser());
+
+        new DownloadThumbnailTask().execute(status);
+
+        TextView tv01 = (TextView) findViewById(R.id.TextView01);
+        StringBuilder sb = new StringBuilder("<b>");
+        if (status.getRetweetedStatus()==null) {
+            sb.append(status.getUser().getName());
+            sb.append(" (");
+            sb.append(status.getUser().getScreenName());
+            sb.append(")");
+            sb.append("</b>");
+        }
+        else {
+            sb.append(status.getRetweetedStatus().getUser().getName());
+            sb.append(" (");
+            sb.append(status.getRetweetedStatus().getUser().getScreenName());
+            sb.append(" )</b> ").append(getString(R.string.resent_by)).append(" <b>");
+            sb.append(status.getUser().getName());
+            sb.append("</b>");
+        }
+        tv01.setText(Html.fromHtml(sb.toString()));
+
+        TextView mtv = (TextView) findViewById(R.id.MiscTextView);
+        if (status.getInReplyToScreenName()!=null) {
+            String s = getString(R.string.in_reply_to);
+            mtv.setText(Html.fromHtml(s + " <b>" + status.getInReplyToScreenName() + "</b>"));
+        }
+        else {
+            mtv.setText("");
+        }
+
+        TextView tweetView = (TextView)findViewById(R.id.TweetTextView);
+        tweetView.setText(status.getText());
+
+        TextView timeCientView = (TextView)findViewById(R.id.TimeTextView);
+        TwitterHelper th = new TwitterHelper(this);
+        String s = getString(R.string.via);
+        String text = th.getStatusDate(status) + s + status.getSource();
+        String from = getString(R.string.from);
+        if (status.getPlace()!=null) {
+            Place place = status.getPlace();
+            text += " " + from + " " + place.getFullName();
+        }
+        timeCientView.setText(Html.fromHtml(text));
+
+
+        // Update Button state depending on Status' properties
+        ImageButton threadButton = (ImageButton) findViewById(R.id.ThreadButton);
+        if (status.getInReplyToScreenName()==null) {
+            threadButton.setEnabled(false);
+        }
+
+        ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
+        if (status.isFavorited())
+            favoriteButton.setImageResource(R.drawable.favorite_on);
+
+        ImageButton translateButon = (ImageButton) findViewById(R.id.TranslateButton);
+        translateButon.setEnabled(networkHelper.isOnline());
 	}
 
     /**
@@ -418,7 +440,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
             User user = users[0];
             PicHelper picHelper = new PicHelper();
-            Bitmap bi = null;
+            Bitmap bi;
             if (downloadPictures)
                 bi = picHelper.fetchUserPic(user);
             else
