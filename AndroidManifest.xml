@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.bsd.zwitscher"
-          android:versionName="0.50"
-          android:versionCode="50"
+          android:versionName="0.51"
+          android:versionCode="51"
           >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application android:icon="@drawable/icon" android:label="Zwitscher"
-    			android:debuggable="false"  android:allowBackup="true"
+    			android:debuggable="true"  android:allowBackup="true"
         >
 
         <activity android:name=".TweetListActivity"/>
@@ -21,7 +21,13 @@
 
 		<activity android:name=".OneTweetActivity"/>
 
-        <activity android:name=".NewTweetActivity"/>
+        <activity android:name=".NewTweetActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+        </activity>
 
         <activity android:name="Preferences" android:label="Preferences"/>
 

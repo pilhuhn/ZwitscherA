@@ -17,7 +17,6 @@
         android:layout_height="wrap_content"
         android:lines="4"
         android:inputType="textMultiLine"
-        android:maxLength="140"
         android:layout_below="@id/textOben"
         android:gravity="top|left"
        />

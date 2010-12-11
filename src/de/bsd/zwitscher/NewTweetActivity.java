@@ -61,6 +61,8 @@ public class NewTweetActivity extends Activity implements LocationListener {
 		if (bundle!=null) {
 			TextView textOben = (TextView) findViewById(R.id.textOben);
 
+            String bundleText = bundle.getString(Intent.EXTRA_TEXT);
+
 			String op = (String) bundle.get("op");
          User directUser = (User) bundle.get("user"); // set when coming from user detail view
 			if (op!=null) {
@@ -91,15 +93,19 @@ public class NewTweetActivity extends Activity implements LocationListener {
 					edittext.setText(msg); // limit to 140 chars is done by the edittext via maxLength attribute
 				} else if (op.equals(getString(R.string.direct))) {
 
-                if (directUser!=null)
-                  toUser = directUser;
-                else if (origStatus!=null) {
-                  toUser = origStatus.getUser();
-                }
+                 if (directUser!=null)
+                     toUser = directUser;
+                 else if (origStatus!=null) {
+                     toUser = origStatus.getUser();
+                 }
                 String s = getString(R.string.send_direct_to);
                 textOben.setText(s + " "+ toUser.getScreenName());
                 }
 			}
+            else { // OP is null -> new tweet
+                if (bundleText!=null)
+                    edittext.setText(bundleText);
+            }
 		}
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		boolean locationEnabled = preferences.getBoolean("location",false);
