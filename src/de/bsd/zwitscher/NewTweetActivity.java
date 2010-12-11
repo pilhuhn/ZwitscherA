@@ -3,8 +3,6 @@ package de.bsd.zwitscher;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import android.content.Context;
@@ -18,7 +16,11 @@ import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Window;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.GeoLocation;
 import twitter4j.Status;
@@ -41,85 +43,85 @@ public class NewTweetActivity extends Activity implements LocationListener {
     String picturePath;
     LocationManager locationManager;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-	    setContentView(R.layout.new_tweet);
+        setContentView(R.layout.new_tweet);
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         charCountView = (TextView) findViewById(R.id.CharCount);
 
 
-	    final Button tweetButton = (Button) findViewById(R.id.TweetButton);
-		edittext = (EditText) findViewById(R.id.edittext);
-		edittext.setSelected(true);
-		tweetButton.setEnabled(false);
+        final Button tweetButton = (Button) findViewById(R.id.TweetButton);
+        edittext = (EditText) findViewById(R.id.edittext);
+        edittext.setSelected(true);
+        tweetButton.setEnabled(false);
 
-		Bundle bundle = getIntent().getExtras();
-		if (bundle!=null) {
-			TextView textOben = (TextView) findViewById(R.id.textOben);
+        Bundle bundle = getIntent().getExtras();
+        if (bundle!=null) {
+            TextView textOben = (TextView) findViewById(R.id.textOben);
 
             String bundleText = bundle.getString(Intent.EXTRA_TEXT);
 
-			String op = (String) bundle.get("op");
-         User directUser = (User) bundle.get("user"); // set when coming from user detail view
-			if (op!=null) {
-            origStatus = (Status) bundle.get("status");
-            Log.i("Replying..", "Orig is " + origStatus);
-             if (op.equals(getString(R.string.reply))) {
+            String op = (String) bundle.get("op");
+            User directUser = (User) bundle.get("user"); // set when coming from user detail view
+            if (op!=null) {
+                origStatus = (Status) bundle.get("status");
+                Log.i("Replying..", "Orig is " + origStatus);
+                if (op.equals(getString(R.string.reply))) {
                     textOben.setText(origStatus.getText());
-					edittext.setText("@"+origStatus.getUser().getScreenName()+" ");
-				} else if (op.equals(getString(R.string.replyall))) {
+                    edittext.setText("@"+origStatus.getUser().getScreenName()+" ");
+                } else if (op.equals(getString(R.string.replyall))) {
                     textOben.setText(origStatus.getText());
-					String oText = origStatus.getText();
+                    String oText = origStatus.getText();
 //					Matcher m = p.matcher(oText);
-					StringBuilder sb = new StringBuilder();
-					sb.append("@");
-					sb.append(origStatus.getUser().getScreenName()).append(" ");
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("@");
+                    sb.append(origStatus.getUser().getScreenName()).append(" ");
 //					if (m.matches()) {
 //						for (int i = 1; i < m.groupCount() ; i++) {
 //							sb.append(m.group(i));
 //							sb.append(" ");
 //						}
 //					}
-					findUsers (sb,oText);
-					edittext.setText(sb.toString());
-				} else if (op.equals(getString(R.string.classicretweet))) {
+                    findUsers (sb,oText);
+                    edittext.setText(sb.toString());
+                } else if (op.equals(getString(R.string.classicretweet))) {
                     textOben.setText(origStatus.getText());
-					String msg = "RT @" + origStatus.getUser().getScreenName() + " ";
-					msg = msg + origStatus.getText();
-					edittext.setText(msg); // limit to 140 chars is done by the edittext via maxLength attribute
-				} else if (op.equals(getString(R.string.direct))) {
+                    String msg = "RT @" + origStatus.getUser().getScreenName() + " ";
+                    msg = msg + origStatus.getText();
+                    edittext.setText(msg); // limit to 140 chars is done by the edittext via maxLength attribute
+                } else if (op.equals(getString(R.string.direct))) {
 
-                 if (directUser!=null)
-                     toUser = directUser;
-                 else if (origStatus!=null) {
-                     toUser = origStatus.getUser();
-                 }
-                String s = getString(R.string.send_direct_to);
-                textOben.setText(s + " "+ toUser.getScreenName());
+                    if (directUser!=null)
+                        toUser = directUser;
+                    else if (origStatus!=null) {
+                        toUser = origStatus.getUser();
+                    }
+                    String s = getString(R.string.send_direct_to);
+                    textOben.setText(s + " "+ toUser.getScreenName());
                 }
-			}
+            }
             else { // OP is null -> new tweet
                 if (bundleText!=null)
                     edittext.setText(bundleText);
             }
-		}
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		boolean locationEnabled = preferences.getBoolean("location",false);
-		CheckBox box = (CheckBox) findViewById(R.id.GeoCheckBox);
-		if (locationEnabled) {
-			box.setEnabled(true);
-			box.setChecked(true);
+        }
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        boolean locationEnabled = preferences.getBoolean("location",false);
+        CheckBox box = (CheckBox) findViewById(R.id.GeoCheckBox);
+        if (locationEnabled) {
+            box.setEnabled(true);
+            box.setChecked(true);
 
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1,1,this);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1,1,this);
 
 
-		}
+        }
 
         // Add a listener to count the text length.
         edittext.addTextChangedListener(new TextWatcher() {
@@ -149,11 +151,11 @@ public class NewTweetActivity extends Activity implements LocationListener {
         });
 
 
-		tweetButton.setOnClickListener(new OnClickListener() {
+        tweetButton.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				StatusUpdate up  = new StatusUpdate(edittext.getText().toString());
+            @Override
+            public void onClick(View v) {
+                StatusUpdate up  = new StatusUpdate(edittext.getText().toString());
                 // add location  if enabled in preferences and checked on tweet
                 CheckBox box = (CheckBox) findViewById(R.id.GeoCheckBox);
                 boolean locationEnabled = box.isChecked();
@@ -164,32 +166,32 @@ public class NewTweetActivity extends Activity implements LocationListener {
                         up.setLocation(geoLocation);
                     }
                 }
-	        	if (origStatus!=null) {
-	        		up.setInReplyToStatusId(origStatus.getId());
-	        	}
+                if (origStatus!=null) {
+                    up.setInReplyToStatusId(origStatus.getId());
+                }
                 if (toUser==null)
-	        	    tweet(up);
+                    tweet(up);
                 else
                     direct(toUser,edittext.getText().toString());
-	        	origStatus=null;
+                origStatus=null;
                 switchOffLocationUpdates();
-	        	finish();
+                finish();
 
-			}
-		});
+            }
+        });
 
-		final Button clearButton = (Button) findViewById(R.id.ClearButton);
-		clearButton.setOnClickListener(new OnClickListener() {
+        final Button clearButton = (Button) findViewById(R.id.ClearButton);
+        clearButton.setOnClickListener(new OnClickListener() {
 
 
-			@Override
-			public void onClick(View v) {
-				edittext.setText("");
+            @Override
+            public void onClick(View v) {
+                edittext.setText("");
 
-			}
-		});
+            }
+        });
 
-	}
+    }
 
 
 
