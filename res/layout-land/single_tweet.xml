@@ -127,10 +127,10 @@
         android:src="@drawable/back_button"
 		android:text="Done!"/>
 
-<ImageView android:id="@+id/OTImageView"
-           android:layout_below="@id/DoneButton"
-           android:layout_height="256px"
-           android:layout_width="256px"
-           />
+    <Gallery xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/gallery"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/DoneButton"
+    />
 </RelativeLayout>
 </ScrollView>

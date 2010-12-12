@@ -1,9 +1,12 @@
 package de.bsd.zwitscher;
 
 
+import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.Html;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.*;
 import com.google.api.translate.Language;
@@ -43,9 +46,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 	Status status ;
     ImageView userPictureView;
     ProgressBar pg;
-    ImageView thumbnailView;
     boolean downloadPictures=false;
     TextToSpeech tts;
+    TextView titleTextView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +61,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+        titleTextView = (TextView) findViewById(R.id.title_msg_box);
 
         userPictureView = (ImageView) findViewById(R.id.UserPictureImageView);
-        thumbnailView = (ImageView) findViewById(R.id.OTImageView);
 
         NetworkHelper networkHelper = new NetworkHelper(this);
         downloadPictures = networkHelper.mayDownloadImages();
@@ -100,7 +103,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         else
             new DownloadImageTask().execute(status.getRetweetedStatus().getUser());
 
-        new DownloadThumbnailTask().execute(status);
+        new DownloadThumbnailTask(this).execute(status);
 
         TextView tv01 = (TextView) findViewById(R.id.TextView01);
         StringBuilder sb = new StringBuilder("<b>");
@@ -354,7 +357,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     @SuppressWarnings("unused")
 	public void done(View v) {
-        tts.shutdown();
+        if (tts!=null)
+            tts.shutdown();
 		finish();
 	}
 
@@ -363,10 +367,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      * Load thumbnails of linked images if the url in the status is recognized
      * as an image service
      * @param status Status to analyze
-     * @return Bitmap to display
-     * @todo Support multiple images in one status
+     * @return List of Bitmaps to display
      */
-    private Bitmap loadThumbnail(Status status) {
+    private List<BitmapWithUrl> loadThumbnail(Status status) {
         URL[] urlArray = status.getURLs();
         Set<String> urls = new HashSet<String>();
         if (urlArray!=null) {
@@ -385,13 +388,14 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             }
         }
         if (urls.size()==0)
-            return null;
+            return Collections.emptyList();
+
+        List<BitmapWithUrl> bitmaps = new ArrayList<BitmapWithUrl>(urls.size());
 
         // We have urls, so check for picture services
-        // TODO implement preview of multiple pictures.
         for (String url :  urls) {
             Log.d("One tweet","Url = " + url);
-            String finalUrlString = null;
+            String finalUrlString;
             if (url.contains("yfrog.com")) {
                 finalUrlString = url + ".th.jpg";
             }
@@ -403,24 +407,26 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             else if (url.contains("plixi.com")) {
                 finalUrlString = "http://api.plixi.com/api/tpapi.svc/imagefromurl?size=thumbnail&url=" +  url;
             }
-            else
-                return null;
+            else {
+                Log.d("OTA::loadThumbnails", "Url " + url + " not supported for preview");
+                continue;
+            }
 
-            Log.i("loadThumbail","URL to load is " + finalUrlString);
+            Log.i("loadThumbail", "URL to load is " + finalUrlString);
 
             try {
                 URL picUrl = new URL(finalUrlString);
                 BufferedInputStream in = new BufferedInputStream(picUrl.openStream());
                 Bitmap bitmap = BitmapFactory.decodeStream(in);
                 in.close();
-                return bitmap;
+                BitmapWithUrl bwu = new BitmapWithUrl(bitmap,url);
+                bitmaps.add(bwu);
             }
             catch (Exception e) {
                 e.printStackTrace();
-                return null;
             }
         }
-        return null;
+        return bitmaps;
     }
 
 
@@ -459,21 +465,111 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Background task to download the thumbnails of linked images
      */
-    private class DownloadThumbnailTask extends AsyncTask<Status,Void,Bitmap> {
+    private class DownloadThumbnailTask extends AsyncTask<Status,Void,List<BitmapWithUrl>> {
 
-        @Override
-        protected Bitmap doInBackground(twitter4j.Status... statuses) {
-            Bitmap b=null;
-            if (downloadPictures)
-                b = loadThumbnail(statuses[0]);
-            return b;
+        private Context context;
+
+        private DownloadThumbnailTask(Context context) {
+            this.context = context;
         }
 
         @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-            if (bitmap!=null)
-                thumbnailView.setImageBitmap(bitmap);
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pg.setVisibility(ProgressBar.VISIBLE);
+            titleTextView.setText("Loading previews...");
+        }
+
+        @Override
+        protected List<BitmapWithUrl> doInBackground(twitter4j.Status... statuses) {
+            List<BitmapWithUrl> bitmapList=null;
+            if (downloadPictures)
+                bitmapList = loadThumbnail(statuses[0]);
+            return bitmapList;
+        }
+
+        @Override
+        protected void onPostExecute(final List<BitmapWithUrl> bitmaps) {
+            super.onPostExecute(bitmaps);
+            if (bitmaps!=null) {
+                Gallery g = (Gallery) findViewById(R.id.gallery);
+                ImageAdapter adapter = new ImageAdapter(context);
+
+                adapter.addImages(bitmaps);
+                g.setAdapter(adapter);
+                g.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        String url = bitmaps.get(position).url;
+                        Uri uri = Uri.parse(url);
+                        Intent i = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(i);
+                    }
+                });
+            }
+
+            titleTextView.setText("");
+            pg.setVisibility(ProgressBar.INVISIBLE);
+
+        }
+    }
+
+
+    private class ImageAdapter extends BaseAdapter {
+
+        private List<BitmapWithUrl> mImages = new ArrayList<BitmapWithUrl>();
+
+        void addImages(List<BitmapWithUrl> images) {
+            mImages.addAll(images);
+        }
+
+        int mGalleryItemBackground;
+
+        public ImageAdapter(Context c) {
+            mContext = c;
+            // See res/values/style.xml for the <declare-styleable> that defines
+            // Gallery1.
+            TypedArray a = obtainStyledAttributes(R.styleable.Gallery1);
+            mGalleryItemBackground = a.getResourceId(
+                    R.styleable.Gallery1_android_galleryItemBackground, 0);
+            a.recycle();
+        }
+
+        public int getCount() {
+            return mImages.size();
+        }
+
+        public Object getItem(int position) {
+            return position;
+        }
+
+        public long getItemId(int position) {
+            return position;
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ImageView i = new ImageView(mContext);
+
+            i.setImageBitmap(mImages.get(position).bitmap);
+            i.setScaleType(ImageView.ScaleType.FIT_XY);
+            i.setLayoutParams(new Gallery.LayoutParams(300, 180)); // TODO other values for landscape?
+
+            // The preferred Gallery item background
+            i.setBackgroundResource(mGalleryItemBackground);
+
+            return i;
+        }
+
+        private Context mContext;
+    }
+
+    private class BitmapWithUrl {
+        Bitmap bitmap;
+        String url;
+
+        public BitmapWithUrl(Bitmap bitmap, String picUrlString) {
+            this.bitmap = bitmap;
+            this.url = picUrlString;
         }
     }
 
