@@ -33,6 +33,7 @@
     <string name="add">Add</string>
     <string name="from">from</string>
     <string name="get_user_detail">Getting user details ...</string>
+    <string name="get_preview">"Loading previews..."</string>
     <string name="From">From</string>
     <string name="to">to</string>
     <string name="please_sync_lists">Please sync lists</string>

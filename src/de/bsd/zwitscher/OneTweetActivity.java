@@ -369,7 +369,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      * @param status Status to analyze
      * @return List of Bitmaps to display
      */
-    private List<BitmapWithUrl> loadThumbnail(Status status) {
+    private List<BitmapWithUrl> loadThumbnails(Status status) {
         URL[] urlArray = status.getURLs();
         Set<String> urls = new HashSet<String>();
         if (urlArray!=null) {
@@ -477,14 +477,15 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         protected void onPreExecute() {
             super.onPreExecute();
             pg.setVisibility(ProgressBar.VISIBLE);
-            titleTextView.setText("Loading previews...");
+            String text = getString(R.string.get_preview);
+            titleTextView.setText(text);
         }
 
         @Override
         protected List<BitmapWithUrl> doInBackground(twitter4j.Status... statuses) {
             List<BitmapWithUrl> bitmapList=null;
             if (downloadPictures)
-                bitmapList = loadThumbnail(statuses[0]);
+                bitmapList = loadThumbnails(statuses[0]);
             return bitmapList;
         }
 
@@ -510,11 +511,13 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
             titleTextView.setText("");
             pg.setVisibility(ProgressBar.INVISIBLE);
-
         }
     }
 
-
+    /**
+     * Picture adapter for the Gallery that holds the images
+     * It is filled via data obtained via #loadThumbnails
+     */
     private class ImageAdapter extends BaseAdapter {
 
         private List<BitmapWithUrl> mImages = new ArrayList<BitmapWithUrl>();
@@ -563,6 +566,11 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         private Context mContext;
     }
 
+    /**
+     * Helper class that holds a bitmap along with the picture url,
+     * so that a click on the image in the gallery can start a browser
+     * window to the image service to browser the full size one.
+     */
     private class BitmapWithUrl {
         Bitmap bitmap;
         String url;

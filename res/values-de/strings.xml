@@ -22,6 +22,7 @@
     <string name="add">Hinzufügen</string>
     <string name="from">von</string>
     <string name="get_user_detail">Lade Benutzerdaten ...</string>
+    <string name="get_preview">"Lade Bildvorschau..."</string>
     <string name="From">Von</string>
     <string name="to">an</string>
     <string name="please_sync_lists">Bitte synchronisieren Sie die Listen</string>
