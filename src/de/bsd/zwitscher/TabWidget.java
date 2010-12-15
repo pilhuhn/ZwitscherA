@@ -78,7 +78,7 @@ public class TabWidget extends TabActivity {
         Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
         searchIntent.putExtra("list",1);
         homeSpec = tabHost.newTabSpec("searches")
-                .setIndicator("Search")//,res.getDrawable(R.drawable.ic_tab_list))
+                .setIndicator("Search",res.getDrawable(R.drawable.ic_tab_search))
                 .setContent(searchIntent);
         tabHost.addTab(homeSpec);
 
