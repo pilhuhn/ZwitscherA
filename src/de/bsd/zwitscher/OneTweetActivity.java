@@ -99,11 +99,15 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         // Download the user profile image in a background task, as this may
         // mean a network call.
         if (status.getRetweetedStatus()==null)
-            new DownloadImageTask().execute(status.getUser());
+            new DownloadUserImageTask().execute(status.getUser());
         else
-            new DownloadImageTask().execute(status.getRetweetedStatus().getUser());
+            new DownloadUserImageTask().execute(status.getRetweetedStatus().getUser());
 
-        new DownloadThumbnailTask(this).execute(status);
+        // Check if the tweet contains urls to picture services and load thumbnails
+        // if needed
+        List<UrlPair> pictureUrls = parseForPictureUrls(status);
+        if (!pictureUrls.isEmpty())
+            new DownloadImagePreviewsTask(this).execute(pictureUrls);
 
         TextView tv01 = (TextView) findViewById(R.id.TextView01);
         StringBuilder sb = new StringBuilder("<b>");
@@ -364,12 +368,12 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
 
     /**
-     * Load thumbnails of linked images if the url in the status is recognized
+     * Return urls for thumbnails of linked images if the url in the status is recognized
      * as an image service
      * @param status Status to analyze
      * @return List of Bitmaps to display
      */
-    private List<BitmapWithUrl> loadThumbnails(Status status) {
+    private List<UrlPair> parseForPictureUrls(Status status) {
         URL[] urlArray = status.getURLs();
         Set<String> urls = new HashSet<String>();
         if (urlArray!=null) {
@@ -390,7 +394,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         if (urls.size()==0)
             return Collections.emptyList();
 
-        List<BitmapWithUrl> bitmaps = new ArrayList<BitmapWithUrl>(urls.size());
+        ArrayList<UrlPair> urlPairs = new ArrayList<UrlPair>(urls.size());
+
 
         // We have urls, so check for picture services
         for (String url :  urls) {
@@ -411,15 +416,30 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 Log.d("OTA::loadThumbnails", "Url " + url + " not supported for preview");
                 continue;
             }
+            UrlPair pair = new UrlPair(url,finalUrlString);
+            urlPairs.add(pair);
+        }
+        return urlPairs;
+    }
 
-            Log.i("loadThumbail", "URL to load is " + finalUrlString);
+    /**
+     * Load thumbnails of linked images for the passed listOfUrlPairs
+     * @param listOfUrlPairs list of images to load (thumbnail url, url to full img)
+     * @return List of bitmaps along
+     */
+    private List<BitmapWithUrl> loadThumbnails(List<UrlPair> listOfUrlPairs) {
+
+        List<BitmapWithUrl> bitmaps = new ArrayList<BitmapWithUrl>(listOfUrlPairs.size());
+
+        for (UrlPair urlPair : listOfUrlPairs) {
+            Log.i("loadThumbail", "URL to load is " + urlPair.thumbnailUrl);
 
             try {
-                URL picUrl = new URL(finalUrlString);
+                URL picUrl = new URL(urlPair.thumbnailUrl);
                 BufferedInputStream in = new BufferedInputStream(picUrl.openStream());
                 Bitmap bitmap = BitmapFactory.decodeStream(in);
                 in.close();
-                BitmapWithUrl bwu = new BitmapWithUrl(bitmap,url);
+                BitmapWithUrl bwu = new BitmapWithUrl(bitmap,urlPair.fullUrl);
                 bitmaps.add(bwu);
             }
             catch (Exception e) {
@@ -434,7 +454,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Background task to download the user profile images.
      */
-    private class DownloadImageTask extends AsyncTask<User, Void,Bitmap> {
+    private class DownloadUserImageTask extends AsyncTask<User, Void,Bitmap> {
 
         @Override
         protected void onPreExecute() {
@@ -465,11 +485,11 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Background task to download the thumbnails of linked images
      */
-    private class DownloadThumbnailTask extends AsyncTask<Status,Void,List<BitmapWithUrl>> {
+    private class DownloadImagePreviewsTask extends AsyncTask<List<UrlPair>,Void,List<BitmapWithUrl>> {
 
         private Context context;
 
-        private DownloadThumbnailTask(Context context) {
+        private DownloadImagePreviewsTask(Context context) {
             this.context = context;
         }
 
@@ -482,10 +502,10 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         }
 
         @Override
-        protected List<BitmapWithUrl> doInBackground(twitter4j.Status... statuses) {
+        protected List<BitmapWithUrl> doInBackground(List<UrlPair>... urls) {
             List<BitmapWithUrl> bitmapList=null;
             if (downloadPictures)
-                bitmapList = loadThumbnails(statuses[0]);
+                bitmapList = loadThumbnails(urls[0]);
             return bitmapList;
         }
 
@@ -553,9 +573,10 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         public View getView(int position, View convertView, ViewGroup parent) {
             ImageView i = new ImageView(mContext);
 
-            i.setImageBitmap(mImages.get(position).bitmap);
+            Bitmap bitmap = mImages.get(position).bitmap;
+            i.setImageBitmap(bitmap);
             i.setScaleType(ImageView.ScaleType.FIT_XY);
-            i.setLayoutParams(new Gallery.LayoutParams(300, 180)); // TODO other values for landscape?
+            i.setLayoutParams(new Gallery.LayoutParams(bitmap.getWidth()*2, bitmap.getHeight()*2));
 
             // The preferred Gallery item background
             i.setBackgroundResource(mGalleryItemBackground);
@@ -581,4 +602,17 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         }
     }
 
+    /**
+     * Helper that just holds the urls of the full image service
+     * url and the link to the thumbnail
+     */
+    private class UrlPair {
+        String fullUrl;
+        String thumbnailUrl;
+
+        private UrlPair(String fullImageUrl, String thumbnailUrl) {
+            this.fullUrl = fullImageUrl;
+            this.thumbnailUrl = thumbnailUrl;
+        }
+    }
 }
