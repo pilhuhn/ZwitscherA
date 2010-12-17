@@ -329,15 +329,18 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     //////////////// speak related stuff end ////////////////////
 
     /**
-     * Translate the current status by calling Google translate
+     * Translate the current status by calling Google translate.
+     * Target language is the users current locale.
      * @param v
      */
     @SuppressWarnings("unused")
 	public void translate(View v) {
 		Translate.setHttpReferrer("http://bsd.de/zwitscher");
 		try {
-			// TODO get target language from system
-			String result = Translate.execute(status.getText(), Language.AUTO_DETECT, Language.GERMAN);
+            Language targetLanguage;
+            String locale = Locale.getDefault().getLanguage();
+            targetLanguage = Language.fromString(locale);
+			String result = Translate.execute(status.getText(), Language.AUTO_DETECT, targetLanguage);
 			AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 			builder.setMessage(result);
 			builder.setTitle("Translation result");
@@ -349,7 +352,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 			AlertDialog alert = builder.create();
 			alert.show();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			Toast.makeText(getApplicationContext(), e.getMessage(), 15000).show();
 		}
