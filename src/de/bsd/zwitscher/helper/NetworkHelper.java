@@ -49,8 +49,15 @@ public class NetworkHelper {
 
         Log.i("NetworkHelper","Current network is " + info.getTypeName() + ":" + info.getSubtypeName());
         Log.i("NetworkHelper","Current network is " + type + ":" + info.getSubtype());
+        Log.i("NetworkHelper","Desired config is  " + networkConfig);
 
-        int configType = Integer.parseInt(networkConfig);
+        int configType = 0;
+        try {
+            configType = Integer.parseInt(networkConfig);
+        } catch (NumberFormatException e) {
+            Log.w("NetworkHelper",e.getMessage());
+            configType = 5;
+        }
         if (configType==5) // Never
             return false;
         if (configType==1)

@@ -29,7 +29,7 @@
 
     <ListPreference android:title="@string/prefs_pic_loading"
                     android:summary="@string/prefs_pic_loading_descr"
-                    android:defaultValue="Always"
+                    android:defaultValue="1"
                     android:entryValues="@array/network_config_vals"
                     android:entries="@array/network_config"
                     android:key="networkConfig"/>
