@@ -25,12 +25,14 @@
             android:layout_height="wrap_content"
             android:stretchColumns="1"
             android:shrinkColumns="1"
+            android:paddingBottom="10dp"
             >
         <TableRow>
             <TextView android:text="@string/location"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_location"
+                      style="@style/helpText"
                     />
         </TableRow>
         <TableRow>
@@ -39,6 +41,7 @@
                     />
             <TextView android:id="@+id/userDetail_web"
                       android:autoLink="web"
+                      style="@style/helpText"
                     />
         </TableRow>
         <TableRow>
@@ -46,7 +49,7 @@
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_bio"
-
+                      style="@style/helpText"
                     />
         </TableRow>
         <TableRow>
@@ -54,6 +57,7 @@
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_tweetCount"
+                      style="@style/helpText"
                     />
         </TableRow>
         <TableRow>
@@ -62,6 +66,7 @@
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_followerCount"
+                      style="@style/helpText"
                     />
         </TableRow>
         <TableRow>
@@ -70,6 +75,7 @@
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_followingCount"
+                      style="@style/helpText"
                     />
         </TableRow>
         <TableRow>
@@ -78,6 +84,7 @@
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_listedCount"
+                      style="@style/helpText"
                     />
         </TableRow>
     </TableLayout>
