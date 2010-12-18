@@ -20,7 +20,7 @@
                 android:id="@+id/UserPictureImageView"/>
 
 
-    <TableLayout
+    <TableLayout android:id="@+id/user_table_layout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:stretchColumns="1"

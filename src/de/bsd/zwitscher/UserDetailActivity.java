@@ -3,29 +3,31 @@ package de.bsd.zwitscher;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
-import twitter4j.Twitter;
 import twitter4j.User;
-import twitter4j.UserList;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 
 /**
  * Show details about a user and allow to follow
@@ -73,7 +75,7 @@ public class UserDetailActivity extends Activity  {
     }
 
     /**
-     * Fill data of the passwd user in the form fields.
+     * Fill data of the passed user in the form fields.
      * @param user
      */
     private void fillDetails(User user, boolean weAreFollowing) {
@@ -82,8 +84,34 @@ public class UserDetailActivity extends Activity  {
             String uName = "<b>" + user.getName() + "</b>" + " (" + user.getScreenName() + ")";
             userNameView.setText(Html.fromHtml(uName));
 
-            PicHelper picHelper = new PicHelper();
+            String colorString = user.getProfileBackgroundColor();
+            getWindow().setTitleColor(Color.parseColor("#" + colorString));
             boolean downloadImages = new NetworkHelper(this).mayDownloadImages();
+            if (downloadImages) {
+                try {
+                    URL url = new URL(user.getProfileBackgroundImageUrl());
+                    InputStream is = url.openStream();
+                    Drawable background = Drawable.createFromStream(is,"lala");
+                    getWindow().setBackgroundDrawable(background);
+                } catch (IOException e) {
+                    e.printStackTrace();  // TODO: Customise this generated block
+                }
+            }
+            String textColorString = user.getProfileTextColor();
+            int textColor = Color.parseColor("#" + textColorString);
+
+            userNameView.setTextColor(textColor);
+
+            TableLayout tl = (TableLayout) findViewById(R.id.user_table_layout);
+            for (int i = 0 ; i < tl.getChildCount(); i++) {
+                TableRow row = (TableRow) tl.getChildAt(i);
+                for (int j = 0 ; j < row.getChildCount(); j++) {
+                    TextView tv = (TextView) row.getChildAt(j);
+                    tv.setTextColor(textColor);
+                }
+            }
+
+            PicHelper picHelper = new PicHelper();
             Bitmap bitmap;
             if (downloadImages)
                 bitmap = picHelper.fetchUserPic(user);
@@ -101,20 +129,22 @@ public class UserDetailActivity extends Activity  {
             bioView.setText(user.getDescription());
 
             TextView webView = (TextView) findViewById(R.id.userDetail_web);
-            if (user.getURL()!=null)
+            if (user.getURL()!=null) {
                 webView.setText(user.getURL().toString());
+                webView.setTextColor(Color.parseColor("#" + user.getProfileLinkColor()));
+            }
 
             TextView tweetView = (TextView) findViewById(R.id.userDetail_tweetCount);
-            tweetView.setText(""+user.getStatusesCount());
+            tweetView.setText("" + user.getStatusesCount());
 
             TextView followersView = (TextView) findViewById(R.id.userDetail_followerCount);
-            followersView.setText(""+user.getFollowersCount());
+            followersView.setText("" + user.getFollowersCount());
 
             TextView followingView = (TextView) findViewById(R.id.userDetail_followingCount);
-            followingView.setText(""+user.getFriendsCount());
+            followingView.setText("" + user.getFriendsCount());
 
             TextView listedView = (TextView) findViewById(R.id.userDetail_listedCount);
-            listedView.setText(""+user.getListedCount());
+            listedView.setText("" + user.getListedCount());
 
 
             followButton.setEnabled(true);
