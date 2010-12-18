@@ -126,5 +126,19 @@
                 android:src="@drawable/direct_button"
                 android:text="Direct"/>
     </LinearLayout>
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:orientation="horizontal"
+        >
+        <!-- TODO convert to ImageButton -->
+        <Button android:text="view on web"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:onClick="viewOnWeb"
+                android:enabled="true"/>
+
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
@@ -182,7 +183,7 @@ public class UserDetailActivity extends Activity  {
     */
     @SuppressWarnings("unused")
     public void directMessage(View v) {
-       Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
+       Intent i = new Intent(this, NewTweetActivity.class);
        i.putExtra("user",theUser);
        i.putExtra("op", getString(R.string.direct));
        startActivity(i);
@@ -202,6 +203,18 @@ public class UserDetailActivity extends Activity  {
         }
     }
 
+    /**
+     * Start a browser to view user on server
+     * Triggered from a button
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void viewOnWeb(View v) {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        String u = "http://twitter.com/#!/" + theUser.getScreenName();
+        i.setData(Uri.parse(u));
+        startActivity(i);
+    }
 
     /**
      * Called from the addToList button
