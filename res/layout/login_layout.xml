@@ -14,6 +14,7 @@
 		android:layout_height="wrap_content"
         android:layout_below="@id/login_text"
 		android:id="@+id/GetPinButton"
+        android:onClick="getPinButton"
 		android:text="Get pin from Twitter"/>
 <EditText
 		  android:layout_width="wrap_content"
@@ -30,6 +31,7 @@
  		android:id="@+id/setPinButton"
  		android:layout_below="@id/GetPinButton"
  		android:layout_toRightOf="@id/pinText"
+        android:onClick="setPinButton"
  		android:text="Set Pin"/>
 
 </RelativeLayout>

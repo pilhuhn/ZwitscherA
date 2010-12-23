@@ -33,4 +33,7 @@
         <item>yfrog</item>
         <item>twitpic</item>
     </string-array>
+    <string-array name="services">
+        <item>Twitter</item>
+    </string-array>
 </resources>

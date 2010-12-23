@@ -45,6 +45,12 @@
         <br/><br/>
         You only have to do this once at initial login
     </string>
+    <string name="please_log_in">Please log in</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Log in...</string>
+    <string name="service">Service</string>
+
 
     <!-- preferences -->
     <string name="prefs_location_enabled">Location enabled</string>

@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.*;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
 import twitter4j.json.DataObjectFactory;
@@ -254,6 +256,11 @@ public class TwitterHelper {
         return requestToken;
 	}
 
+    /**
+     * Get an auth token the classical OAuth way
+     * @param pin
+     * @throws Exception
+     */
 	public void generateAuthToken(String pin) throws Exception{
         Twitter twitter = new TwitterFactory().getInstance();
         twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
@@ -266,9 +273,30 @@ public class TwitterHelper {
 		editor.putString("accessToken", accessToken.getToken());
 		editor.putString("accessTokenSecret", accessToken.getTokenSecret());
 		editor.commit();
-
-
 	}
+
+    /**
+     * Get an auth token the xAuth way. This only works if especially enabled by Twitter
+     * @param username
+     * @param password
+     * @throws Exception
+     */
+    public void generateAuthToken(String username, String password) throws Exception {
+        ConfigurationBuilder cb = new ConfigurationBuilder();
+        cb.setOAuthConsumerKey(TwitterConsumerToken.consumerKey);
+        cb.setOAuthConsumerSecret(TwitterConsumerToken.consumerSecret);
+        Configuration conf = cb.build() ;
+        Twitter twitter = new TwitterFactory(conf).getInstance(username,password);
+//        twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
+
+        AccessToken accessToken = twitter.getOAuthAccessToken();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Editor editor = preferences.edit();
+        editor.putString("accessToken", accessToken.getToken());
+        editor.putString("accessTokenSecret", accessToken.getTokenSecret());
+        editor.commit();
+
+    }
 
 	public UpdateResponse updateStatus(UpdateRequest request) {
 		Twitter twitter = getTwitter();
@@ -371,7 +399,7 @@ public class TwitterHelper {
         Log.i("getUserList","Now we have " + statuses.size());
 
         MetaList<Status> metaList = new MetaList<Status>(statuses,numOriginal,filled);
-Log.d("getUsetList","Returning " + metaList);
+Log.d("getUsetList", "Returning " + metaList);
         return metaList;
 	}
 

@@ -40,6 +40,12 @@
         und starten von dort Zwitscher erneut. Geben Sie die PIN ein und klicken auf "Set pin".<br/><br/>
         Sie müssen dies nur einmal machen.
     </string>
+    <string name="please_log_in">Bitte einloggen</string>
+    <string name="username">Benutzername</string>
+    <string name="password">Passwort</string>
+    <string name="login">Einloggen...</string>
+    <string name="service">Dienst</string>
+
 
     <!-- preferences -->
     <string name="prefs_location_enabled">Position senden</string>
