@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -84,8 +86,10 @@ public class TabWidget extends TabActivity {
 
 		tabHost.setCurrentTab(0); // Home tab, tabs start at 0
 
-
+        new InitialSyncTask(this).execute(accountId);
 	}
+
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -194,6 +198,30 @@ public class TabWidget extends TabActivity {
     private void cleanImages() {
         PicHelper ph = new PicHelper();
         ph.cleanup();
+    }
+
+    /**
+     * Helper class that triggers syncing of lists and searches
+     * at start when both are empty.
+     */
+    private class InitialSyncTask extends AsyncTask<Integer,Void,Void> {
+
+        private Context context;
+
+        private InitialSyncTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Integer... params) {
+            int accountId = params[0];
+
+            TweetDB tdb = new TweetDB(context,accountId);
+            if (tdb.getLists().size()==0 && tdb.getSavedSearches().size()==0)
+                syncLists();
+
+            return null;
+        }
     }
 
 }
