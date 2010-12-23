@@ -30,13 +30,6 @@
  		android:id="@+id/setPinButton"
  		android:layout_below="@id/GetPinButton"
  		android:layout_toRightOf="@id/pinText"
- 		android:text="Set Pin"></Button>
+ 		android:text="Set Pin"/>
 
-<!--
-<Button android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/continueButton"
-		android:layout_below="@id/pinText"
-		android:text="Continue..."/>
--->
 </RelativeLayout>
