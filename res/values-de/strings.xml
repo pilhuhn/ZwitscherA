@@ -45,6 +45,8 @@
     <string name="password">Passwort</string>
     <string name="login">Einloggen...</string>
     <string name="service">Dienst</string>
+    <string name="new_mentions">Neue Erwähnung(en)</string>
+
 
 
     <!-- preferences -->

@@ -50,6 +50,7 @@
     <string name="password">Password</string>
     <string name="login">Log in...</string>
     <string name="service">Service</string>
+    <string name="new_mentions">new mentions</string>
 
 
     <!-- preferences -->

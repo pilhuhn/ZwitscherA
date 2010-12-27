@@ -1,14 +1,17 @@
 package de.bsd.zwitscher;
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import de.bsd.zwitscher.helper.CaseInsensitiveStringComparator;
+import de.bsd.zwitscher.helper.MetaList;
+import twitter4j.Paging;
 import twitter4j.SavedSearch;
+import twitter4j.Status;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,12 +24,14 @@ import java.util.Set;
  *
  * @author Heiko W. Rupp
  */
-public class ListOfListsActivity extends ListActivity {
+public class ListOfListsActivity extends AbstractListActivity {
 
     TwitterHelper th;
     TweetDB tdb;
     Set<Map.Entry<String, Integer>> userListsEntries;
     int mode;
+    ArrayAdapter<String> adapter;
+
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +40,10 @@ public class ListOfListsActivity extends ListActivity {
         th = new TwitterHelper(this);
         tdb = new TweetDB(this,0); // TODO set correct account
         mode = getIntent().getIntExtra("list",0);
+
+        setContentView(R.layout.tweet_list_layout);
+        ImageButton reloadButton = (ImageButton) findViewById(R.id.tweet_list_reload_button);
+        reloadButton.setEnabled(false);  // TODO enable later
     }
 
 
@@ -69,7 +78,8 @@ public class ListOfListsActivity extends ListActivity {
             throw new IllegalArgumentException("Unknown mode " + mode);
 
         Collections.sort(result, new CaseInsensitiveStringComparator());
-        setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, result));
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, result);
+        setListAdapter(adapter);
 
     }
 
@@ -113,6 +123,36 @@ public class ListOfListsActivity extends ListActivity {
                     startActivity(intent);
                 }
             }
+        }
+    }
+
+    @Override
+    public void reload(View v) {
+        TwitterHelper th = new TwitterHelper(this);
+        TweetDB tdb = new TweetDB(this,0); // TODO correct account
+        if (mode==0) {
+            for (Map.Entry<String,Integer> userList : userListsEntries) {
+                Paging paging = new Paging();
+                paging.setCount(100);
+                int listId = userList.getValue();
+                long lastFetched = tdb.getLastRead(listId);
+                if (lastFetched>0)
+                    paging.setSinceId(lastFetched);
+                MetaList<Status> list = th.getTimeline(paging,listId,false);
+                long newOnes = list.getNumOriginal();
+
+                ListView listView = getListView();
+                for (int i = 0; i < listView.getCount(); i++) {
+                    String itemAtI = (String) listView.getItemAtPosition(i);
+                    if (itemAtI.equals(userList.getKey())) {
+                        adapter.remove(itemAtI);
+                        itemAtI = itemAtI + "(" + newOnes + ")";
+                        adapter.insert(itemAtI,i);
+                    }
+                }
+            }
+        } else if (mode==1) {
+            // TODO
         }
     }
 }

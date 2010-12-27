@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.ListActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -32,7 +31,7 @@ import twitter4j.Tweet;
  * </ul>
  * @author Heiko W. Rupp
  */
-public class TweetListActivity extends ListActivity implements AbsListView.OnScrollListener,
+public class TweetListActivity extends AbstractListActivity implements AbsListView.OnScrollListener,
         OnItemClickListener, OnItemLongClickListener {
 
     List<Status> statuses;
@@ -46,6 +45,7 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     TweetDB tdb;
     TwitterHelper th;
     ListView lv;
+    int newMentions=0;
 
     /**
      * Called when the activity is first created.
@@ -194,7 +194,19 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
         switch (list_id) {
         case 0:
+            // Home time line
         	myStatuses = th.getTimeline(paging,list_id, fromDbOnly);
+
+            // Also check for directs
+            if (!fromDbOnly) {
+                long mentionLast = tdb.getLastRead(-1);
+                paging = new Paging().count(100);
+
+                if (mentionLast>0)
+                    paging.setSinceId(mentionLast);
+                MetaList<Status> mentions = th.getTimeline(paging,-1,fromDbOnly);
+                newMentions = mentions.getNumOriginal();
+            }
         	break;
         case -1:
         	myStatuses = th.getTimeline(paging, list_id, fromDbOnly);
@@ -277,25 +289,6 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     @SuppressWarnings("unused")
     public void done(View v) {
         finish();
-    }
-
-    /**
-     * Scrolls to top, called from the ToTop button
-     * @param v
-     */
-    @SuppressWarnings("unused")
-    public void scrollToTop(View v) {
-        getListView().setSelection(0);
-    }
-
-    /**
-     * Called from the post button
-     * @param v
-     */
-    @SuppressWarnings("unused")
-    public void post(View v) {
-        Intent i = new Intent(this, NewTweetActivity.class);
-        startActivity(i);
     }
 
     private void fillListViewFromTimeline(boolean fromDbOnly) {
@@ -388,6 +381,11 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             if (titleTextBox!=null)
                 titleTextBox.setText("");
 	        getListView().requestLayout();
+            if (newMentions>0) {
+                newMentions=0;
+                String s = getString(R.string.new_mentions);
+                Toast.makeText(thisActivity,newMentions + " " + s,Toast.LENGTH_LONG).show();
+            }
 
             // Only do the next if we actually did an update from twitter
             if (!fromDbOnly) {
