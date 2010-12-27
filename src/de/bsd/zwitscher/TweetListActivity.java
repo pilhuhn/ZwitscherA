@@ -382,9 +382,9 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 titleTextBox.setText("");
 	        getListView().requestLayout();
             if (newMentions>0) {
-                newMentions=0;
                 String s = getString(R.string.new_mentions);
                 Toast.makeText(thisActivity,newMentions + " " + s,Toast.LENGTH_LONG).show();
+                newMentions=0;
             }
 
             // Only do the next if we actually did an update from twitter
