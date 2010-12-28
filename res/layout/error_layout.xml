@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
            android:layout_height="fill_parent"
            android:layout_width="fill_parent"
+           android:orientation="vertical"
         >
 
     <ImageView android:id="@+id/error_image"
@@ -12,16 +13,27 @@
               android:src="@drawable/icon"
             />
 
+
     <TextView android:id="@+id/error_head"
               android:layout_height="wrap_content"
               android:layout_width="fill_parent"
-              android:layout_toRightOf="@id/error_image"
+              android:paddingBottom="4dp"
+              android:padding="8dp"
               />
     <TextView android:id="@+id/error_text"
               android:layout_height="wrap_content"
               android:layout_width="fill_parent"
-              android:layout_toRightOf="@id/error_image"
-              android:layout_below="@id/error_head"
               />
+    <EditText android:id="@+id/error_message"
+              android:layout_height="wrap_content"
+              android:layout_width="fill_parent"
+              android:editable="false"
+              />
+    <Button android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:onClick="doneButton"
+            android:text="Ok"
+        />
 
-</RelativeLayout>
+
+</LinearLayout>

@@ -307,7 +307,7 @@ public class TwitterHelper {
             updateResponse.setMessage("Tweet sent");
             updateResponse.setSuccess();
 		} catch (TwitterException e) {
-            updateResponse.setMessage("Failed to send tweet: " + e.getLocalizedMessage());
+            updateResponse.setMessage( e.getLocalizedMessage());
             updateResponse.setFailure();
         }
         return updateResponse;
@@ -322,7 +322,7 @@ public class TwitterHelper {
 			response.setMessage("Retweeted successfully");
 		} catch (TwitterException e) {
             response.setFailure();
-            response.setMessage("Failed to  retweet: " + e.getLocalizedMessage());
+            response.setMessage(e.getLocalizedMessage());
 		}
         return response;
 	}
@@ -347,7 +347,7 @@ public class TwitterHelper {
             updateResponse.setMessage("(Un)favorite set");
 		} catch (Exception e) {
             updateResponse.setFailure();
-            updateResponse.setMessage("Failed to (un)create a favorite: " + e.getLocalizedMessage());
+            updateResponse.setMessage(e.getLocalizedMessage());
 		}
         updateResponse.setStatus(status);
         return updateResponse;
@@ -363,7 +363,7 @@ public class TwitterHelper {
             updateResponse.setMessage("Direct message sent");
         } catch (TwitterException e) {
             updateResponse.setFailure();
-            updateResponse.setMessage("Sending of direct tweet failed: " + e.getLocalizedMessage());
+            updateResponse.setMessage(e.getLocalizedMessage());
             updateResponse.setOrigMessage(request.message);
         }
         return updateResponse;

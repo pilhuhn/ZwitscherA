@@ -1,15 +1,16 @@
 package de.bsd.zwitscher;
 
+import javax.management.monitor.StringMonitor;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.text.Html;
+import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
-import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 import twitter4j.StatusUpdate;
@@ -101,27 +102,33 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
     private void createNotification(UpdateResponse result) {
         String ns = Context.NOTIFICATION_SERVICE;
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(ns);
+        mNotificationManager.cancelAll();
         int icon = R.drawable.icon; // TODO create small version for status bar
         Notification notification = new Notification(icon,result.getUpdateType().toString() + " failed",System.currentTimeMillis());
 
-        String head = "<b>" + result.getUpdateType() + " failed:</b> ";
-        String text =  result.getMessage() + "<br/>";
+        String head =  result.getUpdateType() + " failed:";
+        String text =  result.getMessage();
+        String message ="";
         if (result.getUpdateType()==UpdateType.UPDATE)
-            text += result.getUpdate().getStatus();
+            message= result.getUpdate().getStatus();
         if (result.getUpdateType()==UpdateType.DIRECT)
-            text += result.getOrigMessage();
+            message= result.getOrigMessage();
 
-        RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.error_layout);
         //contentView.setImageViewResource(R.id.image, R.drawable.notification_image);
-        contentView.setTextViewText(R.id.error_head, Html.fromHtml(head));
-        contentView.setTextViewText(R.id.error_text, Html.fromHtml(text));
-        notification.contentView = contentView;
 
-        Intent intent = new Intent(context,LoginActivity.class);
-        PendingIntent pintent = PendingIntent.getActivity(context,0,intent,0);
-        notification.contentIntent =pintent;
+        Intent intent = new Intent(context,ErrorDisplayActivity.class);
+        Bundle bundle=new Bundle(3);
+        bundle.putString("e_head", head);
+        bundle.putString("e_body", text);
+        bundle.putString("e_text", message);
+        intent.putExtras(bundle);
+        PendingIntent pintent = PendingIntent.getActivity(context,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
 
-        mNotificationManager.notify(1,notification); // TODO better id generation ?
+        notification.setLatestEventInfo(context,
+                head,
+                text,
+                pintent);
+        mNotificationManager.notify(3,notification);
     }
 
 }
