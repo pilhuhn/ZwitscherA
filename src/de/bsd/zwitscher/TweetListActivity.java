@@ -46,6 +46,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     TwitterHelper th;
     ListView lv;
     int newMentions=0;
+    private int newDirects=0;
 
     /**
      * Called when the activity is first created.
@@ -197,7 +198,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             // Home time line
         	myStatuses = th.getTimeline(paging,list_id, fromDbOnly);
 
-            // Also check for directs
+            // Also check for mentions + directs
             if (!fromDbOnly) {
                 long mentionLast = tdb.getLastRead(-1);
                 paging = new Paging().count(100);
@@ -206,6 +207,20 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     paging.setSinceId(mentionLast);
                 MetaList<Status> mentions = th.getTimeline(paging,-1,fromDbOnly);
                 newMentions = mentions.getNumOriginal();
+                long id = mentions.getList().get(0).getId();
+                tdb.updateOrInsertLastRead(-1,id);
+
+                long directsLast = tdb.getLastRead(-2);
+                paging = new Paging().count(100);
+
+                if (directsLast>0)
+                    paging.setSinceId(directsLast);
+
+                MetaList<DirectMessage> directs = th.getDirectMessages(false,paging);
+                newDirects = directs.getNumOriginal();
+                id = mentions.getList().get(0).getId();
+                tdb.updateOrInsertLastRead(-2,id);
+
             }
         	break;
         case -1:
@@ -312,7 +327,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             if (adapter instanceof StatusAdapter) {
                 StatusAdapter sta = (StatusAdapter) adapter;
                 if (totalCount>0) {
-                    TwitterHelper th = new TwitterHelper(thisActivity);
                     Object item = sta.getItem(totalCount - 1);
                     int i = 0;
                     if (item instanceof  DirectMessage) {
@@ -385,6 +399,11 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 String s = getString(R.string.new_mentions);
                 Toast.makeText(thisActivity,newMentions + " " + s,Toast.LENGTH_LONG).show();
                 newMentions=0;
+            }
+            if (newDirects>0) {
+                String s = getString(R.string.new_directs);
+                Toast.makeText(thisActivity,newDirects + " " + s,Toast.LENGTH_LONG).show();
+                newDirects=0;
             }
 
             // Only do the next if we actually did an update from twitter

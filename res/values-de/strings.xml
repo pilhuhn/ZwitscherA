@@ -46,6 +46,7 @@
     <string name="login">Einloggen...</string>
     <string name="service">Dienst</string>
     <string name="new_mentions">Neue Erwähnung(en)</string>
+    <string name="new_directs">Neue direkt(e) Nachricht(en)</string>
 
 
 
@@ -63,7 +64,7 @@
     <string name="prefs_pic_roaming">Roaming</string>
     <string name="prefs_pic_roaming_descr">Dürfen während des Roamings Bilder geladen werden?</string>
     <string name="prefs_pictureService">Picture Service</string>
-    <string name="prefs_pictureService_descr">Choose a service for picture uploading</string>
+    <string name="prefs_pictureService_descr">Dienst für hochgeladene Bilder</string>
     <!-- preferences -->
     <string name="help">Hilfe</string>
     <string name="help_common">Diese Seite zeigt alle in Zwitscher verwendeten Icons</string>

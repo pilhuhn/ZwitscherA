@@ -51,6 +51,7 @@
     <string name="login">Log in...</string>
     <string name="service">Service</string>
     <string name="new_mentions">new mentions</string>
+    <string name="new_directs">new direct messages</string>
 
 
     <!-- preferences -->
