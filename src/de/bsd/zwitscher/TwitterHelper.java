@@ -473,7 +473,7 @@ Log.d("FillUp","Return: " + i);
         Status status = null;
 
         if (!directOnly) {
-            String obj  = tweetDB.getStatusObjectById(statusId);
+            String obj  = tweetDB.getStatusObjectById(statusId, list_id);
             if (obj!=null) {
                 status = materializeStatus(obj);
                 if (status!=null)
@@ -577,7 +577,7 @@ Log.d("FillUp","Return: " + i);
     }
 
     private void persistStatus(TweetDB tdb, Status status, long list_id) throws IOException {
-        if (tdb.getStatusObjectById(status.getId())!=null)
+        if (tdb.getStatusObjectById(status.getId(), list_id)!=null)
             return; // This is already in DB, so do nothing
 
         // Serialize and then store in DB

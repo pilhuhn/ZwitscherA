@@ -232,16 +232,41 @@ public class TweetDB {
     }
 
     /**
-     * Return the blob of one stored status by its (unique) id.
+     * Return the blob of one stored status by its id and list_id.
+     * A status with the same id can occur multiple times with various
+     * listIds.
+     *
      * @param statusId The id of the status
+     * @param listId The id of the list this status appears
      * @return The json_string if the status exists in the DB or null otherwise
      */
-    public String getStatusObjectById(long statusId) {
+    public String getStatusObjectById(long statusId, Long listId) {
 
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         String ret = null;
         Cursor c;
-        c= db.query(TABLE_STATUSES,new String[]{STATUS},"id = ? AND " + ACCOUNT_ID_IS,new String[]{String.valueOf(statusId),account},null,null,null);
+        String statusIdS = String.valueOf(statusId);
+        if (listId!=null) {
+            c= db.query(TABLE_STATUSES, // Table
+                    new String[]{STATUS}, // returned column
+                    "id = ? AND list_id = ? AND " + ACCOUNT_ID_IS, // selection
+                    new String[]{statusIdS,String.valueOf(listId),account}, // selection param
+                    null, // groupBy
+                    null, // having
+                    null // order by
+            );
+        }
+        else { // We don't care here - just take one if present
+            c= db.query(TABLE_STATUSES, // Table
+                    new String[]{STATUS}, // returned column
+                    "id = ? AND " + ACCOUNT_ID_IS, // selection
+                    new String[]{statusIdS,account}, // selection param
+                    null, // groupBy
+                    null, // having
+                    null // order by
+            );
+
+        }
         if (c.getCount()>0){
             c.moveToFirst();
             ret = c.getString(0);
@@ -289,10 +314,27 @@ public class TweetDB {
         List<String> ret = new ArrayList<String>();
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
+        String listIdS = String.valueOf(list_id);
         if (sinceId>-1)
-            c = db.query(TABLE_STATUSES,new String[]{STATUS},"id < ? AND list_id = ? AND " +ACCOUNT_ID_IS,new String[]{String.valueOf(sinceId),String.valueOf(list_id),account},null,null,"ID DESC",String.valueOf(howMany));
-        else
-            c = db.query(TABLE_STATUSES,new String[]{STATUS},"list_id = ? AND " + ACCOUNT_ID_IS,new String[]{String.valueOf(list_id),account},null,null,"ID DESC",String.valueOf(howMany));
+            c = db.query(TABLE_STATUSES, // Table
+                    new String[]{STATUS}, // Columns returned
+                    "id < ? AND list_id = ? AND " +ACCOUNT_ID_IS, // selection
+                    new String[]{String.valueOf(sinceId), listIdS,account}, // selection values
+                    null, // group by
+                    null, // having
+                    "ID DESC", // order by
+                    String.valueOf(howMany) // limit
+            );
+        else // since id = -1 -> just get the n newest
+            c = db.query(TABLE_STATUSES, // Table
+                    new String[]{STATUS}, // Columns returned
+                    "list_id = ? AND " + ACCOUNT_ID_IS, // selection
+                    new String[]{listIdS,account},  // selection values
+                    null, // group by
+                    null, // having
+                    "ID DESC", // order by
+                    String.valueOf(howMany) // limit
+            );
 
         if (c.getCount()>0){
             c.moveToFirst();
