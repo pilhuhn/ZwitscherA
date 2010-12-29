@@ -17,7 +17,6 @@
         android:layout_height="wrap_content"
         android:lines="4"
         android:inputType="textMultiLine"
-        android:maxLength="140"
         android:layout_below="@id/textOben"
         android:gravity="top|left"
        />
@@ -65,6 +64,13 @@
                  android:layout_height="wrap_content"
                  android:layout_below="@id/CharCount"
 			     android:layout_toRightOf="@id/GeoCheckBox"
+                 />
+    <ImageButton android:src="@drawable/select_user"
+                 android:onClick="selectUser"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_below="@id/CharCount"
+                 android:layout_toRightOf="@id/nt_CameraButton"
                  />
     <Button android:id="@+id/TweetButton"
             android:text="@string/TweetButton"

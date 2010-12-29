@@ -1,12 +1,14 @@
 package de.bsd.zwitscher;
 
+import javax.management.monitor.StringMonitor;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.view.View;
+import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -77,9 +79,10 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
         if (result.getUpdateType()==UpdateType.UPLOAD_PIC) {
             TextView textView = (TextView) result.view;
-            CharSequence text = textView.getText();
-            text = result.getMessage() + " " + text;
-            textView.setText(text);
+            if (textView.getText().length()==0)
+                textView.setText(result.getMessage());
+            else
+                textView.append(" " + result.getMessage());
 
         } else if (result.getUpdateType() == UpdateType.FAVORITE) {
             ImageButton favoriteButton = (ImageButton) result.view;
@@ -99,22 +102,33 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
     private void createNotification(UpdateResponse result) {
         String ns = Context.NOTIFICATION_SERVICE;
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(ns);
+        mNotificationManager.cancelAll();
         int icon = R.drawable.icon; // TODO create small version for status bar
         Notification notification = new Notification(icon,result.getUpdateType().toString() + " failed",System.currentTimeMillis());
 
-        Intent intent = new Intent(context,OneTweetActivity.class);
-        PendingIntent pintent = PendingIntent.getActivity(context,0,intent,0);
-
-        String text = result.getMessage() + "<br/>";
+        String head =  result.getUpdateType() + " failed:";
+        String text =  result.getMessage();
+        String message ="";
         if (result.getUpdateType()==UpdateType.UPDATE)
-            text += result.getUpdate().getStatus();
+            message= result.getUpdate().getStatus();
+        if (result.getUpdateType()==UpdateType.DIRECT)
+            message= result.getOrigMessage();
+
+        //contentView.setImageViewResource(R.id.image, R.drawable.notification_image);
+
+        Intent intent = new Intent(context,ErrorDisplayActivity.class);
+        Bundle bundle=new Bundle(3);
+        bundle.putString("e_head", head);
+        bundle.putString("e_body", text);
+        bundle.putString("e_text", message);
+        intent.putExtras(bundle);
+        PendingIntent pintent = PendingIntent.getActivity(context,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
 
         notification.setLatestEventInfo(context,
-                result.getUpdateType() + " failed",
+                head,
                 text,
                 pintent);
-
-        mNotificationManager.notify(1,notification); // TODO better id generation ?
+        mNotificationManager.notify(3,notification);
     }
 
 }

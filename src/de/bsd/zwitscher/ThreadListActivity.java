@@ -1,6 +1,7 @@
 package de.bsd.zwitscher;
 
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,11 +25,14 @@ public class ThreadListActivity extends ListActivity {
 
     ProgressBar pg;
     TextView titleTextBox;
+    Context thisActivity;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        thisActivity = this;
 
         requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         // Set the layout of the list activity
@@ -45,26 +49,30 @@ public class ThreadListActivity extends ListActivity {
         ImageButton reloadButton = (ImageButton) findViewById(R.id.tweet_list_reload_button);
         reloadButton.setVisibility(View.GONE);
 
+        // Pull the start id ( = id of the calling s
         Intent i = getIntent();
+        Bundle b = i.getExtras();
+        long startId = 0;
+        if (b!=null)
+            startId = b.getLong("startId");
 
-        new GetConversationTask().execute(i);
+        new GetConversationTask().execute(startId);
 
     }
 
-
-
-    void fillConversation(Intent i) {
+    /**
+     * Do the magic of getting the coversation starting with the status with
+     * id <i>statusId</i>.
+     * @param statusId Id of the status to start with
+     * @return List of Status that are involved in the conversation (may not be complete).
+     */
+    List<Status> getConversation(long statusId) {
 
         List<Status> result = new ArrayList<Status>();
 
-        Bundle b = i.getExtras();
-        long id = 0;
-        if (b!=null)
-            id = b.getLong("startId");
-
         TwitterHelper th = new TwitterHelper(this);
 
-        Status status = th.getStatusById(id,null, false, true) ;
+        Status status = th.getStatusById(statusId,null, false, true) ;
         while (status!=null) {
             List<Status> replies = th.getRepliesToStatus(status.getId());
             for (Status reply : replies) {
@@ -80,11 +88,7 @@ public class ThreadListActivity extends ListActivity {
                 status=null;
         }
 
-        setListAdapter(new StatusAdapter<twitter4j.Status>(this, R.layout.tweet_list_item, result));
-
-        ListView lv = getListView();
-        lv.requestLayout();
-
+        return result;
     }
 
     /**
@@ -115,32 +119,36 @@ public class ThreadListActivity extends ListActivity {
         startActivity(i);
     }
 
-
-    private class GetConversationTask extends AsyncTask<Intent,Void,Void> {
+    /**
+     * Task to get the conversation in the background
+     */
+    private class GetConversationTask extends AsyncTask<Long,Void,List<twitter4j.Status>> {
 
         @Override
-        protected Void doInBackground(Intent... params) {
-            Intent i = params[0];
-            fillConversation(i);
-            return null;
+        protected List<twitter4j.Status> doInBackground(Long... params) {
+            Long i = params[0];
+            return getConversation(i);
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
 
-            pg.setVisibility(ProgressBar.INVISIBLE);
-            titleTextBox.setText("");
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
             pg.setVisibility(ProgressBar.VISIBLE);
             String s = getString(R.string.getting_conversation)+ "...";
             titleTextBox.setText(s);
 
+        }
+
+        @Override
+        protected void onPostExecute(List<twitter4j.Status> statusList) {
+            pg.setVisibility(ProgressBar.INVISIBLE);
+            titleTextBox.setText("");
+
+            setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, R.layout.tweet_list_item, statusList));
+
+            ListView lv = getListView();
+            lv.requestLayout();
         }
     }
 }

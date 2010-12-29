@@ -1,9 +1,12 @@
 package de.bsd.zwitscher;
 
 
+import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.Html;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.*;
 import com.google.api.translate.Language;
@@ -43,9 +46,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 	Status status ;
     ImageView userPictureView;
     ProgressBar pg;
-    ImageView thumbnailView;
     boolean downloadPictures=false;
     TextToSpeech tts;
+    TextView titleTextView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,83 +61,109 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+        titleTextView = (TextView) findViewById(R.id.title_msg_box);
 
         userPictureView = (ImageView) findViewById(R.id.UserPictureImageView);
-        thumbnailView = (ImageView) findViewById(R.id.OTImageView);
 
         NetworkHelper networkHelper = new NetworkHelper(this);
         downloadPictures = networkHelper.mayDownloadImages();
 
-		Bundle bundle = getIntent().getExtras();
-		if (bundle!=null) {
-			status = (Status) bundle.get(getString(R.string.status));
-			Log.i("OneTweetActivity","Showing status: " + status.toString());
+        Intent intent = getIntent();
+        String dataString = intent.getDataString();
+        Bundle bundle = intent.getExtras();
 
-            // Download the user profile image in a background task, as this may
-            // mean a network call.
-            if (status.getRetweetedStatus()==null)
-                new DownloadImageTask().execute(status.getUser());
-            else
-                new DownloadImageTask().execute(status.getRetweetedStatus().getUser());
-
-            new DownloadThumbnailTask().execute(status);
-
-			TextView tv01 = (TextView) findViewById(R.id.TextView01);
-            StringBuilder sb = new StringBuilder("<b>");
-			if (status.getRetweetedStatus()==null) {
-                sb.append(status.getUser().getName());
-                sb.append(" (");
-                sb.append(status.getUser().getScreenName());
-                sb.append(")");
-                sb.append("</b>");
-			}
-			else {
-                sb.append(status.getRetweetedStatus().getUser().getName());
-				sb.append(" (");
-				sb.append(status.getRetweetedStatus().getUser().getScreenName());
-				sb.append(" )</b> ").append(getString(R.string.resent_by)).append(" <b>");
-				sb.append(status.getUser().getName());
-                sb.append("</b>");
-			}
-            tv01.setText(Html.fromHtml(sb.toString()));
-
-			TextView mtv = (TextView) findViewById(R.id.MiscTextView);
-			if (status.getInReplyToScreenName()!=null) {
-                String s = getString(R.string.in_reply_to);
-                mtv.setText(Html.fromHtml(s + " <b>" + status.getInReplyToScreenName() + "</b>"));
-			}
-			else {
-				mtv.setText("");
-			}
-
-			TextView tweetView = (TextView)findViewById(R.id.TweetTextView);
-			tweetView.setText(status.getText());
-
-            TextView timeCientView = (TextView)findViewById(R.id.TimeTextView);
-            TwitterHelper th = new TwitterHelper(this);
-            String s = getString(R.string.via);
-            String text = th.getStatusDate(status) + s + status.getSource();
-            String from = getString(R.string.from);
-            if (status.getPlace()!=null) {
-                Place place = status.getPlace();
-                text += " " + from + " " + place.getFullName();
+        // If this is not null, we are called from another app
+        if ( dataString!=null) {
+            if (dataString.matches("http://twitter.com/.*/status/.*$")) {
+                String tids = dataString.substring(dataString.lastIndexOf("/")+1);
+                Long tid = Long.parseLong(tids);
+                TwitterHelper th = new TwitterHelper(this);
+                status = th.getStatusById(tid,0L,false,false);
             }
-            timeCientView.setText(Html.fromHtml(text));
+        } else {
+            // Called from within Zwitscher
+            status = (Status) bundle.get(getString(R.string.status));
+        }
 
 
-            // Update Button state depending on Status' properties
-			ImageButton threadButton = (ImageButton) findViewById(R.id.ThreadButton);
-			if (status.getInReplyToScreenName()==null) {
-				threadButton.setEnabled(false);
-			}
+        if (status==null) {
+            // e.g. when called from HTC Mail, which fails to forward the full
+            // http://twitter.com/#!/.../status/.. url, but only sends http://twitter.com
+            Log.w("OneTweetActivity","Status was null for Intent " + intent );
+            finish();
+            return;
+        }
 
-			ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
-			if (status.isFavorited())
-				favoriteButton.setImageResource(R.drawable.favorite_on);
+        Log.i("OneTweetActivity","Showing status: " + status.toString());
 
-            ImageButton translateButon = (ImageButton) findViewById(R.id.TranslateButton);
-            translateButon.setEnabled(networkHelper.isOnline());
-		}
+        // Download the user profile image in a background task, as this may
+        // mean a network call.
+        if (status.getRetweetedStatus()==null)
+            new DownloadUserImageTask().execute(status.getUser());
+        else
+            new DownloadUserImageTask().execute(status.getRetweetedStatus().getUser());
+
+        // Check if the tweet contains urls to picture services and load thumbnails
+        // if needed
+        List<UrlPair> pictureUrls = parseForPictureUrls(status);
+        if (!pictureUrls.isEmpty())
+            new DownloadImagePreviewsTask(this).execute(pictureUrls);
+
+        TextView tv01 = (TextView) findViewById(R.id.TextView01);
+        StringBuilder sb = new StringBuilder("<b>");
+        if (status.getRetweetedStatus()==null) {
+            sb.append(status.getUser().getName());
+            sb.append(" (");
+            sb.append(status.getUser().getScreenName());
+            sb.append(")");
+            sb.append("</b>");
+        }
+        else {
+            sb.append(status.getRetweetedStatus().getUser().getName());
+            sb.append(" (");
+            sb.append(status.getRetweetedStatus().getUser().getScreenName());
+            sb.append(" )</b> ").append(getString(R.string.resent_by)).append(" <b>");
+            sb.append(status.getUser().getName());
+            sb.append("</b>");
+        }
+        tv01.setText(Html.fromHtml(sb.toString()));
+
+        TextView mtv = (TextView) findViewById(R.id.MiscTextView);
+        if (status.getInReplyToScreenName()!=null) {
+            String s = getString(R.string.in_reply_to);
+            mtv.setText(Html.fromHtml(s + " <b>" + status.getInReplyToScreenName() + "</b>"));
+        }
+        else {
+            mtv.setText("");
+        }
+
+        TextView tweetView = (TextView)findViewById(R.id.TweetTextView);
+        tweetView.setText(status.getText());
+
+        TextView timeCientView = (TextView)findViewById(R.id.TimeTextView);
+        TwitterHelper th = new TwitterHelper(this);
+        String s = getString(R.string.via);
+        String text = th.getStatusDate(status) + s + status.getSource();
+        String from = getString(R.string.from);
+        if (status.getPlace()!=null) {
+            Place place = status.getPlace();
+            text += " " + from + " " + place.getFullName();
+        }
+        timeCientView.setText(Html.fromHtml(text));
+
+
+        // Update Button state depending on Status' properties
+        ImageButton threadButton = (ImageButton) findViewById(R.id.ThreadButton);
+        if (status.getInReplyToScreenName()==null) {
+            threadButton.setEnabled(false);
+        }
+
+        ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
+        if (status.isFavorited())
+            favoriteButton.setImageResource(R.drawable.favorite_on);
+
+        ImageButton translateButon = (ImageButton) findViewById(R.id.TranslateButton);
+        translateButon.setEnabled(networkHelper.isOnline());
 	}
 
     /**
@@ -258,13 +287,11 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     //////////////// speak related stuff ////////////////////
 
-    @Override
     public void onInit(int status) {
         String statusString = status == 0 ? "Success" : "Failure";
         System.out.println("speak"+" onInit " + statusString);
     }
 
-    @Override
     public void onUtteranceCompleted(String utteranceId) {
         Log.i("speak", "Utterance done: " + utteranceId);
 
@@ -284,6 +311,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Speak the current status via TTS
      */
+    @SuppressWarnings("unused")
     public void speak(View v)
     {
         int res = tts.setOnUtteranceCompletedListener(this);
@@ -297,30 +325,26 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
 	}
 
-    private void checkforSpeechServices() {
-		Intent checkIntent = new Intent();
-		checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-		startActivityForResult(checkIntent, 1);
-
-    }
 
     //////////////// speak related stuff end ////////////////////
 
     /**
-     * Translate the current status by calling Google translate
+     * Translate the current status by calling Google translate.
+     * Target language is the users current locale.
      * @param v
      */
     @SuppressWarnings("unused")
 	public void translate(View v) {
 		Translate.setHttpReferrer("http://bsd.de/zwitscher");
 		try {
-			// TODO get target language from system
-			String result = Translate.execute(status.getText(), Language.AUTO_DETECT, Language.GERMAN);
+            Language targetLanguage;
+            String locale = Locale.getDefault().getLanguage();
+            targetLanguage = Language.fromString(locale);
+			String result = Translate.execute(status.getText(), Language.AUTO_DETECT, targetLanguage);
 			AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 			builder.setMessage(result);
 			builder.setTitle("Translation result");
 			builder.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 				}
@@ -328,7 +352,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 			AlertDialog alert = builder.create();
 			alert.show();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			Toast.makeText(getApplicationContext(), e.getMessage(), 15000).show();
 		}
@@ -340,19 +363,19 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     @SuppressWarnings("unused")
 	public void done(View v) {
-        tts.shutdown();
+        if (tts!=null)
+            tts.shutdown();
 		finish();
 	}
 
 
     /**
-     * Load thumbnails of linked images if the url in the status is recognized
+     * Return urls for thumbnails of linked images if the url in the status is recognized
      * as an image service
      * @param status Status to analyze
-     * @return Bitmap to display
-     * @todo Support multiple images in one status
+     * @return List of Bitmaps to display
      */
-    private Bitmap loadThumbnail(Status status) {
+    private List<UrlPair> parseForPictureUrls(Status status) {
         URL[] urlArray = status.getURLs();
         Set<String> urls = new HashSet<String>();
         if (urlArray!=null) {
@@ -371,13 +394,15 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             }
         }
         if (urls.size()==0)
-            return null;
+            return Collections.emptyList();
+
+        ArrayList<UrlPair> urlPairs = new ArrayList<UrlPair>(urls.size());
+
 
         // We have urls, so check for picture services
-        // TODO implement preview of multiple pictures.
         for (String url :  urls) {
             Log.d("One tweet","Url = " + url);
-            String finalUrlString = null;
+            String finalUrlString;
             if (url.contains("yfrog.com")) {
                 finalUrlString = url + ".th.jpg";
             }
@@ -389,24 +414,41 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             else if (url.contains("plixi.com")) {
                 finalUrlString = "http://api.plixi.com/api/tpapi.svc/imagefromurl?size=thumbnail&url=" +  url;
             }
-            else
-                return null;
+            else {
+                Log.d("OTA::loadThumbnails", "Url " + url + " not supported for preview");
+                continue;
+            }
+            UrlPair pair = new UrlPair(url,finalUrlString);
+            urlPairs.add(pair);
+        }
+        return urlPairs;
+    }
 
-            Log.i("loadThumbail","URL to load is " + finalUrlString);
+    /**
+     * Load thumbnails of linked images for the passed listOfUrlPairs
+     * @param listOfUrlPairs list of images to load (thumbnail url, url to full img)
+     * @return List of bitmaps along
+     */
+    private List<BitmapWithUrl> loadThumbnails(List<UrlPair> listOfUrlPairs) {
+
+        List<BitmapWithUrl> bitmaps = new ArrayList<BitmapWithUrl>(listOfUrlPairs.size());
+
+        for (UrlPair urlPair : listOfUrlPairs) {
+            Log.i("loadThumbail", "URL to load is " + urlPair.thumbnailUrl);
 
             try {
-                URL picUrl = new URL(finalUrlString);
+                URL picUrl = new URL(urlPair.thumbnailUrl);
                 BufferedInputStream in = new BufferedInputStream(picUrl.openStream());
                 Bitmap bitmap = BitmapFactory.decodeStream(in);
                 in.close();
-                return bitmap;
+                BitmapWithUrl bwu = new BitmapWithUrl(bitmap,urlPair.fullUrl);
+                bitmaps.add(bwu);
             }
             catch (Exception e) {
                 e.printStackTrace();
-                return null;
             }
         }
-        return null;
+        return bitmaps;
     }
 
 
@@ -414,7 +456,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Background task to download the user profile images.
      */
-    private class DownloadImageTask extends AsyncTask<User, Void,Bitmap> {
+    private class DownloadUserImageTask extends AsyncTask<User, Void,Bitmap> {
 
         @Override
         protected void onPreExecute() {
@@ -426,7 +468,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
             User user = users[0];
             PicHelper picHelper = new PicHelper();
-            Bitmap bi = null;
+            Bitmap bi;
             if (downloadPictures)
                 bi = picHelper.fetchUserPic(user);
             else
@@ -445,22 +487,134 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Background task to download the thumbnails of linked images
      */
-    private class DownloadThumbnailTask extends AsyncTask<Status,Void,Bitmap> {
+    private class DownloadImagePreviewsTask extends AsyncTask<List<UrlPair>,Void,List<BitmapWithUrl>> {
 
-        @Override
-        protected Bitmap doInBackground(twitter4j.Status... statuses) {
-            Bitmap b=null;
-            if (downloadPictures)
-                b = loadThumbnail(statuses[0]);
-            return b;
+        private Context context;
+
+        private DownloadImagePreviewsTask(Context context) {
+            this.context = context;
         }
 
         @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-            if (bitmap!=null)
-                thumbnailView.setImageBitmap(bitmap);
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pg.setVisibility(ProgressBar.VISIBLE);
+            String text = getString(R.string.get_preview);
+            titleTextView.setText(text);
+        }
+
+        @Override
+        protected List<BitmapWithUrl> doInBackground(List<UrlPair>... urls) {
+            List<BitmapWithUrl> bitmapList=null;
+            if (downloadPictures)
+                bitmapList = loadThumbnails(urls[0]);
+            return bitmapList;
+        }
+
+        @Override
+        protected void onPostExecute(final List<BitmapWithUrl> bitmaps) {
+            super.onPostExecute(bitmaps);
+            if (bitmaps!=null) {
+                Gallery g = (Gallery) findViewById(R.id.gallery);
+                ImageAdapter adapter = new ImageAdapter(context);
+
+                adapter.addImages(bitmaps);
+                g.setAdapter(adapter);
+                g.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        String url = bitmaps.get(position).url;
+                        Uri uri = Uri.parse(url);
+                        Intent i = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(i);
+                    }
+                });
+            }
+
+            titleTextView.setText("");
+            pg.setVisibility(ProgressBar.INVISIBLE);
         }
     }
 
+    /**
+     * Picture adapter for the Gallery that holds the images
+     * It is filled via data obtained via #loadThumbnails
+     */
+    private class ImageAdapter extends BaseAdapter {
+
+        private List<BitmapWithUrl> mImages = new ArrayList<BitmapWithUrl>();
+
+        void addImages(List<BitmapWithUrl> images) {
+            mImages.addAll(images);
+        }
+
+        int mGalleryItemBackground;
+
+        public ImageAdapter(Context c) {
+            mContext = c;
+            // See res/values/style.xml for the <declare-styleable> that defines
+            // Gallery1.
+            TypedArray a = obtainStyledAttributes(R.styleable.Gallery1);
+            mGalleryItemBackground = a.getResourceId(
+                    R.styleable.Gallery1_android_galleryItemBackground, 0);
+            a.recycle();
+        }
+
+        public int getCount() {
+            return mImages.size();
+        }
+
+        public Object getItem(int position) {
+            return position;
+        }
+
+        public long getItemId(int position) {
+            return position;
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ImageView i = new ImageView(mContext);
+
+            Bitmap bitmap = mImages.get(position).bitmap;
+            i.setImageBitmap(bitmap);
+            i.setScaleType(ImageView.ScaleType.FIT_XY);
+            i.setLayoutParams(new Gallery.LayoutParams(bitmap.getWidth()*2, bitmap.getHeight()*2));
+
+            // The preferred Gallery item background
+            i.setBackgroundResource(mGalleryItemBackground);
+
+            return i;
+        }
+
+        private Context mContext;
+    }
+
+    /**
+     * Helper class that holds a bitmap along with the picture url,
+     * so that a click on the image in the gallery can start a browser
+     * window to the image service to browser the full size one.
+     */
+    private class BitmapWithUrl {
+        Bitmap bitmap;
+        String url;
+
+        public BitmapWithUrl(Bitmap bitmap, String picUrlString) {
+            this.bitmap = bitmap;
+            this.url = picUrlString;
+        }
+    }
+
+    /**
+     * Helper that just holds the urls of the full image service
+     * url and the link to the thumbnail
+     */
+    private class UrlPair {
+        String fullUrl;
+        String thumbnailUrl;
+
+        private UrlPair(String fullImageUrl, String thumbnailUrl) {
+            this.fullUrl = fullImageUrl;
+            this.thumbnailUrl = thumbnailUrl;
+        }
+    }
 }

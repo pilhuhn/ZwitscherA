@@ -9,7 +9,7 @@
     <EditTextPreference android:title="@string/prefs_filter"
                         android:summary="@string/prefs_filter_descr"
                         android:key="filter"
-                        android:hint="http://4sq.com/|http://shz.am/"
+                        android:hint="http://4sq.com/,http://shz.am/"
                         />
     <ListPreference android:title="@string/prefs_min_old"
                     android:summary="@string/prefs_min_old_descr"
@@ -29,7 +29,7 @@
 
     <ListPreference android:title="@string/prefs_pic_loading"
                     android:summary="@string/prefs_pic_loading_descr"
-                    android:defaultValue="Always"
+                    android:defaultValue="1"
                     android:entryValues="@array/network_config_vals"
                     android:entries="@array/network_config"
                     android:key="networkConfig"/>

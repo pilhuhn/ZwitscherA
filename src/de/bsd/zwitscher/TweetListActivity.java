@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.ListActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -20,6 +19,7 @@ import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.DirectMessage;
 import twitter4j.Paging;
 import twitter4j.Status;
+import twitter4j.Tweet;
 
 /**
  * Show the list of tweets.
@@ -31,10 +31,12 @@ import twitter4j.Status;
  * </ul>
  * @author Heiko W. Rupp
  */
-public class TweetListActivity extends ListActivity implements AbsListView.OnScrollListener,
+public class TweetListActivity extends AbstractListActivity implements AbsListView.OnScrollListener,
         OnItemClickListener, OnItemLongClickListener {
 
     List<Status> statuses;
+    List<DirectMessage> directs;
+    List<Tweet> tweets;
     Bundle intentInfo;
     TweetListActivity thisActivity;
     ProgressBar pg;
@@ -43,6 +45,8 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     TweetDB tdb;
     TwitterHelper th;
     ListView lv;
+    int newMentions=0;
+    private int newDirects=0;
 
     /**
      * Called when the activity is first created.
@@ -118,9 +122,21 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
      */
     public void onItemClick(AdapterView<?> parent, View view,
             int position, long id) {
-        Intent i = new Intent(parent.getContext(),OneTweetActivity.class);
-        i.putExtra(getString(R.string.status), statuses.get(position)); //TODO directs
-        startActivity(i);
+
+        if (statuses!=null) {
+         Intent i = new Intent(parent.getContext(),OneTweetActivity.class);
+         i.putExtra(getString(R.string.status), statuses.get(position));
+         startActivity(i);
+        }
+        else if (directs!=null) {
+           Intent i = new Intent(parent.getContext(), NewTweetActivity.class);
+           i.putExtra("user",directs.get(position).getSender());
+           i.putExtra("op",getString(R.string.direct));
+           startActivity(i);
+        } else {
+            // Tweets; TODO
+        }
+
 
     }
 
@@ -137,9 +153,19 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             int position, long id) {
         Log.i("TLA","Long click, pos=" + position + ",id="+id);
         Intent i = new Intent(parent.getContext(), NewTweetActivity.class);
-        i.putExtra(getString(R.string.status), statuses.get(position)); //TODO directs
-        i.putExtra("op",getString(R.string.reply));
-        startActivity(i);
+        if (statuses!=null) {
+           i.putExtra(getString(R.string.status), statuses.get(position));
+           i.putExtra("op",getString(R.string.reply));
+           startActivity(i);
+        }
+        else if (directs!=null) {
+         i.putExtra("user",directs.get(position).getSender());
+         i.putExtra("op",getString(R.string.direct));
+         startActivity(i);
+        } else {
+            // Tweets TODO
+        }
+
 
         return true; // We've consumed the long click
     }
@@ -169,7 +195,33 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
         switch (list_id) {
         case 0:
+            // Home time line
         	myStatuses = th.getTimeline(paging,list_id, fromDbOnly);
+
+            // Also check for mentions + directs
+            if (!fromDbOnly) {
+                long mentionLast = tdb.getLastRead(-1);
+                paging = new Paging().count(100);
+
+                if (mentionLast>0)
+                    paging.setSinceId(mentionLast);
+                MetaList<Status> mentions = th.getTimeline(paging,-1,fromDbOnly);
+                newMentions = mentions.getNumOriginal();
+                long id = mentions.getList().get(0).getId();
+                tdb.updateOrInsertLastRead(-1,id);
+
+                long directsLast = tdb.getLastRead(-2);
+                paging = new Paging().count(100);
+
+                if (directsLast>0)
+                    paging.setSinceId(directsLast);
+
+                MetaList<DirectMessage> directs = th.getDirectMessages(false,paging);
+                newDirects = directs.getNumOriginal();
+                id = mentions.getList().get(0).getId();
+                tdb.updateOrInsertLastRead(-2,id);
+
+            }
         	break;
         case -1:
         	myStatuses = th.getTimeline(paging, list_id, fromDbOnly);
@@ -214,14 +266,27 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
         long last = tdb.getLastRead(-2);
         Paging paging = new Paging();
         if (last>-1)
-         paging.setSinceId(last);
+            paging.setSinceId(last);
 
 
         messages = th.getDirectMessages(fromDbOnly, paging);
+        directs = messages.getList();
 
         return messages;
     }
 
+    private MetaList getSavedSearchFromTwitter(int searchId, boolean fromDbOnly) {
+        MetaList<Tweet> messages;
+
+        Paging paging = new Paging();
+        paging.setCount(20);
+
+        messages = th.getSavedSearchesTweets(searchId, fromDbOnly,paging);
+
+        tweets = messages.getList();
+
+        return messages;
+    }
 
     /**
      * Called from the reload button
@@ -239,25 +304,6 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
     @SuppressWarnings("unused")
     public void done(View v) {
         finish();
-    }
-
-    /**
-     * Scrolls to top, called from the ToTop button
-     * @param v
-     */
-    @SuppressWarnings("unused")
-    public void scrollToTop(View v) {
-        getListView().setSelection(0);
-    }
-
-    /**
-     * Called from the post button
-     * @param v
-     */
-    @SuppressWarnings("unused")
-    public void post(View v) {
-        Intent i = new Intent(this, NewTweetActivity.class);
-        startActivity(i);
     }
 
     private void fillListViewFromTimeline(boolean fromDbOnly) {
@@ -281,19 +327,26 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
             if (adapter instanceof StatusAdapter) {
                 StatusAdapter sta = (StatusAdapter) adapter;
                 if (totalCount>0) {
-                    if (sta.getItem(totalCount-1) instanceof  DirectMessage) // TODO directs
-                        return;
-
-                    Status last = (Status) sta.getItem(totalCount-1);
-
-                    TwitterHelper th = new TwitterHelper(thisActivity);
-                    List<Status> newStatuses = th.getStatuesFromDb(last.getId(),7,list_id);
-
+                    Object item = sta.getItem(totalCount - 1);
                     int i = 0;
-                    for (Status status : newStatuses ) {
-                        sta.insert(status,totalCount+i);
-                        statuses.add(status);
-                        i++;
+                    if (item instanceof  DirectMessage) {
+                        DirectMessage message = (DirectMessage) item;
+
+                        List<DirectMessage> messages = th.getDirectsFromDb(message.getId(),7);
+                        for (DirectMessage direct : messages) {
+                            sta.insert(direct,totalCount+i);
+                            directs.add(direct);
+                            i++;
+                        }
+                    } else if (item instanceof Status) {
+                        Status last = (Status) item;
+
+                        List<Status> newStatuses = th.getStatuesFromDb(last.getId(),7,list_id);
+                        for (Status status : newStatuses ) {
+                            sta.insert(status,totalCount+i);
+                            statuses.add(status);
+                            i++;
+                        }
                     }
                 }
             }
@@ -318,25 +371,40 @@ public class TweetListActivity extends ListActivity implements AbsListView.OnScr
 
 
 		@Override
-		protected MetaList<twitter4j.Status> doInBackground(Boolean... params) {
+		protected MetaList doInBackground(Boolean... params) {
             fromDbOnly = params[0];
 	        MetaList data;
-            if (list_id!=-2)
+            if (list_id>-2)
                 data = getTimlinesFromTwitter(fromDbOnly);
-            else
+            else if (list_id==-2)
                 data = getDirectsFromTwitter(fromDbOnly);
-            Log.i("GTLTask", "got " + data.toString());
+            else // list id < -2 ==> saved search
+                data = getSavedSearchFromTwitter(-list_id,fromDbOnly);
 	        return data;
 		}
 
 		@Override
 		protected void onPostExecute(MetaList result) {
-	        setListAdapter(new StatusAdapter(thisActivity, R.layout.tweet_list_item, result.getList()));
+            if (list_id<-2)
+	            setListAdapter(new TweetAdapter(thisActivity, R.layout.tweet_list_item, result.getList()));
+            else
+	            setListAdapter(new StatusAdapter(thisActivity, R.layout.tweet_list_item, result.getList()));
+
             if (pg!=null)
                 pg.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)
                 titleTextBox.setText("");
 	        getListView().requestLayout();
+            if (newMentions>0) {
+                String s = getString(R.string.new_mentions);
+                Toast.makeText(thisActivity,newMentions + " " + s,Toast.LENGTH_LONG).show();
+                newMentions=0;
+            }
+            if (newDirects>0) {
+                String s = getString(R.string.new_directs);
+                Toast.makeText(thisActivity,newDirects + " " + s,Toast.LENGTH_LONG).show();
+                newDirects=0;
+            }
 
             // Only do the next if we actually did an update from twitter
             if (!fromDbOnly) {

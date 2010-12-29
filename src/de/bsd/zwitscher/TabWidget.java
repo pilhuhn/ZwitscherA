@@ -5,10 +5,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import android.content.ComponentName;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.bsd.zwitscher.helper.PicHelper;
+import twitter4j.SavedSearch;
 import twitter4j.UserList;
 
 import android.app.TabActivity;
@@ -82,14 +85,16 @@ public class TabWidget extends TabActivity {
         Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
         searchIntent.putExtra("list",1);
         homeSpec = tabHost.newTabSpec("searches")
-                .setIndicator("Search")//,res.getDrawable(R.drawable.ic_tab_list))
+                .setIndicator("Search",res.getDrawable(R.drawable.ic_tab_search))
                 .setContent(searchIntent);
         tabHost.addTab(homeSpec);
 
 		tabHost.setCurrentTab(0); // Home tab, tabs start at 0
 
-
+        new InitialSyncTask(this).execute(accountId);
 	}
+
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -123,7 +128,10 @@ public class TabWidget extends TabActivity {
             Intent serviceIntent = new Intent().setClass(this,TweetFetchService.class);
             stopService(serviceIntent);
             break;
-
+        case R.id.helpMenu:
+            i = new Intent(TabWidget.this, HelpActivity.class);
+            startActivity(i);
+            break;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
@@ -133,9 +141,6 @@ public class TabWidget extends TabActivity {
 	/**
 	 * Synchronize lists between what is available in the db
 	 * and on twitter.
-	 * Unfortunately there is no easy way to just remove a tab from
-	 * a tabHost. So we need to clean out the tabs and add the remaining
-	 * ones again
 	 */
 	private void syncLists() {
 		TwitterHelper th = new TwitterHelper(getApplicationContext());
@@ -144,15 +149,11 @@ public class TabWidget extends TabActivity {
 		Map<String,Integer> storedLists = tdb.getLists();
 		// Check for lists to add
 		for (UserList userList : userLists) {
-			if (storedLists.containsValue(userList.getId())) {
-				continue;
-			}
-			else {
+			if (!storedLists.containsValue(userList.getId())) {
 				tdb.addList(userList.getName(),userList.getId(), DataObjectFactory.getRawJSON(userList));
 			}
 		}
 		// check for outdated lists and remove them
-		boolean needsReload = false;
 		for (Entry<String, Integer> entry : storedLists.entrySet()) {
 			Integer id = entry.getValue();
 			boolean found = false;
@@ -166,7 +167,29 @@ public class TabWidget extends TabActivity {
 				tdb.removeList(id);
 			}
 		}
+
+        syncSearches(th,tdb);
 	}
+
+    private void syncSearches(TwitterHelper th, TweetDB tdb) {
+        List<SavedSearch> searches = th.getSavedSearchesFromServer();
+        List<SavedSearch> storedSearches = th.getSavedSearchesFromDb();
+
+        for (SavedSearch search : searches) {
+            if (!storedSearches.contains(search)) {
+                th.persistSavedSearch(search);
+            }
+        }
+
+        for (SavedSearch search : storedSearches) {
+            if (!searches.contains(search)) {
+                tdb.deleteSearch(search.getId());
+            }
+        }
+
+    }
+
+
 
     private void resetLastRead() {
         TweetDB tb = new TweetDB(this,accountId);
@@ -181,6 +204,30 @@ public class TabWidget extends TabActivity {
     private void cleanImages() {
         PicHelper ph = new PicHelper();
         ph.cleanup();
+    }
+
+    /**
+     * Helper class that triggers syncing of lists and searches
+     * at start when both are empty.
+     */
+    private class InitialSyncTask extends AsyncTask<Integer,Void,Void> {
+
+        private Context context;
+
+        private InitialSyncTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Integer... params) {
+            int accountId = params[0];
+
+            TweetDB tdb = new TweetDB(context,accountId);
+            if (tdb.getLists().size()==0 && tdb.getSavedSearches().size()==0)
+                syncLists();
+
+            return null;
+        }
     }
 
 }

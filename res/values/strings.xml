@@ -33,10 +33,25 @@
     <string name="add">Add</string>
     <string name="from">from</string>
     <string name="get_user_detail">Getting user details ...</string>
+    <string name="get_preview">"Loading previews..."</string>
     <string name="From">From</string>
     <string name="to">to</string>
     <string name="please_sync_lists">Please sync lists</string>
-    <string name="no_searches_found">No saved searches found</string>
+    <string name="no_searches_found">No saved searches found - do you need to sync?</string>
+
+    <string name="login_common">You need to log into Twitter to authorize Zwitscher. <br/><br/>
+        To do this, click on "Get pin from Twitter", then log in in the Browser, write down the PIN and then
+        from the home screen start Zwitscher again and enter the pin. Then click on "Set pin"
+        <br/><br/>
+        You only have to do this once at initial login
+    </string>
+    <string name="please_log_in">Please log in</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Log in...</string>
+    <string name="service">Service</string>
+    <string name="new_mentions">new mentions</string>
+    <string name="new_directs">new direct messages</string>
 
 
     <!-- preferences -->
@@ -55,4 +70,26 @@
     <string name="prefs_pictureService">Picture Service</string>
     <string name="prefs_pictureService_descr">Choose a service for picture uploading</string>
     <!-- preferences -->
+    <string name="help">Help</string>
+    <string name="help_common">This page shows all the icons used with in Zwitscher</string>
+    <string name="help_add_list">Add the user to a list</string>
+    <string name="help_back_button">Go back to the previous page</string>
+    <string name="help_camera">Take a picture with the camera. See preferences for picture upload services.</string>
+    <string name="help_direct_button">Send a direct message to the user</string>
+    <string name="help_favorite">Add/remote the status as/from favorite(s)</string>
+    <string name="help_post_button">Write new message</string>
+    <string name="help_reload_button">Reload the timeline (from the server)</string>
+    <string name="help_reply_button">Reply to the current status</string>
+    <string name="help_reply_all_button">Reply to the current status with all users listed in the message</string>
+    <string name="help_rt_button">Retweet the current status</string>
+    <string name="help_rt_button_cl">Classical retweet of the current status</string>
+    <string name="help_speaker">Speak the current status message</string>
+    <string name="help_threads">Show the conversation this thread is involved in</string>
+    <string name="help_to_top">Jump to top of the list</string>
+    <string name="help_translate">Translate the current status</string>
+    <string name="help_user_unknown">No picture for the user loaded</string>
+    <string name="help_select_user">Select a user</string>
+    <string name="help_more">To learn more, go to http://bsd.de/zwitscher . To report bugs, write feature requests or browse the source, go to https://github.com/pilhuhn/ZwitscherA</string>
+
+
 </resources>
