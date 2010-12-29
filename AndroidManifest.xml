@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.bsd.zwitscher"
-          android:versionName="0.60"
-          android:versionCode="60"
+          android:versionName="0.61"
+          android:versionCode="61"
           >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -50,6 +50,7 @@
         <activity android:name=".ListOfListsActivity"/>
         <activity android:name=".MultiSelectListActivity"/>
         <activity android:name=".HelpActivity" android:label="@string/help"/>
+        <activity android:name=".ErrorDisplayActivity" android:label="Error during update"/>
 
     </application>
 
