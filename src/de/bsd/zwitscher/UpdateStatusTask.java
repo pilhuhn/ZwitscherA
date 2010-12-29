@@ -1,7 +1,6 @@
 package de.bsd.zwitscher;
 
-import javax.management.monitor.StringMonitor;
-
+import twitter4j.StatusUpdate;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,7 +12,6 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import twitter4j.StatusUpdate;
 
 /**
 * Task that does async updates to the server
