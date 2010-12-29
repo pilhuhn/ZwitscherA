@@ -20,6 +20,7 @@ public class UpdateResponse {
     UpdateType updateType;
     Status status;
     View view;
+    String origMessage;
 
     public UpdateResponse(UpdateType updateType, boolean success, String message) {
         this.message = message;
@@ -90,5 +91,13 @@ public class UpdateResponse {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public String getOrigMessage() {
+        return origMessage;
+    }
+
+    public void setOrigMessage(String origMessage) {
+        this.origMessage = origMessage;
     }
 }

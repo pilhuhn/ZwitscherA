@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.*;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
 import twitter4j.json.DataObjectFactory;
@@ -86,7 +88,10 @@ public class TwitterHelper {
 
 
     /**
-     * Return direct messages
+     * Return direct messages.
+     * The "fetch from the server" part is a bit tricky. as Twitter4J keeps
+     * the JSON representation of the objects in a ThreadLocal. So to obtain
+     * it, it must be accessed before the next call to twitter.
      *
      * @param fromDbOnly
      * @param paging
@@ -94,39 +99,66 @@ public class TwitterHelper {
      */
     public MetaList<DirectMessage> getDirectMessages(boolean fromDbOnly, Paging paging) {
 
-        Twitter twitter = getTwitter();
+       Twitter twitter = getTwitter();
 
-        List<DirectMessage> ret;
-        try {
-            ret = twitter.getDirectMessages(paging);
-            List<DirectMessage> ret2 = twitter.getSentDirectMessages(paging);
-            ret.addAll(ret2);
-        } catch (TwitterException e) {
-            Log.e("getDirects", "Got exception: " + e.getMessage());
-            ret = Collections.emptyList();
-        }
+       List<DirectMessage> ret;
+       List<DirectMessage> ret2 = new ArrayList<DirectMessage>();
 
-        //  persist directs
-       if (ret.size()>0) {
-          Collections.sort(ret,new Comparator<DirectMessage>() {
-             @Override
+       if (!fromDbOnly) {
+          // Get direct messages sent to us
+          try {
+             ret = twitter.getDirectMessages(paging);
+          } catch (TwitterException e) {
+             Log.e("getDirects", "Got exception: " + e.getMessage());
+             ret = Collections.emptyList();
+          }
+
+          long max = -1;
+          //  persist directs
+
+          if (ret.size()>0) {
+             for (DirectMessage msg : ret) {
+                persistDirects(msg);
+             }
+             if (ret.get(0).getId()>max)
+                max = ret.get(0).getId();
+
+             ret2.addAll(ret);
+          }
+
+          // get direct messages we sent
+          try {
+             ret = twitter.getSentDirectMessages(paging);
+          } catch (TwitterException e) {
+             Log.e("getDirects", "Got exception: " + e.getMessage());
+             ret = Collections.emptyList();
+          }
+          if (ret.size()>0) {
+             for (DirectMessage msg : ret) {
+                persistDirects(msg);
+             }
+             if (ret.get(0).getId()>max)
+                max = ret.get(0).getId();
+
+             ret2.addAll(ret);
+          }
+
+          // Now sort the two collections we've got to form a linear
+          // timeline.
+          Collections.sort(ret2,new Comparator<DirectMessage>() {
              public int compare(DirectMessage directMessage, DirectMessage directMessage1) {
                 return directMessage1.getId() - directMessage.getId();
              }
           });
-        for (DirectMessage msg : ret) {
-            persistDirects(msg);
-        }
 
 
-        tweetDB.updateOrInsertLastRead(-2,ret.get(0).getId());
-        }
+          tweetDB.updateOrInsertLastRead(-2,max);
+       }
+       int numDirects = ret2.size();
+       int filled = fillUpDirectsFromDb(ret2);
 
-        int numDirects = ret.size();
-        int filled = fillUpDirectsFromDb(ret);
-
-        MetaList<DirectMessage> result = new MetaList<DirectMessage>(ret,numDirects,filled);
-        return result;
+       MetaList<DirectMessage> result = new MetaList<DirectMessage>(ret2,numDirects,filled);
+       return result;
     }
 
 
@@ -147,7 +179,7 @@ public class TwitterHelper {
         return ret;
     }
 
-    private List<DirectMessage> getDirectsFromDb(int sinceId, int num) {
+    public List<DirectMessage> getDirectsFromDb(int sinceId, int num) {
         List<DirectMessage> ret = new ArrayList<DirectMessage>();
         List<String> responses = tweetDB.getDirectsOlderThan(sinceId,num);
         for (String json : responses) {
@@ -224,6 +256,11 @@ public class TwitterHelper {
         return requestToken;
 	}
 
+    /**
+     * Get an auth token the classical OAuth way
+     * @param pin
+     * @throws Exception
+     */
 	public void generateAuthToken(String pin) throws Exception{
         Twitter twitter = new TwitterFactory().getInstance();
         twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
@@ -236,9 +273,30 @@ public class TwitterHelper {
 		editor.putString("accessToken", accessToken.getToken());
 		editor.putString("accessTokenSecret", accessToken.getTokenSecret());
 		editor.commit();
-
-
 	}
+
+    /**
+     * Get an auth token the xAuth way. This only works if especially enabled by Twitter
+     * @param username
+     * @param password
+     * @throws Exception
+     */
+    public void generateAuthToken(String username, String password) throws Exception {
+        ConfigurationBuilder cb = new ConfigurationBuilder();
+        cb.setOAuthConsumerKey(TwitterConsumerToken.consumerKey);
+        cb.setOAuthConsumerSecret(TwitterConsumerToken.consumerSecret);
+        Configuration conf = cb.build() ;
+        Twitter twitter = new TwitterFactory(conf).getInstance(username,password);
+//        twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
+
+        AccessToken accessToken = twitter.getOAuthAccessToken();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Editor editor = preferences.edit();
+        editor.putString("accessToken", accessToken.getToken());
+        editor.putString("accessTokenSecret", accessToken.getTokenSecret());
+        editor.commit();
+
+    }
 
 	public UpdateResponse updateStatus(UpdateRequest request) {
 		Twitter twitter = getTwitter();
@@ -249,7 +307,7 @@ public class TwitterHelper {
             updateResponse.setMessage("Tweet sent");
             updateResponse.setSuccess();
 		} catch (TwitterException e) {
-            updateResponse.setMessage("Failed to send tweet: " + e.getLocalizedMessage());
+            updateResponse.setMessage( e.getLocalizedMessage());
             updateResponse.setFailure();
         }
         return updateResponse;
@@ -264,7 +322,7 @@ public class TwitterHelper {
 			response.setMessage("Retweeted successfully");
 		} catch (TwitterException e) {
             response.setFailure();
-            response.setMessage("Failed to  retweet: " + e.getLocalizedMessage());
+            response.setMessage(e.getLocalizedMessage());
 		}
         return response;
 	}
@@ -289,7 +347,7 @@ public class TwitterHelper {
             updateResponse.setMessage("(Un)favorite set");
 		} catch (Exception e) {
             updateResponse.setFailure();
-            updateResponse.setMessage("Failed to (un)create a favorite: " + e.getLocalizedMessage());
+            updateResponse.setMessage(e.getLocalizedMessage());
 		}
         updateResponse.setStatus(status);
         return updateResponse;
@@ -305,7 +363,8 @@ public class TwitterHelper {
             updateResponse.setMessage("Direct message sent");
         } catch (TwitterException e) {
             updateResponse.setFailure();
-            updateResponse.setMessage("Sending of direct tweet failed: " + e.getLocalizedMessage());
+            updateResponse.setMessage(e.getLocalizedMessage());
+            updateResponse.setOrigMessage(request.message);
         }
         return updateResponse;
     }
@@ -340,7 +399,7 @@ public class TwitterHelper {
         Log.i("getUserList","Now we have " + statuses.size());
 
         MetaList<Status> metaList = new MetaList<Status>(statuses,numOriginal,filled);
-Log.d("getUsetList","Returning " + metaList);
+Log.d("getUsetList", "Returning " + metaList);
         return metaList;
 	}
 
@@ -414,7 +473,7 @@ Log.d("FillUp","Return: " + i);
         Status status = null;
 
         if (!directOnly) {
-            String obj  = tweetDB.getStatusObjectById(statusId);
+            String obj  = tweetDB.getStatusObjectById(statusId, list_id);
             if (obj!=null) {
                 status = materializeStatus(obj);
                 if (status!=null)
@@ -518,7 +577,7 @@ Log.d("FillUp","Return: " + i);
     }
 
     private void persistStatus(TweetDB tdb, Status status, long list_id) throws IOException {
-        if (tdb.getStatusObjectById(status.getId())!=null)
+        if (tdb.getStatusObjectById(status.getId(), list_id)!=null)
             return; // This is already in DB, so do nothing
 
         // Serialize and then store in DB
@@ -655,7 +714,7 @@ Log.d("FillUp","Return: " + i);
         }
     }
 
-    public List<SavedSearch> getSavedSearches() {
+    public List<SavedSearch> getSavedSearchesFromServer() {
 
         Twitter twitter = getTwitter();
         List<SavedSearch> searches;
@@ -667,5 +726,64 @@ Log.d("FillUp","Return: " + i);
         }
 
         return searches;  // TODO: Customise this generated block
+    }
+
+    public List<SavedSearch> getSavedSearchesFromDb() {
+        List<String> jsons = tweetDB.getSavedSearches();
+        List<SavedSearch> searches = new ArrayList<SavedSearch>(jsons.size());
+
+        for (String json : jsons) {
+            try {
+                SavedSearch search = DataObjectFactory.createSavedSearch(json);
+                searches.add(search);
+            } catch (TwitterException e) {
+                e.printStackTrace(); // TODO Customize ...
+            }
+        }
+        return searches;
+    }
+
+    public List<User> getUsersFromDb() {
+        List<String> jsons = tweetDB.getUsers();
+        List<User> users = new ArrayList<User>(jsons.size());
+        for (String json : jsons) {
+            try {
+                User user = DataObjectFactory.createUser(json);
+                users.add(user);
+            } catch (TwitterException e) {
+                e.printStackTrace();  // TODO: Customise this generated block
+            }
+        }
+        return users;
+    }
+
+    public MetaList<Tweet> getSavedSearchesTweets(int searchId, boolean fromDbOnly, Paging paging) {
+        Twitter twitter = getTwitter();
+
+        List<SavedSearch> searches = getSavedSearchesFromDb();
+        for (SavedSearch search : searches) {
+            if (search.getId()==searchId) {
+                String queryString = search.getQuery();
+                Query query = new Query(queryString); // TODO paging - probably not needed as default is 15
+                   // TODO set some restriction like language or such
+                try {
+                    QueryResult queryResult = twitter.search(query);
+                    List<Tweet> tweets = queryResult.getTweets();
+                    MetaList metaList = new MetaList(tweets,tweets.size(),0);
+                    return metaList;
+                } catch (TwitterException e) {
+                    e.printStackTrace();  // TODO: Customise this generated block
+                    return new MetaList<Tweet>();
+                }
+            }
+        }
+
+        return null;  // TODO: Customise this generated block
+    }
+
+    public void persistSavedSearch(SavedSearch search) {
+        String json = DataObjectFactory.getRawJSON(search);
+
+        tweetDB.storeSavedSearch(search.getName(),search.getQuery(),search.getId(),json);
     }
 }

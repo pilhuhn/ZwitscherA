@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_height="fill_parent"
+              android:layout_width="fill_parent"
+        >
+    <TextView android:layout_height="wrap_content"
+              android:layout_width="fill_parent"
+              android:text="@string/please_log_in"
+              android:textSize="14dp"
+              android:textStyle="bold"
+              />
+    <TableLayout android:layout_height="wrap_content"
+                 android:layout_width="fill_parent"
+                 android:stretchColumns="1"
+                 android:shrinkColumns="1"
+            >
+        <TableRow>
+            <TextView android:text="@string/service"
+                    style="@style/text"/>
+            <Spinner android:id="@+id/spinner1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:drawSelectorOnTop="true"
+                android:entries="@array/services"
+            />
+        </TableRow>
+        <TableRow>
+            <TextView android:text="@string/username"
+                    style="@style/text"/>
+            <EditText android:id="@+id/login_username"/>
+        </TableRow>
+        <TableRow>
+            <TextView android:text="@string/password"
+                    style="@style/text"/>
+            <EditText android:id="@+id/login_password"
+                    android:password="true"/>
+        </TableRow>
+    </TableLayout>
+    <Button android:text="@string/login"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/login_login"
+            android:onClick="loginXauth"
+        />
+</LinearLayout>

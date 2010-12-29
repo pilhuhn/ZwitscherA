@@ -24,6 +24,7 @@ public class TwitterConsumerToken {
 
 	public static String consumerKey = "replaceWithKey";
 	public static String consumerSecret = "replaceWithSecret";
+	public static boolean xAuthEnabled = false;
 
 }
 
@@ -31,12 +32,13 @@ To obtain this Token, go to http://twitter.com/apps and log in.
 Then click on "Register an Application" and give some details.
 When this is done you will end up on a page that lists application
 details including consumerKey and consumerSecret.
+As Twitter by default does not enable xAuth, the third parameter
+needs to be set to false to go through the "normal" oAuth procedure of
+logging in.
 
-When Zwitscher has progressed more, I will probably offer binary
-versions on the Android market store, so you do not need the consumer
-token to use it.
-I will also make some earlier binary version available at
-http://bsd.de/zwitscher
+Zwitscher has meanwhile progressed enough to be available on the Android market.
+For this version you don't need to obtain any tokens.
+
 
 ==========================
 

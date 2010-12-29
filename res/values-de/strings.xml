@@ -13,6 +13,11 @@
 <string name="direct">Direkt</string>
 <string name="mentions">mentions</string>
     <string name="location">Ort:</string>
+    <string name="web">Web:</string>
+    <string name="tweet_count">Anzahl Tweets:</string>
+    <string name="follower_count">Anzahl Verfolger:</string>
+    <string name="following_count">Anzahl Folgende:</string>
+    <string name="listed_count">Wie oft gelistet:</string>
     <string name="in_reply_to"> als Antwort auf </string>
     <string name="send_direct_to">Sende private Nachricht an </string>
     <string name="getting_tweets">Lade Tweets</string>
@@ -22,12 +27,26 @@
     <string name="add">Hinzufügen</string>
     <string name="from">von</string>
     <string name="get_user_detail">Lade Benutzerdaten ...</string>
+    <string name="get_preview">"Lade Bildvorschau..."</string>
     <string name="From">Von</string>
     <string name="to">an</string>
     <string name="please_sync_lists">Bitte synchronisieren Sie die Listen</string>
-    <string name="no_searches_found">Keine gespeicherten Suchen gefunden</string>
+    <string name="no_searches_found">Keine gespeicherten Suchen gefunden - Bitte synchronisieren Sie</string>
 
-
+    <string name="login_common">
+        Sie müssen sich bei Twitter anmelden, um Zwitscher zu authorisieren.<br/><br/>
+        Um dies zu tun, klicken Sie auf "Get pin from Twitter", geben dann im Browser den Login an
+        und klicken auf "Akzeptieren". Danach müssen Sie sich die PIN merken. Gehen Sie dann zum Home-Screen
+        und starten von dort Zwitscher erneut. Geben Sie die PIN ein und klicken auf "Set pin".<br/><br/>
+        Sie müssen dies nur einmal machen.
+    </string>
+    <string name="please_log_in">Bitte einloggen</string>
+    <string name="username">Benutzername</string>
+    <string name="password">Passwort</string>
+    <string name="login">Einloggen...</string>
+    <string name="service">Dienst</string>
+    <string name="new_mentions">Neue Erwähnung(en)</string>
+    <string name="new_directs">Neue direkt(e) Nachricht(en)</string>
 
 
 
@@ -45,8 +64,28 @@
     <string name="prefs_pic_roaming">Roaming</string>
     <string name="prefs_pic_roaming_descr">Dürfen während des Roamings Bilder geladen werden?</string>
     <string name="prefs_pictureService">Picture Service</string>
-    <string name="prefs_pictureService_descr">Choose a service for picture uploading</string>
+    <string name="prefs_pictureService_descr">Dienst für hochgeladene Bilder</string>
     <!-- preferences -->
+    <string name="help">Hilfe</string>
+    <string name="help_common">Diese Seite zeigt alle in Zwitscher verwendeten Icons</string>
+    <string name="help_add_list">Benutzer zu einer Liste hinzufügen</string>
+    <string name="help_back_button">Gehe zurück zur vorherigen Seite</string>
+    <string name="help_camera">Bild mit der Kamer aufnemen und an den Tweet anhängen. Siehe auch die Voresinstellungen für einen Upload-Dienst.</string>
+    <string name="help_direct_button">Dem Benutzer eine direkte Nachricht senden</string>
+    <string name="help_favorite">Status als Favorit hinzufügen/löschen</string>
+    <string name="help_post_button">Neue Nachricht schreiben</string>
+    <string name="help_reload_button">Zeitstrahl neu (vom Server) laden</string>
+    <string name="help_reply_button">Dem aktuellen Status antworten</string>
+    <string name="help_reply_all_button">Allen Benutzern im Status antworten</string>
+    <string name="help_rt_button">Den aktuellen Status retweeten</string>
+    <string name="help_rt_button_cl">Den aktuellen Status klassisch retweeten</string>
+    <string name="help_speaker">Den aktuellen Status vorlesen</string>
+    <string name="help_threads">Konversation anzeigen</string>
+    <string name="help_to_top">An den Anfang der Liste springen</string>
+    <string name="help_translate">Aktuellen Status übersetzen</string>
+    <string name="help_user_unknown">Kein Bild für den Benutzer geladen</string>
+    <string name="help_select_user">Benutzer auswählen</string>
+    <string name="help_more">Um mehr zu erfahren, gehen Sie zu http://bsd.de/zwitscher . Um Bugs zu melden, Wünsche aufzuschreiben oder den Quellcode anzusehen, gehen Sie zu https://github.com/pilhuhn/ZwitscherA</string>
 
 
 </resources>

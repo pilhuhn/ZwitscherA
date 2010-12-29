@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.bsd.zwitscher"
-          android:versionName="0.41"
-          android:versionCode="41"
+          android:versionName="0.61"
+          android:versionCode="61"
           >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -12,16 +12,29 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application android:icon="@drawable/icon" android:label="Zwitscher"
-    			android:debuggable="true"  android:allowBackup="true"
+    			android:debuggable="false"  android:allowBackup="true"
         >
 
         <activity android:name=".TweetListActivity"/>
 
 		<activity android:name=".TabWidget"/>
 
-		<activity android:name=".OneTweetActivity"/>
+		<activity android:name=".OneTweetActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" android:host="twitter.com"/> <!-- TODO: android:pathPattern="#!/.*/status/.*"/> -->
+            </intent-filter>
+        </activity>
 
-        <activity android:name=".NewTweetActivity"/>
+        <activity android:name=".NewTweetActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+        </activity>
 
         <activity android:name="Preferences" android:label="Preferences"/>
 
@@ -41,6 +54,8 @@
         <activity android:name=".UserDetailActivity"/>
         <activity android:name=".ListOfListsActivity"/>
         <activity android:name=".MultiSelectListActivity"/>
+        <activity android:name=".HelpActivity" android:label="@string/help"/>
+        <activity android:name=".ErrorDisplayActivity" android:label="Error during update"/>
 
     </application>
 
