@@ -1,14 +1,13 @@
 package de.bsd.zwitscher.helper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
-import com.sun.corba.se.impl.orbutil.ObjectWriter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Helper to create a Spannable strings.
