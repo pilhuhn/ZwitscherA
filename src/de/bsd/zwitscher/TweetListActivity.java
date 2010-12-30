@@ -16,6 +16,7 @@ import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import de.bsd.zwitscher.helper.MetaList;
+import de.bsd.zwitscher.helper.NetworkHelper;
 import twitter4j.DirectMessage;
 import twitter4j.Paging;
 import twitter4j.Status;
@@ -198,8 +199,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             // Home time line
         	myStatuses = th.getTimeline(paging,list_id, fromDbOnly);
 
-            // Also check for mentions + directs
-            if (!fromDbOnly) {
+            // Also check for mentions + directs (if allowed in prefs)
+            NetworkHelper networkHelper = new NetworkHelper(this);
+
+            if (!fromDbOnly && networkHelper.mayReloadAdditional()) {
                 long mentionLast = tdb.getLastRead(-1);
                 paging = new Paging().count(100);
 
@@ -315,6 +318,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         // nothing to do for us
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onScroll(AbsListView absListView, int firstVisible, int visibleCount, int totalCount) {
 
@@ -383,6 +387,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 	        return data;
 		}
 
+        @SuppressWarnings("unchecked")
 		@Override
 		protected void onPostExecute(MetaList result) {
             if (list_id<-2)

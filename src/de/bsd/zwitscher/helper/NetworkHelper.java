@@ -10,19 +10,17 @@ import android.util.Log;
 
 
 /**
- * TODO: Document this
+ * Helper that deals with network availability
  *
  * @author Heiko W. Rupp
  */
 public class NetworkHelper {
 
-    private Context context;
     ConnectivityManager cManager;
     SharedPreferences preferences;
     TelephonyManager telephonyManager;
 
     public NetworkHelper(Context context) {
-        this.context = context;
         cManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
@@ -33,9 +31,21 @@ public class NetworkHelper {
         String networkConfig = preferences.getString("networkConfig","1");
         boolean whenRoaming = preferences.getBoolean("roaming", false);
 
+        return downLoadOk(networkConfig, whenRoaming);
+    }
+
+    public boolean mayReloadAdditional() {
+
+        String networkConfig = preferences.getString("extraload_networkConfig","1");
+        boolean whenRoaming = preferences.getBoolean("extraload_roaming", false);
+
+        return downLoadOk(networkConfig, whenRoaming);
+    }
+
+    private boolean downLoadOk(String networkConfig, boolean whenRoaming) {
         NetworkInfo info = cManager.getActiveNetworkInfo();
         if (info==null) {
-            Log.i("NetworkHelper","Can't get info about active network, blocking image load");
+            Log.i("NetworkHelper", "Can't get info about active network, blocking down load");
             return false;
         }
         int type = info.getType();
@@ -63,8 +73,7 @@ public class NetworkHelper {
         if (configType==1)
             return true; // Always
 
-
-        if (type==ConnectivityManager.TYPE_MOBILE) {
+        if (type== ConnectivityManager.TYPE_MOBILE) {
             if (info.isRoaming() && !whenRoaming) {
                 Log.d("NetworkHelper","Phone is roaming, but download disabled ");
                 return false;
@@ -89,8 +98,6 @@ public class NetworkHelper {
             Log.i("NetworkHelper","Unknown connectivity type: " + info.getTypeName());
             return false;
         }
-
-     //   return true; // TODO fix
     }
 
     public boolean isOnline() {

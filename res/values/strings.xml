@@ -65,10 +65,15 @@
     <string name="prefs_max_old_descr">Number of old tweets to display when there are no new tweets on the server</string>
     <string name="prefs_pic_loading">Picture loading</string>
     <string name="prefs_pic_loading_descr">Network configuration required for picture loading</string>
-    <string name="prefs_pic_roaming">Roaming</string>
+    <string name="prefs_pic_roaming">Roaming (pictures)</string>
     <string name="prefs_pic_roaming_descr">Allow downloading images when Roaming</string>
     <string name="prefs_pictureService">Picture Service</string>
     <string name="prefs_pictureService_descr">Choose a service for picture uploading</string>
+    <string name="prefs_extra_loading">Loading of additional timelines</string>
+    <string name="prefs_extra_loading_descr">Network configuration required to load additional timelines (when on the home timeline)</string>
+    <string name="prefs_extra_roaming">Roaming (timelines)</string>
+    <string name="prefs_extra_roaming_descr">Allow load of additional timelines when roaming?</string>
+
     <!-- preferences -->
     <string name="help">Help</string>
     <string name="help_common">This page shows all the icons used with in Zwitscher</string>
