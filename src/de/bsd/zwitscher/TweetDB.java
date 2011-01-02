@@ -34,7 +34,7 @@ public class TweetDB {
     private final String account;
 
 	public TweetDB(Context context, int accountId) {
-		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 1);
+		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 2);
         account = String.valueOf(accountId);
 
 	}
@@ -85,7 +85,9 @@ public class TweetDB {
             db.execSQL(CREATE_TABLE + TABLE_USERS + " (" +
                     "userId LONG, " + //
                     ACCOUNT_ID + " LONG, " +
-                    "user_json STRING )"
+                    "user_json STRING ," +
+                    "screenname STRING " +
+                ")"
             );
             db.execSQL(CREATE_TABLE + TABLE_SEARCHES + " ("+
                     "name STRING, "+
@@ -98,7 +100,10 @@ public class TweetDB {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+            if (oldVersion==1) {
+                db.execSQL("DELETE FROM " + TABLE_USERS);
+                db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN screenname STRING");
+            }
 
 		}
 
@@ -178,7 +183,7 @@ public class TweetDB {
 		cv.put("name", name);
 		cv.put("id",id);
         cv.put(ACCOUNT_ID,account);
-        cv.put("list_json",json);
+        cv.put("list_json", json);
 
 		SQLiteDatabase db = tdHelper.getWritableDatabase();
 		db.insert(TABLE_LISTS, null, cv);
@@ -193,7 +198,7 @@ public class TweetDB {
      */
 	public void removeList(Integer id) {
 		SQLiteDatabase db = tdHelper.getWritableDatabase();
-		db.delete(TABLE_LISTS, "id = ? AND " +ACCOUNT_ID_IS, new String[]{id.toString(),account});
+		db.delete(TABLE_LISTS, "id = ? AND " + ACCOUNT_ID_IS, new String[]{id.toString(), account});
 		db.close();
 	}
 
@@ -227,7 +232,7 @@ public class TweetDB {
         cv.put(STATUS, status_json);
         cv.put(ACCOUNT_ID,account);
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.update(TABLE_STATUSES,cv,"id = ?", new String[]{String.valueOf(id)});
+        db.update(TABLE_STATUSES, cv, "id = ?", new String[]{String.valueOf(id)});
         db.close();
     }
 
@@ -394,17 +399,17 @@ public class TweetDB {
 
     /**
      * Returns a user by its ID from the database if it exists or null.
+     *
      * @param userId Id of the user
-     * @param accountId Id of the account to use
      * @return Basic JSON string of the user info or null.
      */
-    public String getUserById(int userId, int accountId) {
+    public String getUserById(int userId) {
 
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         String ret = null;
 
         Cursor c;
-        c = db.query(TABLE_USERS,new String[]{"user_json"},"userId = ? AND  " + ACCOUNT_ID + " = ?",new String[] { String.valueOf(userId), String.valueOf(accountId)},null, null, null);
+        c = db.query(TABLE_USERS,new String[]{"user_json"},"userId = ? AND  " + ACCOUNT_ID_IS,new String[] { String.valueOf(userId), account},null, null, null);
         if (c.getCount()>0) {
             c.moveToFirst();
             ret = c.getString(0);
@@ -413,6 +418,28 @@ public class TweetDB {
         db.close();
         return ret;
     }
+
+    /**
+     * Returns a user by its screenname from the database if it exists or null.
+     *
+     * @param screenName screenname of the user
+     * @return Basic JSON string of the user info or null.
+     */
+    public String getUserByName(String screenName) {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        String ret = null;
+
+        Cursor c;
+        c = db.query(TABLE_USERS,new String[]{"user_json"},"screenname = ? AND  " + ACCOUNT_ID_IS ,new String[] { screenName, account},null, null, null);
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            ret = c.getString(0);
+        }
+        c.close();
+        db.close();
+        return ret;
+    }
+
 
     /**
      * Return a list of all users stored
@@ -450,7 +477,7 @@ public class TweetDB {
         cv.put("user_json",json);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.insert(TABLE_USERS,null,cv);
+        db.insert(TABLE_USERS, null, cv);
         db.close();
     }
 
@@ -464,7 +491,8 @@ public class TweetDB {
         cv.put("user_json",json);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.update(TABLE_USERS,cv,"userId = ? AND "+ ACCOUNT_ID + " = ?",new String[] { String.valueOf(userId),account});
+        db.update(TABLE_USERS, cv, "userId = ? AND " + ACCOUNT_ID + " = ?",
+                new String[]{String.valueOf(userId), account});
         db.close();
     }
 
@@ -482,7 +510,7 @@ public class TweetDB {
         cv.put("message_json",json);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.insert(TABLE_DIRECTS,null,cv);
+        db.insert(TABLE_DIRECTS, null, cv);
         db.close();
     }
 

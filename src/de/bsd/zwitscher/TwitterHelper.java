@@ -520,7 +520,7 @@ Log.d("FillUp","Return: " + i);
         User user = null;
         try {
 
-            String userJson = tweetDB.getUserById(userId,0);
+            String userJson = tweetDB.getUserById(userId);
             if (userJson==null) {
                 if (!cachedOnly) {
                     user = twitter.showUser(userId);
@@ -537,14 +537,32 @@ Log.d("FillUp","Return: " + i);
         return user;
     }
 
-    public User getUserByScreenName(String name) {
+    /**
+     * Retrieve a User object of the passed screen name
+     * @param screenName Screen name of the user
+     * @param cachedOnly If true, only a cached version of the object or null is returned. Otherwise a request to the server is made
+     * @return User object or null, if it can not be obtained.
+     */
+    public User getUserByScreenName(String screenName, boolean cachedOnly) {
         Twitter twitter = getTwitter();
+        User user = null;
         try {
-            return twitter.showUser(name);
+            String userJson = tweetDB.getUserByName(screenName);
+            if (userJson==null) {
+                if (!cachedOnly) {
+
+                    user = twitter.showUser(screenName);
+                    userJson = DataObjectFactory.getRawJSON(user);
+                    tweetDB.insertUser(user.getId(),userJson);
+                }
+            } else {
+                user = DataObjectFactory.createUser(userJson);
+            }
+
         } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
-            return null;
         }
+        return user;
     }
 
 

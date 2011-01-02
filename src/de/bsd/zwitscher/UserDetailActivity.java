@@ -294,7 +294,7 @@ public class UserDetailActivity extends Activity  {
             }
             else if (params[0] instanceof String) {
                 String name= (String) params[0];
-                user = thTwitterHelper.getUserByScreenName(name);
+                user = thTwitterHelper.getUserByScreenName(name, false);
                 if (user==null)
                     return new Object[]{};
                 userId = user.getId();
