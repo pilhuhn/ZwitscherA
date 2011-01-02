@@ -537,6 +537,17 @@ Log.d("FillUp","Return: " + i);
         return user;
     }
 
+    public User getUserByScreenName(String name) {
+        Twitter twitter = getTwitter();
+        try {
+            return twitter.showUser(name);
+        } catch (TwitterException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+            return null;
+        }
+    }
+
+
     /**
      * Send a request to follow or unfollow a user
      * @param userId Id of the user to follow

@@ -71,8 +71,12 @@ public class UserDetailActivity extends Activity  {
 
         thTwitterHelper = new TwitterHelper(this);
         int userId = bundle.getInt("userId");
+        String userName = bundle.getString("userName");
 
-        new UserDetailDownloadTask().execute(userId);
+        if (userId!=0)
+            new UserDetailDownloadTask().execute(userId);
+        else
+            new UserDetailDownloadTask().execute(userName);
     }
 
     /**
@@ -267,7 +271,7 @@ public class UserDetailActivity extends Activity  {
      * Async task to download the userdata from server (or db) and
      * trigger its display.
      */
-    private class UserDetailDownloadTask extends AsyncTask<Integer,Void, Object[]> {
+    private class UserDetailDownloadTask extends AsyncTask<Object,Void, Object[]> {
 
         @Override
         protected void onPreExecute() {
@@ -279,10 +283,27 @@ public class UserDetailActivity extends Activity  {
 
 
         @Override
-        protected Object[] doInBackground(Integer... params) {
+        protected Object[] doInBackground(Object... params) {
 
-            Integer userId = params[0];
-            User user = thTwitterHelper.getUserById(userId, false);
+            Integer userId;
+            User user;
+
+            if (params[0] instanceof Integer) {
+                userId = (Integer) params[0];
+                user = thTwitterHelper.getUserById(userId, false);
+            }
+            else if (params[0] instanceof String) {
+                String name= (String) params[0];
+                user = thTwitterHelper.getUserByScreenName(name);
+                if (user==null)
+                    return new Object[]{};
+                userId = user.getId();
+            } else {
+                // Should not happen
+                return new Object[]{};
+            }
+
+
             Boolean isFriend = thTwitterHelper.areWeFollowing(userId);
             weAreFollowing = isFriend;
             Object[] res = new Object[2];
