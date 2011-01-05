@@ -2,6 +2,7 @@ package de.bsd.zwitscher.helper;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,7 +32,10 @@ public class MetaList<T> {
      * @param numAdded Number of items added from DB
      */
     public MetaList(List<T> list, int numOriginal, int numAdded) {
-        this.list = list;
+        if (list==null)
+            this.list = Collections.emptyList();
+        else
+            this.list = list;
         this.numOriginal = numOriginal;
         this.numAdded = numAdded;
     }

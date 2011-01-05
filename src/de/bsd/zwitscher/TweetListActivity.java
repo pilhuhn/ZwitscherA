@@ -210,8 +210,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     paging.setSinceId(mentionLast);
                 MetaList<Status> mentions = th.getTimeline(paging,-1,fromDbOnly);
                 newMentions = mentions.getNumOriginal();
-                long id = mentions.getList().get(0).getId();
-                tdb.updateOrInsertLastRead(-1,id);
+                if (mentions.getList().size()>0) {
+                    long id = mentions.getList().get(0).getId();
+                    tdb.updateOrInsertLastRead(-1,id);
+                }
 
                 long directsLast = tdb.getLastRead(-2);
                 paging = new Paging().count(100);
@@ -221,8 +223,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
                 MetaList<DirectMessage> directs = th.getDirectMessages(false,paging);
                 newDirects = directs.getNumOriginal();
-                id = mentions.getList().get(0).getId();
-                tdb.updateOrInsertLastRead(-2,id);
+                if (directs.getList().size()>0) {
+                    long id = mentions.getList().get(0).getId();
+                    tdb.updateOrInsertLastRead(-2,id);
+                }
 
             }
         	break;
@@ -338,7 +342,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
                         List<DirectMessage> messages = th.getDirectsFromDb(message.getId(),7);
                         for (DirectMessage direct : messages) {
-                            sta.insert(direct,totalCount+i);
+                            sta.insert(direct, totalCount + i);
                             directs.add(direct);
                             i++;
                         }
@@ -347,7 +351,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
                         List<Status> newStatuses = th.getStatuesFromDb(last.getId(),7,list_id);
                         for (Status status : newStatuses ) {
-                            sta.insert(status,totalCount+i);
+                            sta.insert(status, totalCount + i);
                             statuses.add(status);
                             i++;
                         }
@@ -413,8 +417,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
             // Only do the next if we actually did an update from twitter
             if (!fromDbOnly) {
-                Log.i("GTLTask"," scroll to " + result.getNumOriginal());
-                getListView().setSelection(result.getNumOriginal()-1);
+                Log.i("GTLTask", " scroll to " + result.getNumOriginal());
+                getListView().setSelection(result.getNumOriginal() - 1);
             }
 		}
     }
