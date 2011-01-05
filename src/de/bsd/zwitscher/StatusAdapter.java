@@ -56,7 +56,7 @@ class StatusAdapter<T extends TwitterResponse> extends ArrayAdapter<T> {
         // Use ViewHolder pattern to only inflate once
         if (convertView ==null) {
             LayoutInflater li = (LayoutInflater) extContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = li.inflate(R.layout.tweet_list_item,null);
+            convertView = li.inflate(R.layout.tweet_list_item,parent,false);
 
             viewHolder = new ViewHolder();
             viewHolder.iv = (ImageView) convertView.findViewById(R.id.ListImageView);

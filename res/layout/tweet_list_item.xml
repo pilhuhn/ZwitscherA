@@ -2,9 +2,8 @@
 <!--  this is a single entry in the ListView created by ArrayAdapter -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="fill_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:layout_height="wrap_content"
     android:padding="4dip"
-    android:orientation="horizontal"
         >
     <!-- left column -->
     <ImageView android:id="@+id/ListImageView"

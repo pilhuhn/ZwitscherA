@@ -329,9 +329,11 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         boolean loadMore = /* maybe add a padding */
             firstVisible + visibleCount >= totalCount-1;
 
-        ListAdapter adapter = absListView.getAdapter();
-        Log.d("onScroll:","loadMore f=" + firstVisible + ", vc=" + visibleCount + ", tc=" +totalCount);
+
+//        Log.d("onScroll:","loadMore f=" + firstVisible + ", vc=" + visibleCount + ", tc=" +totalCount);
         if(loadMore) {
+//Debug.startMethodTracing("list" + firstVisible);
+            ListAdapter adapter = absListView.getAdapter();
             if (adapter instanceof StatusAdapter) {
                 StatusAdapter sta = (StatusAdapter) adapter;
                 if (totalCount>0) {
@@ -356,9 +358,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                             i++;
                         }
                     }
+                    sta.notifyDataSetChanged();
                 }
             }
-
+//Debug.stopMethodTracing();
         }
     }
 
