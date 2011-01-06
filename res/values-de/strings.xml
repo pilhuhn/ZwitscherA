@@ -47,6 +47,8 @@
     <string name="service">Dienst</string>
     <string name="new_mentions">Neue Erwähnung(en)</string>
     <string name="new_directs">Neue direkt(e) Nachricht(en)</string>
+    <string name="copy_and_paste">Sie können den nachfolgenden Text kopieren, um das Senden erneut zu versuchen.</string>
+
 
 
 

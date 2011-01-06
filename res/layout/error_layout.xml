@@ -24,6 +24,10 @@
               android:layout_height="wrap_content"
               android:layout_width="fill_parent"
               />
+    <TextView android:id="@+id/copy_and_paste"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/copy_and_paste"/>
     <EditText android:id="@+id/error_message"
               android:layout_height="wrap_content"
               android:layout_width="fill_parent"

@@ -52,6 +52,8 @@
     <string name="service">Service</string>
     <string name="new_mentions">new mentions</string>
     <string name="new_directs">new direct messages</string>
+    <string name="copy_and_paste">You can copy and paste the message to re-try.</string>
+
 
 
     <!-- preferences -->
