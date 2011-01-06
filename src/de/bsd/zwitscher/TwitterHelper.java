@@ -34,10 +34,12 @@ public class TwitterHelper {
 
 	Context context;
     TweetDB tweetDB;
+    Twitter twitter;
 
 	public TwitterHelper(Context context) {
 		this.context = context;
         tweetDB = new TweetDB(context,0); // TODO set real account
+        twitter = getTwitter();
 	}
 
     /**
@@ -49,7 +51,6 @@ public class TwitterHelper {
      * @see twitter4j.Status
      */
 	public MetaList<Status> getTimeline(Paging paging, int list_id, boolean fromDbOnly) {
-        Twitter twitter = getTwitter();
 
         List<Status> statuses = null;
 		try {
@@ -101,8 +102,6 @@ public class TwitterHelper {
      * @return
      */
     public MetaList<DirectMessage> getDirectMessages(boolean fromDbOnly, Paging paging) {
-
-       Twitter twitter = getTwitter();
 
        List<DirectMessage> ret;
        List<DirectMessage> ret2 = new ArrayList<DirectMessage>();
@@ -195,7 +194,6 @@ public class TwitterHelper {
 
 
     public List<UserList> getUserLists() {
-		Twitter twitter = getTwitter();
 
         List<UserList> userLists;
 		try {
@@ -217,11 +215,11 @@ public class TwitterHelper {
         String accessTokenToken = preferences.getString("accessToken",null);
         String accessTokenSecret = preferences.getString("accessTokenSecret",null);
         if (accessTokenToken!=null && accessTokenSecret!=null) {
-        	Twitter twitter = new TwitterFactory().getOAuthAuthorizedInstance(
+        	Twitter twitterInstance = new TwitterFactory().getOAuthAuthorizedInstance(
         			TwitterConsumerToken.consumerKey,
         			TwitterConsumerToken.consumerSecret,
         			new AccessToken(accessTokenToken, accessTokenSecret));
-        	return twitter;
+        	return twitterInstance;
         }
 
 		return null;
@@ -248,9 +246,9 @@ public class TwitterHelper {
 		}
 
 
-        Twitter twitter = new TwitterFactory().getInstance();
-        twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
-        RequestToken requestToken = twitter.getOAuthRequestToken();
+        Twitter twitterInstance = new TwitterFactory().getInstance();
+        twitterInstance.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
+        RequestToken requestToken = twitterInstance.getOAuthRequestToken();
         Editor editor = preferences.edit();
         editor.putString("requestToken", requestToken.getToken());
         editor.putString("requestTokenSecret", requestToken.getTokenSecret());
@@ -265,10 +263,10 @@ public class TwitterHelper {
      * @throws Exception
      */
 	public void generateAuthToken(String pin) throws Exception{
-        Twitter twitter = new TwitterFactory().getInstance();
-        twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
-        RequestToken requestToken = getRequestToken(false); // twitter.getOAuthRequestToken();
-		AccessToken accessToken = twitter.getOAuthAccessToken(requestToken, pin);
+        Twitter twitterInstance = new TwitterFactory().getInstance();
+        twitterInstance.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
+        RequestToken requestToken = getRequestToken(false); // twitterInstance.getOAuthRequestToken();
+		AccessToken accessToken = twitterInstance.getOAuthAccessToken(requestToken, pin);
 
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -289,10 +287,10 @@ public class TwitterHelper {
         cb.setOAuthConsumerKey(TwitterConsumerToken.consumerKey);
         cb.setOAuthConsumerSecret(TwitterConsumerToken.consumerSecret);
         Configuration conf = cb.build() ;
-        Twitter twitter = new TwitterFactory(conf).getInstance(username,password);
-//        twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
+        Twitter twitterInstance = new TwitterFactory(conf).getInstance(username,password);
+//        twitterInstance.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
 
-        AccessToken accessToken = twitter.getOAuthAccessToken();
+        AccessToken accessToken = twitterInstance.getOAuthAccessToken();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         Editor editor = preferences.edit();
         editor.putString("accessToken", accessToken.getToken());
@@ -302,7 +300,6 @@ public class TwitterHelper {
     }
 
 	public UpdateResponse updateStatus(UpdateRequest request) {
-		Twitter twitter = getTwitter();
         UpdateResponse updateResponse = new UpdateResponse(request.updateType,request.statusUpdate);
 		Log.i("TwitterHelper", "Sending update: " + request.statusUpdate);
 		try {
@@ -317,7 +314,6 @@ public class TwitterHelper {
 	}
 
 	public UpdateResponse retweet(UpdateRequest request) {
-		Twitter twitter = getTwitter();
         UpdateResponse response = new UpdateResponse(request.updateType,request.id);
 		try {
 			twitter.retweetStatus(request.id);
@@ -334,7 +330,6 @@ public class TwitterHelper {
         Status status = request.status;
         UpdateResponse updateResponse = new UpdateResponse(request.updateType, status);
         updateResponse.view = request.view;
-		Twitter twitter = getTwitter();
 		try {
 			if (status.isFavorited()) {
 				twitter.destroyFavorite(status.getId());
@@ -359,7 +354,6 @@ public class TwitterHelper {
 
     public UpdateResponse direct(UpdateRequest request) {
         UpdateResponse updateResponse = new UpdateResponse(request.updateType, (Status) null); // TODO
-        Twitter twitter = getTwitter();
         try {
             twitter.sendDirectMessage((int)request.id,request.message);
             updateResponse.setSuccess();
@@ -373,7 +367,6 @@ public class TwitterHelper {
     }
 
 	public MetaList<Status> getUserList(Paging paging, int listId, boolean fromDbOnly) {
-        Twitter twitter = getTwitter();
 
         List<Status> statuses;
         if (!fromDbOnly) {
@@ -484,7 +477,6 @@ Log.d("FillUp","Return: " + i);
             }
         }
 
-        Twitter twitter = getTwitter();
         try {
             status = twitter.showStatus(statusId);
 
@@ -519,7 +511,6 @@ Log.d("FillUp","Return: " + i);
      * @return User object or null, if it can not be obtained.
      */
     public User getUserById(int userId, boolean cachedOnly) {
-        Twitter twitter = getTwitter();
         User user = null;
         try {
 
@@ -547,7 +538,6 @@ Log.d("FillUp","Return: " + i);
      * @return User object or null, if it can not be obtained.
      */
     public User getUserByScreenName(String screenName, boolean cachedOnly) {
-        Twitter twitter = getTwitter();
         User user = null;
         try {
             String userJson = tweetDB.getUserByName(screenName);
@@ -577,7 +567,6 @@ Log.d("FillUp","Return: " + i);
      * @todo make async
      */
     public boolean followUnfollowUser(int userId, boolean doFollow ) {
-        Twitter twitter = getTwitter();
         try {
             if (doFollow)
                 twitter.createFriendship(userId);
@@ -598,7 +587,6 @@ Log.d("FillUp","Return: " + i);
      * @return true if successful
      */
     public boolean addUserToLists(int userId, int listId) {
-        Twitter twitter = getTwitter();
         try {
             twitter.addUserListMember(listId,userId);
         } catch (TwitterException e) {
@@ -706,7 +694,6 @@ Log.d("FillUp","Return: " + i);
      * @return Url where this was stored on the remote service or null on error
      */
     public String postPicture(String fileName) {
-        Twitter twitter = getTwitter();
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String provider = preferences.getString("pictureService","yfrog");
@@ -749,7 +736,6 @@ Log.d("FillUp","Return: " + i);
      */
     public boolean areWeFollowing(Integer userId) {
 
-        Twitter twitter = getTwitter();
         try {
             int myId = twitter.getId();
             Relationship rel = twitter.showFriendship(myId,userId);
@@ -762,7 +748,6 @@ Log.d("FillUp","Return: " + i);
 
     public List<SavedSearch> getSavedSearchesFromServer() {
 
-        Twitter twitter = getTwitter();
         List<SavedSearch> searches;
         try {
             searches = twitter.getSavedSearches();
@@ -804,7 +789,6 @@ Log.d("FillUp","Return: " + i);
     }
 
     public MetaList<Tweet> getSavedSearchesTweets(int searchId, boolean fromDbOnly, Paging paging) {
-        Twitter twitter = getTwitter();
 
         List<SavedSearch> searches = getSavedSearchesFromDb();
         for (SavedSearch search : searches) {
