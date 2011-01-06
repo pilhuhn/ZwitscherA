@@ -538,6 +538,15 @@ public class TweetDB {
         db.close();
     }
 
+    public void storeDirect(List<ContentValues> values) {
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        for (ContentValues val : values) {
+            db.insertWithOnConflict(TABLE_DIRECTS,null,val,SQLiteDatabase.CONFLICT_IGNORE);
+        }
+        db.close();
+
+    }
+
     /**
      * Get a direct message from th DB
      *

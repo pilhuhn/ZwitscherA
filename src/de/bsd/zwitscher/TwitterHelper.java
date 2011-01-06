@@ -124,9 +124,10 @@ public class TwitterHelper {
           //  persist directs
 
           if (ret.size()>0) {
-             for (DirectMessage msg : ret) {
-                persistDirects(msg);
-             }
+//             for (DirectMessage msg : ret) {
+//                persistDirects(msg);
+//             }
+              persistDirects(ret);
              if (ret.get(0).getId()>max)
                 max = ret.get(0).getId();
 
@@ -141,9 +142,10 @@ public class TwitterHelper {
              ret = Collections.emptyList();
           }
           if (ret.size()>0) {
-             for (DirectMessage msg : ret) {
-                persistDirects(msg);
-             }
+//             for (DirectMessage msg : ret) {
+//                persistDirects(msg);
+//             }
+              persistDirects(ret);
              if (ret.get(0).getId()>max)
                 max = ret.get(0).getId();
 
@@ -627,7 +629,6 @@ Log.d("FillUp","Return: " + i);
             values.add(cv);
         }
         tweetDB.storeStatus(values);
-
     }
 
     private void persistDirects(DirectMessage message) {
@@ -637,6 +638,24 @@ Log.d("FillUp","Return: " + i);
         String json = DataObjectFactory.getRawJSON(message);
 
         tweetDB.insertDirect(message.getId(), message.getCreatedAt().getTime(), json);
+    }
+
+    private void persistDirects(Collection<DirectMessage> directs) {
+        if (directs.isEmpty())
+            return;
+
+        List<ContentValues> values = new ArrayList<ContentValues>(directs.size());
+        for (DirectMessage directMessage : directs) {
+            String json = DataObjectFactory.getRawJSON(directMessage);
+            ContentValues cv = new ContentValues(4);
+            cv.put("id",directMessage.getId());
+            cv.put("created_at", directMessage.getCreatedAt().getTime());
+            cv.put("ACCOUNT_ID",accountId);
+            cv.put("message_json",json);
+            values.add(cv);
+        }
+        tweetDB.storeDirect(values);
+
     }
     /**
      * Update an existing status object in the database with the passed one.
