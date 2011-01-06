@@ -34,7 +34,7 @@ public class TweetDB {
     private final String account;
 
 	public TweetDB(Context context, int accountId) {
-		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 2);
+		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 3);
         account = String.valueOf(accountId);
 
 	}
@@ -55,15 +55,18 @@ public class TweetDB {
                     ACCOUNT_ID + " LONG, " +
                     "LIST_ID LONG, " +
                     "I_REP_TO LONG, " +
-                    "STATUS STRING " +
+                    "STATUS STRING, " +
+                    "UNIQUE (ID, " + ACCOUNT_ID + ")" +
                     ")"
+
             );
 
             db.execSQL(CREATE_TABLE + TABLE_DIRECTS + " (" +
                     "ID LONG, " +
                     "created_at LONG, " +
                     ACCOUNT_ID + " LONG, " +
-                    "MESSAGE_JSON STRING " +
+                    "MESSAGE_JSON STRING, " +
+                    "UNIQUE (ID, " + ACCOUNT_ID + ")" +
                     ")"
             );
 
@@ -71,14 +74,16 @@ public class TweetDB {
 					"list_id LONG, " + //
 					"last_read_id LONG, " +  // Last Id read by the user
                     "last_fetched_id LONG, " +  // last Id fetched from the server
-                    ACCOUNT_ID + " LONG " +
+                    ACCOUNT_ID + " LONG, " +
+                    "UNIQUE (LIST_ID, " + ACCOUNT_ID + ")" +
                     ")"
 			);
 			db.execSQL(CREATE_TABLE + TABLE_LISTS + " (" + //
 					"name TEXT, " + //
 					"id LONG, " +
                     ACCOUNT_ID + " LONG, " +
-                    "list_json TEXT" +
+                    "list_json TEXT, " +
+                    "UNIQUE (ID, " + ACCOUNT_ID + ")" +
                     " )"
 			);
 
@@ -86,7 +91,8 @@ public class TweetDB {
                     "userId LONG, " + //
                     ACCOUNT_ID + " LONG, " +
                     "user_json STRING ," +
-                    "screenname STRING " +
+                    "screenname STRING, " +
+                    "UNIQUE (USERID, " + ACCOUNT_ID + ")" +
                 ")"
             );
             db.execSQL(CREATE_TABLE + TABLE_SEARCHES + " ("+
@@ -94,7 +100,9 @@ public class TweetDB {
                     "id LONG, " +
                     ACCOUNT_ID + " LONG, " +
                     "query STRING, " +
-                    "json STRING )"
+                    "json STRING,"+
+                    "UNIQUE (ID, " + ACCOUNT_ID + ")" +
+                ")"
             );
 		}
 
@@ -103,6 +111,14 @@ public class TweetDB {
             if (oldVersion==1) {
                 db.execSQL("DELETE FROM " + TABLE_USERS);
                 db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN screenname STRING");
+            }
+            if (oldVersion<3) {
+                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_STATUSES + "(ID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_DIRECTS + "(ID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_LAST_READ + "(list_ID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_LISTS + "(ID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_USERS + "(userID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_SEARCHES + "(ID, " + ACCOUNT_ID +")");
             }
 
 		}
@@ -210,7 +226,7 @@ public class TweetDB {
      * @param status_json
      */
     public void storeStatus(long id, long i_reply_id, long list_id, String status_json) {
-        ContentValues cv = new ContentValues(4);
+        ContentValues cv = new ContentValues(5);
         cv.put("ID", id);
         cv.put("I_REP_TO", i_reply_id);
         cv.put("LIST_ID", list_id);
@@ -218,6 +234,14 @@ public class TweetDB {
         cv.put(STATUS,status_json);
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.insert(TABLE_STATUSES, null, cv);
+        db.close();
+    }
+
+    public void storeStatus(List<ContentValues> values) {
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        for (ContentValues val : values) {
+            db.insertWithOnConflict(TABLE_STATUSES,null,val,SQLiteDatabase.CONFLICT_IGNORE);
+        }
         db.close();
     }
 

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.bsd.zwitscher"
-          android:versionName="0.64"
-          android:versionCode="64"
+          android:installLocation="preferExternal"
+          android:versionName="0.65"
+          android:versionCode="65"
           >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -12,7 +13,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application android:icon="@drawable/icon" android:label="Zwitscher"
-    			android:debuggable="false"  android:allowBackup="true"
+    			android:debuggable="true"  android:allowBackup="true"
         >
 
         <activity android:name=".TweetListActivity"/>
@@ -54,5 +55,5 @@
 
     </application>
 
-    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="7"/>
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="8"/>
 </manifest>

@@ -3,12 +3,14 @@ package de.bsd.zwitscher;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -35,10 +37,12 @@ public class TwitterHelper {
 	Context context;
     TweetDB tweetDB;
     Twitter twitter;
+    int accountId;
 
 	public TwitterHelper(Context context) {
 		this.context = context;
-        tweetDB = new TweetDB(context,0); // TODO set real account
+        accountId = 0; // TODO set real account
+        tweetDB = new TweetDB(context,accountId);
         twitter = getTwitter();
 	}
 
@@ -69,9 +73,10 @@ public class TwitterHelper {
 			}
             if (statuses==null)
                 statuses=new ArrayList<Status>();
-            for (Status status : statuses) { // TODO persist in one go
-                persistStatus(tweetDB, status,list_id);
-            }
+//            for (Status status : statuses) { // TODO persist in one go
+//                persistStatus(tweetDB, status,list_id);
+//            }
+            persistStatus(statuses,list_id);
 
         }
         catch (Exception e) {
@@ -377,9 +382,10 @@ public class TwitterHelper {
                 int size = statuses.size();
                 Log.i("getUserList","Got " + size + " statuses from Twitter");
 
-                for (Status status : statuses) {
-                    persistStatus(tweetDB, status,listId);
-                }
+//                for (Status status : statuses) {
+//                    persistStatus(tweetDB, status,listId);
+//                }
+                persistStatus(statuses,listId);
             } catch (Exception e) {
                 statuses = new ArrayList<Status>();
 
@@ -603,6 +609,25 @@ Log.d("FillUp","Return: " + i);
         // Serialize and then store in DB
         String json = DataObjectFactory.getRawJSON(status);
         tdb.storeStatus(status.getId(), status.getInReplyToStatusId(), list_id, json);
+    }
+
+    private void persistStatus(Collection<Status> statuses, long list_id) {
+        if (statuses.isEmpty())
+            return;
+
+        List<ContentValues> values = new ArrayList<ContentValues>(statuses.size());
+        for (Status status : statuses) {
+            String json = DataObjectFactory.getRawJSON(status);
+            ContentValues cv = new ContentValues(5);
+            cv.put("ID", status.getId());
+            cv.put("I_REP_TO", status.getInReplyToStatusId());
+            cv.put("LIST_ID", list_id);
+            cv.put("ACCOUNT_ID",accountId);
+            cv.put("STATUS",json);
+            values.add(cv);
+        }
+        tweetDB.storeStatus(values);
+
     }
 
     private void persistDirects(DirectMessage message) {
