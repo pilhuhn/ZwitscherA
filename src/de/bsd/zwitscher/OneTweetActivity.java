@@ -594,10 +594,11 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             ImageView i = new ImageView(mContext);
 
             Bitmap bitmap = mImages.get(position).bitmap;
-            i.setImageBitmap(bitmap);
-            i.setScaleType(ImageView.ScaleType.FIT_XY);
-            i.setLayoutParams(new Gallery.LayoutParams(bitmap.getWidth()*2, bitmap.getHeight()*2));
-
+            if (bitmap!=null) {
+                i.setImageBitmap(bitmap);
+                i.setScaleType(ImageView.ScaleType.FIT_XY);
+                i.setLayoutParams(new Gallery.LayoutParams(bitmap.getWidth()*2, bitmap.getHeight()*2));
+            }
             // The preferred Gallery item background
             i.setBackgroundResource(mGalleryItemBackground);
 
