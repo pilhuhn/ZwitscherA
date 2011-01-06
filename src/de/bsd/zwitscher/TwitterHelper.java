@@ -147,7 +147,7 @@ public class TwitterHelper {
           // timeline.
           Collections.sort(ret2,new Comparator<DirectMessage>() {
              public int compare(DirectMessage directMessage, DirectMessage directMessage1) {
-                return directMessage1.getId() - directMessage.getId();
+                return (int) (directMessage1.getId() - directMessage.getId());
              }
           });
 
@@ -179,7 +179,7 @@ public class TwitterHelper {
         return ret;
     }
 
-    public List<DirectMessage> getDirectsFromDb(int sinceId, int num) {
+    public List<DirectMessage> getDirectsFromDb(long sinceId, int num) {
         List<DirectMessage> ret = new ArrayList<DirectMessage>();
         List<String> responses = tweetDB.getDirectsOlderThan(sinceId,num);
         for (String json : responses) {

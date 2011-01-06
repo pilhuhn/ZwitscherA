@@ -353,7 +353,7 @@ public class TweetDB {
         return ret;
     }
 
-    public List<String> getDirectsOlderThan(int sinceId, int howMany) {
+    public List<String> getDirectsOlderThan(long sinceId, int howMany) {
         List<String> ret = new ArrayList<String>();
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
@@ -502,7 +502,7 @@ public class TweetDB {
      * @param time creation time
      * @param json Json string of the message
      */
-    public void insertDirect(int id, long time, String json) {
+    public void insertDirect(long id, long time, String json) {
         ContentValues cv = new ContentValues(4);
         cv.put("id",id);
         cv.put("created_at", time);
@@ -516,10 +516,11 @@ public class TweetDB {
 
     /**
      * Get a direct message from th DB
+     *
      * @param id ID of the message to look up
      * @return JSON string of the message or null if not found
      */
-    public String getDirectById(int id) {
+    public String getDirectById(long id) {
 
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         String ret = null;
