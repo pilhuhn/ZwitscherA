@@ -124,9 +124,6 @@ public class TwitterHelper {
           //  persist directs
 
           if (ret.size()>0) {
-//             for (DirectMessage msg : ret) {
-//                persistDirects(msg);
-//             }
               persistDirects(ret);
              if (ret.get(0).getId()>max)
                 max = ret.get(0).getId();
@@ -142,9 +139,6 @@ public class TwitterHelper {
              ret = Collections.emptyList();
           }
           if (ret.size()>0) {
-//             for (DirectMessage msg : ret) {
-//                persistDirects(msg);
-//             }
               persistDirects(ret);
              if (ret.get(0).getId()>max)
                 max = ret.get(0).getId();
@@ -347,7 +341,7 @@ public class TwitterHelper {
 
             // reload tweet and update in DB - twitter4j should have some status.setFav()..
             status = getStatusById(status.getId(),null, true, false); // no list id, don't persist
-            updateStatus(tweetDB,status); // explicitly update in DB - we know it is there.
+            updateStatus(status); // explicitly update in DB - we know it is there.
 			updateResponse.setSuccess();
             updateResponse.setMessage("(Un)favorite set");
 		} catch (Exception e) {
@@ -384,9 +378,6 @@ public class TwitterHelper {
                 int size = statuses.size();
                 Log.i("getUserList","Got " + size + " statuses from Twitter");
 
-//                for (Status status : statuses) {
-//                    persistStatus(tweetDB, status,listId);
-//                }
                 persistStatus(statuses,listId);
             } catch (Exception e) {
                 statuses = new ArrayList<Status>();
@@ -494,7 +485,9 @@ Log.d("FillUp","Return: " + i);
                     id = 0;
                 else
                     id = list_id;
-                persistStatus(tweetDB,status,id);
+                List<Status> sList = new ArrayList<Status>(1);
+                sList.add(status);
+                persistStatus(sList, id);
             }
         } catch (Exception e) {
             e.printStackTrace();  // TODO: Customise this generated block
@@ -604,15 +597,6 @@ Log.d("FillUp","Return: " + i);
         return true;
     }
 
-    private void persistStatus(TweetDB tdb, Status status, long list_id) throws IOException {
-        if (tdb.getStatusObjectById(status.getId(), list_id)!=null)
-            return; // This is already in DB, so do nothing
-
-        // Serialize and then store in DB
-        String json = DataObjectFactory.getRawJSON(status);
-        tdb.storeStatus(status.getId(), status.getInReplyToStatusId(), list_id, json);
-    }
-
     private void persistStatus(Collection<Status> statuses, long list_id) {
         if (statuses.isEmpty())
             return;
@@ -629,15 +613,6 @@ Log.d("FillUp","Return: " + i);
             values.add(cv);
         }
         tweetDB.storeStatus(values);
-    }
-
-    private void persistDirects(DirectMessage message) {
-        if (tweetDB.getDirectById(message.getId())!=null)
-            return;
-
-        String json = DataObjectFactory.getRawJSON(message);
-
-        tweetDB.insertDirect(message.getId(), message.getCreatedAt().getTime(), json);
     }
 
     private void persistDirects(Collection<DirectMessage> directs) {
@@ -659,15 +634,15 @@ Log.d("FillUp","Return: " + i);
     }
     /**
      * Update an existing status object in the database with the passed one.
-     * @param tdb TweetDb to use
+     *
      * @param status Updated status object
      * @throws IOException
      */
-    private void updateStatus(TweetDB tdb, Status status) throws IOException {
+    private void updateStatus(Status status) throws IOException {
 
         // Serialize and then store in DB
         String json = DataObjectFactory.getRawJSON(status);
-        tdb.updateStatus(status.getId(), json);
+        tweetDB.updateStatus(status.getId(), json);
     }
 
 
