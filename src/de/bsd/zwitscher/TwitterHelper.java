@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -20,11 +21,13 @@ import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.*;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+import twitter4j.conf.PropertyConfiguration;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
 import twitter4j.json.DataObjectFactory;
-import twitter4j.util.ImageUpload;
-
+import twitter4j.media.ImageUpload;
+import twitter4j.media.ImageUploaderFactory;
+import twitter4j.media.MediaProvider;
 
 public class TwitterHelper {
 
@@ -710,13 +713,27 @@ Log.d("FillUp","Return: " + i);
 
         try {
             File file = new File(fileName);
-            ImageUpload upload;
+            MediaProvider mProvider ;
             if (provider.equals("yfrog"))
-                upload= ImageUpload.getYFrogUploader(twitter);
+                mProvider = MediaProvider.YFROG;
             else if (provider.equals("twitpic"))
-                upload= ImageUpload.getTwitpicUploader(twitter);
+                mProvider = MediaProvider.TWITPIC;
             else
                 throw new IllegalArgumentException("Picture provider " + provider + " unknown");
+
+            String accessTokenToken = preferences.getString("accessToken",null);
+            String accessTokenSecret = preferences.getString("accessTokenSecret",null);
+
+            Properties props = new Properties();
+            props.put(PropertyConfiguration.MEDIA_PROVIDER,mProvider);
+            props.put(PropertyConfiguration.OAUTH_ACCESS_TOKEN,accessTokenToken);
+            props.put(PropertyConfiguration.OAUTH_ACCESS_TOKEN_SECRET,accessTokenSecret);
+            props.put(PropertyConfiguration.OAUTH_CONSUMER_KEY,TwitterConsumerToken.consumerKey);
+            props.put(PropertyConfiguration.OAUTH_CONSUMER_SECRET,TwitterConsumerToken.consumerSecret);
+            Configuration conf = new PropertyConfiguration(props);
+
+            ImageUploaderFactory factory = new ImageUploaderFactory(conf);
+            ImageUpload upload = factory.getInstance(mProvider);
             String url = upload.upload(file);
             return url;
         } catch (Exception e) {

@@ -63,6 +63,11 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                         ret = new UpdateResponse(request.updateType,request.view,url);
                         ret.setSuccess();
                     }
+                    else {
+                        ret = new UpdateResponse(request.updateType,request.view,"");
+                        ret.setFailure();
+                        ret.setMessage("Picture upload failed");
+                    }
                 }
                 break;
             default:
