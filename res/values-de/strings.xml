@@ -18,6 +18,7 @@
     <string name="follower_count">Anzahl Verfolger:</string>
     <string name="following_count">Anzahl Folgende:</string>
     <string name="listed_count">Wie oft gelistet:</string>
+    <string name="resent_by">Neu gesendet durch</string>
     <string name="in_reply_to"> als Antwort auf </string>
     <string name="send_direct_to">Sende private Nachricht an </string>
     <string name="getting_tweets">Lade Tweets</string>
