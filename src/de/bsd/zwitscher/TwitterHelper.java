@@ -597,6 +597,20 @@ Log.d("FillUp","Return: " + i);
         return true;
     }
 
+    public List<Status> getUserTweets(int userId) {
+
+        Paging paging = new Paging();
+        paging.setCount(30);
+        List<Status> ret = null;
+        try {
+            ret = twitter.getUserTimeline(userId,paging);
+        } catch (TwitterException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+            return Collections.emptyList();
+        }
+        return ret;
+    }
+
     private void persistStatus(Collection<Status> statuses, long list_id) {
         if (statuses.isEmpty())
             return;

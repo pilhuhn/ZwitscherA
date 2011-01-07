@@ -20,10 +20,12 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
+import twitter4j.Status;
 import twitter4j.User;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -218,6 +220,23 @@ public class UserDetailActivity extends Activity  {
         String u = "http://twitter.com/#!/" + theUser.getScreenName();
         i.setData(Uri.parse(u));
         startActivity(i);
+    }
+
+    /**
+     * View users's recent tweets
+     * Triggered from a button
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void showUserTweets(View v) {
+
+        int userId = theUser.getId();
+
+        Intent intent = new Intent().setClass(this,TweetListActivity.class);
+        intent.putExtra("userId",userId);
+
+        startActivity(intent);
+
     }
 
     /**

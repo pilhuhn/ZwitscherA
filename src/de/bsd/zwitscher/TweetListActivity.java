@@ -48,6 +48,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     ListView lv;
     int newMentions=0;
     private int newDirects=0;
+    Integer userId=null;
 
     /**
      * Called when the activity is first created.
@@ -97,6 +98,13 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             list_id = 0;
         } else {
             list_id = intentInfo.getInt(TabWidget.LIST_ID);
+            if (intentInfo.containsKey("userId")) {
+                // Display tweets of a single user
+                userId = intentInfo.getInt("userId");
+                // This is a one off list. So don't offer the reload button
+                ImageButton tweet_list_reload_button = (ImageButton) findViewById(R.id.tweet_list_reload_button);
+                tweet_list_reload_button.setVisibility(View.INVISIBLE);
+            }
         }
 
         boolean fromDbOnly = tdb.getLastRead(list_id) != -1;
@@ -385,7 +393,11 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 		protected MetaList doInBackground(Boolean... params) {
             fromDbOnly = params[0];
 	        MetaList data;
-            if (list_id>-2)
+            if (userId!=null) {
+                List<twitter4j.Status> statuses = th.getUserTweets(userId);
+                data = new MetaList(statuses,statuses.size(),0);
+            }
+            else if (list_id>-2)
                 data = getTimlinesFromTwitter(fromDbOnly);
             else if (list_id==-2)
                 data = getDirectsFromTwitter(fromDbOnly);

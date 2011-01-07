@@ -138,6 +138,12 @@
                 android:onClick="viewOnWeb"
                 android:enabled="true"/>
 
+        <!-- TODO convert to ImageButton -->
+        <Button android:text="User's tweets"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:onClick="showUserTweets"
+                android:enabled="true"/>
 
     </LinearLayout>
 
