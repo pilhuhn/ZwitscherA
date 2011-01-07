@@ -12,9 +12,10 @@
 <string name="ClearButton">Clear!</string>
 <string name="home_timeline">Home</string>
 <string name="classicretweet">ClassicRetweet</string>
-<string name="list">list</string>
-<string name="direct">Direct</string>
-<string name="mentions">mentions</string>
+<string name="list">Lists</string>
+<string name="direct">Directs</string>
+<string name="mentions">Mentions</string>
+    <string name="searches">Searches</string>
     <string name="location">Location:</string>
     <string name="geo">Geo?</string>
     <string name="web">Web:</string>

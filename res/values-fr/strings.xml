@@ -18,6 +18,11 @@
     <string name="password">Mot de passe</string>
     <string name="login">Connecter...</string>
     <string name="service">Service</string>
+    <string name="home_timeline">Chez-soi</string>
+    <string name="list">Listes</string>
+    <string name="direct">Courier</string>
+    <string name="mentions">Mentions</string>
+    <string name="searches">Recherches</string>
 
 
 

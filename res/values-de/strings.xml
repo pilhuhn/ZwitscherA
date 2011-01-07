@@ -8,10 +8,11 @@
 <string name="no_connect">Kann Twitter nicht erreichen</string>
 <string name="TweetButton">Absenden</string>
 <string name="ClearButton">Löschen</string>
-<string name="home_timeline">Home</string>
-<string name="list">list</string>
+<string name="home_timeline">Daheim</string>
+<string name="list">Listen</string>
 <string name="direct">Direkt</string>
 <string name="mentions">Erwähnungen</string>
+    <string name="searches">Suchen</string>
     <string name="location">Ort:</string>
     <string name="web">Web:</string>
     <string name="tweet_count">Anzahl Tweets:</string>
