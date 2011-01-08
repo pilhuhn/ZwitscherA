@@ -626,7 +626,7 @@ Log.d("FillUp","Return: " + i);
             cv.put("STATUS",json);
             values.add(cv);
         }
-        tweetDB.storeStatus(values);
+        tweetDB.storeValues(TweetDB.TABLE_STATUSES,values);
     }
 
     private void persistDirects(Collection<DirectMessage> directs) {
@@ -643,7 +643,7 @@ Log.d("FillUp","Return: " + i);
             cv.put("message_json",json);
             values.add(cv);
         }
-        tweetDB.storeDirect(values);
+        tweetDB.storeValues(TweetDB.TABLE_DIRECTS,values);
 
     }
     /**

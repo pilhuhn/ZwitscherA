@@ -21,12 +21,12 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
  */
 public class TweetDB {
 
-    private static final String TABLE_STATUSES = "statuses";
+    public static final String TABLE_STATUSES = "statuses";
     private static final String TABLE_LAST_READ = "lastRead";
     private static final String TABLE_LISTS = "lists";
     private static final String TABLE_USERS = "users";
     private static final String TABLE_SEARCHES = "searches";
-    private static final String TABLE_DIRECTS = "directs";
+    public static final String TABLE_DIRECTS = "directs";
     static final String STATUS = "STATUS";
     static final String ACCOUNT_ID = "ACCOUNT_ID";
     static final String ACCOUNT_ID_IS = ACCOUNT_ID + "=?";
@@ -40,7 +40,7 @@ public class TweetDB {
 	}
 
 
-    private class TweetDBOpenHelper extends SQLiteOpenHelper {
+    private static class TweetDBOpenHelper extends SQLiteOpenHelper {
         static final String CREATE_TABLE = "CREATE TABLE ";
 
 		public TweetDBOpenHelper(Context context, String name,
@@ -56,7 +56,7 @@ public class TweetDB {
                     "LIST_ID LONG, " +
                     "I_REP_TO LONG, " +
                     "STATUS STRING, " +
-                    "UNIQUE (ID, " + ACCOUNT_ID + ")" +
+                    "UNIQUE (ID, LIST_ID, " + ACCOUNT_ID + ")" +
                     ")"
 
             );
@@ -113,7 +113,7 @@ public class TweetDB {
                 db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN screenname STRING");
             }
             if (oldVersion<3) {
-                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_STATUSES + "(ID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_STATUSES + "(ID, LIST_ID, " + ACCOUNT_ID +")");
                 db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_DIRECTS + "(ID, " + ACCOUNT_ID +")");
                 db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_LAST_READ + "(list_ID, " + ACCOUNT_ID +")");
                 db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_LISTS + "(ID, " + ACCOUNT_ID +")");
@@ -218,32 +218,6 @@ public class TweetDB {
 		db.close();
 	}
 
-    /**
-     * Store a new Status object in the DB. See {@link twitter4j.Status}
-     * @param id Id of the status
-     * @param i_reply_id Id of a status the passed one is a reply to
-     * @param list_id Id of a list - pseudo IDs apply --see {@link de.bsd.zwitscher.TwitterHelper#getTimeline(twitter4j.Paging, int, boolean)}
-     * @param status_json
-     */
-    public void storeStatus(long id, long i_reply_id, long list_id, String status_json) {
-        ContentValues cv = new ContentValues(5);
-        cv.put("ID", id);
-        cv.put("I_REP_TO", i_reply_id);
-        cv.put("LIST_ID", list_id);
-        cv.put(ACCOUNT_ID,account);
-        cv.put(STATUS,status_json);
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.insert(TABLE_STATUSES, null, cv);
-        db.close();
-    }
-
-    public void storeStatus(List<ContentValues> values) {
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
-        for (ContentValues val : values) {
-            db.insertWithOnConflict(TABLE_STATUSES,null,val,SQLiteDatabase.CONFLICT_IGNORE);
-        }
-        db.close();
-    }
 
     /**
      * Update the stored TwitterResponse object. This may be necessary when e.g. the
@@ -520,31 +494,22 @@ public class TweetDB {
         db.close();
     }
 
+
     /**
-     * Insert a direct message into the DB
-     * @param id ID of the message
-     * @param time creation time
-     * @param json Json string of the message
+     * Insert Lists of ContentValues into the DB table <i>table</i>.
+     * The insert uses the v8 method insertWithOnConflict() with a parameter
+     * of CONFLICT_IGNORE meaning, that inserts that violate the (uniqueness)
+     * constraints are just ignored and do not cause a rollback. This is ok, as
+     * this method is called on new inserts of data received from the server.
+     * @param table Table to insert into
+     * @param values ContentValues that describe the content
      */
-    public void insertDirect(long id, long time, String json) {
-        ContentValues cv = new ContentValues(4);
-        cv.put("id",id);
-        cv.put("created_at", time);
-        cv.put(ACCOUNT_ID,account);
-        cv.put("message_json",json);
-
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.insert(TABLE_DIRECTS, null, cv);
-        db.close();
-    }
-
-    public void storeDirect(List<ContentValues> values) {
+    public void storeValues(String table, List<ContentValues> values) {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         for (ContentValues val : values) {
-            db.insertWithOnConflict(TABLE_DIRECTS,null,val,SQLiteDatabase.CONFLICT_IGNORE);
+            db.insertWithOnConflict(table,null,val,SQLiteDatabase.CONFLICT_IGNORE);
         }
         db.close();
-
     }
 
     /**
