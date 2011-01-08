@@ -20,12 +20,10 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
-import twitter4j.Status;
 import twitter4j.User;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +44,8 @@ public class UserDetailActivity extends Activity  {
     User theUser;
     boolean weAreFollowing = false;
     Button followButton ;
-
+    private String userName;
+    private int userId;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,8 +71,8 @@ public class UserDetailActivity extends Activity  {
         super.onResume();
 
         thTwitterHelper = new TwitterHelper(this);
-        int userId = bundle.getInt("userId");
-        String userName = bundle.getString("userName");
+        userId = bundle.getInt("userId");
+        userName = bundle.getString("userName");
 
         if (userId!=0)
             new UserDetailDownloadTask().execute(userId);
@@ -102,6 +101,8 @@ public class UserDetailActivity extends Activity  {
                     getWindow().setBackgroundDrawable(background);
                 } catch (IOException e) {
                     e.printStackTrace();  // TODO: Customise this generated block
+                } catch (OutOfMemoryError oome) {
+                    oome.printStackTrace();
                 }
             }
             String textColorString = user.getProfileTextColor();
@@ -230,7 +231,6 @@ public class UserDetailActivity extends Activity  {
     @SuppressWarnings("unused")
     public void showUserTweets(View v) {
 
-        int userId = theUser.getId();
 
         Intent intent = new Intent().setClass(this,TweetListActivity.class);
         intent.putExtra("userId",userId);
