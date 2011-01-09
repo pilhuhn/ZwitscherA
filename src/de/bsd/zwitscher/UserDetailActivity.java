@@ -74,6 +74,12 @@ public class UserDetailActivity extends Activity  {
         userId = bundle.getInt("userId");
         userName = bundle.getString("userName");
 
+        // If the user is in the DB, show the saved state while reloading its data
+        if (userId!=0) {
+            theUser = thTwitterHelper.getUserById(userId,true);
+            fillDetails(theUser,false);
+        }
+
         if (userId!=0)
             new UserDetailDownloadTask().execute(userId);
         else
@@ -91,6 +97,7 @@ public class UserDetailActivity extends Activity  {
             userNameView.setText(Html.fromHtml(uName));
             userId = user.getId();
             findViewById(R.id.view_users_tweets_button).setEnabled(true);
+            findViewById(R.id.view_user_on_web_button).setEnabled(true);
 
             String colorString = user.getProfileBackgroundColor();
             getWindow().setTitleColor(Color.parseColor("#" + colorString));
@@ -120,9 +127,10 @@ public class UserDetailActivity extends Activity  {
                     tv.setTextColor(textColor);
                 }
             }
-            String backgroundColorString = user.getProfileBackgroundColor();
+            String backgroundColorString = user.getProfileSidebarFillColor();
             int backgroundColor = Color.parseColor("#" + backgroundColorString);
             tl.setBackgroundColor(backgroundColor);
+            userNameView.setBackgroundColor(backgroundColor);
 
             PicHelper picHelper = new PicHelper();
             Bitmap bitmap;
@@ -344,6 +352,7 @@ public class UserDetailActivity extends Activity  {
             Boolean isFriend = (Boolean) params[1];
             theUser = user;
             fillDetails(user,isFriend);
+            findViewById(R.id.userDetail_follow_button).setEnabled(true);
             pg.setVisibility(ProgressBar.INVISIBLE);
             titleTextBox.setText("");
         }

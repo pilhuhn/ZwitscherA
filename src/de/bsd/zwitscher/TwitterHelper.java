@@ -39,7 +39,7 @@ public class TwitterHelper {
     Twitter twitter;
     int accountId;
 
-	public TwitterHelper(Context context) {
+    public TwitterHelper(Context context) {
 		this.context = context;
         accountId = 0; // TODO set real account
         tweetDB = new TweetDB(context,accountId);
@@ -513,18 +513,25 @@ Log.d("FillUp","Return: " + i);
      */
     public User getUserById(int userId, boolean cachedOnly) {
         User user = null;
-        try {
+        boolean existing = false;
 
+        try {
             String userJson = tweetDB.getUserById(userId);
-            if (userJson==null) {
-                if (!cachedOnly) {
-                    user = twitter.showUser(userId);
-                    userJson = DataObjectFactory.getRawJSON(user);
-                    tweetDB.insertUser(userId,userJson);
-                }
-            } else {
+            if (userJson!=null) {
+                existing = true;
                 user = DataObjectFactory.createUser(userJson);
             }
+            if (cachedOnly) {
+                return user;
+            }
+
+            // not cached only -> go to the server
+            user = twitter.showUser(userId);
+            userJson = DataObjectFactory.getRawJSON(user);
+            if (!existing)
+                tweetDB.insertUser(userId,userJson);
+            else
+                tweetDB.updateUser(userId,userJson);
 
         } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
@@ -540,18 +547,24 @@ Log.d("FillUp","Return: " + i);
      */
     public User getUserByScreenName(String screenName, boolean cachedOnly) {
         User user = null;
+        boolean existing = false;
+
         try {
             String userJson = tweetDB.getUserByName(screenName);
-            if (userJson==null) {
-                if (!cachedOnly) {
-
-                    user = twitter.showUser(screenName);
-                    userJson = DataObjectFactory.getRawJSON(user);
-                    tweetDB.insertUser(user.getId(),userJson);
-                }
-            } else {
+            if (userJson!=null) {
+                existing=true;
                 user = DataObjectFactory.createUser(userJson);
             }
+            if (cachedOnly)
+                return user;
+
+            // not cached only -> go to the server
+            user = twitter.showUser(screenName);
+            userJson = DataObjectFactory.getRawJSON(user);
+            if (!existing)
+                tweetDB.insertUser(user.getId(),userJson);
+            else
+                tweetDB.updateUser(user.getId(),userJson);
 
         } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
