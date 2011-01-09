@@ -15,20 +15,21 @@
 
     <TextView
         android:id="@+id/title_msg_box"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_toRightOf="@android:id/title"
         android:paddingLeft="5px"
-        android:paddingRight="5px"
+        android:paddingRight="2px"
         />
 	<ProgressBar
 		android:id="@+id/title_progress_bar"
-		style="?android:attr/progressBarStyleSmallTitle"
+		style="?android:attr/progressBarStyleHorizontal"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_alignParentRight="true"
 		android:layout_centerVertical="true"
 		android:visibility="invisible"
-		android:indeterminateOnly="true"/>
+		android:indeterminateOnly="true"
+     />
 
 </RelativeLayout>

@@ -1,17 +1,22 @@
 package de.bsd.zwitscher;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 import de.bsd.zwitscher.helper.CaseInsensitiveStringComparator;
 import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.Paging;
 import twitter4j.SavedSearch;
-import twitter4j.Status;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,6 +36,8 @@ public class ListOfListsActivity extends AbstractListActivity {
     Set<Map.Entry<String, Integer>> userListsEntries;
     int mode;
     ArrayAdapter<String> adapter;
+    ProgressBar pg;
+    TextView titleTextBox;
 
 
 
@@ -42,8 +49,20 @@ public class ListOfListsActivity extends AbstractListActivity {
         mode = getIntent().getIntExtra("list",0);
 
         setContentView(R.layout.tweet_list_layout);
+
+        Activity theParent = getParent();
+        if (theParent instanceof TabWidget) {
+            TabWidget parent = (TabWidget) theParent;
+            pg = parent.pg;
+            titleTextBox = parent.titleTextBox;
+        }
+
+
         ImageButton reloadButton = (ImageButton) findViewById(R.id.tweet_list_reload_button);
-        reloadButton.setEnabled(false);  // TODO enable later
+        if (mode==0)
+            reloadButton.setEnabled(true);
+        else
+            reloadButton.setEnabled(false);  // disabled for stored searches (for now), as the tweets are not persisted
     }
 
 
@@ -131,28 +150,100 @@ public class ListOfListsActivity extends AbstractListActivity {
         TwitterHelper th = new TwitterHelper(this);
         TweetDB tdb = new TweetDB(this,0); // TODO correct account
         if (mode==0) {
+
+            new SyncAllListsTask(this).execute();
+//                ListView listView = getListView();
+//                for (int i = 0; i < listView.getCount(); i++) {
+//                    String itemAtI = (String) listView.getItemAtPosition(i);
+//                    if (itemAtI.equals(userList.getKey())) {
+//                        adapter.remove(itemAtI);
+//                        itemAtI = itemAtI + "(" + newOnes + ")";
+//                        adapter.insert(itemAtI,i);
+//                    }
+//                }
+            }
+    }
+
+    class SyncAllListsTask extends AsyncTask<Void,Object,Void> {
+
+        Context context;
+        String updating;
+
+        SyncAllListsTask(Context context) {
+            this.context = context;
+            updating = context.getString(R.string.updating);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+//            setProgressBarVisibility(true);
+            pg.setVisibility(ProgressBar.VISIBLE);
+
+        }
+
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            int i = 0;
             for (Map.Entry<String,Integer> userList : userListsEntries) {
+
+                publishProgress(userList.getKey());
+
                 Paging paging = new Paging();
                 paging.setCount(100);
                 int listId = userList.getValue();
                 long lastFetched = tdb.getLastRead(listId);
                 if (lastFetched>0)
                     paging.setSinceId(lastFetched);
-                MetaList<Status> list = th.getTimeline(paging,listId,false);
+                MetaList<twitter4j.Status> list = th.getUserList(paging, listId, false);
                 long newOnes = list.getNumOriginal();
+                if (newOnes>0) {
+                    long maxId = list.getList().get(0).getId();
+                    tdb.updateOrInsertLastRead(listId,maxId);
 
-                ListView listView = getListView();
-                for (int i = 0; i < listView.getCount(); i++) {
-                    String itemAtI = (String) listView.getItemAtPosition(i);
-                    if (itemAtI.equals(userList.getKey())) {
-                        adapter.remove(itemAtI);
-                        itemAtI = itemAtI + "(" + newOnes + ")";
-                        adapter.insert(itemAtI,i);
-                    }
+                    publishProgress(userList.getKey(),newOnes);
+
                 }
+                i++;
+//                publishProgress(i);
             }
-        } else if (mode==1) {
-            // TODO
+
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            setProgressBarVisibility(false);
+            pg.setVisibility(ProgressBar.INVISIBLE);
+            titleTextBox.setText("");
+        }
+
+        @Override
+        protected void onProgressUpdate(Object... values) {
+            super.onProgressUpdate(values);
+
+
+            String list = (String) values[0];
+
+            if (values.length==2) {
+                Long num = (Long) values[1];
+                Toast.makeText(context, list + ": " + num + " new", Toast.LENGTH_SHORT).show();
+            } else { // len =1
+
+                titleTextBox.setText(updating + " " + list + "...");
+            }
+//            int i = values[0];
+//            int val = (i * 10000) / userListsEntries.size();
+//            Log.d("SyAlLiTa","progress: " + val);
+//            setProgress(val);
+//            pg.setProgress(val);
+
+
         }
     }
 }

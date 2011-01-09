@@ -39,6 +39,7 @@
     <string name="to">to</string>
     <string name="please_sync_lists">Please sync lists</string>
     <string name="no_searches_found">No saved searches found - do you need to sync?</string>
+    <string name="updating">Updating</string>
 
     <string name="login_common">You need to log into Twitter to authorize Zwitscher. <br/><br/>
         To do this, click on "Get pin from Twitter", then log in in the Browser, write down the PIN and then
