@@ -120,6 +120,9 @@ public class UserDetailActivity extends Activity  {
                     tv.setTextColor(textColor);
                 }
             }
+            String backgroundColorString = user.getProfileBackgroundColor();
+            int backgroundColor = Color.parseColor("#" + backgroundColorString);
+            tl.setBackgroundColor(backgroundColor);
 
             PicHelper picHelper = new PicHelper();
             Bitmap bitmap;

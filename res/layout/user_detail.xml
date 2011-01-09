@@ -26,6 +26,7 @@
             android:stretchColumns="1"
             android:shrinkColumns="1"
             android:paddingBottom="10dp"
+            android:paddingTop="10dp"
             >
         <TableRow>
             <TextView android:text="@string/location"
