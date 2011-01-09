@@ -145,23 +145,16 @@ public class ListOfListsActivity extends AbstractListActivity {
         }
     }
 
+    /**
+     * Trigger updating the user lists. This is only
+     * supported for lists and not for searches (those are not persisted)
+     * @param v
+     */
     @Override
     public void reload(View v) {
-        TwitterHelper th = new TwitterHelper(this);
-        TweetDB tdb = new TweetDB(this,0); // TODO correct account
         if (mode==0) {
-
             new SyncAllListsTask(this).execute();
-//                ListView listView = getListView();
-//                for (int i = 0; i < listView.getCount(); i++) {
-//                    String itemAtI = (String) listView.getItemAtPosition(i);
-//                    if (itemAtI.equals(userList.getKey())) {
-//                        adapter.remove(itemAtI);
-//                        itemAtI = itemAtI + "(" + newOnes + ")";
-//                        adapter.insert(itemAtI,i);
-//                    }
-//                }
-            }
+        }
     }
 
     class SyncAllListsTask extends AsyncTask<Void,Object,Void> {
@@ -186,7 +179,6 @@ public class ListOfListsActivity extends AbstractListActivity {
         @Override
         protected Void doInBackground(Void... params) {
 
-            int i = 0;
             for (Map.Entry<String,Integer> userList : userListsEntries) {
 
                 publishProgress(userList.getKey());
@@ -206,7 +198,6 @@ public class ListOfListsActivity extends AbstractListActivity {
                     publishProgress(userList.getKey(),newOnes);
 
                 }
-                i++;
 //                publishProgress(i);
             }
 
@@ -237,11 +228,23 @@ public class ListOfListsActivity extends AbstractListActivity {
 
                 titleTextBox.setText(updating + " " + list + "...");
             }
+            // Support Progress bar with a determinate value
 //            int i = values[0];
 //            int val = (i * 10000) / userListsEntries.size();
 //            Log.d("SyAlLiTa","progress: " + val);
 //            setProgress(val);
 //            pg.setProgress(val);
+
+            // Update the list entries somehow with a marker that they have new tweets
+//                ListView listView = getListView();
+//                for (int i = 0; i < listView.getCount(); i++) {
+//                    String itemAtI = (String) listView.getItemAtPosition(i);
+//                    if (itemAtI.equals(userList.getKey())) {
+//                        adapter.remove(itemAtI);
+//                        itemAtI = itemAtI + "(" + newOnes + ")";
+//                        adapter.insert(itemAtI,i);
+//                    }
+//                }
 
 
         }
