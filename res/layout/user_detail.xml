@@ -139,11 +139,12 @@
                 android:enabled="true"/>
 
         <!-- TODO convert to ImageButton -->
-        <Button android:text="User's tweets"
+        <Button android:id="@+id/view_users_tweets_button"
+                android:text="User's tweets"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:onClick="showUserTweets"
-                android:enabled="true"/>
+                android:enabled="false"/>
 
     </LinearLayout>
 

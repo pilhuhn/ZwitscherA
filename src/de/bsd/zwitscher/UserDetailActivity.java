@@ -89,6 +89,8 @@ public class UserDetailActivity extends Activity  {
             TextView userNameView = (TextView) findViewById(R.id.UserName);
             String uName = "<b>" + user.getName() + "</b>" + " (" + user.getScreenName() + ")";
             userNameView.setText(Html.fromHtml(uName));
+            userId = user.getId();
+            findViewById(R.id.view_users_tweets_button).setEnabled(true);
 
             String colorString = user.getProfileBackgroundColor();
             getWindow().setTitleColor(Color.parseColor("#" + colorString));
