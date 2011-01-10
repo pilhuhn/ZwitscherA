@@ -40,11 +40,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     List<Tweet> tweets;
     Bundle intentInfo;
     TweetListActivity thisActivity;
-    ProgressBar pg;
-    TextView titleTextBox;
     int list_id;
-    TweetDB tdb;
-    TwitterHelper th;
     ListView lv;
     int newMentions=0;
     private int newDirects=0;
@@ -69,12 +65,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
 
         // Get the windows progress bar from the enclosing TabWidget
-        if (theParent instanceof TabWidget) {
-            TabWidget parent = (TabWidget) theParent;
-            pg = parent.pg;
-            titleTextBox = parent.titleTextBox;
-        }
-        else {
+        if (!(theParent instanceof TabWidget)) {
             // We have no enclosing TabWidget, so we need our window here
             getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
             pg = (ProgressBar) findViewById(R.id.title_progress_bar);
@@ -85,8 +76,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             imageButton.setVisibility(View.VISIBLE);
 
         }
-        tdb = new TweetDB(this,0); // TODO set correct account
-        th = new TwitterHelper(this);
         lv = getListView();
         lv.setOnScrollListener(this);
 		lv.setOnItemClickListener(this);

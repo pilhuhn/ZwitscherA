@@ -31,32 +31,16 @@ import java.util.Set;
  */
 public class ListOfListsActivity extends AbstractListActivity {
 
-    TwitterHelper th;
-    TweetDB tdb;
     Set<Map.Entry<String, Integer>> userListsEntries;
     int mode;
     ArrayAdapter<String> adapter;
-    ProgressBar pg;
-    TextView titleTextBox;
-
-
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        th = new TwitterHelper(this);
-        tdb = new TweetDB(this,0); // TODO set correct account
         mode = getIntent().getIntExtra("list",0);
 
         setContentView(R.layout.tweet_list_layout);
-
-        Activity theParent = getParent();
-        if (theParent instanceof TabWidget) {
-            TabWidget parent = (TabWidget) theParent;
-            pg = parent.pg;
-            titleTextBox = parent.titleTextBox;
-        }
-
 
         ImageButton reloadButton = (ImageButton) findViewById(R.id.tweet_list_reload_button);
         if (mode==0)
@@ -198,7 +182,6 @@ public class ListOfListsActivity extends AbstractListActivity {
                     publishProgress(userList.getKey(),newOnes);
 
                 }
-//                publishProgress(i);
             }
 
             return null;
