@@ -467,15 +467,17 @@ public class TweetDB {
      * Insert a user into the database.
      * @param userId The Id of the user to insert
      * @param json JSON representation of the User object
+     * @param screenName
      */
-    public void insertUser(int userId, String json) {
-        ContentValues cv = new ContentValues(3);
+    public void insertUser(int userId, String json, String screenName) {
+        ContentValues cv = new ContentValues(4);
         cv.put("userId",userId);
         cv.put(ACCOUNT_ID,account);
         cv.put("user_json",json);
+        cv.put("screenname",screenName);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.insert(TABLE_USERS, null, cv);
+        db.insertWithOnConflict(TABLE_USERS, null, cv,SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
     }
 
@@ -483,6 +485,7 @@ public class TweetDB {
      * Update an existing user in the database.
      * @param userId
      * @param json
+     * @todo Still needed with conflict resolution on insert?
      */
     public void updateUser(int userId, String json) {
         ContentValues cv = new ContentValues(1);

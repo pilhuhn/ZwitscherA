@@ -529,7 +529,7 @@ Log.d("FillUp","Return: " + i);
             user = twitter.showUser(userId);
             userJson = DataObjectFactory.getRawJSON(user);
             if (!existing)
-                tweetDB.insertUser(userId,userJson);
+                tweetDB.insertUser(userId,userJson, user.getScreenName());
             else
                 tweetDB.updateUser(userId,userJson);
 
@@ -562,7 +562,7 @@ Log.d("FillUp","Return: " + i);
             user = twitter.showUser(screenName);
             userJson = DataObjectFactory.getRawJSON(user);
             if (!existing)
-                tweetDB.insertUser(user.getId(),userJson);
+                tweetDB.insertUser(user.getId(),userJson, user.getScreenName());
             else
                 tweetDB.updateUser(user.getId(),userJson);
 

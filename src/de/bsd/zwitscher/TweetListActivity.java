@@ -401,6 +401,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             else
 	            setListAdapter(new StatusAdapter(thisActivity, R.layout.tweet_list_item, result.getList()));
 
+            if (result.getList().size()==0) {
+                Toast.makeText(thisActivity,"Got no result from the server",Toast.LENGTH_LONG).show();
+            }
+
             if (pg!=null)
                 pg.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)
