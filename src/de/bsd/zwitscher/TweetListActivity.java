@@ -197,7 +197,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             // Also check for mentions + directs (if allowed in prefs)
             NetworkHelper networkHelper = new NetworkHelper(this);
 
-            if (!fromDbOnly && networkHelper.mayReloadAdditional()) {
+            if (!fromDbOnly && networkHelper.mayReloadAdditional()) { // TODO move this block to doInBackground below.
                 long mentionLast = tdb.getLastRead(-1);
                 paging = new Paging().count(100);
 
@@ -360,7 +360,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         }
     }
 
-    private class GetTimeLineTask extends AsyncTask<Boolean, Void, MetaList> {
+    private class GetTimeLineTask extends AsyncTask<Boolean, String, MetaList> {
 
         boolean fromDbOnly = false;
 
@@ -383,13 +383,20 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             if (userId!=null) {
                 List<twitter4j.Status> statuses = th.getUserTweets(userId);
                 data = new MetaList(statuses,statuses.size(),0);
+                publishProgress("User");
             }
-            else if (list_id>-2)
+            else if (list_id>-2) {
+                publishProgress(list_id==-1?"Mentions":"Home");
                 data = getTimlinesFromTwitter(fromDbOnly);
-            else if (list_id==-2)
+            }
+            else if (list_id==-2) {
+                publishProgress("Directs");
                 data = getDirectsFromTwitter(fromDbOnly);
-            else // list id < -2 ==> saved search
+            }
+            else { // list id < -2 ==> saved search
+                publishProgress("Saved Search");
                 data = getSavedSearchFromTwitter(-list_id,fromDbOnly);
+            }
 	        return data;
 		}
 
@@ -427,6 +434,12 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 getListView().setSelection(result.getNumOriginal() - 1);
             }
 		}
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            titleTextBox.setText("Loading " + values[0] + "...");
+        }
     }
 
 
