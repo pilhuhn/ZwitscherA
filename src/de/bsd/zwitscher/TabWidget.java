@@ -54,38 +54,43 @@ public class TabWidget extends TabActivity {
 		Intent homeIntent = new Intent().setClass(this,TweetListActivity.class);
         homeIntent.putExtra(LIST_ID, 0);
 
-		homeSpec = tabHost.newTabSpec("home")
-				.setIndicator("Home",res.getDrawable(R.drawable.ic_tab_home))
+        String tmp = getString(R.string.home_timeline);
+        homeSpec = tabHost.newTabSpec("tmp")
+				.setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_home))
 				.setContent(homeIntent);
 		tabHost.addTab(homeSpec);
 
 		Intent mentionsIntent = new Intent().setClass(this,TweetListActivity.class);
 		mentionsIntent.putExtra(LIST_ID, -1);
 
+        tmp= getString(R.string.mentions);
 		homeSpec = tabHost.newTabSpec("mentions")
-				.setIndicator("Mentions",res.getDrawable(R.drawable.ic_tab_mention))
+				.setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_mention))
 				.setContent(mentionsIntent);
 		tabHost.addTab(homeSpec);
 
+        tmp = getString(R.string.direct);
         Intent directIntent = new Intent().setClass(this,TweetListActivity.class);
         directIntent.putExtra(LIST_ID, -2);
 		homeSpec = tabHost.newTabSpec("directs")
-				.setIndicator("Direct",res.getDrawable(R.drawable.ic_tab_direct))
+				.setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_direct))
 				.setContent(directIntent);
 		tabHost.addTab(homeSpec);
 
+        tmp = getString(R.string.list);
         Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
         listsIntent.putExtra("list",0);
         homeSpec = tabHost.newTabSpec("lists")
-                .setIndicator("Lists",res.getDrawable(R.drawable.ic_tab_list))
+                .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_list))
                 .setContent(listsIntent);
         tabHost.addTab(homeSpec);
 
 
         Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
         searchIntent.putExtra("list",1);
+        tmp = getString(R.string.searches);
         homeSpec = tabHost.newTabSpec("searches")
-                .setIndicator("Search",res.getDrawable(R.drawable.ic_tab_search))
+                .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_search))
                 .setContent(searchIntent);
         tabHost.addTab(homeSpec);
 
@@ -229,5 +234,4 @@ public class TabWidget extends TabActivity {
             return null;
         }
     }
-
 }

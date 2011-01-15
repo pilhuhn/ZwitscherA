@@ -44,7 +44,8 @@ public class UserDetailActivity extends Activity  {
     User theUser;
     boolean weAreFollowing = false;
     Button followButton ;
-
+    private String userName;
+    private int userId;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,9 +71,19 @@ public class UserDetailActivity extends Activity  {
         super.onResume();
 
         thTwitterHelper = new TwitterHelper(this);
-        int userId = bundle.getInt("userId");
+        userId = bundle.getInt("userId");
+        userName = bundle.getString("userName");
 
-        new UserDetailDownloadTask().execute(userId);
+        // If the user is in the DB, show the saved state while reloading its data
+        if (userId!=0) {
+            theUser = thTwitterHelper.getUserById(userId,true);
+            fillDetails(theUser,false);
+        }
+
+        if (userId!=0)
+            new UserDetailDownloadTask().execute(userId);
+        else
+            new UserDetailDownloadTask().execute(userName);
     }
 
     /**
@@ -84,6 +95,9 @@ public class UserDetailActivity extends Activity  {
             TextView userNameView = (TextView) findViewById(R.id.UserName);
             String uName = "<b>" + user.getName() + "</b>" + " (" + user.getScreenName() + ")";
             userNameView.setText(Html.fromHtml(uName));
+            userId = user.getId();
+            findViewById(R.id.view_users_tweets_button).setEnabled(true);
+            findViewById(R.id.view_user_on_web_button).setEnabled(true);
 
             String colorString = user.getProfileBackgroundColor();
             getWindow().setTitleColor(Color.parseColor("#" + colorString));
@@ -96,6 +110,8 @@ public class UserDetailActivity extends Activity  {
                     getWindow().setBackgroundDrawable(background);
                 } catch (IOException e) {
                     e.printStackTrace();  // TODO: Customise this generated block
+                } catch (OutOfMemoryError oome) {
+                    oome.printStackTrace();
                 }
             }
             String textColorString = user.getProfileTextColor();
@@ -111,6 +127,10 @@ public class UserDetailActivity extends Activity  {
                     tv.setTextColor(textColor);
                 }
             }
+            String backgroundColorString = user.getProfileSidebarFillColor();
+            int backgroundColor = Color.parseColor("#" + backgroundColorString);
+            tl.setBackgroundColor(backgroundColor);
+            userNameView.setBackgroundColor(backgroundColor);
 
             PicHelper picHelper = new PicHelper();
             Bitmap bitmap;
@@ -217,6 +237,22 @@ public class UserDetailActivity extends Activity  {
     }
 
     /**
+     * View users's recent tweets
+     * Triggered from a button
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void showUserTweets(View v) {
+
+
+        Intent intent = new Intent().setClass(this,TweetListActivity.class);
+        intent.putExtra("userId",userId);
+
+        startActivity(intent);
+
+    }
+
+    /**
      * Called from the addToList button
      * @param v
      */
@@ -267,7 +303,7 @@ public class UserDetailActivity extends Activity  {
      * Async task to download the userdata from server (or db) and
      * trigger its display.
      */
-    private class UserDetailDownloadTask extends AsyncTask<Integer,Void, Object[]> {
+    private class UserDetailDownloadTask extends AsyncTask<Object,Void, Object[]> {
 
         @Override
         protected void onPreExecute() {
@@ -279,10 +315,27 @@ public class UserDetailActivity extends Activity  {
 
 
         @Override
-        protected Object[] doInBackground(Integer... params) {
+        protected Object[] doInBackground(Object... params) {
 
-            Integer userId = params[0];
-            User user = thTwitterHelper.getUserById(userId, false);
+            Integer userId;
+            User user;
+
+            if (params[0] instanceof Integer) {
+                userId = (Integer) params[0];
+                user = thTwitterHelper.getUserById(userId, false);
+            }
+            else if (params[0] instanceof String) {
+                String name= (String) params[0];
+                user = thTwitterHelper.getUserByScreenName(name, false);
+                if (user==null)
+                    return new Object[]{};
+                userId = user.getId();
+            } else {
+                // Should not happen
+                return new Object[]{};
+            }
+
+
             Boolean isFriend = thTwitterHelper.areWeFollowing(userId);
             weAreFollowing = isFriend;
             Object[] res = new Object[2];
@@ -299,6 +352,7 @@ public class UserDetailActivity extends Activity  {
             Boolean isFriend = (Boolean) params[1];
             theUser = user;
             fillDetails(user,isFriend);
+            findViewById(R.id.userDetail_follow_button).setEnabled(true);
             pg.setVisibility(ProgressBar.INVISIBLE);
             titleTextBox.setText("");
         }

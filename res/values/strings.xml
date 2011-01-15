@@ -6,15 +6,16 @@
     <string name="tweet_sent">Tweet sent</string>
     <string name="hello">Enter your tweet text below:</string>
     <string name="app_name">Zwitscher</string>
-<string name="loading">Loading Tweets ...</string>
-<string name="no_connect">Can not connect to Twitter</string>
-<string name="TweetButton">Tweet this!</string>
-<string name="ClearButton">Clear!</string>
-<string name="home_timeline">Home</string>
-<string name="classicretweet">ClassicRetweet</string>
-<string name="list">list</string>
-<string name="direct">Direct</string>
-<string name="mentions">mentions</string>
+    <string name="loading">Loading Tweets ...</string>
+    <string name="no_connect">Can not connect to Twitter</string>
+    <string name="TweetButton">Tweet this!</string>
+    <string name="ClearButton">Clear!</string>
+    <string name="home_timeline">Home</string>
+    <string name="classicretweet">ClassicRetweet</string>
+    <string name="list">Lists</string>
+    <string name="direct">Directs</string>
+    <string name="mentions">Mentions</string>
+    <string name="searches">Searches</string>
     <string name="location">Location:</string>
     <string name="geo">Geo?</string>
     <string name="web">Web:</string>
@@ -38,6 +39,7 @@
     <string name="to">to</string>
     <string name="please_sync_lists">Please sync lists</string>
     <string name="no_searches_found">No saved searches found - do you need to sync?</string>
+    <string name="updating">Updating</string>
 
     <string name="login_common">You need to log into Twitter to authorize Zwitscher. <br/><br/>
         To do this, click on "Get pin from Twitter", then log in in the Browser, write down the PIN and then
@@ -52,6 +54,9 @@
     <string name="service">Service</string>
     <string name="new_mentions">new mentions</string>
     <string name="new_directs">new direct messages</string>
+    <string name="copy_and_paste">You can copy and paste the message to re-try.</string>
+    <string name="user">User</string>
+
 
 
     <!-- preferences -->
@@ -65,10 +70,15 @@
     <string name="prefs_max_old_descr">Number of old tweets to display when there are no new tweets on the server</string>
     <string name="prefs_pic_loading">Picture loading</string>
     <string name="prefs_pic_loading_descr">Network configuration required for picture loading</string>
-    <string name="prefs_pic_roaming">Roaming</string>
+    <string name="prefs_pic_roaming">Roaming (pictures)</string>
     <string name="prefs_pic_roaming_descr">Allow downloading images when Roaming</string>
     <string name="prefs_pictureService">Picture Service</string>
     <string name="prefs_pictureService_descr">Choose a service for picture uploading</string>
+    <string name="prefs_extra_loading">Loading of additional timelines</string>
+    <string name="prefs_extra_loading_descr">Network configuration required to load additional timelines (when on the home timeline)</string>
+    <string name="prefs_extra_roaming">Roaming (timelines)</string>
+    <string name="prefs_extra_roaming_descr">Allow load of additional timelines when roaming?</string>
+
     <!-- preferences -->
     <string name="help">Help</string>
     <string name="help_common">This page shows all the icons used with in Zwitscher</string>

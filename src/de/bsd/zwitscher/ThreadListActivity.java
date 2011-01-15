@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -26,6 +27,7 @@ public class ThreadListActivity extends ListActivity {
     ProgressBar pg;
     TextView titleTextBox;
     Context thisActivity;
+    List<Status> statuses;
 
 
     @Override
@@ -92,6 +94,24 @@ public class ThreadListActivity extends ListActivity {
     }
 
     /**
+     * Handle click on a list item which triggers the detail view of that item
+     * @param l Parent view
+     * @param v Clicked view
+     * @param position Position in the list that was clicked
+     * @param id
+     */
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        if (statuses!=null) {
+            Intent i = new Intent(this,OneTweetActivity.class);
+            i.putExtra(getString(R.string.status), statuses.get(position));
+            startActivity(i);
+        }
+    }
+
+    /**
      * Called from the Back button
      * @param v
      */
@@ -146,6 +166,7 @@ public class ThreadListActivity extends ListActivity {
             titleTextBox.setText("");
 
             setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, R.layout.tweet_list_item, statusList));
+            statuses = statusList;
 
             ListView lv = getListView();
             lv.requestLayout();

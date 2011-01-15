@@ -39,6 +39,18 @@
                         android:summary="@string/prefs_pic_roaming_descr"
                         android:defaultValue="false"/>
 
+    <ListPreference android:title="@string/prefs_extra_loading"
+                    android:summary="@string/prefs_extra_loading_descr"
+                    android:defaultValue="1"
+                    android:entryValues="@array/network_config_vals"
+                    android:entries="@array/network_config"
+                    android:key="extraload_networkConfig"/>
+
+    <CheckBoxPreference android:title="@string/prefs_extra_roaming"
+                        android:key="extraload_roaming"
+                        android:summary="@string/prefs_extra_roaming_descr"
+                        android:defaultValue="false"/>
+
     <ListPreference android:title="@string/prefs_pictureService"
                     android:summary="@string/prefs_pictureService_descr"
                     android:key="pictureService"
