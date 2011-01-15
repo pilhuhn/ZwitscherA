@@ -4,20 +4,22 @@
     <string name="tweet_sent">Tweet gesendet</string>
     <string name="hello">Geben Sie den Text ein:</string>
     <string name="app_name">Zwitscher</string>
-<string name="loading">Lade Tweets ...</string>
-<string name="no_connect">Kann Twitter nicht erreichen</string>
-<string name="TweetButton">Absenden</string>
-<string name="ClearButton">Löschen</string>
-<string name="home_timeline">Home</string>
-<string name="list">list</string>
-<string name="direct">Direkt</string>
-<string name="mentions">mentions</string>
+    <string name="loading">Lade Tweets ...</string>
+    <string name="no_connect">Kann Twitter nicht erreichen</string>
+    <string name="TweetButton">Absenden</string>
+    <string name="ClearButton">Löschen</string>
+    <string name="home_timeline">Daheim</string>
+    <string name="list">Listen</string>
+    <string name="direct">Direkt</string>
+    <string name="mentions">Erwähnungen</string>
+    <string name="searches">Suchen</string>
     <string name="location">Ort:</string>
     <string name="web">Web:</string>
     <string name="tweet_count">Anzahl Tweets:</string>
     <string name="follower_count">Anzahl Verfolger:</string>
     <string name="following_count">Anzahl Folgende:</string>
     <string name="listed_count">Wie oft gelistet:</string>
+    <string name="resent_by">Neu gesendet durch</string>
     <string name="in_reply_to"> als Antwort auf </string>
     <string name="send_direct_to">Sende private Nachricht an </string>
     <string name="getting_tweets">Lade Tweets</string>
@@ -32,6 +34,10 @@
     <string name="to">an</string>
     <string name="please_sync_lists">Bitte synchronisieren Sie die Listen</string>
     <string name="no_searches_found">Keine gespeicherten Suchen gefunden - Bitte synchronisieren Sie</string>
+    <string name="updating">Aktualisiere</string>
+    <string name="user">Benutzer</string>
+
+
 
     <string name="login_common">
         Sie müssen sich bei Twitter anmelden, um Zwitscher zu authorisieren.<br/><br/>
@@ -47,6 +53,8 @@
     <string name="service">Dienst</string>
     <string name="new_mentions">Neue Erwähnung(en)</string>
     <string name="new_directs">Neue direkt(e) Nachricht(en)</string>
+    <string name="copy_and_paste">Sie können den nachfolgenden Text kopieren, um das Senden erneut zu versuchen.</string>
+
 
 
 
@@ -61,10 +69,15 @@
     <string name="prefs_max_old_descr">Anzahl an alten Tweets, die angezeigt werden, wenn keine neuen Tweets empfangen wurden.</string>
     <string name="prefs_pic_loading">Laden von Bildern</string>
     <string name="prefs_pic_loading_descr">Netzwerkkonfiguration, die nötig ist, um Bilder zu laden.</string>
-    <string name="prefs_pic_roaming">Roaming</string>
+    <string name="prefs_pic_roaming">Roaming (Bilder)</string>
     <string name="prefs_pic_roaming_descr">Dürfen während des Roamings Bilder geladen werden?</string>
     <string name="prefs_pictureService">Picture Service</string>
     <string name="prefs_pictureService_descr">Dienst für hochgeladene Bilder</string>
+    <string name="prefs_extra_loading">Laden zusätzlicher Timelines</string>
+    <string name="prefs_extra_loading_descr">Netzwerkkonfiguration, die nötig ist, um zusätzliche Timelines (aus Home heraus) zu laden.</string>
+    <string name="prefs_extra_roaming">Roaming (Timelines)</string>
+    <string name="prefs_extra_roaming_descr">Dürfen während des Roamings zus. Timelines (aus Home) geladen werden?</string>
+
     <!-- preferences -->
     <string name="help">Hilfe</string>
     <string name="help_common">Diese Seite zeigt alle in Zwitscher verwendeten Icons</string>

@@ -79,7 +79,22 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 Long tid = Long.parseLong(tids);
                 TwitterHelper th = new TwitterHelper(this);
                 status = th.getStatusById(tid,0L,false,false);
+            } else if (dataString.matches("http://twitter.com/#!/.*$")) {
+                // A user - forward to UserDetailActivity TODO: remove once this is coded in AndroidManifest.xml
+                String userName = dataString.substring(dataString.lastIndexOf("/")+1);
+                Intent i = new Intent(this,UserDetailActivity.class);
+                i.putExtra("userName",userName);
+                startActivity(i);
+                finish();
+            } else if (dataString.matches("http://twitter.com/[a-zA-Z0-9_]*\\?.*")) {
+                // A user ref in email - forward to UserDetailActivity TODO: remove once this is coded in AndroidManifest.xml
+                String userName = dataString.substring(19,dataString.indexOf("?"));
+                Intent i = new Intent(this,UserDetailActivity.class);
+                i.putExtra("userName",userName);
+                startActivity(i);
+                finish();
             }
+
         } else {
             // Called from within Zwitscher
             status = (Status) bundle.get(getString(R.string.status));
@@ -90,6 +105,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             // e.g. when called from HTC Mail, which fails to forward the full
             // http://twitter.com/#!/.../status/.. url, but only sends http://twitter.com
             Log.w("OneTweetActivity","Status was null for Intent " + intent );
+            if (tts!=null)
+                tts.shutdown();
+
             finish();
             return;
         }
@@ -576,10 +594,11 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             ImageView i = new ImageView(mContext);
 
             Bitmap bitmap = mImages.get(position).bitmap;
-            i.setImageBitmap(bitmap);
-            i.setScaleType(ImageView.ScaleType.FIT_XY);
-            i.setLayoutParams(new Gallery.LayoutParams(bitmap.getWidth()*2, bitmap.getHeight()*2));
-
+            if (bitmap!=null) {
+                i.setImageBitmap(bitmap);
+                i.setScaleType(ImageView.ScaleType.FIT_XY);
+                i.setLayoutParams(new Gallery.LayoutParams(bitmap.getWidth()*2, bitmap.getHeight()*2));
+            }
             // The preferred Gallery item background
             i.setBackgroundResource(mGalleryItemBackground);
 

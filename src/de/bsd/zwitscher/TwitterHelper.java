@@ -3,11 +3,14 @@ package de.bsd.zwitscher;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -20,21 +23,27 @@ import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.*;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+import twitter4j.conf.PropertyConfiguration;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
 import twitter4j.json.DataObjectFactory;
-import twitter4j.util.ImageUpload;
-
+import twitter4j.media.ImageUpload;
+import twitter4j.media.ImageUploaderFactory;
+import twitter4j.media.MediaProvider;
 
 public class TwitterHelper {
 
 
 	Context context;
     TweetDB tweetDB;
+    Twitter twitter;
+    int accountId;
 
-	public TwitterHelper(Context context) {
+    public TwitterHelper(Context context) {
 		this.context = context;
-        tweetDB = new TweetDB(context,0); // TODO set real account
+        accountId = 0; // TODO set real account
+        tweetDB = new TweetDB(context,accountId);
+        twitter = getTwitter();
 	}
 
     /**
@@ -46,7 +55,6 @@ public class TwitterHelper {
      * @see twitter4j.Status
      */
 	public MetaList<Status> getTimeline(Paging paging, int list_id, boolean fromDbOnly) {
-        Twitter twitter = getTwitter();
 
         List<Status> statuses = null;
 		try {
@@ -65,9 +73,10 @@ public class TwitterHelper {
 			}
             if (statuses==null)
                 statuses=new ArrayList<Status>();
-            for (Status status : statuses) { // TODO persist in one go
-                persistStatus(tweetDB, status,list_id);
-            }
+//            for (Status status : statuses) { // TODO persist in one go
+//                persistStatus(tweetDB, status,list_id);
+//            }
+            persistStatus(statuses,list_id);
 
         }
         catch (Exception e) {
@@ -99,8 +108,6 @@ public class TwitterHelper {
      */
     public MetaList<DirectMessage> getDirectMessages(boolean fromDbOnly, Paging paging) {
 
-       Twitter twitter = getTwitter();
-
        List<DirectMessage> ret;
        List<DirectMessage> ret2 = new ArrayList<DirectMessage>();
 
@@ -117,9 +124,7 @@ public class TwitterHelper {
           //  persist directs
 
           if (ret.size()>0) {
-             for (DirectMessage msg : ret) {
-                persistDirects(msg);
-             }
+              persistDirects(ret);
              if (ret.get(0).getId()>max)
                 max = ret.get(0).getId();
 
@@ -134,9 +139,7 @@ public class TwitterHelper {
              ret = Collections.emptyList();
           }
           if (ret.size()>0) {
-             for (DirectMessage msg : ret) {
-                persistDirects(msg);
-             }
+              persistDirects(ret);
              if (ret.get(0).getId()>max)
                 max = ret.get(0).getId();
 
@@ -147,7 +150,7 @@ public class TwitterHelper {
           // timeline.
           Collections.sort(ret2,new Comparator<DirectMessage>() {
              public int compare(DirectMessage directMessage, DirectMessage directMessage1) {
-                return directMessage1.getId() - directMessage.getId();
+                return (int) (directMessage1.getId() - directMessage.getId());
              }
           });
 
@@ -179,7 +182,7 @@ public class TwitterHelper {
         return ret;
     }
 
-    public List<DirectMessage> getDirectsFromDb(int sinceId, int num) {
+    public List<DirectMessage> getDirectsFromDb(long sinceId, int num) {
         List<DirectMessage> ret = new ArrayList<DirectMessage>();
         List<String> responses = tweetDB.getDirectsOlderThan(sinceId,num);
         for (String json : responses) {
@@ -192,7 +195,6 @@ public class TwitterHelper {
 
 
     public List<UserList> getUserLists() {
-		Twitter twitter = getTwitter();
 
         List<UserList> userLists;
 		try {
@@ -214,11 +216,11 @@ public class TwitterHelper {
         String accessTokenToken = preferences.getString("accessToken",null);
         String accessTokenSecret = preferences.getString("accessTokenSecret",null);
         if (accessTokenToken!=null && accessTokenSecret!=null) {
-        	Twitter twitter = new TwitterFactory().getOAuthAuthorizedInstance(
+        	Twitter twitterInstance = new TwitterFactory().getOAuthAuthorizedInstance(
         			TwitterConsumerToken.consumerKey,
         			TwitterConsumerToken.consumerSecret,
         			new AccessToken(accessTokenToken, accessTokenSecret));
-        	return twitter;
+        	return twitterInstance;
         }
 
 		return null;
@@ -245,9 +247,9 @@ public class TwitterHelper {
 		}
 
 
-        Twitter twitter = new TwitterFactory().getInstance();
-        twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
-        RequestToken requestToken = twitter.getOAuthRequestToken();
+        Twitter twitterInstance = new TwitterFactory().getInstance();
+        twitterInstance.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
+        RequestToken requestToken = twitterInstance.getOAuthRequestToken();
         Editor editor = preferences.edit();
         editor.putString("requestToken", requestToken.getToken());
         editor.putString("requestTokenSecret", requestToken.getTokenSecret());
@@ -262,10 +264,10 @@ public class TwitterHelper {
      * @throws Exception
      */
 	public void generateAuthToken(String pin) throws Exception{
-        Twitter twitter = new TwitterFactory().getInstance();
-        twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
-        RequestToken requestToken = getRequestToken(false); // twitter.getOAuthRequestToken();
-		AccessToken accessToken = twitter.getOAuthAccessToken(requestToken, pin);
+        Twitter twitterInstance = new TwitterFactory().getInstance();
+        twitterInstance.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
+        RequestToken requestToken = getRequestToken(false); // twitterInstance.getOAuthRequestToken();
+		AccessToken accessToken = twitterInstance.getOAuthAccessToken(requestToken, pin);
 
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -286,10 +288,10 @@ public class TwitterHelper {
         cb.setOAuthConsumerKey(TwitterConsumerToken.consumerKey);
         cb.setOAuthConsumerSecret(TwitterConsumerToken.consumerSecret);
         Configuration conf = cb.build() ;
-        Twitter twitter = new TwitterFactory(conf).getInstance(username,password);
-//        twitter.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
+        Twitter twitterInstance = new TwitterFactory(conf).getInstance(username,password);
+//        twitterInstance.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
 
-        AccessToken accessToken = twitter.getOAuthAccessToken();
+        AccessToken accessToken = twitterInstance.getOAuthAccessToken();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         Editor editor = preferences.edit();
         editor.putString("accessToken", accessToken.getToken());
@@ -299,7 +301,6 @@ public class TwitterHelper {
     }
 
 	public UpdateResponse updateStatus(UpdateRequest request) {
-		Twitter twitter = getTwitter();
         UpdateResponse updateResponse = new UpdateResponse(request.updateType,request.statusUpdate);
 		Log.i("TwitterHelper", "Sending update: " + request.statusUpdate);
 		try {
@@ -314,7 +315,6 @@ public class TwitterHelper {
 	}
 
 	public UpdateResponse retweet(UpdateRequest request) {
-		Twitter twitter = getTwitter();
         UpdateResponse response = new UpdateResponse(request.updateType,request.id);
 		try {
 			twitter.retweetStatus(request.id);
@@ -331,7 +331,6 @@ public class TwitterHelper {
         Status status = request.status;
         UpdateResponse updateResponse = new UpdateResponse(request.updateType, status);
         updateResponse.view = request.view;
-		Twitter twitter = getTwitter();
 		try {
 			if (status.isFavorited()) {
 				twitter.destroyFavorite(status.getId());
@@ -342,7 +341,7 @@ public class TwitterHelper {
 
             // reload tweet and update in DB - twitter4j should have some status.setFav()..
             status = getStatusById(status.getId(),null, true, false); // no list id, don't persist
-            updateStatus(tweetDB,status); // explicitly update in DB - we know it is there.
+            updateStatus(status); // explicitly update in DB - we know it is there.
 			updateResponse.setSuccess();
             updateResponse.setMessage("(Un)favorite set");
 		} catch (Exception e) {
@@ -356,7 +355,6 @@ public class TwitterHelper {
 
     public UpdateResponse direct(UpdateRequest request) {
         UpdateResponse updateResponse = new UpdateResponse(request.updateType, (Status) null); // TODO
-        Twitter twitter = getTwitter();
         try {
             twitter.sendDirectMessage((int)request.id,request.message);
             updateResponse.setSuccess();
@@ -370,7 +368,6 @@ public class TwitterHelper {
     }
 
 	public MetaList<Status> getUserList(Paging paging, int listId, boolean fromDbOnly) {
-        Twitter twitter = getTwitter();
 
         List<Status> statuses;
         if (!fromDbOnly) {
@@ -381,9 +378,7 @@ public class TwitterHelper {
                 int size = statuses.size();
                 Log.i("getUserList","Got " + size + " statuses from Twitter");
 
-                for (Status status : statuses) {
-                    persistStatus(tweetDB, status,listId);
-                }
+                persistStatus(statuses,listId);
             } catch (Exception e) {
                 statuses = new ArrayList<Status>();
 
@@ -481,7 +476,6 @@ Log.d("FillUp","Return: " + i);
             }
         }
 
-        Twitter twitter = getTwitter();
         try {
             status = twitter.showStatus(statusId);
 
@@ -491,7 +485,9 @@ Log.d("FillUp","Return: " + i);
                     id = 0;
                 else
                     id = list_id;
-                persistStatus(tweetDB,status,id);
+                List<Status> sList = new ArrayList<Status>(1);
+                sList.add(status);
+                persistStatus(sList, id);
             }
         } catch (Exception e) {
             e.printStackTrace();  // TODO: Customise this generated block
@@ -516,26 +512,66 @@ Log.d("FillUp","Return: " + i);
      * @return User object or null, if it can not be obtained.
      */
     public User getUserById(int userId, boolean cachedOnly) {
-        Twitter twitter = getTwitter();
         User user = null;
-        try {
+        boolean existing = false;
 
-            String userJson = tweetDB.getUserById(userId,0);
-            if (userJson==null) {
-                if (!cachedOnly) {
-                    user = twitter.showUser(userId);
-                    userJson = DataObjectFactory.getRawJSON(user);
-                    tweetDB.insertUser(userId,userJson);
-                }
-            } else {
+        try {
+            String userJson = tweetDB.getUserById(userId);
+            if (userJson!=null) {
+                existing = true;
                 user = DataObjectFactory.createUser(userJson);
             }
+            if (cachedOnly) {
+                return user;
+            }
+
+            // not cached only -> go to the server
+            user = twitter.showUser(userId);
+            userJson = DataObjectFactory.getRawJSON(user);
+            if (!existing)
+                tweetDB.insertUser(userId,userJson, user.getScreenName());
+            else
+                tweetDB.updateUser(userId,userJson);
 
         } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
         }
         return user;
     }
+
+    /**
+     * Retrieve a User object of the passed screen name
+     * @param screenName Screen name of the user
+     * @param cachedOnly If true, only a cached version of the object or null is returned. Otherwise a request to the server is made
+     * @return User object or null, if it can not be obtained.
+     */
+    public User getUserByScreenName(String screenName, boolean cachedOnly) {
+        User user = null;
+        boolean existing = false;
+
+        try {
+            String userJson = tweetDB.getUserByName(screenName);
+            if (userJson!=null) {
+                existing=true;
+                user = DataObjectFactory.createUser(userJson);
+            }
+            if (cachedOnly)
+                return user;
+
+            // not cached only -> go to the server
+            user = twitter.showUser(screenName);
+            userJson = DataObjectFactory.getRawJSON(user);
+            if (!existing)
+                tweetDB.insertUser(user.getId(),userJson, user.getScreenName());
+            else
+                tweetDB.updateUser(user.getId(),userJson);
+
+        } catch (TwitterException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+        return user;
+    }
+
 
     /**
      * Send a request to follow or unfollow a user
@@ -545,7 +581,6 @@ Log.d("FillUp","Return: " + i);
      * @todo make async
      */
     public boolean followUnfollowUser(int userId, boolean doFollow ) {
-        Twitter twitter = getTwitter();
         try {
             if (doFollow)
                 twitter.createFriendship(userId);
@@ -566,7 +601,6 @@ Log.d("FillUp","Return: " + i);
      * @return true if successful
      */
     public boolean addUserToLists(int userId, int listId) {
-        Twitter twitter = getTwitter();
         try {
             twitter.addUserListMember(listId,userId);
         } catch (TwitterException e) {
@@ -576,34 +610,66 @@ Log.d("FillUp","Return: " + i);
         return true;
     }
 
-    private void persistStatus(TweetDB tdb, Status status, long list_id) throws IOException {
-        if (tdb.getStatusObjectById(status.getId(), list_id)!=null)
-            return; // This is already in DB, so do nothing
+    public List<Status> getUserTweets(int userId) {
 
-        // Serialize and then store in DB
-        String json = DataObjectFactory.getRawJSON(status);
-        tdb.storeStatus(status.getId(), status.getInReplyToStatusId(), list_id, json);
+        Paging paging = new Paging();
+        paging.setCount(30);
+        List<Status> ret = null;
+        try {
+            ret = twitter.getUserTimeline(userId,paging);
+        } catch (TwitterException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+            return Collections.emptyList();
+        }
+        return ret;
     }
 
-    private void persistDirects(DirectMessage message) {
-        if (tweetDB.getDirectById(message.getId())!=null)
+    private void persistStatus(Collection<Status> statuses, long list_id) {
+        if (statuses.isEmpty())
             return;
 
-        String json = DataObjectFactory.getRawJSON(message);
+        List<ContentValues> values = new ArrayList<ContentValues>(statuses.size());
+        for (Status status : statuses) {
+            String json = DataObjectFactory.getRawJSON(status);
+            ContentValues cv = new ContentValues(5);
+            cv.put("ID", status.getId());
+            cv.put("I_REP_TO", status.getInReplyToStatusId());
+            cv.put("LIST_ID", list_id);
+            cv.put("ACCOUNT_ID",accountId);
+            cv.put("STATUS",json);
+            values.add(cv);
+        }
+        tweetDB.storeValues(TweetDB.TABLE_STATUSES,values);
+    }
 
-        tweetDB.insertDirect(message.getId(), message.getCreatedAt().getTime(), json);
+    private void persistDirects(Collection<DirectMessage> directs) {
+        if (directs.isEmpty())
+            return;
+
+        List<ContentValues> values = new ArrayList<ContentValues>(directs.size());
+        for (DirectMessage directMessage : directs) {
+            String json = DataObjectFactory.getRawJSON(directMessage);
+            ContentValues cv = new ContentValues(4);
+            cv.put("id",directMessage.getId());
+            cv.put("created_at", directMessage.getCreatedAt().getTime());
+            cv.put("ACCOUNT_ID",accountId);
+            cv.put("message_json",json);
+            values.add(cv);
+        }
+        tweetDB.storeValues(TweetDB.TABLE_DIRECTS,values);
+
     }
     /**
      * Update an existing status object in the database with the passed one.
-     * @param tdb TweetDb to use
+     *
      * @param status Updated status object
      * @throws IOException
      */
-    private void updateStatus(TweetDB tdb, Status status) throws IOException {
+    private void updateStatus(Status status) throws IOException {
 
         // Serialize and then store in DB
         String json = DataObjectFactory.getRawJSON(status);
-        tdb.updateStatus(status.getId(), json);
+        tweetDB.updateStatus(status.getId(), json);
     }
 
 
@@ -674,20 +740,33 @@ Log.d("FillUp","Return: " + i);
      * @return Url where this was stored on the remote service or null on error
      */
     public String postPicture(String fileName) {
-        Twitter twitter = getTwitter();
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String provider = preferences.getString("pictureService","yfrog");
 
         try {
             File file = new File(fileName);
-            ImageUpload upload;
+            MediaProvider mProvider ;
             if (provider.equals("yfrog"))
-                upload= ImageUpload.getYFrogUploader(twitter);
+                mProvider = MediaProvider.YFROG;
             else if (provider.equals("twitpic"))
-                upload= ImageUpload.getTwitpicUploader(twitter);
+                mProvider = MediaProvider.TWITPIC;
             else
                 throw new IllegalArgumentException("Picture provider " + provider + " unknown");
+
+            String accessTokenToken = preferences.getString("accessToken",null);
+            String accessTokenSecret = preferences.getString("accessTokenSecret",null);
+
+            Properties props = new Properties();
+            props.put(PropertyConfiguration.MEDIA_PROVIDER,mProvider);
+            props.put(PropertyConfiguration.OAUTH_ACCESS_TOKEN,accessTokenToken);
+            props.put(PropertyConfiguration.OAUTH_ACCESS_TOKEN_SECRET,accessTokenSecret);
+            props.put(PropertyConfiguration.OAUTH_CONSUMER_KEY,TwitterConsumerToken.consumerKey);
+            props.put(PropertyConfiguration.OAUTH_CONSUMER_SECRET,TwitterConsumerToken.consumerSecret);
+            Configuration conf = new PropertyConfiguration(props);
+
+            ImageUploaderFactory factory = new ImageUploaderFactory(conf);
+            ImageUpload upload = factory.getInstance(mProvider);
             String url = upload.upload(file);
             return url;
         } catch (Exception e) {
@@ -703,7 +782,6 @@ Log.d("FillUp","Return: " + i);
      */
     public boolean areWeFollowing(Integer userId) {
 
-        Twitter twitter = getTwitter();
         try {
             int myId = twitter.getId();
             Relationship rel = twitter.showFriendship(myId,userId);
@@ -716,7 +794,6 @@ Log.d("FillUp","Return: " + i);
 
     public List<SavedSearch> getSavedSearchesFromServer() {
 
-        Twitter twitter = getTwitter();
         List<SavedSearch> searches;
         try {
             searches = twitter.getSavedSearches();
@@ -758,7 +835,6 @@ Log.d("FillUp","Return: " + i);
     }
 
     public MetaList<Tweet> getSavedSearchesTweets(int searchId, boolean fromDbOnly, Paging paging) {
-        Twitter twitter = getTwitter();
 
         List<SavedSearch> searches = getSavedSearchesFromDb();
         for (SavedSearch search : searches) {

@@ -28,7 +28,7 @@ public class TweetDB {
     private static final String TABLE_LISTS = "lists";
     private static final String TABLE_USERS = "users";
     private static final String TABLE_SEARCHES = "searches";
-    private static final String TABLE_DIRECTS = "directs";
+    public static final String TABLE_DIRECTS = "directs";
     static final String STATUS = "STATUS";
     static final String ACCOUNT_ID = "ACCOUNT_ID";
     static final String ACCOUNT_ID_IS = ACCOUNT_ID + "=?";
@@ -36,13 +36,13 @@ public class TweetDB {
     private final String account;
 
 	public TweetDB(Context context, int accountId) {
-		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 1);
+		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 3);
         account = String.valueOf(accountId);
 
 	}
 
 
-    private class TweetDBOpenHelper extends SQLiteOpenHelper {
+    private static class TweetDBOpenHelper extends SQLiteOpenHelper {
         static final String CREATE_TABLE = "CREATE TABLE ";
 
 		public TweetDBOpenHelper(Context context, String name,
@@ -57,15 +57,18 @@ public class TweetDB {
                     ACCOUNT_ID + " LONG, " +
                     "LIST_ID LONG, " +
                     "I_REP_TO LONG, " +
-                    "STATUS STRING " +
+                    "STATUS STRING, " +
+                    "UNIQUE (ID, LIST_ID, " + ACCOUNT_ID + ")" +
                     ")"
+
             );
 
             db.execSQL(CREATE_TABLE + TABLE_DIRECTS + " (" +
                     "ID LONG, " +
                     "created_at LONG, " +
                     ACCOUNT_ID + " LONG, " +
-                    "MESSAGE_JSON STRING " +
+                    "MESSAGE_JSON STRING, " +
+                    "UNIQUE (ID, " + ACCOUNT_ID + ")" +
                     ")"
             );
 
@@ -73,21 +76,26 @@ public class TweetDB {
 					"list_id LONG, " + //
 					"last_read_id LONG, " +  // Last Id read by the user
                     "last_fetched_id LONG, " +  // last Id fetched from the server
-                    ACCOUNT_ID + " LONG " +
+                    ACCOUNT_ID + " LONG, " +
+                    "UNIQUE (LIST_ID, " + ACCOUNT_ID + ")" +
                     ")"
 			);
 			db.execSQL(CREATE_TABLE + TABLE_LISTS + " (" + //
 					"name TEXT, " + //
 					"id LONG, " +
                     ACCOUNT_ID + " LONG, " +
-                    "list_json TEXT" +
+                    "list_json TEXT, " +
+                    "UNIQUE (ID, " + ACCOUNT_ID + ")" +
                     " )"
 			);
 
             db.execSQL(CREATE_TABLE + TABLE_USERS + " (" +
                     "userId LONG, " + //
                     ACCOUNT_ID + " LONG, " +
-                    "user_json STRING )"
+                    "user_json STRING ," +
+                    "screenname STRING, " +
+                    "UNIQUE (USERID, " + ACCOUNT_ID + ")" +
+                ")"
             );
 
          db.execSQL("CREATE TABLE accounts (" +
@@ -103,12 +111,27 @@ public class TweetDB {
                     "id LONG, " +
                     ACCOUNT_ID + " LONG, " +
                     "query STRING, " +
-                    "json STRING )"
+                    "json STRING,"+
+                    "UNIQUE (ID, " + ACCOUNT_ID + ")" +
+                ")"
             );
 		}
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            if (oldVersion==1) {
+                db.execSQL("DELETE FROM " + TABLE_USERS);
+                db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN screenname STRING");
+            }
+            if (oldVersion<3) {
+                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_STATUSES + "(ID, LIST_ID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_DIRECTS + "(ID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_LAST_READ + "(list_ID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_LISTS + "(ID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_USERS + "(userID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_SEARCHES + "(ID, " + ACCOUNT_ID +")");
+            }
+
 		}
 
 	}
@@ -187,7 +210,7 @@ public class TweetDB {
 		cv.put("name", name);
 		cv.put("id",id);
         cv.put(ACCOUNT_ID,account);
-        cv.put("list_json",json);
+        cv.put("list_json", json);
 
 		SQLiteDatabase db = tdHelper.getWritableDatabase();
 		db.insert(TABLE_LISTS, null, cv);
@@ -202,28 +225,10 @@ public class TweetDB {
      */
 	public void removeList(Integer id) {
 		SQLiteDatabase db = tdHelper.getWritableDatabase();
-		db.delete(TABLE_LISTS, "id = ? AND " +ACCOUNT_ID_IS, new String[]{id.toString(),account});
+		db.delete(TABLE_LISTS, "id = ? AND " + ACCOUNT_ID_IS, new String[]{id.toString(), account});
 		db.close();
 	}
 
-    /**
-     * Store a new Status object in the DB. See {@link twitter4j.Status}
-     * @param id Id of the status
-     * @param i_reply_id Id of a status the passed one is a reply to
-     * @param list_id Id of a list - pseudo IDs apply --see {@link de.bsd.zwitscher.TwitterHelper#getTimeline(twitter4j.Paging, int, boolean)}
-     * @param status_json
-     */
-    public void storeStatus(long id, long i_reply_id, long list_id, String status_json) {
-        ContentValues cv = new ContentValues(4);
-        cv.put("ID", id);
-        cv.put("I_REP_TO", i_reply_id);
-        cv.put("LIST_ID", list_id);
-        cv.put(ACCOUNT_ID,account);
-        cv.put(STATUS,status_json);
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.insert(TABLE_STATUSES, null, cv);
-        db.close();
-    }
 
     /**
      * Update the stored TwitterResponse object. This may be necessary when e.g. the
@@ -236,7 +241,7 @@ public class TweetDB {
         cv.put(STATUS, status_json);
         cv.put(ACCOUNT_ID,account);
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.update(TABLE_STATUSES,cv,"id = ?", new String[]{String.valueOf(id)});
+        db.update(TABLE_STATUSES, cv, "id = ?", new String[]{String.valueOf(id)});
         db.close();
     }
 
@@ -357,7 +362,7 @@ public class TweetDB {
         return ret;
     }
 
-    public List<String> getDirectsOlderThan(int sinceId, int howMany) {
+    public List<String> getDirectsOlderThan(long sinceId, int howMany) {
         List<String> ret = new ArrayList<String>();
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
@@ -403,17 +408,17 @@ public class TweetDB {
 
     /**
      * Returns a user by its ID from the database if it exists or null.
+     *
      * @param userId Id of the user
-     * @param accountId Id of the account to use
      * @return Basic JSON string of the user info or null.
      */
-    public String getUserById(int userId, int accountId) {
+    public String getUserById(int userId) {
 
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         String ret = null;
 
         Cursor c;
-        c = db.query(TABLE_USERS,new String[]{"user_json"},"userId = ? AND  " + ACCOUNT_ID + " = ?",new String[] { String.valueOf(userId), String.valueOf(accountId)},null, null, null);
+        c = db.query(TABLE_USERS,new String[]{"user_json"},"userId = ? AND  " + ACCOUNT_ID_IS,new String[] { String.valueOf(userId), account},null, null, null);
         if (c.getCount()>0) {
             c.moveToFirst();
             ret = c.getString(0);
@@ -422,6 +427,28 @@ public class TweetDB {
         db.close();
         return ret;
     }
+
+    /**
+     * Returns a user by its screenname from the database if it exists or null.
+     *
+     * @param screenName screenname of the user
+     * @return Basic JSON string of the user info or null.
+     */
+    public String getUserByName(String screenName) {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        String ret = null;
+
+        Cursor c;
+        c = db.query(TABLE_USERS,new String[]{"user_json"},"screenname = ? AND  " + ACCOUNT_ID_IS ,new String[] { screenName, account},null, null, null);
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            ret = c.getString(0);
+        }
+        c.close();
+        db.close();
+        return ret;
+    }
+
 
     /**
      * Return a list of all users stored
@@ -451,15 +478,17 @@ public class TweetDB {
      * Insert a user into the database.
      * @param userId The Id of the user to insert
      * @param json JSON representation of the User object
+     * @param screenName
      */
-    public void insertUser(int userId, String json) {
-        ContentValues cv = new ContentValues(3);
+    public void insertUser(int userId, String json, String screenName) {
+        ContentValues cv = new ContentValues(4);
         cv.put("userId",userId);
         cv.put(ACCOUNT_ID,account);
         cv.put("user_json",json);
+        cv.put("screenname",screenName);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.insert(TABLE_USERS,null,cv);
+        db.insertWithOnConflict(TABLE_USERS, null, cv,SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
     }
 
@@ -467,13 +496,15 @@ public class TweetDB {
      * Update an existing user in the database.
      * @param userId
      * @param json
+     * @todo Still needed with conflict resolution on insert?
      */
     public void updateUser(int userId, String json) {
         ContentValues cv = new ContentValues(1);
         cv.put("user_json",json);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.update(TABLE_USERS,cv,"userId = ? AND "+ ACCOUNT_ID + " = ?",new String[] { String.valueOf(userId),account});
+        db.update(TABLE_USERS, cv, "userId = ? AND " + ACCOUNT_ID + " = ?",
+                new String[]{String.valueOf(userId), account});
         db.close();
     }
 
@@ -521,29 +552,29 @@ public class TweetDB {
     }
 
     /**
-     * Insert a direct message into the DB
-     * @param id ID of the message
-     * @param time creation time
-     * @param json Json string of the message
+     * Insert Lists of ContentValues into the DB table <i>table</i>.
+     * The insert uses the v8 method insertWithOnConflict() with a parameter
+     * of CONFLICT_IGNORE meaning, that inserts that violate the (uniqueness)
+     * constraints are just ignored and do not cause a rollback. This is ok, as
+     * this method is called on new inserts of data received from the server.
+     * @param table Table to insert into
+     * @param values ContentValues that describe the content
      */
-    public void insertDirect(int id, long time, String json) {
-        ContentValues cv = new ContentValues(4);
-        cv.put("id",id);
-        cv.put("created_at", time);
-        cv.put(ACCOUNT_ID,account);
-        cv.put("message_json",json);
-
+    public void storeValues(String table, List<ContentValues> values) {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.insert(TABLE_DIRECTS,null,cv);
+        for (ContentValues val : values) {
+            db.insertWithOnConflict(table,null,val,SQLiteDatabase.CONFLICT_IGNORE);
+        }
         db.close();
     }
 
     /**
      * Get a direct message from th DB
+     *
      * @param id ID of the message to look up
      * @return JSON string of the message or null if not found
      */
-    public String getDirectById(int id) {
+    public String getDirectById(long id) {
 
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         String ret = null;

@@ -10,7 +10,10 @@ import android.view.View;
 import android.widget.TextView;
 
 /**
- *  TODO: Document this
+ * Activity that displays error messages and
+ * the original text to send if sending failed.
+ * users can then copy&paste the text and retry.
+ * Needs more work to allow for real 1-touch retry.
  * @author Heiko W. Rupp
  */
 public class ErrorDisplayActivity extends Activity {
@@ -39,7 +42,12 @@ public class ErrorDisplayActivity extends Activity {
         bodyView.setText(Html.fromHtml(body));
 
         TextView messageView = (TextView) findViewById(R.id.error_message);
-        messageView.setText(Html.fromHtml(message));
+        if (message!=null && !message.equals("")) {
+            messageView.setText(Html.fromHtml(message));
+        } else {
+            messageView.setEnabled(false);
+            findViewById(R.id.copy_and_paste).setEnabled(false);
+        }
 
     }
 
