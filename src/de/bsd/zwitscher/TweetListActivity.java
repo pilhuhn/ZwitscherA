@@ -175,10 +175,12 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
      * <li>>0 : User list</li>
      * </ul>
      * This method may trigger a network call if fromDbOnly is false.
+     *
      * @param fromDbOnly If true only statuses already in the DB are returned
+     * @param filter
      * @return List of status items along with some counts
      */
-	private MetaList<Status> getTimlinesFromTwitter(boolean fromDbOnly) {
+	private MetaList<Status> getTimlinesFromTwitter(boolean fromDbOnly, String filter) {
 		Paging paging = new Paging().count(100);
 
 		MetaList<Status> myStatuses;
@@ -214,7 +216,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
     	statuses = new ArrayList<Status>();
 		List<Status> data = new ArrayList<Status>(myStatuses.getList().size());
-        String filter = getFilter();
 		for (Status status : myStatuses.getList()) {
 			if ((filter==null) || (filter!= null && !status.getText().matches(filter))) {
 				data.add(status);
@@ -368,7 +369,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     String mentionsString = context.getString(R.string.mentions);
                     String homeString = context.getString(R.string.home_timeline);
                     publishProgress(list_id==-1? mentionsString : homeString);
-                    data = getTimlinesFromTwitter(fromDbOnly);
+                    String filter = getFilter();
+                    data = getTimlinesFromTwitter(fromDbOnly, filter);
                     // Also check for mentions + directs (if allowed in prefs)
                     NetworkHelper networkHelper = new NetworkHelper(context);
 
