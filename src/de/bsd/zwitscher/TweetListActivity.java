@@ -353,48 +353,55 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             if (userId!=null) {
                 List<twitter4j.Status> statuses = th.getUserTweets(userId);
                 data = new MetaList(statuses,statuses.size(),0);
-                publishProgress("User");
+                String user = thisActivity.getString(R.string.user);
+                publishProgress(user);
             }
-            else if (list_id>-2) {
-                publishProgress(list_id==-1?"Mentions":"Home");
-                data = getTimlinesFromTwitter(fromDbOnly);
-                // Also check for mentions + directs (if allowed in prefs)
-                NetworkHelper networkHelper = new NetworkHelper(thisActivity);
+            else {
+                String directsString = thisActivity.getString(R.string.direct);
+                if (list_id>-2) {
+                    String mentionsString = thisActivity.getString(R.string.mentions);
+                    String homeString = thisActivity.getString(R.string.home_timeline);
+                    publishProgress(list_id==-1? mentionsString : homeString);
+                    data = getTimlinesFromTwitter(fromDbOnly);
+                    // Also check for mentions + directs (if allowed in prefs)
+                    NetworkHelper networkHelper = new NetworkHelper(thisActivity);
 
-                if (!fromDbOnly && networkHelper.mayReloadAdditional()) { // TODO make this block nicer
-                    publishProgress("Mentions");
-                    long mentionLast = tdb.getLastRead(-1);
-                    Paging paging;
-                    paging = new Paging().count(100);
+                    if (!fromDbOnly && networkHelper.mayReloadAdditional()) { // TODO make this block nicer
+                        publishProgress(mentionsString);
+                        long mentionLast = tdb.getLastRead(-1);
+                        Paging paging;
+                        paging = new Paging().count(100);
 
-                    if (mentionLast>0)
-                        paging.setSinceId(mentionLast);
-                    MetaList<twitter4j.Status> mentions = th.getTimeline(paging,-1,false);
-                    newMentions = mentions.getNumOriginal();
-                    if (mentions.getList().size()>0) {
-                        long id = mentions.getList().get(0).getId();
-                        tdb.updateOrInsertLastRead(-1,id);
-                    }
-
-                    if (list_id==0) { // Fetch directs only if original list was homes
-                        publishProgress("Directs");
-                        MetaList<DirectMessage> directs = getDirectsFromTwitter(false);
-                        newDirects = directs.getNumOriginal();
-                        if (directs.getList().size()>0) {
+                        if (mentionLast>0)
+                            paging.setSinceId(mentionLast);
+                        MetaList<twitter4j.Status> mentions = th.getTimeline(paging,-1,false);
+                        newMentions = mentions.getNumOriginal();
+                        if (mentions.getList().size()>0) {
                             long id = mentions.getList().get(0).getId();
-                            tdb.updateOrInsertLastRead(-2,id);
+                            tdb.updateOrInsertLastRead(-1,id);
                         }
-                    }
 
+                        if (list_id==0) { // Fetch directs only if original list was homes
+                            publishProgress(directsString);
+                            MetaList<DirectMessage> directs = getDirectsFromTwitter(false);
+                            newDirects = directs.getNumOriginal();
+                            if (directs.getList().size()>0) {
+                                long id = mentions.getList().get(0).getId();
+                                tdb.updateOrInsertLastRead(-2,id);
+                            }
+                        }
+
+                    }
                 }
-            }
-            else if (list_id==-2) {
-                publishProgress("Directs");
-                data = getDirectsFromTwitter(fromDbOnly);
-            }
-            else { // list id < -2 ==> saved search
-                publishProgress("Saved Search");
-                data = getSavedSearchFromTwitter(-list_id,fromDbOnly);
+                else if (list_id==-2) {
+                    publishProgress(directsString);
+                    data = getDirectsFromTwitter(fromDbOnly);
+                }
+                else { // list id < -2 ==> saved search
+                    String s = thisActivity.getString(R.string.searches);
+                    publishProgress(s);
+                    data = getSavedSearchFromTwitter(-list_id,fromDbOnly);
+                }
             }
 	        return data;
 		}

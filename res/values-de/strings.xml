@@ -35,6 +35,8 @@
     <string name="please_sync_lists">Bitte synchronisieren Sie die Listen</string>
     <string name="no_searches_found">Keine gespeicherten Suchen gefunden - Bitte synchronisieren Sie</string>
     <string name="updating">Aktualisiere</string>
+    <string name="user">Benutzer</string>
+
 
 
     <string name="login_common">
