@@ -36,7 +36,7 @@ public class TweetDB {
     private final String account;
 
 	public TweetDB(Context context, int accountId) {
-		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 3);
+		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 4);
         account = String.valueOf(accountId);
 
 	}
@@ -98,13 +98,16 @@ public class TweetDB {
                 ")"
             );
 
-         db.execSQL("CREATE TABLE accounts (" +
-                     "name TEXT, " + // 0
-                     "tokenKey TEXT, "+ // 1
-                     "tokenSecret TEXT, "+ // 2
-                     "serverUrl TEXT, " + // 3
-                     "serverType )" // 4
-         );
+            db.execSQL(CREATE_TABLE + TABLE_ACCOUNTS + " (" +
+                    "name TEXT, " + // 0
+                    "tokenKey TEXT, "+ // 1
+                    "tokenSecret TEXT, "+ // 2
+                    "serverUrl TEXT, " + // 3
+                    "serverType TEXT, " +
+                    "id LONG, " +
+                    "isDefault INTEGER, " +
+                    "UNIQUE (name, serverUrl )" // 4
+            );
 
             db.execSQL(CREATE_TABLE + TABLE_SEARCHES + " ("+
                     "name STRING, "+
@@ -526,6 +529,27 @@ public class TweetDB {
         c.close();
         db.close();
         return account;
+    }
+
+    public Account getDefaultAccount(String type) { // TODO type enough?
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        Cursor c;
+        Account account=null;
+        c = db.query(TABLE_ACCOUNTS,null,"serverType = ? AND isDefault=1", new String[]{type},null,null,null);
+        if (c.getColumnCount()>0) {
+            c.moveToFirst();
+            account = new Account(
+                    c.getString(0),
+                    c.getString(1),
+                    c.getString(2),
+                    type,
+                    c.getString(4)
+            );
+        }
+        c.close();
+        db.close();
+        return account;
+
     }
 
     public void deleteAccount(Account account) {

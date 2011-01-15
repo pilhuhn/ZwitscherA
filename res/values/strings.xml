@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="accountTypes">
+        <item>Twitter</item>
+        <item>laconi.ca</item>
+        <item>status.net</item>
+    </string-array>
+
     <string name="status">status</string>
     <string name="reply">reply</string>
     <string name="replyall">replyAll</string>
     <string name="tweet_sent">Tweet sent</string>
     <string name="hello">Enter your tweet text below:</string>
     <string name="app_name">Zwitscher</string>
-    <string-array name="accountTypes"><item>Twitter</item>
-    <item>laconi.ca</item>
-    <item>status.net</item>
-    </string-array>
     <string name="loading">Loading Tweets ...</string>
     <string name="no_connect">Can not connect to Twitter</string>
     <string name="TweetButton">Tweet this!</string>
