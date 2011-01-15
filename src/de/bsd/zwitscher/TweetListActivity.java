@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -39,7 +40,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     List<DirectMessage> directs;
     List<Tweet> tweets;
     Bundle intentInfo;
-    TweetListActivity thisActivity;
     int list_id;
     ListView lv;
     int newMentions=0;
@@ -52,7 +52,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        thisActivity = this;
 
         Activity theParent = getParent();
         if (!(theParent instanceof TabWidget)) {
@@ -279,7 +278,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     }
 
     private void fillListViewFromTimeline(boolean fromDbOnly) {
-    	new GetTimeLineTask().execute(fromDbOnly);
+    	new GetTimeLineTask(this).execute(fromDbOnly);
     }
 
     @Override
@@ -334,11 +333,16 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
         boolean fromDbOnly = false;
         String updating;
+        Context context;
+
+        private GetTimeLineTask(Context context) {
+            this.context = context;
+        }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            updating = thisActivity.getString(R.string.updating);
+            updating = context.getString(R.string.updating);
             if (pg!=null)
                 pg.setVisibility(ProgressBar.VISIBLE);
             if(titleTextBox!=null) {
@@ -355,18 +359,18 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             if (userId!=null) {
                 List<twitter4j.Status> statuses = th.getUserTweets(userId);
                 data = new MetaList(statuses,statuses.size(),0);
-                String user = thisActivity.getString(R.string.user);
+                String user = context.getString(R.string.user);
                 publishProgress(user);
             }
             else {
-                String directsString = thisActivity.getString(R.string.direct);
+                String directsString = context.getString(R.string.direct);
                 if (list_id>-2) {
-                    String mentionsString = thisActivity.getString(R.string.mentions);
-                    String homeString = thisActivity.getString(R.string.home_timeline);
+                    String mentionsString = context.getString(R.string.mentions);
+                    String homeString = context.getString(R.string.home_timeline);
                     publishProgress(list_id==-1? mentionsString : homeString);
                     data = getTimlinesFromTwitter(fromDbOnly);
                     // Also check for mentions + directs (if allowed in prefs)
-                    NetworkHelper networkHelper = new NetworkHelper(thisActivity);
+                    NetworkHelper networkHelper = new NetworkHelper(context);
 
                     if (!fromDbOnly && networkHelper.mayReloadAdditional()) { // TODO make this block nicer
                         publishProgress(mentionsString);
@@ -400,7 +404,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     data = getDirectsFromTwitter(fromDbOnly);
                 }
                 else { // list id < -2 ==> saved search
-                    String s = thisActivity.getString(R.string.searches);
+                    String s = context.getString(R.string.searches);
                     publishProgress(s);
                     data = getSavedSearchFromTwitter(-list_id,fromDbOnly);
                 }
@@ -412,12 +416,12 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 		@Override
 		protected void onPostExecute(MetaList result) {
             if (list_id<-2)
-	            setListAdapter(new TweetAdapter(thisActivity, R.layout.tweet_list_item, result.getList()));
+	            setListAdapter(new TweetAdapter(context, R.layout.tweet_list_item, result.getList()));
             else
-	            setListAdapter(new StatusAdapter(thisActivity, R.layout.tweet_list_item, result.getList()));
+	            setListAdapter(new StatusAdapter(context, R.layout.tweet_list_item, result.getList()));
 
             if (result.getList().size()==0) {
-                Toast.makeText(thisActivity,"Got no result from the server",Toast.LENGTH_LONG).show();
+                Toast.makeText(context,"Got no result from the server",Toast.LENGTH_LONG).show();
             }
 
             if (pg!=null)
@@ -427,12 +431,12 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 	        getListView().requestLayout();
             if (newMentions>0) {
                 String s = getString(R.string.new_mentions);
-                Toast.makeText(thisActivity,newMentions + " " + s,Toast.LENGTH_LONG).show();
+                Toast.makeText(context,newMentions + " " + s,Toast.LENGTH_LONG).show();
                 newMentions=0;
             }
             if (newDirects>0) {
                 String s = getString(R.string.new_directs);
-                Toast.makeText(thisActivity,newDirects + " " + s,Toast.LENGTH_LONG).show();
+                Toast.makeText(context,newDirects + " " + s,Toast.LENGTH_LONG).show();
                 newDirects=0;
             }
 
