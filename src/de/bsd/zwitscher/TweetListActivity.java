@@ -194,36 +194,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             // Home time line
         	myStatuses = th.getTimeline(paging,list_id, fromDbOnly);
 
-            // Also check for mentions + directs (if allowed in prefs)
-            NetworkHelper networkHelper = new NetworkHelper(this);
-
-            if (!fromDbOnly && networkHelper.mayReloadAdditional()) { // TODO move this block to doInBackground below.
-                long mentionLast = tdb.getLastRead(-1);
-                paging = new Paging().count(100);
-
-                if (mentionLast>0)
-                    paging.setSinceId(mentionLast);
-                MetaList<Status> mentions = th.getTimeline(paging,-1,fromDbOnly);
-                newMentions = mentions.getNumOriginal();
-                if (mentions.getList().size()>0) {
-                    long id = mentions.getList().get(0).getId();
-                    tdb.updateOrInsertLastRead(-1,id);
-                }
-
-                long directsLast = tdb.getLastRead(-2);
-                paging = new Paging().count(100);
-
-                if (directsLast>0)
-                    paging.setSinceId(directsLast);
-
-                MetaList<DirectMessage> directs = th.getDirectMessages(false,paging);
-                newDirects = directs.getNumOriginal();
-                if (directs.getList().size()>0) {
-                    long id = mentions.getList().get(0).getId();
-                    tdb.updateOrInsertLastRead(-2,id);
-                }
-
-            }
         	break;
         case -1:
         	myStatuses = th.getTimeline(paging, list_id, fromDbOnly);
@@ -261,7 +231,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 		return metaList;
 	}
 
-    private MetaList getDirectsFromTwitter(boolean fromDbOnly) {
+    private MetaList<DirectMessage> getDirectsFromTwitter(boolean fromDbOnly) {
         MetaList<DirectMessage> messages;
 
 
@@ -277,7 +247,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         return messages;
     }
 
-    private MetaList getSavedSearchFromTwitter(int searchId, boolean fromDbOnly) {
+    private MetaList<Tweet> getSavedSearchFromTwitter(int searchId, boolean fromDbOnly) {
         MetaList<Tweet> messages;
 
         Paging paging = new Paging();
@@ -388,6 +358,35 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             else if (list_id>-2) {
                 publishProgress(list_id==-1?"Mentions":"Home");
                 data = getTimlinesFromTwitter(fromDbOnly);
+                // Also check for mentions + directs (if allowed in prefs)
+                NetworkHelper networkHelper = new NetworkHelper(thisActivity);
+
+                if (!fromDbOnly && networkHelper.mayReloadAdditional()) { // TODO make this block nicer
+                    publishProgress("Mentions");
+                    long mentionLast = tdb.getLastRead(-1);
+                    Paging paging;
+                    paging = new Paging().count(100);
+
+                    if (mentionLast>0)
+                        paging.setSinceId(mentionLast);
+                    MetaList<twitter4j.Status> mentions = th.getTimeline(paging,-1,false);
+                    newMentions = mentions.getNumOriginal();
+                    if (mentions.getList().size()>0) {
+                        long id = mentions.getList().get(0).getId();
+                        tdb.updateOrInsertLastRead(-1,id);
+                    }
+
+                    if (list_id==0) { // Fetch directs only if original list was homes
+                        publishProgress("Directs");
+                        MetaList<DirectMessage> directs = getDirectsFromTwitter(false);
+                        newDirects = directs.getNumOriginal();
+                        if (directs.getList().size()>0) {
+                            long id = mentions.getList().get(0).getId();
+                            tdb.updateOrInsertLastRead(-2,id);
+                        }
+                    }
+
+                }
             }
             else if (list_id==-2) {
                 publishProgress("Directs");
