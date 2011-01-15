@@ -333,10 +333,12 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     private class GetTimeLineTask extends AsyncTask<Boolean, String, MetaList> {
 
         boolean fromDbOnly = false;
+        String updating;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            updating = thisActivity.getString(R.string.updating);
             if (pg!=null)
                 pg.setVisibility(ProgressBar.VISIBLE);
             if(titleTextBox!=null) {
@@ -444,7 +446,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            titleTextBox.setText("Loading " + values[0] + "...");
+            titleTextBox.setText(updating +" "+ values[0] + "...");
         }
     }
 
