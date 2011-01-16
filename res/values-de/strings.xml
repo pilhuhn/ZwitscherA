@@ -98,7 +98,7 @@
     <string name="help_translate">Aktuellen Status übersetzen</string>
     <string name="help_user_unknown">Kein Bild für den Benutzer geladen</string>
     <string name="help_select_user">Benutzer auswählen</string>
-    <string name="help_more">Um mehr zu erfahren, gehen Sie zu http://bsd.de/zwitscher . Um Bugs zu melden, Wünsche aufzuschreiben oder den Quellcode anzusehen, gehen Sie zu https://github.com/pilhuhn/ZwitscherA</string>
+    <string name="help_more">Um mehr zu erfahren, gehen Sie zu http://bsd.de/zwitscher . Um Bugs zu melden, Wünsche aufzuschreiben oder den Quellcode anzusehen, gehen Sie zu https://github.com/pilhuhn/ZwitscherA . Zusätzliche Hilfe gibt es auch im Wiki unter https://github.com/pilhuhn/ZwitscherA/wiki/Help</string>
 
 
 </resources>

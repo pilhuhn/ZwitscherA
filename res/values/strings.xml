@@ -105,7 +105,7 @@
     <string name="help_translate">Translate the current status</string>
     <string name="help_user_unknown">No picture for the user loaded</string>
     <string name="help_select_user">Select a user</string>
-    <string name="help_more">To learn more, go to http://bsd.de/zwitscher . To report bugs, write feature requests or browse the source, go to https://github.com/pilhuhn/ZwitscherA</string>
+    <string name="help_more">To learn more, go to http://bsd.de/zwitscher . To report bugs, write feature requests or browse the source, go to https://github.com/pilhuhn/ZwitscherA . There is also help in the Wiki at https://github.com/pilhuhn/ZwitscherA/wiki/Help</string>
 
 
 </resources>
