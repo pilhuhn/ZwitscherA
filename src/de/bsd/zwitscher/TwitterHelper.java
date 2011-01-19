@@ -217,15 +217,11 @@ public class TwitterHelper {
 
 
 	private Twitter getTwitter() {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-        String accessTokenToken = preferences.getString("accessToken",null);
-        String accessTokenSecret = preferences.getString("accessTokenSecret",null);
-        if (accessTokenToken!=null && accessTokenSecret!=null) {
+        if (account!=null) {
         	Twitter twitterInstance = new TwitterFactory().getOAuthAuthorizedInstance(
         			TwitterConsumerToken.consumerKey,
         			TwitterConsumerToken.consumerSecret,
-        			new AccessToken(accessTokenToken, accessTokenSecret));
+        			new AccessToken(account.getAccessTokenKey(), account.getAccessTokenSecret()));
         	return twitterInstance;
         }
 
@@ -769,8 +765,8 @@ Log.d("FillUp","Return: " + i);
             else
                 throw new IllegalArgumentException("Picture provider " + provider + " unknown");
 
-            String accessTokenToken = preferences.getString("accessToken",null);
-            String accessTokenSecret = preferences.getString("accessTokenSecret",null);
+            String accessTokenToken = account.getAccessTokenKey();
+            String accessTokenSecret = account.getAccessTokenSecret();
 
             Properties props = new Properties();
             props.put(PropertyConfiguration.MEDIA_PROVIDER,mProvider);
