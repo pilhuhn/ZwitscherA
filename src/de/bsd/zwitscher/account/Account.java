@@ -18,30 +18,46 @@
  */
 package de.bsd.zwitscher.account;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * One server account
  *
  * @author Heiko W. Rupp
  */
-public class Account {
+public class Account implements Parcelable {
+    int id;
     String name;
     String accessTokenKey;
     String accessTokenSecret;
     String serverType;
     String serverUrl;
+    boolean defaultAccount;
 
-    public Account(String name, String accessTokenKey, String accessTokenSecret, String serverType, String serverUrl) {
+    public Account(int id, String name, String accessTokenKey, String accessTokenSecret, String serverUrl, String serverType,boolean defaultAccount) {
+        this.id = id;
         this.name = name;
         this.accessTokenKey = accessTokenKey;
         this.accessTokenSecret = accessTokenSecret;
         this.serverType = serverType;
         this.serverUrl = serverUrl;
+        this.defaultAccount = defaultAccount;
     }
 
-    public Account(String name, String serverType) {
-        this.name = name;
-        this.serverType = serverType;
+    public Account(Parcel parcel) {
+        id = parcel.readInt();
+        name = parcel.readString();
+        accessTokenKey = parcel.readString();
+        accessTokenSecret = parcel.readString();
+        serverType = parcel.readString();
+        serverUrl  = parcel.readString();
+        defaultAccount = parcel.readInt() == 1;
+
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getName() {
@@ -75,4 +91,30 @@ public class Account {
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
     }
+
+    public boolean isDefaultAccount() { return defaultAccount; }
+
+    public int describeContents() {
+        return 0;  // TODO: Customise this generated block
+    }
+
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
+        parcel.writeString(name);
+        parcel.writeString(accessTokenKey);
+        parcel.writeString(accessTokenSecret);
+        parcel.writeString(serverType);
+        parcel.writeString(serverUrl);
+        parcel.writeInt(defaultAccount ? 1 : 0);
+    }
+
+    public static Creator<Account> CREATOR = new Creator<Account>() {
+        public Account createFromParcel(Parcel parcel) {
+            return new Account(parcel);
+        }
+
+        public Account[] newArray(int size) {
+            return new Account[size];
+        }
+    };
 }

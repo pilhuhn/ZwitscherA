@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
 import de.bsd.zwitscher.helper.SpannableBuilder;
@@ -34,12 +35,12 @@ class TweetAdapter<T extends Tweet> extends ArrayAdapter<T> {
     boolean downloadImages;
 
 
-    public TweetAdapter(Context context, int textViewResourceId, List<T> objects) {
+    public TweetAdapter(Context context, Account account, int textViewResourceId, List<T> objects) {
         super(context, textViewResourceId, objects);
         extContext = context;
         items = objects;
         ph = new PicHelper();
-        th = new TwitterHelper(context);
+        th = new TwitterHelper(context, account);
         downloadImages = new NetworkHelper(context).mayDownloadImages();
 
     }

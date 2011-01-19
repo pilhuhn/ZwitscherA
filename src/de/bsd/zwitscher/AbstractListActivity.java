@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import de.bsd.zwitscher.account.Account;
 
 /**
  * Superclass for Tabs with list stuff
@@ -18,6 +19,7 @@ public abstract class AbstractListActivity extends ListActivity {
     TextView titleTextBox;
     TwitterHelper th;
     TweetDB tdb;
+    Account account;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,8 +31,10 @@ public abstract class AbstractListActivity extends ListActivity {
             titleTextBox = parent.titleTextBox;
         }
 
-        th = new TwitterHelper(this);
-        tdb = new TweetDB(this,0); // TODO set correct account
+        account = getIntent().getExtras().getParcelable("account"); // TODO what if the account chages?  would need nuke + rebuild
+
+        th = new TwitterHelper(this, account);
+        tdb = new TweetDB(this,account.getId());
 
     }
 
@@ -50,6 +54,7 @@ public abstract class AbstractListActivity extends ListActivity {
     @SuppressWarnings("unused")
     public void post(View v) {
         Intent i = new Intent(this, NewTweetActivity.class);
+        i.putExtra("account",account);
         startActivity(i);
     }
 

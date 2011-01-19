@@ -19,6 +19,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.*;
 import twitter4j.conf.Configuration;
@@ -33,15 +34,20 @@ import twitter4j.media.MediaProvider;
 
 public class TwitterHelper {
 
-
 	Context context;
     TweetDB tweetDB;
     Twitter twitter;
     int accountId;
+    Account account;
 
-    public TwitterHelper(Context context) {
+
+    public TwitterHelper(Context context, Account account) {
 		this.context = context;
-        accountId = 0; // TODO set real account
+        this.account = account;
+        if (account!=null)
+            accountId = account.getId();
+        else
+            accountId = -1; // default if no account selected.
         tweetDB = new TweetDB(context,accountId);
         twitter = getTwitter();
 	}
@@ -279,11 +285,13 @@ public class TwitterHelper {
 
     /**
      * Get an auth token the xAuth way. This only works if especially enabled by Twitter
-     * @param username
-     * @param password
-     * @throws Exception
+     *
+     * @param username Username to get the token for
+     * @param password password of that user and service
+     * @throws Exception If the server can not be reached or the credentials are not vaild
+     * @return id of the account
      */
-    public void generateAuthToken(String username, String password) throws Exception {
+    public Account generateAuthToken(String username, String password) throws Exception {
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setOAuthConsumerKey(TwitterConsumerToken.consumerKey);
         cb.setOAuthConsumerSecret(TwitterConsumerToken.consumerSecret);
@@ -292,11 +300,18 @@ public class TwitterHelper {
 //        twitterInstance.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
 
         AccessToken accessToken = twitterInstance.getOAuthAccessToken();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        Editor editor = preferences.edit();
-        editor.putString("accessToken", accessToken.getToken());
-        editor.putString("accessTokenSecret", accessToken.getTokenSecret());
-        editor.commit();
+//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+//        Editor editor = preferences.edit();
+//        editor.putString("accessToken", accessToken.getToken());
+//        editor.putString("accessTokenSecret", accessToken.getTokenSecret());
+//        editor.commit();
+
+        // TODO determine account id -- db sequence?
+        int newId = tweetDB.getNewAccountId();
+        Account account = new Account(newId,username,accessToken.getToken(),accessToken.getTokenSecret(),null,"twitter",true);
+        tweetDB.insertOrUpdateAccount(account);
+
+        return account;
 
     }
 

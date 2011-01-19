@@ -2,6 +2,7 @@ package de.bsd.zwitscher.account;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
 import de.bsd.zwitscher.R;
 
 
@@ -14,4 +15,9 @@ public class NewAccountActivity extends Activity {
 
 		setContentView(R.layout.new_account);
 	}
+
+
+    public void create(View v) {
+
+    }
 }

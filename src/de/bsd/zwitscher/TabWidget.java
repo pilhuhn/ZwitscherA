@@ -9,6 +9,9 @@ import android.os.AsyncTask;
 import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import de.bsd.zwitscher.account.Account;
+import de.bsd.zwitscher.account.NewAccountActivity;
+import de.bsd.zwitscher.account.SelectAccountActivity;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.SavedSearch;
 import twitter4j.UserList;
@@ -23,6 +26,10 @@ import android.view.MenuItem;
 import android.widget.TabHost;
 import twitter4j.json.DataObjectFactory;
 
+/**
+ * Activity that creates the Tab bar and starts the various
+ * activities on the tabs. Also hosts the main menu.
+ */
 public class TabWidget extends TabActivity {
 
     static final String LIST_ID = "list_id";
@@ -31,6 +38,7 @@ public class TabWidget extends TabActivity {
     ProgressBar pg;
     TextView titleTextBox;
     int accountId;
+    Account account;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +50,14 @@ public class TabWidget extends TabActivity {
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
 
-        accountId = 0; // TODO select correct account
+        account = getIntent().getExtras().getParcelable("account"); // TODO what if the account chages?  would need nuke + rebuild
+        accountId = account.getId();
 
 		Resources res = getResources();
 		tabHost = getTabHost();
 		Intent homeIntent = new Intent().setClass(this,TweetListActivity.class);
         homeIntent.putExtra(LIST_ID, 0);
+        homeIntent.putExtra("account",account);
 
         String tmp = getString(R.string.home_timeline);
         homeSpec = tabHost.newTabSpec("tmp")
@@ -57,6 +67,7 @@ public class TabWidget extends TabActivity {
 
 		Intent mentionsIntent = new Intent().setClass(this,TweetListActivity.class);
 		mentionsIntent.putExtra(LIST_ID, -1);
+        mentionsIntent.putExtra("account",account);
 
         tmp= getString(R.string.mentions);
 		homeSpec = tabHost.newTabSpec("mentions")
@@ -67,6 +78,7 @@ public class TabWidget extends TabActivity {
         tmp = getString(R.string.direct);
         Intent directIntent = new Intent().setClass(this,TweetListActivity.class);
         directIntent.putExtra(LIST_ID, -2);
+        directIntent.putExtra("account", account);
 		homeSpec = tabHost.newTabSpec("directs")
 				.setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_direct))
 				.setContent(directIntent);
@@ -75,6 +87,7 @@ public class TabWidget extends TabActivity {
         tmp = getString(R.string.list);
         Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
         listsIntent.putExtra("list",0);
+        listsIntent.putExtra("account",account);
         homeSpec = tabHost.newTabSpec("lists")
                 .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_list))
                 .setContent(listsIntent);
@@ -83,6 +96,7 @@ public class TabWidget extends TabActivity {
 
         Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
         searchIntent.putExtra("list",1);
+        searchIntent.putExtra("account",account);
         tmp = getString(R.string.searches);
         homeSpec = tabHost.newTabSpec("searches")
                 .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_search))
@@ -109,7 +123,7 @@ public class TabWidget extends TabActivity {
 	    // Handle item selection
 	    switch (item.getItemId()) {
 	    case R.id.preferences:
-	    	i = new Intent(TabWidget.this, Preferences.class);
+	    	i = new Intent(this, Preferences.class);
 			startActivity(i);
 			break;
 	    case R.id.reloadLists:
@@ -124,6 +138,14 @@ public class TabWidget extends TabActivity {
         case R.id.DevelCleanImages:
             cleanImages();
             break;
+        case R.id.DevelCreateAccount:
+            i = new Intent(this,NewAccountActivity.class);
+            startActivity(i);
+            break;
+        case R.id.DevelSwitchAccount:
+            i = new Intent(this, SelectAccountActivity.class);
+            // TODO
+            startActivity(i);
         case R.id.helpMenu:
             i = new Intent(TabWidget.this, HelpActivity.class);
             startActivity(i);
@@ -142,7 +164,7 @@ public class TabWidget extends TabActivity {
 	 * and on twitter.
 	 */
 	private void syncLists() {
-		TwitterHelper th = new TwitterHelper(getApplicationContext());
+		TwitterHelper th = new TwitterHelper(this, account);
         TweetDB tdb = new TweetDB(this,accountId);
 		List<UserList> userLists = th.getUserLists();
 		Map<String,Integer> storedLists = tdb.getLists();

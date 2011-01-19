@@ -7,11 +7,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import de.bsd.zwitscher.account.Account;
 import twitter4j.Status;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class ThreadListActivity extends ListActivity {
     TextView titleTextBox;
     Context thisActivity;
     List<Status> statuses;
-
+    private Account account;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,6 +53,7 @@ public class ThreadListActivity extends ListActivity {
 
         // Pull the start id ( = id of the calling s
         Intent i = getIntent();
+        account = i.getParcelableExtra("account");
         Bundle b = i.getExtras();
         long startId = 0;
         if (b!=null)
@@ -72,7 +73,7 @@ public class ThreadListActivity extends ListActivity {
 
         List<Status> result = new ArrayList<Status>();
 
-        TwitterHelper th = new TwitterHelper(this);
+        TwitterHelper th = new TwitterHelper(this, account);
 
         Status status = th.getStatusById(statusId,null, false, true) ;
         while (status!=null) {
@@ -106,6 +107,7 @@ public class ThreadListActivity extends ListActivity {
 
         if (statuses!=null) {
             Intent i = new Intent(this,OneTweetActivity.class);
+            i.putExtra("account",account);
             i.putExtra(getString(R.string.status), statuses.get(position));
             startActivity(i);
         }
@@ -136,6 +138,7 @@ public class ThreadListActivity extends ListActivity {
     @SuppressWarnings("unused")
     public void post(View v) {
         Intent i = new Intent(this, NewTweetActivity.class);
+        i.putExtra("account",account);
         startActivity(i);
     }
 
@@ -165,7 +168,7 @@ public class ThreadListActivity extends ListActivity {
             pg.setVisibility(ProgressBar.INVISIBLE);
             titleTextBox.setText("");
 
-            setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, R.layout.tweet_list_item, statusList));
+            setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, account, R.layout.tweet_list_item, statusList));
             statuses = statusList;
 
             ListView lv = getListView();

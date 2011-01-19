@@ -21,6 +21,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.GeoLocation;
 import twitter4j.Status;
@@ -42,6 +43,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
     TextView charCountView;
     String picturePath;
     LocationManager locationManager;
+    private Account account;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +54,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         charCountView = (TextView) findViewById(R.id.CharCount);
+        account = getIntent().getExtras().getParcelable("account");
 
 
         final Button tweetButton = (Button) findViewById(R.id.TweetButton);
@@ -240,7 +243,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
         UpdateRequest request = new UpdateRequest(UpdateType.UPDATE);
         request.statusUpdate = update;
         request.picturePath = picturePath;
-        new UpdateStatusTask(this,pg).execute(request);
+        new UpdateStatusTask(this,pg, account).execute(request);
 	}
 
     /**
@@ -252,7 +255,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
         UpdateRequest request = new UpdateRequest(UpdateType.DIRECT);
         request.message = msg;
         request.id = toUser.getId();
-        new UpdateStatusTask(this,pg).execute(request);
+        new UpdateStatusTask(this,pg, account).execute(request);
     }
 
     /**
@@ -263,7 +266,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
     @SuppressWarnings("unused")
     public void selectUser(View v) {
 
-        TwitterHelper th = new TwitterHelper(this);
+        TwitterHelper th = new TwitterHelper(this, account);
         List<User> users = th.getUsersFromDb();
         List<String> data = new ArrayList<String>(users.size());
 
@@ -325,7 +328,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
             req.picturePath = picturePath;
             req.view = edittext;
 
-            new UpdateStatusTask(this,pg).execute(req);
+            new UpdateStatusTask(this,pg, account).execute(req);
         } else if (requestCode==2 && resultCode==RESULT_OK) {
             String item = (String) data.getExtras().get("data");
             if (item.contains(", ")) {

@@ -122,11 +122,13 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
         if (statuses!=null) {
          Intent i = new Intent(this,OneTweetActivity.class);
+         i.putExtra("account",account);
          i.putExtra(getString(R.string.status), statuses.get(position));
          startActivity(i);
         }
         else if (directs!=null) {
            Intent i = new Intent(this, NewTweetActivity.class);
+           i.putExtra("account",account);
            i.putExtra("user",directs.get(position).getSender());
            i.putExtra("op",getString(R.string.direct));
            startActivity(i);
@@ -148,6 +150,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             int position, long id) {
         Log.i("TLA","Long click, pos=" + position + ",id="+id);
         Intent i = new Intent(this, NewTweetActivity.class);
+        i.putExtra("account",account);
         if (statuses!=null) {
            i.putExtra(getString(R.string.status), statuses.get(position));
            i.putExtra("op",getString(R.string.reply));
@@ -418,9 +421,9 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 		@Override
 		protected void onPostExecute(MetaList result) {
             if (list_id<-2)
-	            setListAdapter(new TweetAdapter(context, R.layout.tweet_list_item, result.getList()));
+	            setListAdapter(new TweetAdapter(context, account, R.layout.tweet_list_item, result.getList()));
             else
-	            setListAdapter(new StatusAdapter(context, R.layout.tweet_list_item, result.getList()));
+	            setListAdapter(new StatusAdapter(context, account, R.layout.tweet_list_item, result.getList()));
 
             if (result.getList().size()==0) {
                 Toast.makeText(context,"Got no result from the server",Toast.LENGTH_LONG).show();

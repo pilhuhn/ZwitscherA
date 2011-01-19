@@ -23,7 +23,7 @@ import de.bsd.zwitscher.account.Account;
 public class TweetDB {
 
     private static final String TABLE_ACCOUNTS = "accounts";
-    private static final String TABLE_STATUSES = "statuses";
+    public static final String TABLE_STATUSES = "statuses";
     private static final String TABLE_LAST_READ = "lastRead";
     private static final String TABLE_LISTS = "lists";
     private static final String TABLE_USERS = "users";
@@ -99,14 +99,14 @@ public class TweetDB {
             );
 
             db.execSQL(CREATE_TABLE + TABLE_ACCOUNTS + " (" +
-                    "name TEXT, " + // 0
-                    "tokenKey TEXT, "+ // 1
-                    "tokenSecret TEXT, "+ // 2
-                    "serverUrl TEXT, " + // 3
-                    "serverType TEXT, " +
-                    "id LONG, " +
-                    "isDefault INTEGER, " +
-                    "UNIQUE (name, serverUrl )" // 4
+                    "id INTEGER, " + // 0
+                    "name TEXT, " + // 1
+                    "tokenKey TEXT, "+ // 2
+                    "tokenSecret TEXT, "+ // 3
+                    "serverUrl TEXT, " + // 4
+                    "serverType TEXT, " + // 5
+                    "default INTEGER, " + // 6
+                    "UNIQUE (name, serverUrl )" // TODO add index in default
             );
 
             db.execSQL(CREATE_TABLE + TABLE_SEARCHES + " ("+
@@ -518,12 +518,15 @@ public class TweetDB {
         c = db.query(TABLE_ACCOUNTS,null,"name = ? AND serverType = ?", new String[]{name,type},null,null,null);
         if (c.getColumnCount()>0) {
             c.moveToFirst();
+            boolean isDefault = c.getInt(6) == 1;
             account = new Account(
-                    name,
-                    c.getString(1),
-                    c.getString(2),
-                    type,
-                    c.getString(4)
+                    c.getInt(0), // id
+                    name, // name
+                    c.getString(2), // token key
+                    c.getString(3), // token secret
+                    c.getString(4), // url
+                    type, // type /5)
+                    isDefault // 6
             );
         }
         c.close();
@@ -531,25 +534,42 @@ public class TweetDB {
         return account;
     }
 
-    public Account getDefaultAccount(String type) { // TODO type enough?
+    public Account getDefaultAccount(){
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         Account account=null;
-        c = db.query(TABLE_ACCOUNTS,null,"serverType = ? AND isDefault=1", new String[]{type},null,null,null);
+        c = db.query(TABLE_ACCOUNTS,null,"default=1", null,null,null,null);
         if (c.getColumnCount()>0) {
             c.moveToFirst();
+            boolean isDefault = c.getInt(6) == 1;
             account = new Account(
-                    c.getString(0),
-                    c.getString(1),
-                    c.getString(2),
-                    type,
-                    c.getString(4)
+                    c.getInt(0), // id
+                    c.getString(1), // name
+                    c.getString(2), // token key
+                    c.getString(3), // token secret
+                    c.getString(4), // url
+                    c.getString(5), // type /5)
+                    isDefault // 6
             );
         }
         c.close();
         db.close();
         return account;
 
+    }
+
+    public int getNewAccountId() {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        Cursor c;
+        int ret = 1;
+        c = db.query(TABLE_ACCOUNTS,new String[]{"id"},null, null,null,null,"id desc","1");
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            ret = c.getInt(0);
+        }
+        c.close();
+        db.close();
+        return ret;
     }
 
     public void deleteAccount(Account account) {
@@ -559,18 +579,17 @@ public class TweetDB {
     }
 
     public void insertOrUpdateAccount(Account account) {
-        ContentValues cv = new ContentValues(5);
+        ContentValues cv = new ContentValues(7);
+        cv.put("id",account.getId());
         cv.put("name",account.getName());
         cv.put("tokenKey",account.getAccessTokenKey());
         cv.put("tokenSecret",account.getAccessTokenSecret());
         cv.put("serverUrl",account.getServerUrl());
         cv.put("serverType",account.getServerType());
+        cv.put("default",account.isDefaultAccount() ? 1 : 0);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        if (getAccount(account.getName(),account.getServerType())==null)
-            db.insert(TABLE_ACCOUNTS, null, cv);
-        else
-            db.update(TABLE_ACCOUNTS,cv,"name = ? AND serverType = ?",new String[]{account.getName(),account.getServerType()});
+        db.insertWithOnConflict(TABLE_ACCOUNTS, null, cv,SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
 
     }
