@@ -105,8 +105,9 @@ public class TweetDB {
                     "tokenSecret TEXT, "+ // 3
                     "serverUrl TEXT, " + // 4
                     "serverType TEXT, " + // 5
-                    "default INTEGER, " + // 6
-                    "UNIQUE (name, serverUrl )" // TODO add index in default
+                    "isDefault INTEGER, " + // 6
+                    "UNIQUE (name, serverUrl ) " +// TODO add index in default
+                ")"
             );
 
             db.execSQL(CREATE_TABLE + TABLE_SEARCHES + " ("+
@@ -538,8 +539,8 @@ public class TweetDB {
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         Account account=null;
-        c = db.query(TABLE_ACCOUNTS,null,"default=1", null,null,null,null);
-        if (c.getColumnCount()>0) {
+        c = db.query(TABLE_ACCOUNTS,null,"isDefault=1", null,null,null,null);
+        if (c.getCount()>0) {
             c.moveToFirst();
             boolean isDefault = c.getInt(6) == 1;
             account = new Account(
@@ -557,6 +558,57 @@ public class TweetDB {
         return account;
 
     }
+
+    /**
+     * Sets the account with the passed id as default.
+     * This is two steps: set others to non default,
+     * set the new default one
+     * @param id Primary key of the account.
+     */
+    public void setDefaultAccount(int id) {
+        if (id==-1)
+            throw new IllegalStateException("Account id must not be -1");
+
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        // First see if the id exists
+        Cursor c;
+        c= db.query(TABLE_ACCOUNTS,new String[]{"id"},"where id = " +id , null, null,null,null);
+        if (c.getCount()!=-1) {
+            throw new IllegalStateException("Account with id " + id + " not found");
+        }
+        c.close();
+        db.execSQL("UPDATE " + TABLE_ACCOUNTS + "SET isDefault = 0 WHERE isDefault = 1");
+        db.execSQL("UPDATE " + TABLE_ACCOUNTS + "SET isDefault = 1 WHERE id = " + id);
+        db.close();
+    }
+
+
+    public List<Account> getAccountsForSelection() {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        Cursor c;
+        Account account=null;
+        List<Account> accounts = new ArrayList<Account>();
+        c = db.query(TABLE_ACCOUNTS,null, null,null,null,null,null);
+        if (c.getColumnCount()>0) {
+            c.moveToFirst();
+            boolean isDefault = c.getInt(6) == 1;
+            account = new Account(
+                    c.getInt(0), // id
+                    c.getString(1), // name
+                    c.getString(2), // token key
+                    c.getString(3), // token secret
+                    c.getString(4), // url
+                    c.getString(5), // type /5)
+                    isDefault // 6
+            );
+            accounts.add(account);
+        }
+        c.close();
+        db.close();
+
+        return accounts;
+    }
+
 
     public int getNewAccountId() {
         SQLiteDatabase db = tdHelper.getReadableDatabase();
@@ -584,12 +636,12 @@ public class TweetDB {
         cv.put("name",account.getName());
         cv.put("tokenKey",account.getAccessTokenKey());
         cv.put("tokenSecret",account.getAccessTokenSecret());
-        cv.put("serverUrl",account.getServerUrl());
-        cv.put("serverType",account.getServerType());
+        cv.put("serverUrl", account.getServerUrl());
+        cv.put("serverType", account.getServerType());
         cv.put("default",account.isDefaultAccount() ? 1 : 0);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.insertWithOnConflict(TABLE_ACCOUNTS, null, cv,SQLiteDatabase.CONFLICT_REPLACE);
+        db.insertWithOnConflict(TABLE_ACCOUNTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
 
     }
