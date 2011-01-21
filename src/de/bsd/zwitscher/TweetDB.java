@@ -638,7 +638,7 @@ public class TweetDB {
         cv.put("tokenSecret",account.getAccessTokenSecret());
         cv.put("serverUrl", account.getServerUrl());
         cv.put("serverType", account.getServerType());
-        cv.put("default",account.isDefaultAccount() ? 1 : 0);
+        cv.put("isDefault",account.isDefaultAccount() ? 1 : 0);
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.insertWithOnConflict(TABLE_ACCOUNTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
