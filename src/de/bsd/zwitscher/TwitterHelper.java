@@ -283,16 +283,30 @@ public class TwitterHelper {
      * Get an auth token the xAuth way. This only works if especially enabled by Twitter
      *
      *
+     *
      * @param username Username to get the token for
      * @param password password of that user and service
-     * @param makeDefault
-     * @throws Exception If the server can not be reached or the credentials are not vaild
+     * @param service
+     *@param makeDefault  @throws Exception If the server can not be reached or the credentials are not vaild
      * @return id of the account
      */
-    public Account generateAuthToken(String username, String password, boolean makeDefault) throws Exception {
+    public Account generateAuthToken(String username, String password, String service, boolean makeDefault) throws Exception {
         ConfigurationBuilder cb = new ConfigurationBuilder();
-        cb.setOAuthConsumerKey(TwitterConsumerToken.consumerKey);
-        cb.setOAuthConsumerSecret(TwitterConsumerToken.consumerSecret);
+        if (service.equalsIgnoreCase("twitter")) {
+            cb.setOAuthConsumerKey(TwitterConsumerToken.consumerKey);
+            cb.setOAuthConsumerSecret(TwitterConsumerToken.consumerSecret);
+        }
+        else if (service.equalsIgnoreCase("identi.ca")) {
+            cb.setOAuthConsumerKey(StatusNetConsumerToken.consumerKey);
+            cb.setOAuthConsumerSecret(StatusNetConsumerToken.consumerSecret);
+            cb.setRestBaseURL("http://identi.ca/api");
+            cb.setSearchBaseURL("http://identi.ca/api");
+            cb.setOAuthAccessTokenURL("https://identi.ca/api/oauth/access_token");
+//            cb.setOAuthAuthenticationURL();
+            cb.setOAuthAuthorizationURL("https://identi.ca/api/oauth/authorize");
+            cb.setOAuthRequestTokenURL("https://identi.ca/api/oauth/request_token");
+        }
+
         Configuration conf = cb.build() ;
         Twitter twitterInstance = new TwitterFactory(conf).getInstance(username,password);
 //        twitterInstance.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);

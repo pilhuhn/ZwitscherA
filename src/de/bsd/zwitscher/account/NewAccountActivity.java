@@ -32,12 +32,14 @@ public class NewAccountActivity extends Activity {
 
         String username = usernameView.getText().toString();
         String password = passwordView.getText().toString();
+        String service = serviceSpinner.getSelectedItem().toString();
+
         boolean shouldSwitch = switchBox.isChecked();
 
         TwitterHelper th = new TwitterHelper(this,null);
         try {
             // Try to generate a token and insert it.
-            Account newAccount = th.generateAuthToken(username,password, shouldSwitch);
+            Account newAccount = th.generateAuthToken(username,password, service, shouldSwitch);
 
             Intent intent = new Intent(this, TabWidget.class);
             intent.putExtra("account",newAccount);
