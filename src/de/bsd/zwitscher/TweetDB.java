@@ -517,7 +517,7 @@ public class TweetDB {
         Cursor c;
         Account account=null;
         c = db.query(TABLE_ACCOUNTS,null,"name = ? AND serverType = ?", new String[]{name,type},null,null,null);
-        if (c.getColumnCount()>0) {
+        if (c.getCount()>0) {
             c.moveToFirst();
             boolean isDefault = c.getInt(6) == 1;
             account = new Account(
@@ -589,7 +589,7 @@ public class TweetDB {
         Account account=null;
         List<Account> accounts = new ArrayList<Account>();
         c = db.query(TABLE_ACCOUNTS,null, null,null,null,null,null);
-        if (c.getColumnCount()>0) {
+        if (c.getCount()>0) {
             c.moveToFirst();
             boolean isDefault = c.getInt(6) == 1;
             account = new Account(
