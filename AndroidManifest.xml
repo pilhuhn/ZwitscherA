@@ -39,12 +39,18 @@
 
         <activity android:name="Preferences" android:label="Preferences"/>
 
-	    <activity android:name="LoginActivity">
+        <activity android:name=".account.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-    	</activity>
+        </activity>
+
+        <activity android:name=".account.NewAccountActivity"/>
+        <activity android:name=".account.SelectAccountActivity"/>
+
+        <activity android:name="Preferences" android:label="Preferences"/>
+
 
         <activity android:name=".ThreadListActivity"/>
         <activity android:name=".UserDetailActivity"/>

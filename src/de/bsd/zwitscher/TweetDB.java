@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import de.bsd.zwitscher.account.Account;
 
 /**
  * This class is interfacing with the SQLite3 database on the
@@ -21,6 +22,7 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
  */
 public class TweetDB {
 
+    private static final String TABLE_ACCOUNTS = "accounts";
     public static final String TABLE_STATUSES = "statuses";
     private static final String TABLE_LAST_READ = "lastRead";
     private static final String TABLE_LISTS = "lists";
@@ -34,7 +36,7 @@ public class TweetDB {
     private final String account;
 
 	public TweetDB(Context context, int accountId) {
-		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 3);
+		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 4);
         account = String.valueOf(accountId);
 
 	}
@@ -95,6 +97,20 @@ public class TweetDB {
                     "UNIQUE (USERID, " + ACCOUNT_ID + ")" +
                 ")"
             );
+
+            db.execSQL(CREATE_TABLE + TABLE_ACCOUNTS + " (" +
+                    "id INTEGER, " + // 0
+                    "name TEXT, " + // 1
+                    "tokenKey TEXT, "+ // 2
+                    "tokenSecret TEXT, "+ // 3
+                    "serverUrl TEXT, " + // 4
+                    "serverType TEXT, " + // 5
+                    "isDefault INTEGER, " + // 6
+                    "UNIQUE (id)" + //
+                    "UNIQUE (name, serverUrl ) " +// TODO add index in default
+                ")"
+            );
+
             db.execSQL(CREATE_TABLE + TABLE_SEARCHES + " ("+
                     "name STRING, "+
                     "id LONG, " +
@@ -497,6 +513,142 @@ public class TweetDB {
         db.close();
     }
 
+    public Account getAccount(String name,String type) {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        Cursor c;
+        Account account=null;
+        c = db.query(TABLE_ACCOUNTS,null,"name = ? AND serverType = ?", new String[]{name,type},null,null,null);
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            boolean isDefault = c.getInt(6) == 1;
+            account = new Account(
+                    c.getInt(0), // id
+                    name, // name
+                    c.getString(2), // token key
+                    c.getString(3), // token secret
+                    c.getString(4), // url
+                    type, // type /5)
+                    isDefault // 6
+            );
+        }
+        c.close();
+        db.close();
+        return account;
+    }
+
+    public Account getDefaultAccount(){
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        Cursor c;
+        Account account=null;
+        c = db.query(TABLE_ACCOUNTS,null,"isDefault=1", null,null,null,null);
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            boolean isDefault = c.getInt(6) == 1;
+            account = new Account(
+                    c.getInt(0), // id
+                    c.getString(1), // name
+                    c.getString(2), // token key
+                    c.getString(3), // token secret
+                    c.getString(4), // url
+                    c.getString(5), // type /5)
+                    isDefault // 6
+            );
+        }
+        c.close();
+        db.close();
+        return account;
+
+    }
+
+    /**
+     * Sets the account with the passed id as default.
+     * This is two steps: set others to non default,
+     * set the new default one
+     * @param id Primary key of the account.
+     */
+    public void setDefaultAccount(int id) {
+        if (id==-1)
+            throw new IllegalStateException("Account id must not be -1");
+
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        // First see if the id exists
+        Cursor c;
+        c= db.query(TABLE_ACCOUNTS,new String[]{"id"},"id = " +id , null, null,null,null);
+        if (c.getCount()< 1) {
+            throw new IllegalStateException("Account with id " + id + " not found");
+        }
+        c.close();
+        db.execSQL("UPDATE " + TABLE_ACCOUNTS + " SET isDefault = 0 WHERE isDefault = 1");
+        db.execSQL("UPDATE " + TABLE_ACCOUNTS + " SET isDefault = 1 WHERE id = " + id);
+        db.close();
+    }
+
+
+    public List<Account> getAccountsForSelection() {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        Cursor c;
+        Account account=null;
+        List<Account> accounts = new ArrayList<Account>();
+        c = db.query(TABLE_ACCOUNTS,null, null,null,null,null,null);
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            do {
+                boolean isDefault = c.getInt(6) == 1;
+                account = new Account(
+                        c.getInt(0), // id
+                        c.getString(1), // name
+                        c.getString(2), // token key
+                        c.getString(3), // token secret
+                        c.getString(4), // url
+                        c.getString(5), // type /5)
+                        isDefault // 6
+                );
+                accounts.add(account);
+            } while (c.moveToNext());
+        }
+        c.close();
+        db.close();
+
+        return accounts;
+    }
+
+
+    public int getNewAccountId() {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        Cursor c;
+        int ret = 1;
+        c = db.query(TABLE_ACCOUNTS,new String[]{"id"},null, null,null,null,"id desc","1");
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            ret = c.getInt(0);
+            ret++;
+        }
+        c.close();
+        db.close();
+        return ret;
+    }
+
+    public void deleteAccount(Account account) {
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.delete(TABLE_ACCOUNTS,"name = ? AND type = ? ", new String[]{account.getName(),account.getServerType()});
+        db.close();
+    }
+
+    public void insertOrUpdateAccount(Account account) {
+        ContentValues cv = new ContentValues(7);
+        cv.put("id",account.getId());
+        cv.put("name",account.getName());
+        cv.put("tokenKey",account.getAccessTokenKey());
+        cv.put("tokenSecret",account.getAccessTokenSecret());
+        cv.put("serverUrl", account.getServerUrl());
+        cv.put("serverType", account.getServerType());
+        cv.put("isDefault",account.isDefaultAccount() ? 1 : 0);
+
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.insertWithOnConflict(TABLE_ACCOUNTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+        db.close();
+
+    }
 
     /**
      * Insert Lists of ContentValues into the DB table <i>table</i>.
@@ -599,6 +751,5 @@ public class TweetDB {
         db.delete(TABLE_SEARCHES,ACCOUNT_ID_IS + " AND id = ?",new String[]{account,String.valueOf(id)});
         db.close();
     }
-
 
 }

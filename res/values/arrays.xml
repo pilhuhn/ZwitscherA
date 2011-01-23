@@ -35,5 +35,6 @@
     </string-array>
     <string-array name="services">
         <item>Twitter</item>
+        <item>Laconi.ca</item>
     </string-array>
 </resources>

@@ -1,4 +1,4 @@
-package de.bsd.zwitscher;
+package de.bsd.zwitscher.account;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,13 +10,22 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+import de.bsd.zwitscher.R;
+import de.bsd.zwitscher.TabWidget;
+import de.bsd.zwitscher.TweetDB;
+import de.bsd.zwitscher.TwitterConsumerToken;
+import de.bsd.zwitscher.TwitterHelper;
 
 
 public class LoginActivity extends Activity {
 
+    TweetDB tweetDB;
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        tweetDB = new TweetDB(this,-1); // -1 is no valid account. But does not matter for the moment.
 	}
 
     /**
@@ -27,16 +36,22 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        String accessTokenToken = preferences.getString("accessToken",null);
-        String accessTokenSecret = preferences.getString("accessTokenSecret",null);
-        if (accessTokenToken!=null && accessTokenSecret!=null) {
-            proceed();
-        	return;
+        Account account = tweetDB.getDefaultAccount();
+        if (account!=null) {
+            proceed(account);
         }
 
-        if (TwitterConsumerToken.xAuthEnabled) {
+//		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//
+//        String accessTokenToken = preferences.getString("accessToken",null);
+//        String accessTokenSecret = preferences.getString("accessTokenSecret",null);
+//        if (accessTokenToken!=null && accessTokenSecret!=null) {
+//            proceed();
+//        	return;
+//        }
+
+        if (TwitterConsumerToken.xAuthEnabled) {  // TODO what about laconica etc? -> 2 step 1st type 2nd user/pass
             setContentView(R.layout.login_layout_classic);
         }
         else {
@@ -53,7 +68,7 @@ public class LoginActivity extends Activity {
     public void getPinButton(View v) {
         Intent i = new Intent(Intent.ACTION_VIEW);
 
-        TwitterHelper th = new TwitterHelper(getApplicationContext());
+        TwitterHelper th = new TwitterHelper(this, null);
         String authUrl;
         try {
             authUrl = th.getAuthUrl();
@@ -77,7 +92,7 @@ public class LoginActivity extends Activity {
         if (pinField!=null) {
             if (pinField.getText()!=null && pinField.getText().toString()!= null) {
                 String pin2 = pinField.getText().toString();
-                TwitterHelper th = new TwitterHelper(getApplicationContext());
+                TwitterHelper th = new TwitterHelper(this, null); // pass a null account, which is uninitialized
                 try {
                     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
@@ -88,7 +103,7 @@ public class LoginActivity extends Activity {
 
 
                     // Now lets start
-                    proceed();
+                    proceed(null); // TODO
 
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), "Error: " + e.getMessage() , 15000).show();
@@ -111,10 +126,10 @@ public class LoginActivity extends Activity {
         EditText passwordText = (EditText) findViewById(R.id.login_password);
         String password = passwordText.getText().toString();
 
-        TwitterHelper th = new TwitterHelper(this);
+        TwitterHelper th = new TwitterHelper(this, null); // pass a null account, which is uninitialized
         try {
-            th.generateAuthToken(user,password);
-            proceed();
+            Account account = th.generateAuthToken(user,password, true);
+            proceed(account);
             finish();
 
         } catch (Exception e) {
@@ -127,8 +142,9 @@ public class LoginActivity extends Activity {
     /**
      * Call the TabWidget activity that does the work.
      */
-    private void proceed() {
+    private void proceed(Account account) {
         Intent i = new Intent().setClass(this,TabWidget.class);
+        i.putExtra("account",account);
         startActivity(i);
     }
 

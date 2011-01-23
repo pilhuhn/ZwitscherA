@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+  <TextView
+  	android:id="@+id/AccountSelectionTitle"
+  	android:layout_width="wrap_content"
+  	android:layout_height="wrap_content"
+  	android:text="Please select the account"
+  	/>
+  	<!--
+
+  <ListView
+  	android:id="@+id/AccountListView"
+  	android:layout_height="wrap_content"
+  	android:layout_width="wrap_content"
+  	/>
+
+  -->
+
+  <Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+        android:onClick="showAccounts"
+        android:text="Pick account"
+    />
+
+  <Button
+    android:id="@+id/NewAccountButton"
+    android:text="Add account"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:onClick="newAccount"
+    />
+
+</LinearLayout>

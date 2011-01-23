@@ -7,9 +7,13 @@ import java.util.Map.Entry;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import de.bsd.zwitscher.account.Account;
+import de.bsd.zwitscher.account.NewAccountActivity;
+import de.bsd.zwitscher.account.SelectAccountActivity;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.SavedSearch;
 import twitter4j.UserList;
@@ -24,6 +28,10 @@ import android.view.MenuItem;
 import android.widget.TabHost;
 import twitter4j.json.DataObjectFactory;
 
+/**
+ * Activity that creates the Tab bar and starts the various
+ * activities on the tabs. Also hosts the main menu.
+ */
 public class TabWidget extends TabActivity {
 
     static final String LIST_ID = "list_id";
@@ -33,10 +41,13 @@ public class TabWidget extends TabActivity {
     TextView titleTextBox;
     ComponentName sComponentName;
     int accountId;
+    Account account;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+        Log.i("TabWidget","onCreate");
 
         Intent serviceIntent = new Intent().setClass(this,TweetFetchService.class);
         sComponentName = startService(serviceIntent);
@@ -47,61 +58,83 @@ public class TabWidget extends TabActivity {
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
 
-        accountId = 0; // TODO select correct account
+        account = getIntent().getExtras().getParcelable("account");
+        accountId = account.getId();
+        Log.i("TabWidget","Account=" + account);
 
-		Resources res = getResources();
-		tabHost = getTabHost();
-		Intent homeIntent = new Intent().setClass(this,TweetListActivity.class);
-        homeIntent.putExtra(LIST_ID, 0);
-
-        String tmp = getString(R.string.home_timeline);
-        homeSpec = tabHost.newTabSpec("tmp")
-				.setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_home))
-				.setContent(homeIntent);
-		tabHost.addTab(homeSpec);
-
-		Intent mentionsIntent = new Intent().setClass(this,TweetListActivity.class);
-		mentionsIntent.putExtra(LIST_ID, -1);
-
-        tmp= getString(R.string.mentions);
-		homeSpec = tabHost.newTabSpec("mentions")
-				.setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_mention))
-				.setContent(mentionsIntent);
-		tabHost.addTab(homeSpec);
-
-        tmp = getString(R.string.direct);
-        Intent directIntent = new Intent().setClass(this,TweetListActivity.class);
-        directIntent.putExtra(LIST_ID, -2);
-		homeSpec = tabHost.newTabSpec("directs")
-				.setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_direct))
-				.setContent(directIntent);
-		tabHost.addTab(homeSpec);
-
-        tmp = getString(R.string.list);
-        Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
-        listsIntent.putExtra("list",0);
-        homeSpec = tabHost.newTabSpec("lists")
-                .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_list))
-                .setContent(listsIntent);
-        tabHost.addTab(homeSpec);
-
-
-        Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
-        searchIntent.putExtra("list",1);
-        tmp = getString(R.string.searches);
-        homeSpec = tabHost.newTabSpec("searches")
-                .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_search))
-                .setContent(searchIntent);
-        tabHost.addTab(homeSpec);
+        setupTabs();
 
 		tabHost.setCurrentTab(0); // Home tab, tabs start at 0
 
         new InitialSyncTask(this).execute(accountId);
 	}
 
+    protected void onResume() {
+        super.onResume();
 
+        Log.i("TabWidget","onResume");
+        Account tmp = getIntent().getExtras().getParcelable("account");
+        if (!tmp.equals(account)) {
+            // New account, so re-setup tabs
+            tabHost.clearAllTabs();
+            account = tmp;
+            setupTabs();
+        }
+        Log.i("TabWidget","Account=" + account);
+    }
 
-	@Override
+    private void setupTabs() {
+        Resources res = getResources();
+        tabHost = getTabHost();
+        Intent homeIntent = new Intent().setClass(this,TweetListActivity.class);
+        homeIntent.putExtra(LIST_ID, 0);
+        homeIntent.putExtra("account",account);
+
+        String tmp = getString(R.string.home_timeline);
+        homeSpec = tabHost.newTabSpec("tmp")
+				.setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_home))
+				.setContent(homeIntent);
+        tabHost.addTab(homeSpec);
+
+        Intent mentionsIntent = new Intent().setClass(this,TweetListActivity.class);
+        mentionsIntent.putExtra(LIST_ID, -1);
+        mentionsIntent.putExtra("account",account);
+
+        tmp= getString(R.string.mentions);
+        homeSpec = tabHost.newTabSpec("mentions")
+                .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_mention))
+                .setContent(mentionsIntent);
+        tabHost.addTab(homeSpec);
+
+        tmp = getString(R.string.direct);
+        Intent directIntent = new Intent().setClass(this,TweetListActivity.class);
+        directIntent.putExtra(LIST_ID, -2);
+        directIntent.putExtra("account", account);
+        homeSpec = tabHost.newTabSpec("directs")
+                .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_direct))
+                .setContent(directIntent);
+        tabHost.addTab(homeSpec);
+
+        tmp = getString(R.string.list);
+        Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
+        listsIntent.putExtra("list",0);
+        listsIntent.putExtra("account",account);
+        homeSpec = tabHost.newTabSpec("lists")
+                .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_list))
+                .setContent(listsIntent);
+        tabHost.addTab(homeSpec);
+
+        Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
+        searchIntent.putExtra("list",1);
+        searchIntent.putExtra("account",account);
+        tmp = getString(R.string.searches);
+        homeSpec = tabHost.newTabSpec("searches")
+                .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_search))
+                .setContent(searchIntent);
+        tabHost.addTab(homeSpec);
+    }
+
+    @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		 MenuInflater inflater = getMenuInflater();
 		    inflater.inflate(R.menu.main_menu, menu);
@@ -114,7 +147,7 @@ public class TabWidget extends TabActivity {
 	    // Handle item selection
 	    switch (item.getItemId()) {
 	    case R.id.preferences:
-	    	i = new Intent(TabWidget.this, Preferences.class);
+	    	i = new Intent(this, Preferences.class);
 			startActivity(i);
 			break;
 	    case R.id.reloadLists:
@@ -132,6 +165,14 @@ public class TabWidget extends TabActivity {
         case R.id.DevelStopServices:
             Intent serviceIntent = new Intent().setClass(this,TweetFetchService.class);
             stopService(serviceIntent);
+        case R.id.DevelCreateAccount:
+            i = new Intent(this,NewAccountActivity.class);
+            startActivity(i);
+            break;
+        case R.id.DevelSwitchAccount:
+            i = new Intent(this, SelectAccountActivity.class);
+            // TODO
+            startActivity(i);
             break;
         case R.id.helpMenu:
             i = new Intent(TabWidget.this, HelpActivity.class);
@@ -148,7 +189,7 @@ public class TabWidget extends TabActivity {
 	 * and on twitter.
 	 */
 	private void syncLists() {
-		TwitterHelper th = new TwitterHelper(getApplicationContext());
+		TwitterHelper th = new TwitterHelper(this, account);
         TweetDB tdb = new TweetDB(this,accountId);
 		List<UserList> userLists = th.getUserLists();
 		Map<String,Integer> storedLists = tdb.getLists();

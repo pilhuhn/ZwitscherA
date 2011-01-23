@@ -22,6 +22,10 @@
                     />
             <item android:id="@+id/DevelStopServices"
                   android:title="Stop Services"/>
+            <item android:id="@+id/DevelCreateAccount"
+                  android:title="Create Account"/>
+            <item android:id="@+id/DevelSwitchAccount"
+                  android:title="Switch Account"/>
         </menu>
     </item>
 </menu>

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="accountTypes">
+        <item>Twitter</item>
+        <item>laconi.ca</item>
+        <item>status.net</item>
+    </string-array>
+
     <string name="status">status</string>
     <string name="reply">reply</string>
     <string name="replyall">replyAll</string>

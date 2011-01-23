@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.User;
@@ -46,6 +47,7 @@ public class UserDetailActivity extends Activity  {
     Button followButton ;
     private String userName;
     private int userId;
+    private Account account;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,8 +71,8 @@ public class UserDetailActivity extends Activity  {
 
     public void onResume() {
         super.onResume();
-
-        thTwitterHelper = new TwitterHelper(this);
+        account = getIntent().getExtras().getParcelable("account");
+        thTwitterHelper = new TwitterHelper(this, account);
         userId = bundle.getInt("userId");
         userName = bundle.getString("userName");
 
@@ -206,6 +208,7 @@ public class UserDetailActivity extends Activity  {
        Intent i = new Intent(this, NewTweetActivity.class);
        i.putExtra("user",theUser);
        i.putExtra("op", getString(R.string.direct));
+       i.putExtra("account",account);
        startActivity(i);
 
     }
@@ -247,6 +250,7 @@ public class UserDetailActivity extends Activity  {
 
         Intent intent = new Intent().setClass(this,TweetListActivity.class);
         intent.putExtra("userId",userId);
+        intent.putExtra("account",account);
 
         startActivity(intent);
 
@@ -259,7 +263,7 @@ public class UserDetailActivity extends Activity  {
     @SuppressWarnings("unused")
     public void addToList(View v) {
 
-        TweetDB tdb = new TweetDB(this,0); // TODO correct account
+        TweetDB tdb = new TweetDB(this,account.getId());
 
         List<String> data = new ArrayList<String>();
         Set<Map.Entry<String, Integer>> userListsEntries;
@@ -285,7 +289,7 @@ public class UserDetailActivity extends Activity  {
             System.out.println("res : " + o);
 
 
-            TweetDB tdb = new TweetDB(this,0); // TODO correct account
+            TweetDB tdb = new TweetDB(this,account.getId());
             Set<Map.Entry<String, Integer>> userListsEntries;
 
             int listId =-1;
