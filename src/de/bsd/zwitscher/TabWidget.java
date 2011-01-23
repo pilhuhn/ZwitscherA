@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,18 +45,42 @@ public class TabWidget extends TabActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+        Log.i("TabWidget","onCreate");
         requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.tabs);
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
 
-        account = getIntent().getExtras().getParcelable("account"); // TODO what if the account chages?  would need nuke + rebuild
+        account = getIntent().getExtras().getParcelable("account");
         accountId = account.getId();
+        Log.i("TabWidget","Account=" + account);
 
-		Resources res = getResources();
-		tabHost = getTabHost();
-		Intent homeIntent = new Intent().setClass(this,TweetListActivity.class);
+        setupTabs();
+
+		tabHost.setCurrentTab(0); // Home tab, tabs start at 0
+
+        new InitialSyncTask(this).execute(accountId);
+	}
+
+    protected void onResume() {
+        super.onResume();
+
+        Log.i("TabWidget","onResume");
+        Account tmp = getIntent().getExtras().getParcelable("account");
+        if (!tmp.equals(account)) {
+            // New account, so re-setup tabs
+            tabHost.clearAllTabs();
+            account = tmp;
+            setupTabs();
+        }
+        Log.i("TabWidget","Account=" + account);
+    }
+
+    private void setupTabs() {
+        Resources res = getResources();
+        tabHost = getTabHost();
+        Intent homeIntent = new Intent().setClass(this,TweetListActivity.class);
         homeIntent.putExtra(LIST_ID, 0);
         homeIntent.putExtra("account",account);
 
@@ -63,26 +88,26 @@ public class TabWidget extends TabActivity {
         homeSpec = tabHost.newTabSpec("tmp")
 				.setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_home))
 				.setContent(homeIntent);
-		tabHost.addTab(homeSpec);
+        tabHost.addTab(homeSpec);
 
-		Intent mentionsIntent = new Intent().setClass(this,TweetListActivity.class);
-		mentionsIntent.putExtra(LIST_ID, -1);
+        Intent mentionsIntent = new Intent().setClass(this,TweetListActivity.class);
+        mentionsIntent.putExtra(LIST_ID, -1);
         mentionsIntent.putExtra("account",account);
 
         tmp= getString(R.string.mentions);
-		homeSpec = tabHost.newTabSpec("mentions")
-				.setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_mention))
-				.setContent(mentionsIntent);
-		tabHost.addTab(homeSpec);
+        homeSpec = tabHost.newTabSpec("mentions")
+                .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_mention))
+                .setContent(mentionsIntent);
+        tabHost.addTab(homeSpec);
 
         tmp = getString(R.string.direct);
         Intent directIntent = new Intent().setClass(this,TweetListActivity.class);
         directIntent.putExtra(LIST_ID, -2);
         directIntent.putExtra("account", account);
-		homeSpec = tabHost.newTabSpec("directs")
-				.setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_direct))
-				.setContent(directIntent);
-		tabHost.addTab(homeSpec);
+        homeSpec = tabHost.newTabSpec("directs")
+                .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_direct))
+                .setContent(directIntent);
+        tabHost.addTab(homeSpec);
 
         tmp = getString(R.string.list);
         Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
@@ -93,7 +118,6 @@ public class TabWidget extends TabActivity {
                 .setContent(listsIntent);
         tabHost.addTab(homeSpec);
 
-
         Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
         searchIntent.putExtra("list",1);
         searchIntent.putExtra("account",account);
@@ -102,15 +126,9 @@ public class TabWidget extends TabActivity {
                 .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_search))
                 .setContent(searchIntent);
         tabHost.addTab(homeSpec);
+    }
 
-		tabHost.setCurrentTab(0); // Home tab, tabs start at 0
-
-        new InitialSyncTask(this).execute(accountId);
-	}
-
-
-
-	@Override
+    @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		 MenuInflater inflater = getMenuInflater();
 		    inflater.inflate(R.menu.main_menu, menu);
@@ -146,6 +164,7 @@ public class TabWidget extends TabActivity {
             i = new Intent(this, SelectAccountActivity.class);
             // TODO
             startActivity(i);
+            break;
         case R.id.helpMenu:
             i = new Intent(TabWidget.this, HelpActivity.class);
             startActivity(i);

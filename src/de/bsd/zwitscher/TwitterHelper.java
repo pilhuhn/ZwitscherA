@@ -282,12 +282,14 @@ public class TwitterHelper {
     /**
      * Get an auth token the xAuth way. This only works if especially enabled by Twitter
      *
+     *
      * @param username Username to get the token for
      * @param password password of that user and service
+     * @param makeDefault
      * @throws Exception If the server can not be reached or the credentials are not vaild
      * @return id of the account
      */
-    public Account generateAuthToken(String username, String password) throws Exception {
+    public Account generateAuthToken(String username, String password, boolean makeDefault) throws Exception {
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setOAuthConsumerKey(TwitterConsumerToken.consumerKey);
         cb.setOAuthConsumerSecret(TwitterConsumerToken.consumerSecret);
@@ -302,10 +304,12 @@ public class TwitterHelper {
 //        editor.putString("accessTokenSecret", accessToken.getTokenSecret());
 //        editor.commit();
 
-        // TODO determine account id -- db sequence?
+        // TODO determine account id via db sequence?
         int newId = tweetDB.getNewAccountId();
-        Account account = new Account(newId,username,accessToken.getToken(),accessToken.getTokenSecret(),null,"twitter",true);
+        Account account = new Account(newId,username,accessToken.getToken(),accessToken.getTokenSecret(),null,"twitter",makeDefault);
         tweetDB.insertOrUpdateAccount(account);
+        if (makeDefault)
+            tweetDB.setDefaultAccount(account.getId());
 
         return account;
 

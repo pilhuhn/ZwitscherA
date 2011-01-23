@@ -106,6 +106,7 @@ public class TweetDB {
                     "serverUrl TEXT, " + // 4
                     "serverType TEXT, " + // 5
                     "isDefault INTEGER, " + // 6
+                    "UNIQUE (id)" + //
                     "UNIQUE (name, serverUrl ) " +// TODO add index in default
                 ")"
             );
@@ -573,12 +574,12 @@ public class TweetDB {
         // First see if the id exists
         Cursor c;
         c= db.query(TABLE_ACCOUNTS,new String[]{"id"},"id = " +id , null, null,null,null);
-        if (c.getCount()!=-1) {
+        if (c.getCount()< 1) {
             throw new IllegalStateException("Account with id " + id + " not found");
         }
         c.close();
-        db.execSQL("UPDATE " + TABLE_ACCOUNTS + "SET isDefault = 0 WHERE isDefault = 1");
-        db.execSQL("UPDATE " + TABLE_ACCOUNTS + "SET isDefault = 1 WHERE id = " + id);
+        db.execSQL("UPDATE " + TABLE_ACCOUNTS + " SET isDefault = 0 WHERE isDefault = 1");
+        db.execSQL("UPDATE " + TABLE_ACCOUNTS + " SET isDefault = 1 WHERE id = " + id);
         db.close();
     }
 
@@ -591,17 +592,19 @@ public class TweetDB {
         c = db.query(TABLE_ACCOUNTS,null, null,null,null,null,null);
         if (c.getCount()>0) {
             c.moveToFirst();
-            boolean isDefault = c.getInt(6) == 1;
-            account = new Account(
-                    c.getInt(0), // id
-                    c.getString(1), // name
-                    c.getString(2), // token key
-                    c.getString(3), // token secret
-                    c.getString(4), // url
-                    c.getString(5), // type /5)
-                    isDefault // 6
-            );
-            accounts.add(account);
+            do {
+                boolean isDefault = c.getInt(6) == 1;
+                account = new Account(
+                        c.getInt(0), // id
+                        c.getString(1), // name
+                        c.getString(2), // token key
+                        c.getString(3), // token secret
+                        c.getString(4), // url
+                        c.getString(5), // type /5)
+                        isDefault // 6
+                );
+                accounts.add(account);
+            } while (c.moveToNext());
         }
         c.close();
         db.close();
@@ -618,6 +621,7 @@ public class TweetDB {
         if (c.getCount()>0) {
             c.moveToFirst();
             ret = c.getInt(0);
+            ret++;
         }
         c.close();
         db.close();

@@ -117,4 +117,35 @@ public class Account implements Parcelable {
             return new Account[size];
         }
     };
+
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Account account = (Account) o;
+
+        return id == account.id;
+
+    }
+
+    public int hashCode() {
+        return id;
+    }
+
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("Account");
+        sb.append("{id=").append(id);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", serverType='").append(serverType).append('\'');
+        sb.append(", serverUrl='").append(serverUrl).append('\'');
+        sb.append(", defaultAccount=").append(defaultAccount);
+        sb.append(", accessTokenSecret='").append(accessTokenSecret!=null?"-set-":"-unset-").append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }

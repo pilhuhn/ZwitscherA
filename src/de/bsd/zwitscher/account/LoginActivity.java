@@ -128,7 +128,7 @@ public class LoginActivity extends Activity {
 
         TwitterHelper th = new TwitterHelper(this, null); // pass a null account, which is uninitialized
         try {
-            Account account = th.generateAuthToken(user,password);
+            Account account = th.generateAuthToken(user,password, true);
             proceed(account);
             finish();
 
