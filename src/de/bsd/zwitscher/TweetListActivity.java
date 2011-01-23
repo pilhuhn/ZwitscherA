@@ -371,13 +371,16 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 if (list_id>-2) {
                     String mentionsString = context.getString(R.string.mentions);
                     String homeString = context.getString(R.string.home_timeline);
-                    publishProgress(list_id==-1? mentionsString : homeString);
+                    if (list_id<=0)
+                        publishProgress(list_id==-1? mentionsString : homeString);
+                    else
+                        publishProgress("");
                     String filter = getFilter();
                     data = getTimlinesFromTwitter(fromDbOnly, filter);
                     // Also check for mentions + directs (if allowed in prefs)
                     NetworkHelper networkHelper = new NetworkHelper(context);
 
-                    if (!fromDbOnly && networkHelper.mayReloadAdditional()) { // TODO make this block nicer
+                    if (list_id<=0 && !fromDbOnly && networkHelper.mayReloadAdditional()) { // TODO make this block nicer
                         publishProgress(mentionsString);
                         long mentionLast = tdb.getLastRead(-1);
                         Paging paging;
