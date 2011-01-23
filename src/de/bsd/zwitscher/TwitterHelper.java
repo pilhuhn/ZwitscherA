@@ -869,7 +869,7 @@ Log.d("FillUp","Return: " + i);
             }
         }
 
-        return null;  // TODO: Customise this generated block
+        return new MetaList<Tweet>();
     }
 
     public void persistSavedSearch(SavedSearch search) {
