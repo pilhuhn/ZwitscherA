@@ -572,7 +572,7 @@ public class TweetDB {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         // First see if the id exists
         Cursor c;
-        c= db.query(TABLE_ACCOUNTS,new String[]{"id"},"where id = " +id , null, null,null,null);
+        c= db.query(TABLE_ACCOUNTS,new String[]{"id"},"id = " +id , null, null,null,null);
         if (c.getCount()!=-1) {
             throw new IllegalStateException("Account with id " + id + " not found");
         }
