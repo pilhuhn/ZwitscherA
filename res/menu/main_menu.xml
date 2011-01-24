@@ -20,6 +20,10 @@
             <item android:id="@+id/DevelCleanImages"
                   android:title="Clean User Pics"
                     />
+            <item android:id="@+id/DevelCreateAccount"
+                  android:title="Create Account"/>
+            <item android:id="@+id/DevelSwitchAccount"
+                  android:title="Switch Account"/>
         </menu>
     </item>
 </menu>

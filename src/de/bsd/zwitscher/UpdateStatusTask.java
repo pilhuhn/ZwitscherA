@@ -1,5 +1,6 @@
 package de.bsd.zwitscher;
 
+import de.bsd.zwitscher.account.Account;
 import twitter4j.StatusUpdate;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -23,10 +24,12 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
     StatusUpdate update;
     private Context context;
     private ProgressBar progressBar;
+    private Account account;
 
-    public UpdateStatusTask(Context context,ProgressBar progressBar) {
+    public UpdateStatusTask(Context context, ProgressBar progressBar, Account account) {
         this.context = context;
         this.progressBar = progressBar;
+        this.account = account;
     }
 
     @Override
@@ -38,7 +41,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
     @Override
     protected UpdateResponse doInBackground(UpdateRequest... requests) {
-        TwitterHelper th = new TwitterHelper(context.getApplicationContext());
+        TwitterHelper th = new TwitterHelper(context.getApplicationContext(), account);
 
         UpdateRequest request = requests[0];
         UpdateResponse ret=null;

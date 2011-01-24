@@ -19,6 +19,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.*;
 import twitter4j.conf.Configuration;
@@ -33,15 +34,21 @@ import twitter4j.media.MediaProvider;
 
 public class TwitterHelper {
 
-
-	Context context;
+    private static final String HTTP_IDENTI_CA_API = "http://identi.ca/api/";
+    Context context;
     TweetDB tweetDB;
     Twitter twitter;
     int accountId;
+    Account account;
 
-    public TwitterHelper(Context context) {
+
+    public TwitterHelper(Context context, Account account) {
 		this.context = context;
-        accountId = 0; // TODO set real account
+        this.account = account;
+        if (account!=null)
+            accountId = account.getId();
+        else
+            accountId = -1; // default if no account selected.
         tweetDB = new TweetDB(context,accountId);
         twitter = getTwitter();
 	}
@@ -202,25 +209,36 @@ public class TwitterHelper {
 			userLists = twitter.getUserLists(username, -1);
 			return userLists;
 		} catch (Exception e) {
-			Toast.makeText(context, "Getting lists failed: " + e.getMessage(), 15000).show();
+            // called from background task, so no toast allowed
 			e.printStackTrace();
-			userLists = new ArrayList<UserList>();
+			userLists = Collections.emptyList();
 		}
         return userLists;
 	}
 
 
 	private Twitter getTwitter() {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        if (account!=null) {
+            if (account.getServerType().equalsIgnoreCase("twitter")) {
+                Twitter twitterInstance = new TwitterFactory().getOAuthAuthorizedInstance(
+                        TwitterConsumerToken.consumerKey,
+                        TwitterConsumerToken.consumerSecret,
+                        new AccessToken(account.getAccessTokenKey(), account.getAccessTokenSecret()));
+                return twitterInstance;
+            }
+            else if (account.getServerType().equalsIgnoreCase("identi.ca")) {
+                ConfigurationBuilder cb = new ConfigurationBuilder();
+                cb.setRestBaseURL(HTTP_IDENTI_CA_API);
+                cb.setSearchBaseURL(HTTP_IDENTI_CA_API);
+                cb.setOAuthAccessTokenURL("https://identi.ca/api/oauth/access_token");
+                cb.setOAuthAuthorizationURL("https://identi.ca/api/oauth/authorize");
+                cb.setOAuthRequestTokenURL("https://identi.ca/api/oauth/request_token");
+                Configuration conf = cb.build() ;
 
-        String accessTokenToken = preferences.getString("accessToken",null);
-        String accessTokenSecret = preferences.getString("accessTokenSecret",null);
-        if (accessTokenToken!=null && accessTokenSecret!=null) {
-        	Twitter twitterInstance = new TwitterFactory().getOAuthAuthorizedInstance(
-        			TwitterConsumerToken.consumerKey,
-        			TwitterConsumerToken.consumerSecret,
-        			new AccessToken(accessTokenToken, accessTokenSecret));
-        	return twitterInstance;
+
+                Twitter twitterInstance = new TwitterFactory(conf).getInstance(account.getName(),account.getPassword());
+                return twitterInstance;
+            }
         }
 
 		return null;
@@ -278,25 +296,60 @@ public class TwitterHelper {
 	}
 
     /**
-     * Get an auth token the xAuth way. This only works if especially enabled by Twitter
-     * @param username
-     * @param password
-     * @throws Exception
+     * Generate an account the xAuth way for Twitter. This only works if especially enabled by Twitter
+     *
+     *
+     *
+     * @param username Username to get the token for
+     * @param password password of that user and service
+     * @param service service to use. Currently supported are twitter and identi.ca
+     * @param makeDefault  @throws Exception If the server can not be reached or the credentials are not vaild
+     * @return id of the account
+     * @throws Exception when anything goes wrong (e.g wrong username/password etc.)
      */
-    public void generateAuthToken(String username, String password) throws Exception {
+    public Account generateAccount(String username, String password, String service, boolean makeDefault) throws Exception {
         ConfigurationBuilder cb = new ConfigurationBuilder();
-        cb.setOAuthConsumerKey(TwitterConsumerToken.consumerKey);
-        cb.setOAuthConsumerSecret(TwitterConsumerToken.consumerSecret);
-        Configuration conf = cb.build() ;
-        Twitter twitterInstance = new TwitterFactory(conf).getInstance(username,password);
-//        twitterInstance.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
+        Twitter twitterInstance;
+        Account account = null;
 
-        AccessToken accessToken = twitterInstance.getOAuthAccessToken();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        Editor editor = preferences.edit();
-        editor.putString("accessToken", accessToken.getToken());
-        editor.putString("accessTokenSecret", accessToken.getTokenSecret());
-        editor.commit();
+        if (service.equalsIgnoreCase("twitter")) {
+            cb.setOAuthConsumerKey(TwitterConsumerToken.consumerKey);
+            cb.setOAuthConsumerSecret(TwitterConsumerToken.consumerSecret);
+            Configuration conf = cb.build() ;
+            twitterInstance = new TwitterFactory(conf).getInstance(username,password);
+            AccessToken accessToken = twitterInstance.getOAuthAccessToken();
+            int newId = tweetDB.getNewAccountId();
+            account = new Account(newId,username,accessToken.getToken(),accessToken.getTokenSecret(),null,"twitter",makeDefault);
+            // TODO determine account id via db sequence?
+            tweetDB.insertOrUpdateAccount(account);
+            if (makeDefault)
+                tweetDB.setDefaultAccount(account.getId());
+
+
+
+        }
+        else if (service.equalsIgnoreCase("identi.ca")) {
+            cb.setRestBaseURL(HTTP_IDENTI_CA_API);
+            cb.setSearchBaseURL(HTTP_IDENTI_CA_API);
+            cb.setOAuthAccessTokenURL("https://identi.ca/api/oauth/access_token");
+//            cb.setOAuthAuthenticationURL();
+            cb.setOAuthAuthorizationURL("https://identi.ca/api/oauth/authorize");
+            cb.setOAuthRequestTokenURL("https://identi.ca/api/oauth/request_token");
+            Configuration conf = cb.build() ;
+            TwitterFactory twitterFactory = new TwitterFactory(conf);
+            twitterInstance = twitterFactory.getInstance(username, password);
+
+
+            // TODO determine account id via db sequence?
+            int newId = tweetDB.getNewAccountId();
+            account = new Account(newId,username,null,service,makeDefault,password);
+            tweetDB.insertOrUpdateAccount(account);
+            if (makeDefault)
+                tweetDB.setDefaultAccount(account.getId());
+
+        }
+
+        return account;
 
     }
 
@@ -754,8 +807,8 @@ Log.d("FillUp","Return: " + i);
             else
                 throw new IllegalArgumentException("Picture provider " + provider + " unknown");
 
-            String accessTokenToken = preferences.getString("accessToken",null);
-            String accessTokenSecret = preferences.getString("accessTokenSecret",null);
+            String accessTokenToken = account.getAccessTokenKey();
+            String accessTokenSecret = account.getAccessTokenSecret();
 
             Properties props = new Properties();
             props.put(PropertyConfiguration.MEDIA_PROVIDER,mProvider);
@@ -854,7 +907,7 @@ Log.d("FillUp","Return: " + i);
             }
         }
 
-        return null;  // TODO: Customise this generated block
+        return new MetaList<Tweet>();
     }
 
     public void persistSavedSearch(SavedSearch search) {

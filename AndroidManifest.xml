@@ -47,6 +47,7 @@
         </activity>
 
         <activity android:name=".account.NewAccountActivity"/>
+        <activity android:name=".account.SelectAccountActivity"/>
 
         <activity android:name="Preferences" android:label="Preferences"/>
 

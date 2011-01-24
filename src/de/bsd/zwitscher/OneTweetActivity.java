@@ -12,6 +12,7 @@ import android.widget.*;
 import com.google.api.translate.Language;
 import com.google.api.translate.Translate;
 
+import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.Place;
@@ -49,8 +50,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     boolean downloadPictures=false;
     TextToSpeech tts;
     TextView titleTextView;
+    private Account account;
 
-	@Override
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -71,19 +73,21 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         Intent intent = getIntent();
         String dataString = intent.getDataString();
         Bundle bundle = intent.getExtras();
+        account = intent.getParcelableExtra("account");
 
         // If this is not null, we are called from another app
         if ( dataString!=null) {
             if (dataString.matches("http://twitter.com/.*/status/.*$")) {
                 String tids = dataString.substring(dataString.lastIndexOf("/")+1);
                 Long tid = Long.parseLong(tids);
-                TwitterHelper th = new TwitterHelper(this);
+                TwitterHelper th = new TwitterHelper(this, account);
                 status = th.getStatusById(tid,0L,false,false);
             } else if (dataString.matches("http://twitter.com/#!/.*$")) {
                 // A user - forward to UserDetailActivity TODO: remove once this is coded in AndroidManifest.xml
                 String userName = dataString.substring(dataString.lastIndexOf("/")+1);
                 Intent i = new Intent(this,UserDetailActivity.class);
                 i.putExtra("userName",userName);
+                i.putExtra("account",account);
                 startActivity(i);
                 finish();
             } else if (dataString.matches("http://twitter.com/[a-zA-Z0-9_]*\\?.*")) {
@@ -91,6 +95,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 String userName = dataString.substring(19,dataString.indexOf("?"));
                 Intent i = new Intent(this,UserDetailActivity.class);
                 i.putExtra("userName",userName);
+                i.putExtra("account",account);
                 startActivity(i);
                 finish();
             }
@@ -159,7 +164,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         tweetView.setText(status.getText());
 
         TextView timeCientView = (TextView)findViewById(R.id.TimeTextView);
-        TwitterHelper th = new TwitterHelper(this);
+        TwitterHelper th = new TwitterHelper(this, account);
         String s = getString(R.string.via);
         String text = th.getStatusDate(status) + s + status.getSource();
         String from = getString(R.string.from);
@@ -191,7 +196,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     @SuppressWarnings("unused")
     public void displayUserDetail(View v) {
-        Intent i = new Intent(getApplicationContext(), UserDetailActivity.class);
+        Intent i = new Intent(this, UserDetailActivity.class);
+        i.putExtra("account",account);
         User theUser;
         if (status.getRetweetedStatus()==null) {
             theUser = status.getUser();
@@ -209,7 +215,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     @SuppressWarnings("unused")
 	public void reply(View v) {
-		Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
+		Intent i = new Intent(this, NewTweetActivity.class);
+        i.putExtra("account",account);
 		i.putExtra(getString(R.string.status), status);
 		i.putExtra("op", getString(R.string.reply));
 		startActivity(i);
@@ -223,7 +230,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     @SuppressWarnings("unused")
 	public void replyAll(View v) {
-		Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
+		Intent i = new Intent(this, NewTweetActivity.class);
+        i.putExtra("account",account);
 		i.putExtra(getString(R.string.status), status);
 		i.putExtra("op", getString(R.string.replyall));
 		startActivity(i);
@@ -238,7 +246,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 	public void retweet(View v) {
         UpdateRequest request = new UpdateRequest(UpdateType.RETWEET);
         request.id = status.getId();
-        new UpdateStatusTask(this,pg).execute(request);
+        new UpdateStatusTask(this,pg, account).execute(request);
 	}
 
 
@@ -249,7 +257,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     @SuppressWarnings("unused")
 	public void classicRetweet(View v) {
-		Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
+		Intent i = new Intent(this, NewTweetActivity.class);
+        i.putExtra("account",account);
 		i.putExtra(getString(R.string.status), status);
 		i.putExtra("op", getString(R.string.classicretweet));
 		startActivity(i);
@@ -263,9 +272,10 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     @SuppressWarnings("unused")
     public void threadView(View v) {
-        TwitterHelper th = new TwitterHelper(ctx);
+        TwitterHelper th = new TwitterHelper(ctx, account);
 
-        Intent i = new Intent(getApplicationContext(),ThreadListActivity.class);
+        Intent i = new Intent(this,ThreadListActivity.class);
+        i.putExtra("account",account);
         i.putExtra("startId", status.getId());
         startActivity(i);
     }
@@ -276,7 +286,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     @SuppressWarnings("unused")
     public void favorite(View v) {
-        TwitterHelper th = new TwitterHelper(ctx);
+        TwitterHelper th = new TwitterHelper(ctx, account);
 
         ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
 
@@ -284,7 +294,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         request.status = status;
         request.view = favoriteButton;
 
-        new UpdateStatusTask(this,pg).execute(request);
+        new UpdateStatusTask(this,pg, account).execute(request);
 
     }
 
@@ -295,7 +305,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     @SuppressWarnings("unused")
     public void directMessage(View v) {
-        Intent i = new Intent(getApplicationContext(), NewTweetActivity.class);
+        Intent i = new Intent(this, NewTweetActivity.class);
+        i.putExtra("account",account);
         i.putExtra(getString(R.string.status), status);
         i.putExtra("op", getString(R.string.direct));
         startActivity(i);

@@ -1,47 +1,56 @@
-/*
- * RHQ Management Platform
- * Copyright (C) 2005-2009 Red Hat, Inc.
- * All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation version 2 of the License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- */
 package de.bsd.zwitscher.account;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * One server account
  *
  * @author Heiko W. Rupp
  */
-public class Account {
+public class Account implements Parcelable {
+    int id;
     String name;
     String accessTokenKey;
     String accessTokenSecret;
     String serverType;
     String serverUrl;
+    boolean defaultAccount;
+    String password;
 
-    public Account(String name, String accessTokenKey, String accessTokenSecret, String serverType, String serverUrl) {
+    public Account(int id, String name, String accessTokenKey, String accessTokenSecret, String serverUrl, String serverType,boolean defaultAccount) {
+        this.id = id;
         this.name = name;
         this.accessTokenKey = accessTokenKey;
         this.accessTokenSecret = accessTokenSecret;
         this.serverType = serverType;
         this.serverUrl = serverUrl;
+        this.defaultAccount = defaultAccount;
     }
 
-    public Account(String name, String serverType) {
+    public Account(int id, String name, String serverUrl, String serverType, boolean defaultAccount, String password) {
+        this.id = id;
         this.name = name;
+        this.serverUrl = serverUrl;
         this.serverType = serverType;
+        this.defaultAccount = defaultAccount;
+        this.password = password;
+    }
+
+    public Account(Parcel parcel) {
+        id = parcel.readInt();
+        name = parcel.readString();
+        accessTokenKey = parcel.readString();
+        accessTokenSecret = parcel.readString();
+        serverType = parcel.readString();
+        serverUrl  = parcel.readString();
+        defaultAccount = parcel.readInt() == 1;
+        password = parcel.readString();
+
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getName() {
@@ -74,5 +83,72 @@ public class Account {
 
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
+    }
+
+    public boolean isDefaultAccount() { return defaultAccount; }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public int describeContents() {
+        return 0;  // TODO: Customise this generated block
+    }
+
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
+        parcel.writeString(name);
+        parcel.writeString(accessTokenKey);
+        parcel.writeString(accessTokenSecret);
+        parcel.writeString(serverType);
+        parcel.writeString(serverUrl);
+        parcel.writeInt(defaultAccount ? 1 : 0);
+        parcel.writeString(password);
+    }
+
+    public static Creator<Account> CREATOR = new Creator<Account>() {
+        public Account createFromParcel(Parcel parcel) {
+            return new Account(parcel);
+        }
+
+        public Account[] newArray(int size) {
+            return new Account[size];
+        }
+    };
+
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Account account = (Account) o;
+
+        return id == account.id;
+
+    }
+
+    public int hashCode() {
+        return id;
+    }
+
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("Account");
+        sb.append("{id=").append(id);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", serverType='").append(serverType).append('\'');
+        sb.append(", serverUrl='").append(serverUrl).append('\'');
+        sb.append(", defaultAccount=").append(defaultAccount);
+        sb.append(", accessToken='").append(accessTokenSecret != null ? "-set-" : "-unset-").append('\'');
+        sb.append(", password='").append(password!=null?"-set-":"-unset-").append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }
