@@ -137,6 +137,21 @@ public class TweetDB {
                 db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_USERS + "(userID, " + ACCOUNT_ID +")");
                 db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_SEARCHES + "(ID, " + ACCOUNT_ID +")");
             }
+            if (oldVersion<4) {
+                db.execSQL(CREATE_TABLE + TABLE_ACCOUNTS + " (" +
+                        "id INTEGER, " + // 0
+                        "name TEXT, " + // 1
+                        "tokenKey TEXT, "+ // 2
+                        "tokenSecret TEXT, "+ // 3
+                        "serverUrl TEXT, " + // 4
+                        "serverType TEXT, " + // 5
+                        "isDefault INTEGER, " + // 6
+                        "password TEXT, " + // 7
+                        "UNIQUE (id)" + //
+                        "UNIQUE (name, serverUrl ) " +// TODO add index in default
+                    ")"
+                );
+            }
 
 		}
 

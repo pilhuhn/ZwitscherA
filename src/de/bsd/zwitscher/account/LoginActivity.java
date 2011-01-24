@@ -117,7 +117,7 @@ public class LoginActivity extends Activity {
 
     /**
      * Obtain a auth token the xAuth way by providing username and password
-     * and then proceed to the TabWidget
+     * and then proceed to the TabWidget. Also works for identi.ca
      * @param v Source view
      */
     @SuppressWarnings("unused")

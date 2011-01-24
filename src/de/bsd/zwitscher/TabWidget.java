@@ -75,6 +75,8 @@ public class TabWidget extends TabActivity {
             setupTabs();
         }
         Log.i("TabWidget","Account=" + account);
+        TextView accountNameView = (TextView) findViewById(R.id.account_text);
+        accountNameView.setText(account.getName() + " (" + account.getServerType() + ")"); // TODO more for generic status.net
     }
 
     private void setupTabs() {

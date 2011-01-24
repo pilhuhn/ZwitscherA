@@ -325,8 +325,6 @@ public class TwitterHelper {
             if (makeDefault)
                 tweetDB.setDefaultAccount(account.getId());
 
-
-
         }
         else if (service.equalsIgnoreCase("identi.ca")) {
             cb.setRestBaseURL(HTTP_IDENTI_CA_API);
@@ -338,6 +336,10 @@ public class TwitterHelper {
             Configuration conf = cb.build() ;
             TwitterFactory twitterFactory = new TwitterFactory(conf);
             twitterInstance = twitterFactory.getInstance(username, password);
+            // Trigger a fetch to validate the credentials
+            Paging paging = new Paging();
+            paging.setCount(1);
+            twitterInstance.getHomeTimeline(paging);
 
 
             // TODO determine account id via db sequence?
