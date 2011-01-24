@@ -10,7 +10,7 @@
   	android:id="@+id/NewAccountTitle"
   	android:layout_width="wrap_content"
   	android:layout_height="wrap_content"
-  	android:text="Create account"
+  	android:text="@string/new_account_create_title"
   	/>
 
     <TableLayout android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
                     android:password="true"/>
         </TableRow>
         <TableRow>
-            <TextView android:text="Switch to new"
+            <TextView android:text="@string/new_account_switch"
                       style="@style/text"/>
             <CheckBox android:id="@+id/new_account_switch"
                       android:checked="true"
@@ -51,7 +51,7 @@
    <Button
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:text="Create!"
+       android:text="@string/new_account_create"
        android:onClick="create"
     />
 

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 import de.bsd.zwitscher.R;
 import de.bsd.zwitscher.TabWidget;
@@ -116,7 +117,7 @@ public class LoginActivity extends Activity {
 
     /**
      * Obtain a auth token the xAuth way by providing username and password
-     * and then proceed to the TabWidget
+     * and then proceed to the TabWidget. Also works for identi.ca
      * @param v Source view
      */
     @SuppressWarnings("unused")
@@ -125,10 +126,12 @@ public class LoginActivity extends Activity {
         String user = userText.getText().toString();
         EditText passwordText = (EditText) findViewById(R.id.login_password);
         String password = passwordText.getText().toString();
+        Spinner spinner = (Spinner) findViewById(R.id.spinner1);
+        String service = spinner.getSelectedItem().toString();
 
         TwitterHelper th = new TwitterHelper(this, null); // pass a null account, which is uninitialized
         try {
-            Account account = th.generateAuthToken(user,password, true);
+            Account account = th.generateAccount(user, password, service, true);
             proceed(account);
             finish();
 

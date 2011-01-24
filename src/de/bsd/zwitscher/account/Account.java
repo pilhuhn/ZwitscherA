@@ -16,6 +16,7 @@ public class Account implements Parcelable {
     String serverType;
     String serverUrl;
     boolean defaultAccount;
+    String password;
 
     public Account(int id, String name, String accessTokenKey, String accessTokenSecret, String serverUrl, String serverType,boolean defaultAccount) {
         this.id = id;
@@ -27,6 +28,15 @@ public class Account implements Parcelable {
         this.defaultAccount = defaultAccount;
     }
 
+    public Account(int id, String name, String serverUrl, String serverType, boolean defaultAccount, String password) {
+        this.id = id;
+        this.name = name;
+        this.serverUrl = serverUrl;
+        this.serverType = serverType;
+        this.defaultAccount = defaultAccount;
+        this.password = password;
+    }
+
     public Account(Parcel parcel) {
         id = parcel.readInt();
         name = parcel.readString();
@@ -35,6 +45,7 @@ public class Account implements Parcelable {
         serverType = parcel.readString();
         serverUrl  = parcel.readString();
         defaultAccount = parcel.readInt() == 1;
+        password = parcel.readString();
 
     }
 
@@ -76,6 +87,14 @@ public class Account implements Parcelable {
 
     public boolean isDefaultAccount() { return defaultAccount; }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public int describeContents() {
         return 0;  // TODO: Customise this generated block
     }
@@ -88,6 +107,7 @@ public class Account implements Parcelable {
         parcel.writeString(serverType);
         parcel.writeString(serverUrl);
         parcel.writeInt(defaultAccount ? 1 : 0);
+        parcel.writeString(password);
     }
 
     public static Creator<Account> CREATOR = new Creator<Account>() {
@@ -126,7 +146,8 @@ public class Account implements Parcelable {
         sb.append(", serverType='").append(serverType).append('\'');
         sb.append(", serverUrl='").append(serverUrl).append('\'');
         sb.append(", defaultAccount=").append(defaultAccount);
-        sb.append(", accessTokenSecret='").append(accessTokenSecret!=null?"-set-":"-unset-").append('\'');
+        sb.append(", accessToken='").append(accessTokenSecret != null ? "-set-" : "-unset-").append('\'');
+        sb.append(", password='").append(password!=null?"-set-":"-unset-").append('\'');
         sb.append('}');
         return sb.toString();
     }

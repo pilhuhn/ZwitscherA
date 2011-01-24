@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.bsd.zwitscher"
           android:installLocation="preferExternal"
-          android:versionName="0.66"
-          android:versionCode="66"
+          android:versionName="0.67"
+          android:versionCode="67"
           >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>

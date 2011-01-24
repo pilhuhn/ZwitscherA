@@ -81,6 +81,8 @@ public class TabWidget extends TabActivity {
             setupTabs();
         }
         Log.i("TabWidget","Account=" + account);
+        TextView accountNameView = (TextView) findViewById(R.id.account_text);
+        accountNameView.setText(account.getName() + " (" + account.getServerType() + ")"); // TODO more for generic status.net
     }
 
     private void setupTabs() {
@@ -115,14 +117,16 @@ public class TabWidget extends TabActivity {
                 .setContent(directIntent);
         tabHost.addTab(homeSpec);
 
-        tmp = getString(R.string.list);
-        Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
-        listsIntent.putExtra("list",0);
-        listsIntent.putExtra("account",account);
-        homeSpec = tabHost.newTabSpec("lists")
-                .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_list))
-                .setContent(listsIntent);
-        tabHost.addTab(homeSpec);
+        if (account.getServerType().equalsIgnoreCase("twitter")) {
+            tmp = getString(R.string.list);
+            Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
+            listsIntent.putExtra("list",0);
+            listsIntent.putExtra("account",account);
+            homeSpec = tabHost.newTabSpec("lists")
+                    .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_list))
+                    .setContent(listsIntent);
+            tabHost.addTab(homeSpec);
+        }
 
         Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
         searchIntent.putExtra("list",1);
