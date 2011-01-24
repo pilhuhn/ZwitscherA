@@ -106,6 +106,7 @@ public class TweetDB {
                     "serverUrl TEXT, " + // 4
                     "serverType TEXT, " + // 5
                     "isDefault INTEGER, " + // 6
+                    "password TEXT, " + // 7
                     "UNIQUE (id)" + //
                     "UNIQUE (name, serverUrl ) " +// TODO add index in default
                 ")"
@@ -530,6 +531,7 @@ public class TweetDB {
                     type, // type /5)
                     isDefault // 6
             );
+            account.setPassword(c.getString(7));
         }
         c.close();
         db.close();
@@ -553,6 +555,7 @@ public class TweetDB {
                     c.getString(5), // type /5)
                     isDefault // 6
             );
+            account.setPassword(c.getString(7));
         }
         c.close();
         db.close();
@@ -603,6 +606,7 @@ public class TweetDB {
                         c.getString(5), // type /5)
                         isDefault // 6
                 );
+                account.setPassword(c.getString(7));
                 accounts.add(account);
             } while (c.moveToNext());
         }
@@ -635,7 +639,7 @@ public class TweetDB {
     }
 
     public void insertOrUpdateAccount(Account account) {
-        ContentValues cv = new ContentValues(7);
+        ContentValues cv = new ContentValues(8);
         cv.put("id",account.getId());
         cv.put("name",account.getName());
         cv.put("tokenKey",account.getAccessTokenKey());
@@ -643,6 +647,7 @@ public class TweetDB {
         cv.put("serverUrl", account.getServerUrl());
         cv.put("serverType", account.getServerType());
         cv.put("isDefault",account.isDefaultAccount() ? 1 : 0);
+        cv.put("password",account.getPassword());
 
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.insertWithOnConflict(TABLE_ACCOUNTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
