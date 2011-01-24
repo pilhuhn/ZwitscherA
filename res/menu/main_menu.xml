@@ -21,9 +21,9 @@
                   android:title="Clean User Pics"
                     />
             <item android:id="@+id/DevelCreateAccount"
-                  android:title="Create Account"/>
+                  android:title="@string/new_account_create_title"/>
             <item android:id="@+id/DevelSwitchAccount"
-                  android:title="Switch Account"/>
+                  android:title="@string/menu_switch_account"/>
         </menu>
     </item>
 </menu>

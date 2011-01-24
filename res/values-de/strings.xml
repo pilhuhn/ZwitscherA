@@ -77,8 +77,8 @@
     <string name="prefs_extra_loading_descr">Netzwerkkonfiguration, die nötig ist, um zusätzliche Timelines (aus Home heraus) zu laden.</string>
     <string name="prefs_extra_roaming">Roaming (Timelines)</string>
     <string name="prefs_extra_roaming_descr">Dürfen während des Roamings zus. Timelines (aus Home) geladen werden?</string>
-
     <!-- preferences -->
+
     <string name="help">Hilfe</string>
     <string name="help_common">Diese Seite zeigt alle in Zwitscher verwendeten Icons</string>
     <string name="help_add_list">Benutzer zu einer Liste hinzufügen</string>
@@ -99,6 +99,15 @@
     <string name="help_user_unknown">Kein Bild für den Benutzer geladen</string>
     <string name="help_select_user">Benutzer auswählen</string>
     <string name="help_more">Um mehr zu erfahren, gehen Sie zu http://bsd.de/zwitscher . Um Bugs zu melden, Wünsche aufzuschreiben oder den Quellcode anzusehen, gehen Sie zu https://github.com/pilhuhn/ZwitscherA . Zusätzliche Hilfe gibt es auch im Wiki unter https://github.com/pilhuhn/ZwitscherA/wiki/Help</string>
+
+    <string name="select_account_select">Bitte Account auswählen</string>
+    <string name="select_account_pick">Account auswählen</string>
+    <string name="select_account_new">Account hinzufügen</string>
+    <string name="new_account_create_title">Account anlegen</string>
+    <string name="new_account_switch">Zum neuen Account wechseln</string>
+    <string name="new_account_create">Anlegen!</string>
+    <string name="menu_switch_account">Account wechseln</string>
+
 
 
 </resources>
