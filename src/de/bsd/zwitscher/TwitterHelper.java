@@ -34,7 +34,8 @@ import twitter4j.media.MediaProvider;
 
 public class TwitterHelper {
 
-	Context context;
+    private static final String HTTP_IDENTI_CA_API = "http://identi.ca/api/";
+    Context context;
     TweetDB tweetDB;
     Twitter twitter;
     int accountId;
@@ -208,9 +209,9 @@ public class TwitterHelper {
 			userLists = twitter.getUserLists(username, -1);
 			return userLists;
 		} catch (Exception e) {
-			Toast.makeText(context, "Getting lists failed: " + e.getMessage(), 15000).show();
+            // called from background task, so no toast allowed
 			e.printStackTrace();
-			userLists = new ArrayList<UserList>();
+			userLists = Collections.emptyList();
 		}
         return userLists;
 	}
@@ -227,8 +228,8 @@ public class TwitterHelper {
             }
             else if (account.getServerType().equalsIgnoreCase("identi.ca")) {
                 ConfigurationBuilder cb = new ConfigurationBuilder();
-                cb.setRestBaseURL("http://identi.ca/api");
-                cb.setSearchBaseURL("http://identi.ca/api");
+                cb.setRestBaseURL(HTTP_IDENTI_CA_API);
+                cb.setSearchBaseURL(HTTP_IDENTI_CA_API);
                 cb.setOAuthAccessTokenURL("https://identi.ca/api/oauth/access_token");
                 cb.setOAuthAuthorizationURL("https://identi.ca/api/oauth/authorize");
                 cb.setOAuthRequestTokenURL("https://identi.ca/api/oauth/request_token");
@@ -236,11 +237,6 @@ public class TwitterHelper {
 
 
                 Twitter twitterInstance = new TwitterFactory(conf).getInstance(account.getName(),account.getPassword());
-                try {
-                    twitterInstance.getHomeTimeline(); // TODO remove
-                } catch (TwitterException e) {
-                    e.printStackTrace();  // TODO: Customise this generated block
-                }
                 return twitterInstance;
             }
         }
@@ -333,8 +329,8 @@ public class TwitterHelper {
 
         }
         else if (service.equalsIgnoreCase("identi.ca")) {
-            cb.setRestBaseURL("http://identi.ca/api");
-            cb.setSearchBaseURL("http://identi.ca/api");
+            cb.setRestBaseURL(HTTP_IDENTI_CA_API);
+            cb.setSearchBaseURL(HTTP_IDENTI_CA_API);
             cb.setOAuthAccessTokenURL("https://identi.ca/api/oauth/access_token");
 //            cb.setOAuthAuthenticationURL();
             cb.setOAuthAuthorizationURL("https://identi.ca/api/oauth/authorize");
