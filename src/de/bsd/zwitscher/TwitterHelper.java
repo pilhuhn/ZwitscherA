@@ -684,14 +684,16 @@ Log.d("FillUp","Return: " + i);
             return;
 
         List<ContentValues> values = new ArrayList<ContentValues>(statuses.size());
+        long now = System.currentTimeMillis();
         for (Status status : statuses) {
             String json = DataObjectFactory.getRawJSON(status);
-            ContentValues cv = new ContentValues(5);
+            ContentValues cv = new ContentValues(6);
             cv.put("ID", status.getId());
             cv.put("I_REP_TO", status.getInReplyToStatusId());
             cv.put("LIST_ID", list_id);
             cv.put("ACCOUNT_ID",accountId);
             cv.put("STATUS",json);
+            cv.put("ctime",now);
             values.add(cv);
         }
         tweetDB.storeValues(TweetDB.TABLE_STATUSES,values);

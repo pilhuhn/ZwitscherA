@@ -13,6 +13,7 @@ import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.NewAccountActivity;
 import de.bsd.zwitscher.account.SelectAccountActivity;
+import de.bsd.zwitscher.helper.CleanupTask;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.SavedSearch;
 import twitter4j.UserList;
@@ -173,9 +174,9 @@ public class TabWidget extends TabActivity {
             i = new Intent(TabWidget.this, HelpActivity.class);
             startActivity(i);
             break;
-
-
-
+        case R.id.menu_cleanTweets:
+            new CleanupTask(this).execute();
+            break;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
@@ -212,7 +213,6 @@ public class TabWidget extends TabActivity {
 			}
 		}
 
-        syncSearches(th,tdb);
 	}
 
     private void syncSearches(TwitterHelper th, TweetDB tdb) {
@@ -242,7 +242,7 @@ public class TabWidget extends TabActivity {
 
     private void cleanTweetDB() {
         TweetDB tb = new TweetDB(this,accountId);
-        tb.cleanTweets();
+        tb.cleanTweetDB();
     }
 
     private void cleanImages() {

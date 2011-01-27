@@ -58,6 +58,7 @@ public class TweetDB {
                     "LIST_ID LONG, " +
                     "I_REP_TO LONG, " +
                     "STATUS STRING, " +
+                    "ctime LONG,  " +
                     "UNIQUE (ID, LIST_ID, " + ACCOUNT_ID + ")" +
                     ")"
 
@@ -151,6 +152,7 @@ public class TweetDB {
                         "UNIQUE (name, serverUrl ) " +// TODO add index in default
                     ")"
                 );
+                db.execSQL("ALTER TABLE " + TABLE_STATUSES + " ADD COLUMN ctime LONG");
             }
 
 		}
@@ -258,7 +260,7 @@ public class TweetDB {
      * @param status_json Json representation of it.
      */
     public void updateStatus(long id, String status_json) {
-        ContentValues cv = new ContentValues(1);
+        ContentValues cv = new ContentValues(2);
         cv.put(STATUS, status_json);
         cv.put(ACCOUNT_ID,account);
         SQLiteDatabase db = tdHelper.getWritableDatabase();
@@ -418,13 +420,20 @@ public class TweetDB {
     /**
      * Purge the statuses table.
      */
-    public void cleanTweets() {
+    public void cleanTweetDB() {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_STATUSES);
         db.execSQL("DELETE FROM " + TABLE_DIRECTS);
         db.execSQL("DELETE FROM " + TABLE_USERS);
         db.execSQL("DELETE FROM " + TABLE_LAST_READ);
         db.close();
+    }
+
+    public void cleanStatuses(long cutOff) {
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_STATUSES + " WHERE ctime < " + cutOff);
+        db.close();
+
     }
 
     /**
