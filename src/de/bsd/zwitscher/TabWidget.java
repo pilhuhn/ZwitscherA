@@ -121,16 +121,16 @@ public class TabWidget extends TabActivity {
                     .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_list))
                     .setContent(listsIntent);
             tabHost.addTab(homeSpec);
-        }
 
-        Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
-        searchIntent.putExtra("list",1);
-        searchIntent.putExtra("account",account);
-        tmp = getString(R.string.searches);
-        homeSpec = tabHost.newTabSpec("searches")
-                .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_search))
-                .setContent(searchIntent);
-        tabHost.addTab(homeSpec);
+            Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
+            searchIntent.putExtra("list",1);
+            searchIntent.putExtra("account",account);
+            tmp = getString(R.string.searches);
+            homeSpec = tabHost.newTabSpec("searches")
+                    .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_search))
+                    .setContent(searchIntent);
+            tabHost.addTab(homeSpec);
+        }
     }
 
     @Override
@@ -190,28 +190,31 @@ public class TabWidget extends TabActivity {
 	private void syncLists() {
 		TwitterHelper th = new TwitterHelper(this, account);
         TweetDB tdb = new TweetDB(this,accountId);
-		List<UserList> userLists = th.getUserLists();
-		Map<String,Integer> storedLists = tdb.getLists();
-		// Check for lists to add
-		for (UserList userList : userLists) {
-			if (!storedLists.containsValue(userList.getId())) {
-				tdb.addList(userList.getName(),userList.getId(), DataObjectFactory.getRawJSON(userList));
-			}
-		}
-		// check for outdated lists and remove them
-		for (Entry<String, Integer> entry : storedLists.entrySet()) {
-			Integer id = entry.getValue();
-			boolean found = false;
-			for (UserList userList2 : userLists) {
-				if (userList2.getId() == id) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				tdb.removeList(id);
-			}
-		}
+        if (account.getServerType().equalsIgnoreCase("twitter")) {
+            List<UserList> userLists = th.getUserLists();
+            Map<String,Integer> storedLists = tdb.getLists();
+            // Check for lists to add
+            for (UserList userList : userLists) {
+                if (!storedLists.containsValue(userList.getId())) {
+                    tdb.addList(userList.getName(),userList.getId(), DataObjectFactory.getRawJSON(userList));
+                }
+            }
+            // check for outdated lists and remove them
+            for (Entry<String, Integer> entry : storedLists.entrySet()) {
+                Integer id = entry.getValue();
+                boolean found = false;
+                for (UserList userList2 : userLists) {
+                    if (userList2.getId() == id) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    tdb.removeList(id);
+                }
+            }
+            syncSearches(th,tdb);
+        }
 
 	}
 
