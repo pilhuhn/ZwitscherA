@@ -658,7 +658,7 @@ public class TweetDB {
 
     public void deleteAccount(Account account) {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.delete(TABLE_ACCOUNTS,"name = ? AND type = ? ", new String[]{account.getName(),account.getServerType()});
+        db.delete(TABLE_ACCOUNTS,"name = ? AND serverType = ? ", new String[]{account.getName(),account.getServerType()});
         db.close();
     }
 

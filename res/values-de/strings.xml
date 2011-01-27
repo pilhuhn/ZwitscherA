@@ -106,7 +106,9 @@
     <string name="new_account_create_title">Account anlegen</string>
     <string name="new_account_switch">Zum neuen Account wechseln</string>
     <string name="new_account_create">Anlegen!</string>
-    <string name="menu_switch_account">Account wechseln</string>
+    <string name="menu_switch_account">Accounts</string>
+    <string name="select_account_delete">Account löschen</string>
+
 
 
 

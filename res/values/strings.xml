@@ -112,7 +112,8 @@
     <string name="new_account_create_title">Create account</string>
     <string name="new_account_switch">Switch to new</string>
     <string name="new_account_create">Create!</string>
-    <string name="menu_switch_account">Switch account</string>
+    <string name="menu_switch_account">Accounts</string>
+    <string name="select_account_delete">Delete Account</string>
 
 
 </resources>
