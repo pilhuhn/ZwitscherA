@@ -161,13 +161,8 @@ public class TabWidget extends TabActivity {
         case R.id.DevelCleanImages:
             cleanImages();
             break;
-        case R.id.DevelCreateAccount:
-            i = new Intent(this,NewAccountActivity.class);
-            startActivity(i);
-            break;
         case R.id.AccountStuff:
             i = new Intent(this, AccountStuffActivity.class);
-            // TODO
             startActivity(i);
             break;
         case R.id.helpMenu:
