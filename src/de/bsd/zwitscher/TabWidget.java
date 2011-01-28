@@ -12,7 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.NewAccountActivity;
-import de.bsd.zwitscher.account.SelectAccountActivity;
+import de.bsd.zwitscher.account.AccountStuffActivity;
 import de.bsd.zwitscher.helper.CleanupTask;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.SavedSearch;
@@ -127,7 +127,7 @@ public class TabWidget extends TabActivity {
             searchIntent.putExtra("account",account);
             tmp = getString(R.string.searches);
             homeSpec = tabHost.newTabSpec("searches")
-                    .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_search))
+                    .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_search))
                     .setContent(searchIntent);
             tabHost.addTab(homeSpec);
         }
@@ -165,8 +165,8 @@ public class TabWidget extends TabActivity {
             i = new Intent(this,NewAccountActivity.class);
             startActivity(i);
             break;
-        case R.id.DevelSwitchAccount:
-            i = new Intent(this, SelectAccountActivity.class);
+        case R.id.AccountStuff:
+            i = new Intent(this, AccountStuffActivity.class);
             // TODO
             startActivity(i);
             break;

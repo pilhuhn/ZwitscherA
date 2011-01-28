@@ -29,7 +29,7 @@ public class TweetDB {
     private static final String TABLE_USERS = "users";
     private static final String TABLE_SEARCHES = "searches";
     public static final String TABLE_DIRECTS = "directs";
-    public static final String[] TABLES = {TABLE_ACCOUNTS, TABLE_STATUSES,
+    public static final String[] DATA_TABLES = {TABLE_STATUSES,
         TABLE_LAST_READ,TABLE_LISTS,TABLE_USERS,TABLE_SEARCHES,TABLE_DIRECTS};
     static final String STATUS = "STATUS";
     static final String ACCOUNT_ID = "ACCOUNT_ID";
@@ -661,9 +661,10 @@ public class TweetDB {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         String accountString = "" + account.getId();
         String[] accounts = new String[]{accountString};
-        for (String table: TABLES) {
+        for (String table: DATA_TABLES) {
             db.delete(table,ACCOUNT_ID_IS,accounts);
         }
+        db.delete(TABLE_ACCOUNTS,"id = ?", accounts);
         db.close();
     }
 

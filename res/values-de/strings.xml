@@ -36,6 +36,9 @@
     <string name="no_searches_found">Keine gespeicherten Suchen gefunden - Bitte synchronisieren Sie</string>
     <string name="updating">Aktualisiere</string>
     <string name="user">Benutzer</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+
 
 
 
@@ -101,13 +104,15 @@
     <string name="help_more">Um mehr zu erfahren, gehen Sie zu http://bsd.de/zwitscher . Um Bugs zu melden, Wünsche aufzuschreiben oder den Quellcode anzusehen, gehen Sie zu https://github.com/pilhuhn/ZwitscherA . Zusätzliche Hilfe gibt es auch im Wiki unter https://github.com/pilhuhn/ZwitscherA/wiki/Help</string>
 
     <string name="select_account_select">Bitte Account auswählen</string>
-    <string name="select_account_pick">Account auswählen</string>
+    <string name="select_account_pick">Account wechseln</string>
     <string name="select_account_new">Account hinzufügen</string>
     <string name="new_account_create_title">Account anlegen</string>
     <string name="new_account_switch">Zum neuen Account wechseln</string>
     <string name="new_account_create">Anlegen!</string>
     <string name="menu_switch_account">Accounts</string>
-    <string name="select_account_delete">Account löschen</string>
+    <string name="select_account_delete">Account löschen...</string>
+    <string name="really_delete">Wirklich löschen:</string>
+
 
 
 

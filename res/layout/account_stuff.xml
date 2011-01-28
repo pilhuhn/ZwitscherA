@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <Button
+            android:id="@+id/NewAccountButton"
+            android:text="@string/select_account_new"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="newAccount"
+            android:padding="10dp"
+            android:paddingBottom="20dp"
+            />
+
+
+    <TextView
+            android:id="@+id/AccountSelectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_account_select"
+            android:layout_below="@id/NewAccountButton"
+            android:textStyle="bold"
+            />
+
+    <Spinner android:id="@+id/select_account_spinner"
+             android:layout_height="wrap_content"
+             android:layout_width="fill_parent"
+             android:prompt="@string/select_account_select"
+             android:layout_below="@id/AccountSelectionTitle"
+             android:padding="10dp"
+             />
+
+    <Button
+            android:id="@+id/select_account_pick_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="switchAccount"
+            android:text="@string/select_account_pick"
+            android:padding="10dp"
+            android:layout_below="@id/select_account_spinner"
+            />
+
+
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="deleteAccount"
+            android:text="@string/select_account_delete"
+            android:padding="10dp"
+            android:layout_below="@id/select_account_spinner"
+            android:layout_toRightOf="@id/select_account_pick_button"
+            />
+
+</RelativeLayout>

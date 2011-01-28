@@ -12,7 +12,7 @@
           />
     <item android:enabled="true" android:id="@+id/helpMenu"
       android:titleCondensed="@string/help" android:title="@string/help"/>
-    <item android:id="@+id/DevelSwitchAccount"
+    <item android:id="@+id/AccountStuff"
           android:title="@string/menu_switch_account"/>
     <item android:id="@+id/DevelMenu"
           android:title="Devel..."
