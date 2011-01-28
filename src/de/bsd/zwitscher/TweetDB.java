@@ -192,14 +192,20 @@ public class TweetDB {
 		cv.put("last_read_id", last_read_id);
         cv.put(ACCOUNT_ID,account);
 
-		SQLiteDatabase db = tdHelper.getWritableDatabase();
-		int updated = db.update(TABLE_LAST_READ, cv, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id),account});
-		if (updated==0) {
-			// row not yet present
-			db.insert(TABLE_LAST_READ, null, cv);
-		}
-		db.close();
-	}
+        try {
+            SQLiteDatabase db;
+            db= tdHelper.getWritableDatabase();
+            int updated = db.update(TABLE_LAST_READ, cv, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id),account});
+            if (updated==0) {
+                // row not yet present
+                db.insert(TABLE_LAST_READ, null, cv);
+            }
+            db.close();
+        } catch (Exception e) {
+            // Situation is not too bad, as it just means more network traffic next time // TODO find better solution
+            e.printStackTrace();
+        }
+    }
 
 
     /**
