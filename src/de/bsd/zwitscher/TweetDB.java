@@ -29,6 +29,8 @@ public class TweetDB {
     private static final String TABLE_USERS = "users";
     private static final String TABLE_SEARCHES = "searches";
     public static final String TABLE_DIRECTS = "directs";
+    public static final String[] TABLES = {TABLE_ACCOUNTS, TABLE_STATUSES,
+        TABLE_LAST_READ,TABLE_LISTS,TABLE_USERS,TABLE_SEARCHES,TABLE_DIRECTS};
     static final String STATUS = "STATUS";
     static final String ACCOUNT_ID = "ACCOUNT_ID";
     static final String ACCOUNT_ID_IS = ACCOUNT_ID + "=?";
@@ -614,14 +616,13 @@ public class TweetDB {
     public List<Account> getAccountsForSelection() {
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
-        Account account=null;
         List<Account> accounts = new ArrayList<Account>();
         c = db.query(TABLE_ACCOUNTS,null, null,null,null,null,null);
         if (c.getCount()>0) {
             c.moveToFirst();
             do {
                 boolean isDefault = c.getInt(6) == 1;
-                account = new Account(
+                Account account = new Account(
                         c.getInt(0), // id
                         c.getString(1), // name
                         c.getString(2), // token key
@@ -658,7 +659,11 @@ public class TweetDB {
 
     public void deleteAccount(Account account) {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.delete(TABLE_ACCOUNTS,"name = ? AND serverType = ? ", new String[]{account.getName(),account.getServerType()});
+        String accountString = "" + account.getId();
+        String[] accounts = new String[]{accountString};
+        for (String table: TABLES) {
+            db.delete(table,ACCOUNT_ID_IS,accounts);
+        }
         db.close();
     }
 
