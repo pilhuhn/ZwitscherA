@@ -26,11 +26,13 @@ public class SelectAccountActivity extends Activity {
 		setContentView(R.layout.select_account);
 	}
 
+    @SuppressWarnings("unused")
 	public void newAccount(View view) {
 		Intent i = new Intent(this,NewAccountActivity.class);
 		startActivity(i);
 	}
 
+    @SuppressWarnings("unused")
     public void showAccounts(View view) {
 
         List<String> data = getAccounts();
@@ -42,7 +44,7 @@ public class SelectAccountActivity extends Activity {
         startActivityForResult(intent, 1);
     }
 
-
+    @SuppressWarnings("unused")
     public void deleteAccount(View v) {
         List<String> data = getAccounts();
 
@@ -96,12 +98,15 @@ public class SelectAccountActivity extends Activity {
 
         TweetDB tdb = new TweetDB(this,-1); // Account does not matter
         tdb.deleteAccount(account);
+
+        // Just select the first available account to switch to
         List<Account> theAccounts = tdb.getAccountsForSelection();
         if (!theAccounts.isEmpty()) {
             Account first = theAccounts.get(0);
             tdb.setDefaultAccount(first.getId());
             return first;
         }
+        // No more accounts?
         return null;
     }
 
@@ -145,13 +150,11 @@ public class SelectAccountActivity extends Activity {
         accounts = tdb.getAccountsForSelection();
         List<String> data = new ArrayList<String>(accounts.size());
         for (Account account : accounts) {
-            String e = account.getId() + ": " + account.getServerType() + ": " + account.getName();
+            String e = account.getId() + ": " + account.getName() + "@" + account.getServerType();
             if (account.isDefaultAccount())
                 e += ", (*)";
             data.add(e);
         }
         return data;
     }
-
-
 }
