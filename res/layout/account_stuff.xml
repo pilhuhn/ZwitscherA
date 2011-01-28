@@ -54,4 +54,13 @@
             android:layout_toRightOf="@id/select_account_pick_button"
             />
 
+    <ImageButton
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="left"
+        android:onClick="done"
+        android:src="@drawable/back_button"
+        android:layout_below="@id/select_account_pick_button"
+    />
+
 </RelativeLayout>

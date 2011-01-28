@@ -87,6 +87,11 @@ public class AccountStuffActivity extends Activity {
 
     }
 
+    @SuppressWarnings("unused")
+    public void done(View v) {
+        finish();
+    }
+
 
     private Account removeAccountFromDb(Account account) {
 
