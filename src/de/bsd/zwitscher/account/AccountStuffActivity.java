@@ -54,6 +54,8 @@ public class AccountStuffActivity extends Activity {
     public void switchAccount(View view) {
 
         Account account = getSelectedAccountFromSpinner();
+        TweetDB tdb = new TweetDB(this,-1);
+        tdb.setDefaultAccount(account.getId());
         switchToSelectedAccount(account);
 
     }

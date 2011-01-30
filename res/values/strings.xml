@@ -117,6 +117,7 @@
     <string name="menu_switch_account">Accounts</string>
     <string name="select_account_delete">Delete Account...</string>
     <string name="really_delete">Really delete</string>
+    <string name="menu_clean_statuses">Clean up Statuses</string>
 
 
 </resources>

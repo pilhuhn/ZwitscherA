@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import android.util.Log;
 import de.bsd.zwitscher.account.Account;
 
 /**
@@ -605,6 +606,7 @@ public class TweetDB {
         if (id==-1)
             throw new IllegalStateException("Account id must not be -1");
 
+        Log.i("TweetDB", "Setting default account to id " + id);
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         // First see if the id exists
         Cursor c;

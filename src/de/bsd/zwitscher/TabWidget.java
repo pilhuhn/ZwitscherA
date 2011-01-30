@@ -172,6 +172,12 @@ public class TabWidget extends TabActivity {
         case R.id.menu_cleanTweets:
             new CleanupTask(this).execute();
             break;
+        case R.id.DevelDumpAccounts:
+            TweetDB tmpDb = new TweetDB(this,-1);
+            List<Account> allAccounts = tmpDb.getAccountsForSelection();
+            for (Account a : allAccounts)
+                System.out.println(a);
+            break;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
