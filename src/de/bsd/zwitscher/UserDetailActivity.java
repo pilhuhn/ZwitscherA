@@ -72,6 +72,10 @@ public class UserDetailActivity extends Activity  {
     public void onResume() {
         super.onResume();
         account = getIntent().getExtras().getParcelable("account");
+        if (account==null) {
+            TweetDB tmp = new TweetDB(this,-1);
+            account = tmp.getDefaultAccount();
+        }
         thTwitterHelper = new TwitterHelper(this, account);
         userId = bundle.getInt("userId");
         userName = bundle.getString("userName");
