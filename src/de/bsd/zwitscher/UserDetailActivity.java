@@ -45,7 +45,6 @@ public class UserDetailActivity extends Activity  {
     User theUser;
     boolean weAreFollowing = false;
     Button followButton ;
-    private String userName;
     private int userId;
     private Account account;
 
@@ -72,13 +71,9 @@ public class UserDetailActivity extends Activity  {
     public void onResume() {
         super.onResume();
         account = getIntent().getExtras().getParcelable("account");
-        if (account==null) {
-            TweetDB tmp = new TweetDB(this,-1);
-            account = tmp.getDefaultAccount();
-        }
         thTwitterHelper = new TwitterHelper(this, account);
         userId = bundle.getInt("userId");
-        userName = bundle.getString("userName");
+        String userName = bundle.getString("userName");
 
         // If the user is in the DB, show the saved state while reloading its data
         if (userId!=0) {

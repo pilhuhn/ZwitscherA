@@ -77,6 +77,21 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
         // If this is not null, we are called from another app
         if ( dataString!=null) {
+            // Lets see what server type that is and get an account for it
+            // so that we can access the data
+            if (dataString.contains("://twitter.com")) {
+                TweetDB tmp = new TweetDB(this,-1);
+                account = tmp.getAccountForType("twitter");
+            }
+            else if (dataString.contains("://identi.ca")) {
+                TweetDB tmp = new TweetDB(this,-1);
+                account = tmp.getAccountForType("identi.ca");
+
+            }
+            else {
+                // TODO for e.g. generic status.net
+            }
+
             if (dataString.matches("http://twitter.com/.*/status/.*$")) {
                 String tids = dataString.substring(dataString.lastIndexOf("/")+1);
                 Long tid = Long.parseLong(tids);
@@ -85,6 +100,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             } else if (dataString.matches("http://twitter.com/#!/.*$")) {
                 // A user - forward to UserDetailActivity TODO: remove once this is coded in AndroidManifest.xml
                 String userName = dataString.substring(dataString.lastIndexOf("/")+1);
+                // TODO account needs to be a twitter one
+
                 Intent i = new Intent(this,UserDetailActivity.class);
                 i.putExtra("userName",userName);
                 i.putExtra("account",account);
@@ -92,6 +109,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 finish();
             } else if (dataString.matches("http://twitter.com/[a-zA-Z0-9_]*\\?.*")) {
                 // A user ref in email - forward to UserDetailActivity TODO: remove once this is coded in AndroidManifest.xml
+                // TODO account needs to be a twitter one
+
                 String userName = dataString.substring(19,dataString.indexOf("?"));
                 Intent i = new Intent(this,UserDetailActivity.class);
                 i.putExtra("userName",userName);
