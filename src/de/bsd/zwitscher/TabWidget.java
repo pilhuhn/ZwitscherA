@@ -11,7 +11,6 @@ import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
-import de.bsd.zwitscher.account.NewAccountActivity;
 import de.bsd.zwitscher.account.AccountStuffActivity;
 import de.bsd.zwitscher.helper.CleanupTask;
 import de.bsd.zwitscher.helper.PicHelper;

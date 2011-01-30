@@ -329,7 +329,7 @@ public class TweetDB {
 
         Cursor c ;
         c = db.query(TABLE_STATUSES,new String[]{STATUS}, "status LIKE '%" + query + "%' AND " + ACCOUNT_ID_IS
-                ,new String[]{account},null,null,"ID DESC","30"); // only 30 results
+                ,new String[]{account},null,null,"ID DESC","100"); // only 100 results -> may get filtered down later
         if (c.getCount()>0) {
             c.moveToFirst();
             do {

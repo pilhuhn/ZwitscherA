@@ -567,7 +567,8 @@ Log.d("FillUp","Return: " + i);
         List<Status> ret = new ArrayList<Status>(jsons.size());
         for (String s : jsons ) {
             Status st = materializeStatus(s);
-            ret.add(st);
+            if (st.getText().toLowerCase().contains(query.toLowerCase()))
+                ret.add(st);
         }
 
         return ret;
