@@ -77,6 +77,15 @@
                      android:onClick="classicRetweet"
                      android:src="@drawable/rt_button_cl"
                      android:text="Classic Retweet"/>
+        <ImageButton android:id="@+id/DirectButton"
+                     android:layout_below="@id/TimeTextView"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_toRightOf="@id/ClassicRetweetButton"
+                     android:onClick="directMessage"
+                     android:src="@drawable/direct_button"
+                     android:text="Direct"/>
+
 
         <ImageButton android:id="@+id/ThreadButton"
                      android:layout_below="@id/ReplyButton"
@@ -85,38 +94,30 @@
                      android:onClick="threadView"
                      android:src="@drawable/threads"
                      android:text="Thread"/>
-        <ImageButton android:id="@+id/DirectButton"
-                     android:layout_below="@id/ReplyButton"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:layout_toRightOf="@id/ThreadButton"
-                     android:onClick="directMessage"
-                     android:src="@drawable/direct_button"
-                     android:text="Direct"/>
         <ImageButton android:id="@+id/FavoriteButton"
                      android:layout_below="@id/ReplyButton"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
-                     android:layout_toRightOf="@id/DirectButton"
+                     android:layout_toRightOf="@id/ThreadButton"
                      android:onClick="favorite"
                      android:src="@drawable/favorite_off"
                      android:text="Favorite"/>
-
-        <ImageButton android:id="@+id/SpeakButton"
-                     android:layout_below="@id/ThreadButton"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:onClick="speak"
-                     android:src="@drawable/speaker"
-                     android:text="Speak"/>
         <ImageButton android:id="@+id/TranslateButton"
-                     android:layout_below="@id/ThreadButton"
-                     android:layout_toRightOf="@id/SpeakButton"
+                     android:layout_below="@id/ReplyButton"
+                     android:layout_toRightOf="@id/FavoriteButton"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:onClick="translate"
                      android:src="@drawable/translate"
                      android:text="Translate"/>
+        <ImageButton android:id="@+id/SpeakButton"
+                     android:layout_below="@id/ReplyButton"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:onClick="speak"
+                     android:src="@drawable/speaker"
+                     android:layout_toRightOf="@id/TranslateButton"
+                     android:text="Speak"/>
 
         <ImageButton android:id="@+id/DoneButton"
                      android:layout_below="@id/SpeakButton"
