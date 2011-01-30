@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import android.util.Log;
 import de.bsd.zwitscher.account.Account;
 
 /**
@@ -29,6 +30,8 @@ public class TweetDB {
     private static final String TABLE_USERS = "users";
     private static final String TABLE_SEARCHES = "searches";
     public static final String TABLE_DIRECTS = "directs";
+    public static final String[] DATA_TABLES = {TABLE_STATUSES,
+        TABLE_LAST_READ,TABLE_LISTS,TABLE_USERS,TABLE_SEARCHES,TABLE_DIRECTS};
     static final String STATUS = "STATUS";
     static final String ACCOUNT_ID = "ACCOUNT_ID";
     static final String ACCOUNT_ID_IS = ACCOUNT_ID + "=?";
@@ -58,6 +61,7 @@ public class TweetDB {
                     "LIST_ID LONG, " +
                     "I_REP_TO LONG, " +
                     "STATUS STRING, " +
+                    "ctime LONG,  " +
                     "UNIQUE (ID, LIST_ID, " + ACCOUNT_ID + ")" +
                     ")"
 
@@ -151,6 +155,7 @@ public class TweetDB {
                         "UNIQUE (name, serverUrl ) " +// TODO add index in default
                     ")"
                 );
+                db.execSQL("ALTER TABLE " + TABLE_STATUSES + " ADD COLUMN ctime LONG");
             }
 
 		}
@@ -188,14 +193,20 @@ public class TweetDB {
 		cv.put("last_read_id", last_read_id);
         cv.put(ACCOUNT_ID,account);
 
-		SQLiteDatabase db = tdHelper.getWritableDatabase();
-		int updated = db.update(TABLE_LAST_READ, cv, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id),account});
-		if (updated==0) {
-			// row not yet present
-			db.insert(TABLE_LAST_READ, null, cv);
-		}
-		db.close();
-	}
+        try {
+            SQLiteDatabase db;
+            db= tdHelper.getWritableDatabase();
+            int updated = db.update(TABLE_LAST_READ, cv, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id),account});
+            if (updated==0) {
+                // row not yet present
+                db.insert(TABLE_LAST_READ, null, cv);
+            }
+            db.close();
+        } catch (Exception e) {
+            // Situation is not too bad, as it just means more network traffic next time // TODO find better solution
+            e.printStackTrace();
+        }
+    }
 
 
     /**
@@ -258,7 +269,7 @@ public class TweetDB {
      * @param status_json Json representation of it.
      */
     public void updateStatus(long id, String status_json) {
-        ContentValues cv = new ContentValues(1);
+        ContentValues cv = new ContentValues(2);
         cv.put(STATUS, status_json);
         cv.put(ACCOUNT_ID,account);
         SQLiteDatabase db = tdHelper.getWritableDatabase();
@@ -311,6 +322,28 @@ public class TweetDB {
 
         return ret;
     }
+
+    public List<String> searchStatuses(String query) {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        List<String> ret = new ArrayList<String>();
+
+        Cursor c ;
+        c = db.query(TABLE_STATUSES,new String[]{STATUS}, "status LIKE '%" + query + "%' AND " + ACCOUNT_ID_IS
+                ,new String[]{account},null,null,"ID DESC","30"); // only 30 results
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            do {
+                String json = c.getString(0);
+                ret.add(json);
+            } while (c.moveToNext());
+        }
+        c.close();
+        db.close();
+
+        return ret;
+
+    }
+
 
     /**
      * Get all statuses that are marked as a reply to the passed one.
@@ -418,13 +451,20 @@ public class TweetDB {
     /**
      * Purge the statuses table.
      */
-    public void cleanTweets() {
+    public void cleanTweetDB() {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_STATUSES);
         db.execSQL("DELETE FROM " + TABLE_DIRECTS);
         db.execSQL("DELETE FROM " + TABLE_USERS);
         db.execSQL("DELETE FROM " + TABLE_LAST_READ);
         db.close();
+    }
+
+    public void cleanStatuses(long cutOff) {
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_STATUSES + " WHERE ctime < " + cutOff);
+        db.close();
+
     }
 
     /**
@@ -588,6 +628,7 @@ public class TweetDB {
         if (id==-1)
             throw new IllegalStateException("Account id must not be -1");
 
+        Log.i("TweetDB", "Setting default account to id " + id);
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         // First see if the id exists
         Cursor c;
@@ -605,14 +646,13 @@ public class TweetDB {
     public List<Account> getAccountsForSelection() {
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
-        Account account=null;
         List<Account> accounts = new ArrayList<Account>();
         c = db.query(TABLE_ACCOUNTS,null, null,null,null,null,null);
         if (c.getCount()>0) {
             c.moveToFirst();
             do {
                 boolean isDefault = c.getInt(6) == 1;
-                account = new Account(
+                Account account = new Account(
                         c.getInt(0), // id
                         c.getString(1), // name
                         c.getString(2), // token key
@@ -630,6 +670,16 @@ public class TweetDB {
 
         return accounts;
     }
+
+    public Account getAccountForType(String s) {
+        List<Account> accounts = getAccountsForSelection();
+        for (Account account : accounts) {
+            if (account.getServerType().equalsIgnoreCase(s))
+                return account;
+        }
+        return null;
+    }
+
 
 
     public int getNewAccountId() {
@@ -649,7 +699,12 @@ public class TweetDB {
 
     public void deleteAccount(Account account) {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.delete(TABLE_ACCOUNTS,"name = ? AND type = ? ", new String[]{account.getName(),account.getServerType()});
+        String accountString = "" + account.getId();
+        String[] accounts = new String[]{accountString};
+        for (String table: DATA_TABLES) {
+            db.delete(table,ACCOUNT_ID_IS,accounts);
+        }
+        db.delete(TABLE_ACCOUNTS,"id = ?", accounts);
         db.close();
     }
 

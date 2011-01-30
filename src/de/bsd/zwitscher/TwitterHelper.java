@@ -17,7 +17,6 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.MetaList;
@@ -560,6 +559,21 @@ Log.d("FillUp","Return: " + i);
         return ret;
     }
 
+    public List<Status> searchStatues(String query) {
+        Log.i("searchStatuses", "Query= " + query);
+
+
+        List<String> jsons = tweetDB.searchStatuses(query);
+        List<Status> ret = new ArrayList<Status>(jsons.size());
+        for (String s : jsons ) {
+            Status st = materializeStatus(s);
+            ret.add(st);
+        }
+
+        return ret;
+    }
+
+
     /**
      * Retrieve a User object for the passed userId.
      * @param userId Id of the user to look up
@@ -684,14 +698,16 @@ Log.d("FillUp","Return: " + i);
             return;
 
         List<ContentValues> values = new ArrayList<ContentValues>(statuses.size());
+        long now = System.currentTimeMillis();
         for (Status status : statuses) {
             String json = DataObjectFactory.getRawJSON(status);
-            ContentValues cv = new ContentValues(5);
+            ContentValues cv = new ContentValues(6);
             cv.put("ID", status.getId());
             cv.put("I_REP_TO", status.getInReplyToStatusId());
             cv.put("LIST_ID", list_id);
             cv.put("ACCOUNT_ID",accountId);
             cv.put("STATUS",json);
+            cv.put("ctime",now);
             values.add(cv);
         }
         tweetDB.storeValues(TweetDB.TABLE_STATUSES,values);

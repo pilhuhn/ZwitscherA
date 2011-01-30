@@ -272,14 +272,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         fillListViewFromTimeline(false);
     }
 
-    /**
-     * Called from the Back button
-     * @param v
-     */
-    @SuppressWarnings("unused")
-    public void done(View v) {
-        finish();
-    }
 
     private void fillListViewFromTimeline(boolean fromDbOnly) {
     	new GetTimeLineTask(this).execute(fromDbOnly);

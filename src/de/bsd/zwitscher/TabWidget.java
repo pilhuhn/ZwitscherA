@@ -13,7 +13,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.NewAccountActivity;
-import de.bsd.zwitscher.account.SelectAccountActivity;
+import de.bsd.zwitscher.account.AccountStuffActivity;
+import de.bsd.zwitscher.helper.CleanupTask;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.SavedSearch;
 import twitter4j.UserList;
@@ -126,16 +127,16 @@ public class TabWidget extends TabActivity {
                     .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_list))
                     .setContent(listsIntent);
             tabHost.addTab(homeSpec);
-        }
 
-        Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
-        searchIntent.putExtra("list",1);
-        searchIntent.putExtra("account",account);
-        tmp = getString(R.string.searches);
-        homeSpec = tabHost.newTabSpec("searches")
-                .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_search))
-                .setContent(searchIntent);
-        tabHost.addTab(homeSpec);
+            Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
+            searchIntent.putExtra("list",1);
+            searchIntent.putExtra("account",account);
+            tmp = getString(R.string.searches);
+            homeSpec = tabHost.newTabSpec("searches")
+                    .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_search))
+                    .setContent(searchIntent);
+            tabHost.addTab(homeSpec);
+        }
     }
 
     @Override
@@ -173,14 +174,22 @@ public class TabWidget extends TabActivity {
             i = new Intent(this,NewAccountActivity.class);
             startActivity(i);
             break;
-        case R.id.DevelSwitchAccount:
-            i = new Intent(this, SelectAccountActivity.class);
-            // TODO
+        case R.id.AccountStuff:
+            i = new Intent(this, AccountStuffActivity.class);
             startActivity(i);
             break;
         case R.id.helpMenu:
             i = new Intent(TabWidget.this, HelpActivity.class);
             startActivity(i);
+            break;
+        case R.id.menu_cleanTweets:
+            new CleanupTask(this).execute();
+            break;
+        case R.id.DevelDumpAccounts:
+            TweetDB tmpDb = new TweetDB(this,-1);
+            List<Account> allAccounts = tmpDb.getAccountsForSelection();
+            for (Account a : allAccounts)
+                System.out.println(a);
             break;
 	    default:
 	        return super.onOptionsItemSelected(item);
@@ -195,30 +204,32 @@ public class TabWidget extends TabActivity {
 	private void syncLists() {
 		TwitterHelper th = new TwitterHelper(this, account);
         TweetDB tdb = new TweetDB(this,accountId);
-		List<UserList> userLists = th.getUserLists();
-		Map<String,Integer> storedLists = tdb.getLists();
-		// Check for lists to add
-		for (UserList userList : userLists) {
-			if (!storedLists.containsValue(userList.getId())) {
-				tdb.addList(userList.getName(),userList.getId(), DataObjectFactory.getRawJSON(userList));
-			}
-		}
-		// check for outdated lists and remove them
-		for (Entry<String, Integer> entry : storedLists.entrySet()) {
-			Integer id = entry.getValue();
-			boolean found = false;
-			for (UserList userList2 : userLists) {
-				if (userList2.getId() == id) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				tdb.removeList(id);
-			}
-		}
+        if (account.getServerType().equalsIgnoreCase("twitter")) {
+            List<UserList> userLists = th.getUserLists();
+            Map<String,Integer> storedLists = tdb.getLists();
+            // Check for lists to add
+            for (UserList userList : userLists) {
+                if (!storedLists.containsValue(userList.getId())) {
+                    tdb.addList(userList.getName(),userList.getId(), DataObjectFactory.getRawJSON(userList));
+                }
+            }
+            // check for outdated lists and remove them
+            for (Entry<String, Integer> entry : storedLists.entrySet()) {
+                Integer id = entry.getValue();
+                boolean found = false;
+                for (UserList userList2 : userLists) {
+                    if (userList2.getId() == id) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    tdb.removeList(id);
+                }
+            }
+            syncSearches(th,tdb);
+        }
 
-        syncSearches(th,tdb);
 	}
 
     private void syncSearches(TwitterHelper th, TweetDB tdb) {
@@ -248,7 +259,7 @@ public class TabWidget extends TabActivity {
 
     private void cleanTweetDB() {
         TweetDB tb = new TweetDB(this,accountId);
-        tb.cleanTweets();
+        tb.cleanTweetDB();
     }
 
     private void cleanImages() {

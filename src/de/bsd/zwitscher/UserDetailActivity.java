@@ -45,7 +45,6 @@ public class UserDetailActivity extends Activity  {
     User theUser;
     boolean weAreFollowing = false;
     Button followButton ;
-    private String userName;
     private int userId;
     private Account account;
 
@@ -74,7 +73,7 @@ public class UserDetailActivity extends Activity  {
         account = getIntent().getExtras().getParcelable("account");
         thTwitterHelper = new TwitterHelper(this, account);
         userId = bundle.getInt("userId");
-        userName = bundle.getString("userName");
+        String userName = bundle.getString("userName");
 
         // If the user is in the DB, show the saved state while reloading its data
         if (userId!=0) {
@@ -102,24 +101,38 @@ public class UserDetailActivity extends Activity  {
             findViewById(R.id.view_user_on_web_button).setEnabled(true);
 
             String colorString = user.getProfileBackgroundColor();
-            getWindow().setTitleColor(Color.parseColor("#" + colorString));
+            if (colorString.equals("")) {
+                colorString = "#EFEFEF";
+            }
+            if (!colorString.startsWith("#"))  // identi.ca sends the # , but twitter does not
+                colorString = "#" + colorString;
+            getWindow().setTitleColor(Color.parseColor(colorString));
             boolean downloadImages = new NetworkHelper(this).mayDownloadImages();
             if (downloadImages) {
-                try {
-                    URL url = new URL(user.getProfileBackgroundImageUrl());
-                    InputStream is = url.openStream();
-                    Drawable background = Drawable.createFromStream(is,"lala");
-                    getWindow().setBackgroundDrawable(background);
-                } catch (IOException e) {
-                    e.printStackTrace();  // TODO: Customise this generated block
-                } catch (OutOfMemoryError oome) {
-                    oome.printStackTrace();
+                String profileBackgroundImageUrl = user.getProfileBackgroundImageUrl();
+                if (!profileBackgroundImageUrl.equals("")) {
+                    try {
+                        URL url = new URL(profileBackgroundImageUrl);
+                        InputStream is = url.openStream();
+                        Drawable background = Drawable.createFromStream(is,"lala");
+                        getWindow().setBackgroundDrawable(background);
+                    } catch (IOException e) {
+                        e.printStackTrace();  // TODO: Customise this generated block
+                    } catch (OutOfMemoryError oome) {
+                        oome.printStackTrace();
+                    }
                 }
             }
             String textColorString = user.getProfileTextColor();
-            int textColor = Color.parseColor("#" + textColorString);
+            if (textColorString.equals(""))
+                textColorString = colorString;
+
+            if (!textColorString.startsWith("#"))
+                textColorString = "#" + textColorString;
+            int textColor = Color.parseColor(textColorString);
 
             userNameView.setTextColor(textColor);
+
 
             TableLayout tl = (TableLayout) findViewById(R.id.user_table_layout);
             for (int i = 0 ; i < tl.getChildCount(); i++) {
@@ -130,9 +143,13 @@ public class UserDetailActivity extends Activity  {
                 }
             }
             String backgroundColorString = user.getProfileSidebarFillColor();
-            int backgroundColor = Color.parseColor("#" + backgroundColorString);
-            tl.setBackgroundColor(backgroundColor);
-            userNameView.setBackgroundColor(backgroundColor);
+            if (!backgroundColorString.equals("")) {
+                if (!backgroundColorString.startsWith("#"))
+                    backgroundColorString = "#" + backgroundColorString;
+                int backgroundColor = Color.parseColor(backgroundColorString);
+                tl.setBackgroundColor(backgroundColor);
+                userNameView.setBackgroundColor(backgroundColor);
+            }
 
             PicHelper picHelper = new PicHelper();
             Bitmap bitmap;
@@ -154,7 +171,12 @@ public class UserDetailActivity extends Activity  {
             TextView webView = (TextView) findViewById(R.id.userDetail_web);
             if (user.getURL()!=null) {
                 webView.setText(user.getURL().toString());
-                webView.setTextColor(Color.parseColor("#" + user.getProfileLinkColor()));
+                String plc = user.getProfileBackgroundColor();
+                if (!plc.equals("")) {
+                    if (!plc.startsWith("#"))
+                        plc = "#" + plc;
+                    webView.setTextColor(Color.parseColor(plc));
+                }
             }
 
             TextView tweetView = (TextView) findViewById(R.id.userDetail_tweetCount);
@@ -250,7 +272,7 @@ public class UserDetailActivity extends Activity  {
 
         Intent intent = new Intent().setClass(this,TweetListActivity.class);
         intent.putExtra("userId",userId);
-        intent.putExtra("account",account);
+        intent.putExtra("account", account);
 
         startActivity(intent);
 

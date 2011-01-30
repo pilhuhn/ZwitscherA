@@ -7,8 +7,13 @@
 		  android:visible="true"/>
     <item android:enabled="true" android:id="@+id/reloadLists"
       android:titleCondensed="Sync L and S" android:title="Synchronize Lists and Searches..."/>
+    <item android:enabled="true" android:id="@+id/menu_cleanTweets"
+          android:title="@string/menu_clean_statuses"
+          />
     <item android:enabled="true" android:id="@+id/helpMenu"
       android:titleCondensed="@string/help" android:title="@string/help"/>
+    <item android:id="@+id/AccountStuff"
+          android:title="@string/menu_switch_account"/>
     <item android:id="@+id/DevelMenu"
           android:title="Devel..."
           android:enabled="true"  >
@@ -26,6 +31,9 @@
                   android:title="@string/new_account_create_title"/>
             <item android:id="@+id/DevelSwitchAccount"
                   android:title="@string/menu_switch_account"/>
+            <item android:id="@+id/DevelDumpAccounts"
+                  android:title="Dump accounts"
+                  />
         </menu>
     </item>
 </menu>
