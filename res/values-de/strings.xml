@@ -113,6 +113,7 @@
     <string name="select_account_delete">Account löschen...</string>
     <string name="really_delete">Wirklich löschen:</string>
     <string name="menu_clean_statuses">Status aufräumen</string>
+    <string name="search_hint">Nachrichten suchen</string>
 
 
 

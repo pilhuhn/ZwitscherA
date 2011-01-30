@@ -17,7 +17,6 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.MetaList;
@@ -559,6 +558,21 @@ Log.d("FillUp","Return: " + i);
         }
         return ret;
     }
+
+    public List<Status> searchStatues(String query) {
+        Log.i("searchStatuses", "Query= " + query);
+
+
+        List<String> jsons = tweetDB.searchStatuses(query);
+        List<Status> ret = new ArrayList<Status>(jsons.size());
+        for (String s : jsons ) {
+            Status st = materializeStatus(s);
+            ret.add(st);
+        }
+
+        return ret;
+    }
+
 
     /**
      * Retrieve a User object for the passed userId.

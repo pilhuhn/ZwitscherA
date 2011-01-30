@@ -323,6 +323,28 @@ public class TweetDB {
         return ret;
     }
 
+    public List<String> searchStatuses(String query) {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        List<String> ret = new ArrayList<String>();
+
+        Cursor c ;
+        c = db.query(TABLE_STATUSES,new String[]{STATUS}, "status LIKE '%" + query + "%' AND " + ACCOUNT_ID_IS
+                ,new String[]{account},null,null,"ID DESC","30"); // only 30 results
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            do {
+                String json = c.getString(0);
+                ret.add(json);
+            } while (c.moveToNext());
+        }
+        c.close();
+        db.close();
+
+        return ret;
+
+    }
+
+
     /**
      * Get all statuses that are marked as a reply to the passed one.
      * @param inRepyId Id of the original status
@@ -648,6 +670,16 @@ public class TweetDB {
 
         return accounts;
     }
+
+    public Account getAccountForType(String s) {
+        List<Account> accounts = getAccountsForSelection();
+        for (Account account : accounts) {
+            if (account.getServerType().equalsIgnoreCase(s))
+                return account;
+        }
+        return null;
+    }
+
 
 
     public int getNewAccountId() {

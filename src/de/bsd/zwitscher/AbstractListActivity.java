@@ -33,6 +33,10 @@ public abstract class AbstractListActivity extends ListActivity {
 
         account = getIntent().getExtras().getParcelable("account"); // TODO what if the account chages?  would need nuke + rebuild
 
+        if (account==null) {
+            TweetDB tmp = new TweetDB(this,-1);
+            account = tmp.getDefaultAccount();
+        }
         th = new TwitterHelper(this, account);
         tdb = new TweetDB(this,account.getId());
 
@@ -59,4 +63,8 @@ public abstract class AbstractListActivity extends ListActivity {
     }
 
     abstract public void reload(View v);
+
+    public void done(View v) {
+        finish();
+    }
 }
