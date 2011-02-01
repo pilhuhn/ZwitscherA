@@ -95,6 +95,20 @@ public class Account implements Parcelable {
         this.password = password;
     }
 
+    /**
+     * Return a canonical representation of this account that can be used
+     * within various places in the UI
+     * @return Human readable identifier of this account
+     */
+    public String getAccountIdentifier() {
+        if (serverUrl!=null && !serverUrl.isEmpty()) {
+            return name + "@" + serverUrl;
+        }
+        else {
+            return name + "@" + serverType;
+        }
+    }
+
     public int describeContents() {
         return 0;  // TODO: Customise this generated block
     }
@@ -138,6 +152,11 @@ public class Account implements Parcelable {
         return id;
     }
 
+    /**
+     * Return account details. For a human readable representation
+     * see {@link #getAccountIdentifier}
+     * @return String describing the account.
+     */
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("Account");
