@@ -559,16 +559,38 @@ Log.d("FillUp","Return: " + i);
         return ret;
     }
 
+    /**
+     * Search the status table for statuses of the current user
+     * that match the passed query entry.
+     * @param query
+     * @return
+     */
     public List<Status> searchStatues(String query) {
         Log.i("searchStatuses", "Query= " + query);
 
+        String what=null;
+        if (query.contains(":")) {
+            int pos = query.indexOf(':');
+            what = query.substring(0, pos);
+            query = query.substring(pos +1);
+        }
 
         List<String> jsons = tweetDB.searchStatuses(query);
         List<Status> ret = new ArrayList<Status>(jsons.size());
+        String qtl = query.toLowerCase();
         for (String s : jsons ) {
             Status st = materializeStatus(s);
-            if (st.getText().toLowerCase().contains(query.toLowerCase()))
-                ret.add(st);
+            if (what!=null) {
+                if ("from".equalsIgnoreCase(what)) {  // Todo limit options
+                    if (st.getUser().getName().contains(qtl))
+                        ret.add(st);
+                    if (st.getUser().getScreenName().contains(qtl))
+                        ret.add(st);
+                }
+            } else {
+                if (st.getText().toLowerCase().contains(qtl))
+                   ret.add(st);
+            }
         }
 
         return ret;
