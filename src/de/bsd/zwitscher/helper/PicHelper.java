@@ -19,6 +19,7 @@ import android.util.Log;
  */
 public class PicHelper {
 
+    static final String APP_BASE_DIR = "/Android/data/de.bsd.zwitscher/";
     String externalStorageState;
 
     public PicHelper() {
@@ -171,7 +172,7 @@ public class PicHelper {
      */
     private File getPictureFileForUser(String username) {
 		File baseDir = Environment.getExternalStorageDirectory();
-		File iconDir = new File(baseDir,"/Android/data/de.bsd.zwitscher/files/user_profiles");
+		File iconDir = new File(baseDir, APP_BASE_DIR + "files/user_profiles");
 		if (!iconDir.exists())
 			iconDir.mkdirs();
 		File iconFile = new File(iconDir,username);
@@ -183,11 +184,13 @@ public class PicHelper {
      */
     public void cleanup() {
         File baseDir = Environment.getExternalStorageDirectory();
-        File iconDir = new File(baseDir,"/Android/data/de.bsd.zwitscher/files/user_profiles");
+        File iconDir = new File(baseDir, APP_BASE_DIR + "files/user_profiles");
 
         File[] files = iconDir.listFiles();
-        for (File file : files) {
-            file.delete();
+        if (files!=null) {
+            for (File file : files) {
+                file.delete();
+            }
         }
     }
 
@@ -204,7 +207,7 @@ public class PicHelper {
 
         try {
             File baseDir = Environment.getExternalStorageDirectory();
-            File tmpDir = new File(baseDir,"/Android/data/de.bsd.zwitscher/pictures");
+            File tmpDir = new File(baseDir, APP_BASE_DIR + "pictures");
             if (!tmpDir.exists())
                 tmpDir.mkdirs();
             File file = new File(tmpDir,fileName);
