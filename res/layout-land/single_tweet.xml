@@ -74,13 +74,12 @@
                      android:onClick="classicRetweet"
                      android:src="@drawable/rt_button_cl"
                      android:text="Classic Retweet"/>
-        <ImageButton android:id="@+id/DirectButton"
+        <Button android:id="@+id/DirectButton"
                      android:layout_below="@id/TweetTextView"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:layout_toRightOf="@id/ClassicRetweetButton"
                      android:onClick="directMessage"
-                     android:src="@drawable/direct_button"
                      android:text="Direct"/>
         <ImageButton android:id="@+id/FavoriteButton"
                      android:layout_below="@id/TweetTextView"
@@ -116,6 +115,14 @@
                      android:src="@drawable/speaker"
                      android:onClick="speak"
                      android:text="Speak"/>
+        <ImageButton android:layout_below="@id/TweetTextView"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_toRightOf="@id/SpeakButton"
+                     android:text="Send"
+                     android:onClick="send"
+                     android:src="@drawable/direct_button"
+                />
 
 
         <ImageButton android:id="@+id/DoneButton"

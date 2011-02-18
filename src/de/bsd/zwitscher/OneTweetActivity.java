@@ -377,6 +377,33 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     //////////////// speak related stuff end ////////////////////
 
     /**
+     * Send a message via Email or ...
+     * Invoked from the send button
+     * @param v view this is invoked on
+     */
+    @SuppressWarnings("unused")
+    public void send(View v) {
+        User user = status.getUser();
+        String s = getString(R.string.wrote);
+        String wrote = user.getName() + "(@" + user.getScreenName() + ") " + s + ":";
+        String text = wrote + "\n\n" + status.getText();
+        String url ;
+        if (account.getServerType().equals("twitter")) {
+            url = "http://twitter.com/#!/" + user.getScreenName() + "/status/" + status.getId();
+            text = text + "\n\n" + url;
+        }
+
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("text/plain");
+        i.putExtra(Intent.EXTRA_TEXT,text);
+        String subject = getString(R.string.message_from_zwitscher);
+        i.putExtra(Intent.EXTRA_SUBJECT, subject);
+
+        startActivity(i);
+
+    }
+
+    /**
      * Translate the current status by calling Google translate.
      * Target language is the users current locale.
      * @param v
