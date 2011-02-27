@@ -66,7 +66,6 @@ public class PicHelper {
                 Log.i("fetchUserPic","Downloading image and persisting it locally");
                 BufferedInputStream in = new BufferedInputStream(imageUrl.openStream());
                 Bitmap bitmap = BitmapFactory.decodeStream(in);
-                bitmap = biteCornersOff(bitmap);
 
     			if (bitmap!=null && externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
     				File iconFile = getPictureFileForUser(username);
@@ -86,55 +85,6 @@ public class PicHelper {
         return getBitMapForUserFromFile(user);
 	}
 
-    /**
-     * Take a square bitmap as input and bite the four corners off -
-     * This means those pixels are set to Color.TRANSPARENT
-     * @param bitmap Original bitmap
-     * @return modified bitmap or null if original was null
-     */
-    private Bitmap biteCornersOff(final Bitmap bitmap) {
-        int transparent = Color.TRANSPARENT;
-        if (bitmap==null || bitmap.getConfig()==null) {
-            Log.d("BiteCornersOff", "bitmap or config was null");
-            return null;
-        }
-
-        Bitmap out = bitmap.copy(bitmap.getConfig(), true);
-        out.setPixel(0,0,transparent);
-        out.setPixel(1,0,transparent);
-        out.setPixel(0,1,transparent);
-        out.setPixel(2,0,transparent);
-        out.setPixel(1,1,transparent);
-        out.setPixel(0,2,transparent);
-
-        int mx=bitmap.getWidth()-1;
-        int my=bitmap.getHeight()-1;
-
-        out.setPixel(mx,my,transparent);
-        out.setPixel(mx-1,my,transparent);
-        out.setPixel(mx, my - 1, transparent);
-        out.setPixel(mx-2,my,transparent);
-        out.setPixel(mx-1,my-1,transparent);
-        out.setPixel(mx, my - 2, transparent);
-
-
-        out.setPixel(mx-1,0, transparent);
-        out.setPixel(mx,0, transparent);
-        out.setPixel(mx,1, transparent);
-        out.setPixel(mx-2,0, transparent);
-        out.setPixel(mx-1,1, transparent);
-        out.setPixel(mx,2, transparent);
-
-        out.setPixel(0,my,transparent);
-        out.setPixel(1,my,transparent);
-        out.setPixel(0,my-1,transparent);
-        out.setPixel(2,my,transparent);
-        out.setPixel(1,my-1,transparent);
-        out.setPixel(0,my-2,transparent);
-
-        bitmap.recycle();
-        return out;
-    }
 
     /**
      * Load the bitmap of the user icon for the given user
