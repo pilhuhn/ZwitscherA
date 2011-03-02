@@ -75,8 +75,7 @@ public class TabWidget extends TabActivity {
             setupTabs();
         }
         Log.i("TabWidget","Account=" + account);
-        TextView accountNameView = (TextView) findViewById(R.id.account_text);
-        accountNameView.setText(account.getAccountIdentifier());
+        titleTextBox.setText(account.getAccountIdentifier());
     }
 
     private void setupTabs() {
