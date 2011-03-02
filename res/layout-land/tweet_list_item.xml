@@ -8,13 +8,25 @@
 
     <TextView
         android:id="@+id/ListUserView"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="1dp"
         android:paddingLeft="2dp"
         android:textSize="10sp"
         android:autoLink="none"
         android:focusable="false"
+     />
+    <TextView
+        android:id="@+id/ListTimeView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/ListUserView"
+        android:paddingLeft="3dp"
+        android:padding="1dp"
+        android:textSize="10sp"
+        android:autoLink="none"
+        android:focusable="false"
+        android:layout_alignBaseline="@id/ListUserView"
      />
 
     <!-- left column -->
@@ -43,17 +55,6 @@
             android:textSize="14sp"
             android:autoLink="none"
             android:layout_below="@id/ListUserView"
-            android:focusable="false"
-         />
-        <TextView
-            android:id="@+id/ListTimeView"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/ListImageView"
-            android:paddingLeft="3dp"
-            android:textSize="10sp"
-            android:autoLink="none"
-            android:layout_below="@id/ListTextView"
             android:focusable="false"
          />
 </RelativeLayout>
