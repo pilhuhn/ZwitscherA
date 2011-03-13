@@ -215,8 +215,25 @@ public class TwitterHelper {
         return userLists;
 	}
 
+    /**
+     * Get the default account from the tweet db.
+     * @return Default account
+     */
+    private Account getDefaultAccount() {
+        Account acc = tweetDB.getDefaultAccount();
+        return acc;
+    }
 
+    /**
+     * Get an authorized org.twitter4j.Twitter instance. If the global
+     * account object is not set, the default account is used.
+     * @return authorized Twitter instance.
+     */
 	private Twitter getTwitter() {
+        if (account==null)
+            account = getDefaultAccount();
+
+
         if (account!=null) {
             if (account.getServerType().equalsIgnoreCase("twitter")) {
                 Twitter twitterInstance = new TwitterFactory().getOAuthAuthorizedInstance(
