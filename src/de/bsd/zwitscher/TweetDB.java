@@ -39,7 +39,7 @@ public class TweetDB {
     private final String account;
 
 	public TweetDB(Context context, int accountId) {
-		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 4);
+		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 5);
         account = String.valueOf(accountId);
 
 	}
@@ -66,6 +66,7 @@ public class TweetDB {
                     ")"
 
             );
+            db.execSQL("CREATE INDEX STATUS_CTIME_IDX ON " + TABLE_STATUSES + "(ctime)");
 
             db.execSQL(CREATE_TABLE + TABLE_DIRECTS + " (" +
                     "ID LONG, " +
@@ -156,6 +157,9 @@ public class TweetDB {
                     ")"
                 );
                 db.execSQL("ALTER TABLE " + TABLE_STATUSES + " ADD COLUMN ctime LONG");
+            }
+            if (oldVersion<5) {
+                db.execSQL("CREATE INDEX STATUS_CTIME_IDX ON " + TABLE_STATUSES + "(ctime)");
             }
 
 		}
