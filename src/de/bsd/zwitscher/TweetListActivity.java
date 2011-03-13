@@ -427,7 +427,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             if (pg!=null)
                 pg.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)
-                titleTextBox.setText("");
+                titleTextBox.setText(account.getAccountIdentifier());
 	        getListView().requestLayout();
             if (newMentions>0) {
                 String s = getString(R.string.new_mentions);

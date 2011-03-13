@@ -87,7 +87,7 @@
     <string name="help_add_list">Benutzer zu einer Liste hinzufügen</string>
     <string name="help_back_button">Gehe zurück zur vorherigen Seite</string>
     <string name="help_camera">Bild mit der Kamer aufnemen und an den Tweet anhängen. Siehe auch die Voresinstellungen für einen Upload-Dienst.</string>
-    <string name="help_direct_button">Dem Benutzer eine direkte Nachricht senden</string>
+    <string name="help_direct_button">Die Nachricht via Mail senden</string>
     <string name="help_favorite">Status als Favorit hinzufügen/löschen</string>
     <string name="help_post_button">Neue Nachricht schreiben</string>
     <string name="help_reload_button">Zeitstrahl neu (vom Server) laden</string>
@@ -114,6 +114,8 @@
     <string name="really_delete">Wirklich löschen:</string>
     <string name="menu_clean_statuses">Status aufräumen</string>
     <string name="search_hint">Nachrichten suchen</string>
+    <string name="wrote">schrieb</string>
+    <string name="message_from_zwitscher">Nachricht von Zwitscher</string>
 
 
 

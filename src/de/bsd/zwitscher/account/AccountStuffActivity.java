@@ -138,7 +138,7 @@ public class AccountStuffActivity extends Activity {
     private List<String> getStringsForAccounts() {
         List<String> data = new ArrayList<String>(accounts.size());
         for (Account account : accounts) {
-            String e = account.getName() + "@" + account.getServerType();
+            String e = account.getAccountIdentifier();
             data.add(e);
         }
         return data;

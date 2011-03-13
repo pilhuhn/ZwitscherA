@@ -39,7 +39,7 @@ public class TweetDB {
     private final String account;
 
 	public TweetDB(Context context, int accountId) {
-		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 4);
+		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 5);
         account = String.valueOf(accountId);
 
 	}
@@ -66,6 +66,7 @@ public class TweetDB {
                     ")"
 
             );
+            db.execSQL("CREATE INDEX STATUS_CTIME_IDX ON " + TABLE_STATUSES + "(ctime)");
 
             db.execSQL(CREATE_TABLE + TABLE_DIRECTS + " (" +
                     "ID LONG, " +
@@ -156,6 +157,9 @@ public class TweetDB {
                     ")"
                 );
                 db.execSQL("ALTER TABLE " + TABLE_STATUSES + " ADD COLUMN ctime LONG");
+            }
+            if (oldVersion<5) {
+                db.execSQL("CREATE INDEX STATUS_CTIME_IDX ON " + TABLE_STATUSES + "(ctime)");
             }
 
 		}
@@ -329,7 +333,7 @@ public class TweetDB {
 
         Cursor c ;
         c = db.query(TABLE_STATUSES,new String[]{STATUS}, "status LIKE '%" + query + "%' AND " + ACCOUNT_ID_IS
-                ,new String[]{account},null,null,"ID DESC","30"); // only 30 results
+                ,new String[]{account},null,null,"ID DESC","100"); // only 100 results -> may get filtered down later
         if (c.getCount()>0) {
             c.moveToFirst();
             do {

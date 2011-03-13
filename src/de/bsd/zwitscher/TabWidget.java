@@ -12,7 +12,6 @@ import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
-import de.bsd.zwitscher.account.NewAccountActivity;
 import de.bsd.zwitscher.account.AccountStuffActivity;
 import de.bsd.zwitscher.helper.CleanupTask;
 import de.bsd.zwitscher.helper.PicHelper;
@@ -82,8 +81,7 @@ public class TabWidget extends TabActivity {
             setupTabs();
         }
         Log.i("TabWidget","Account=" + account);
-        TextView accountNameView = (TextView) findViewById(R.id.account_text);
-        accountNameView.setText(account.getName() + " (" + account.getServerType() + ")"); // TODO more for generic status.net
+        titleTextBox.setText(account.getAccountIdentifier());
     }
 
     private void setupTabs() {

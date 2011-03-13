@@ -93,7 +93,7 @@
     <string name="help_add_list">Add the user to a list</string>
     <string name="help_back_button">Go back to the previous page</string>
     <string name="help_camera">Take a picture with the camera. See preferences for picture upload services.</string>
-    <string name="help_direct_button">Send a direct message to the user</string>
+    <string name="help_direct_button">Send the message via mail</string>
     <string name="help_favorite">Add/remote the status as/from favorite(s)</string>
     <string name="help_post_button">Write new message</string>
     <string name="help_reload_button">Reload the timeline (from the server)</string>
@@ -119,6 +119,8 @@
     <string name="really_delete">Really delete</string>
     <string name="menu_clean_statuses">Clean up Statuses</string>
     <string name="search_hint">Search messages</string>
+    <string name="wrote">wrote</string>
+    <string name="message_from_zwitscher">Message from Zwitscher</string>
 
 
 </resources>
