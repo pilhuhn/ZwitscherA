@@ -740,8 +740,15 @@ public class TweetDB {
      */
     public void storeValues(String table, List<ContentValues> values) {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        for (ContentValues val : values) {
-            db.insertWithOnConflict(table,null,val,SQLiteDatabase.CONFLICT_IGNORE);
+        try {
+            db.beginTransaction();
+            for (ContentValues val : values) {
+                db.insertWithOnConflict(table,null,val,SQLiteDatabase.CONFLICT_IGNORE);
+            }
+            db.setTransactionSuccessful();
+        }
+        finally {
+            db.endTransaction();
         }
         db.close();
     }
