@@ -123,6 +123,7 @@
     <string name="search_hint">Search messages</string>
     <string name="wrote">wrote</string>
     <string name="message_from_zwitscher">Message from Zwitscher</string>
+    <string name="click_here">&lt;--- press here</string>
 
 
 </resources>

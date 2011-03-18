@@ -59,6 +59,7 @@
     <!-- preferences -->
 
     <string name="search_hint">Chercher des messages</string>
+    <string name="click_here">&lt;--- cliquez ici</string>
 
 
 </resources>

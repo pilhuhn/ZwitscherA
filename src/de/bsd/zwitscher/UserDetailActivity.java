@@ -2,12 +2,14 @@ package de.bsd.zwitscher;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Html;
 import android.view.View;
 import android.view.Window;
@@ -66,6 +68,9 @@ public class UserDetailActivity extends Activity  {
             TextView userNameView = (TextView) findViewById(R.id.UserName);
             userNameView.setText(userName);
         }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.edit().putBoolean("newUser",false).commit();
     }
 
     public void onResume() {

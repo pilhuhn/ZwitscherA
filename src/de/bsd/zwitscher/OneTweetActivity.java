@@ -1,10 +1,12 @@
 package de.bsd.zwitscher;
 
 
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.text.Html;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -206,6 +208,13 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
         ImageButton translateButon = (ImageButton) findViewById(R.id.TranslateButton);
         translateButon.setEnabled(networkHelper.isOnline());
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isNewUser = prefs.getBoolean("newUser",true);
+        if (!isNewUser) {
+            TextView hintView = (TextView) findViewById(R.id.HintView);
+            hintView.setVisibility(View.GONE);
+        }
 	}
 
     /**
