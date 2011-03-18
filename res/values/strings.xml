@@ -10,6 +10,8 @@
     <string name="reply">reply</string>
     <string name="replyall">replyAll</string>
     <string name="tweet_sent">Tweet sent</string>
+    <string name="dent_sent">Dent sent</string>
+    <string name="direct_message_sent">Direct message sent</string>
     <string name="hello">Enter your tweet text below:</string>
     <string name="app_name">Zwitscher</string>
     <string name="loading">Loading Tweets ...</string>

@@ -2,7 +2,8 @@
 <resources>
     <string name="TweetButton">Envoyer!</string>
     <string name="location">Location:</string>
-    <string name="send_direct_to">Envoie courier privée à</string>
+    <string name="send_direct_to">Envoier courier privée à</string>
+    <string name="direct_message_sent">Courier privée a été envoyée</string>
     <string name="getting_tweets">Obtenir de messages</string>
     <string name="loading">Obtenir de messages...</string>
     <string name="follow_user">Suivre</string>
@@ -12,6 +13,7 @@
     <string name="From">De</string>
     <string name="to">à</string>
     <string name="tweet_sent">Envoyé Tweet</string>
+    <string name="dent_sent">Envoyé Dent</string>
     <string name="hello">Ecvrives votre Tweet au-dessus:</string>
     <string name="please_log_in">Connecter au service s.v.p.</string>
     <string name="username">Utilisateur</string>

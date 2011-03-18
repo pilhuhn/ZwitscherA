@@ -2,6 +2,8 @@
 <resources>
     <string name="status">status</string>
     <string name="tweet_sent">Tweet gesendet</string>
+    <string name="dent_sent">Dent gesendet</string>
+    <string name="direct_message_sent">Private Nachricht gesendet</string>
     <string name="hello">Geben Sie den Text ein:</string>
     <string name="app_name">Zwitscher</string>
     <string name="loading">Lade Tweets ...</string>

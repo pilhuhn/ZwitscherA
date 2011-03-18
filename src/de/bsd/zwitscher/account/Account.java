@@ -95,6 +95,10 @@ public class Account implements Parcelable {
         this.password = password;
     }
 
+    public boolean isStatusNet() {
+        return !serverType.equalsIgnoreCase("twitter");
+
+    }
     /**
      * Return a canonical representation of this account that can be used
      * within various places in the UI
