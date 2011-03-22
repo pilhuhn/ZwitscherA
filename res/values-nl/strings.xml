@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="accountTypes">
+        <item>Twitter</item>
+        <item>laconi.ca</item>
+        <item>status.net</item>
+    </string-array>
+
+    <string name="status">status</string>
+    <string name="reply">Antwoord</string>
+    <string name="replyall">Allen beantwoorden</string>
+    <string name="tweet_sent">Tweet verzonden</string>
+    <string name="dent_sent">Dent verzonden</string>
+    <string name="direct_message_sent">Direct bericht verzonden</string>
+    <string name="hello">Tweet hieronder invoeren:</string>
+    <string name="app_name">Zwitscher</string>
+    <string name="loading">Tweets worden geladen...</string>
+    <string name="no_connect">Geen verbinding met Twitter</string>
+    <string name="TweetButton">Tweet dit!</string>
+    <string name="ClearButton">Clear!</string>
+    <string name="home_timeline">Home</string>
+    <string name="classicretweet">ClassicRetweet</string>
+    <string name="list">Lists</string>
+    <string name="direct">Directs</string>
+    <string name="mentions">Mentions</string>
+    <string name="searches">Zoekopdrachten</string>
+    <string name="location">Lokatie:</string>
+    <string name="geo">Geo?</string>
+    <string name="web">Web:</string>
+    <string name="tweet_count">Aantal Tweets:</string>
+    <string name="follower_count">Aantal volgers:</string>
+    <string name="following_count">Je volgt:</string>
+    <string name="listed_count">Aantal keer vermeldt:</string>
+    <string name="resent_by"> >Retweeted door:</string>
+    <string name="in_reply_to"> in antwoord op </string>
+    <string name="via">" via "</string>
+    <string name="send_direct_to">Direct bericht versturen naar: </string>
+    <string name="getting_tweets">Tweets ophalen</string>
+    <string name="getting_conversation">Conversatie ophalen</string>
+    <string name="follow_user">Volg Twitteraar:</string>
+    <string name="unfollow_user">Stop met volgen</string>
+    <string name="add">Toevoegen</string>
+    <string name="from">van</string>
+    <string name="get_user_detail">User details ophalen..</string>
+    <string name="get_preview">"Previews laden..."</string>
+    <string name="From">Van</string>
+    <string name="to">aan</string>
+    <string name="please_sync_lists">Synchroniseer lijsten</string>
+    <string name="no_searches_found">Geen resultaten gevonden - Synchroniseren?</string>
+    <string name="updating">aan het updaten</string>
+
+    <string name="login_common">Log in op twitter om Zwischer te autoriseren. <br/><br/>
+       klik "Get pin from Twitter", log in via je webbrowser, noteer de PIN en herstart Zwischer en voer de pin in op het openingsscherm. Bevestig met "Set pin"
+        <br/><br/>
+        Dit is eenmalig, bij de eerste keer opstarten.
+    </string>
+    <string name="please_log_in">log in alsjeblieft</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Log in...</string>
+    <string name="service">Service</string>
+    <string name="new_mentions">nieuw mentions</string>
+    <string name="new_directs">nieuw direct messages</string>
+    <string name="copy_and_paste">Copy and Paste het bericht om het opnieuw te proberen.</string>
+    <string name="user">User</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nee</string>
+
+
+
+    <!-- preferences -->
+    <string name="prefs_location_enabled">Locatie's ingeschakeld</string>
+    <string name="prefs_location_enabled_descr">moet Zwitscher locatie's toevoegen aan status updates?</string>
+    <string name="prefs_filter">Filter</string>
+    <string name="prefs_filter_descr">Geef filters, gescheiden door comma('s)</string>
+    <string name="prefs_min_old">Min oude tweets</string>
+    <string name="prefs_min_old_descr">Minimum aantal weer te geven oude tweets na synchroniseren van nieuwe tweets.</string>
+    <string name="prefs_max_old">Default oude tweets</string>
+    <string name="prefs_max_old_descr">Aantal weer te geven oude tweets indien er geen tweets op de server staan te wachten.</string>
+    <string name="prefs_pic_loading">Afbeelding wordt geladen</string>
+    <string name="prefs_pic_loading_descr">Netwerk moet ingesteld worden om het laden van afbeeldingen mogelijk te maken.</string>
+    <string name="prefs_pic_roaming">Roaming (Afbeeldingen)</string>
+    <string name="prefs_pic_roaming_descr">Afbeeldingen downloaden terwijl je Roamt</string>
+    <string name="prefs_pictureService">Picture Service</string>
+    <string name="prefs_pictureService_descr">Kies een dienst voor het uploaden van afbeeldingen</string>
+    <string name="prefs_extra_loading">Extra Timelines downloaden</string>
+    <string name="prefs_extra_loading_descr">Netwerk moet ingesteld worden om het laden van extra timelines mogelijk te maken. (Home TimeLine actief)</string>
+    <string name="prefs_extra_roaming">Roaming (timelines)</string>
+    <string name="prefs_extra_roaming_descr">Downloaden van extra TimeLines toestaan indien roaming actief.</string>
+
+    <!-- preferences -->
+    <string name="help">Help</string>
+    <string name="help_common">Overzichtspagina van alle Iconen in Zwitscher</string>
+    <string name="help_add_list">User aan een lijst toevoegen</string>
+    <string name="help_back_button">Terug naar de vorige pagina</string>
+    <string name="help_camera">Neem een foto. Bekijk voorkeuren voor de verschillende upload diensten.</string>
+    <string name="help_direct_button">Bericht via mail versturen</string>
+    <string name="help_favorite">Status als favoriet toevoegen</string>
+    <string name="help_post_button">Nieuw Bericht</string>
+    <string name="help_reload_button">Timeline herladen</string>
+    <string name="help_reply_button">Reageer op de huidige status</string>
+    <string name="help_reply_all_button">Reageer op de huidige status, naar alle gebruikers</string>
+    <string name="help_rt_button">Retweet de hudige status</string>
+    <string name="help_rt_button_cl">Huidige status 'klassiek' retweeten</string>
+    <string name="help_speaker">Huidige status voorlezen</string>
+    <string name="help_threads">Conversatie tonen</string>
+    <string name="help_to_top">Spring naar top van het overzicht</string>
+    <string name="help_translate">Huidige status vertalen</string>
+    <string name="help_user_unknown">Geen afbeelding voor deze user aanwezig</string>
+    <string name="help_select_user">Selecteer een gebruiker</string>
+    <string name="help_more">Meer weten?, go to http://bsd.de/zwitscher . Bugs rapporteren, features aanvragen of om de broncode te bekijken, ga naar https://github.com/pilhuhn/ZwitscherA . Hulp in de Wiki: https://github.com/pilhuhn/ZwitscherA/wiki/Help</string>
+    <string name="select_account_select">Selecteer Account</string>
+    <string name="select_account_pick">Switch account</string>
+    <string name="select_account_new">Account toevoegen</string>
+    <string name="new_account_create_title">Creeër account</string>
+    <string name="new_account_switch">Overschakelen naar nieuw</string>
+    <string name="new_account_create">Creeër!</string>
+    <string name="menu_switch_account">Accounts wisselen</string>
+    <string name="select_account_delete">Account verwijderen</string>
+    <string name="really_delete">Delete. Echt.</string>
+    <string name="menu_clean_statuses">Status updaten</string>
+    <string name="search_hint">Berichten zoeken</string>
+    <string name="wrote">Schreef</string>
+    <string name="message_from_zwitscher">Bericht van Zwitscher</string>
+    <string name="click_here">&lt;--- druk hier!</string>
+
+
+</resources>
