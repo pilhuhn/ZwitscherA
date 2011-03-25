@@ -31,7 +31,7 @@
     <string name="follower_count">Aantal volgers:</string>
     <string name="following_count">Je volgt:</string>
     <string name="listed_count">Aantal keer vermeldt:</string>
-    <string name="resent_by"> >Retweeted door:</string>
+    <string name="resent_by"> Retweeted door:</string>
     <string name="in_reply_to"> in antwoord op </string>
     <string name="via">" via "</string>
     <string name="send_direct_to">Direct bericht versturen naar: </string>
@@ -69,10 +69,10 @@
 
 
     <!-- preferences -->
-    <string name="prefs_location_enabled">Locatie's ingeschakeld</string>
-    <string name="prefs_location_enabled_descr">moet Zwitscher locatie's toevoegen aan status updates?</string>
+    <string name="prefs_location_enabled">Locatie\'s ingeschakeld</string>
+    <string name="prefs_location_enabled_descr">moet Zwitscher locatie\'s toevoegen aan status updates?</string>
     <string name="prefs_filter">Filter</string>
-    <string name="prefs_filter_descr">Geef filters, gescheiden door comma('s)</string>
+    <string name="prefs_filter_descr">Geef filters, gescheiden door comma(\'s)</string>
     <string name="prefs_min_old">Min oude tweets</string>
     <string name="prefs_min_old_descr">Minimum aantal weer te geven oude tweets na synchroniseren van nieuwe tweets.</string>
     <string name="prefs_max_old">Default oude tweets</string>
@@ -101,7 +101,7 @@
     <string name="help_reply_button">Reageer op de huidige status</string>
     <string name="help_reply_all_button">Reageer op de huidige status, naar alle gebruikers</string>
     <string name="help_rt_button">Retweet de hudige status</string>
-    <string name="help_rt_button_cl">Huidige status 'klassiek' retweeten</string>
+    <string name="help_rt_button_cl">Huidige status \'klassiek\' retweeten</string>
     <string name="help_speaker">Huidige status voorlezen</string>
     <string name="help_threads">Conversatie tonen</string>
     <string name="help_to_top">Spring naar top van het overzicht</string>
@@ -110,7 +110,7 @@
     <string name="help_select_user">Selecteer een gebruiker</string>
     <string name="help_more">Meer weten?, go to http://bsd.de/zwitscher . Bugs rapporteren, features aanvragen of om de broncode te bekijken, ga naar https://github.com/pilhuhn/ZwitscherA . Hulp in de Wiki: https://github.com/pilhuhn/ZwitscherA/wiki/Help</string>
     <string name="select_account_select">Selecteer Account</string>
-    <string name="select_account_pick">Switch account</string>
+    <string name="select_account_pick">Account wisselen</string>
     <string name="select_account_new">Account toevoegen</string>
     <string name="new_account_create_title">Creeër account</string>
     <string name="new_account_switch">Overschakelen naar nieuw</string>
@@ -118,7 +118,7 @@
     <string name="menu_switch_account">Accounts wisselen</string>
     <string name="select_account_delete">Account verwijderen</string>
     <string name="really_delete">Delete. Echt.</string>
-    <string name="menu_clean_statuses">Status updaten</string>
+    <string name="menu_clean_statuses">Status vervallen</string>
     <string name="search_hint">Berichten zoeken</string>
     <string name="wrote">Schreef</string>
     <string name="message_from_zwitscher">Bericht van Zwitscher</string>
