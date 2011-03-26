@@ -14,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
-import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
 import de.bsd.zwitscher.helper.SpannableBuilder;
 import twitter4j.Tweet;
@@ -30,18 +29,13 @@ class TweetAdapter<T extends Tweet> extends ArrayAdapter<T> {
 
     private List<T> items;
     PicHelper ph;
-    TwitterHelper th;
     private Context extContext;
-    boolean downloadImages;
-
 
     public TweetAdapter(Context context, Account account, int textViewResourceId, List<T> objects) {
         super(context, textViewResourceId, objects);
         extContext = context;
         items = objects;
         ph = new PicHelper();
-        th = new TwitterHelper(context, account);
-        downloadImages = new NetworkHelper(context).mayDownloadImages();
 
     }
 
@@ -77,7 +71,6 @@ class TweetAdapter<T extends Tweet> extends ArrayAdapter<T> {
         Bitmap bi;
 
         SpannableBuilder builder = new SpannableBuilder(extContext);
-        User userOnPicture=null;
         String statusText;
 
         builder.append(tweet.getFromUser(), Typeface.BOLD);
@@ -98,15 +91,10 @@ class TweetAdapter<T extends Tweet> extends ArrayAdapter<T> {
         else {
             // underlying convertView seems to be reused, so default image is not loaded when bi==null
             viewHolder.iv.setImageBitmap(BitmapFactory.decodeResource(extContext.getResources(), R.drawable.user_unknown));
-            // Trigger fetching of user pic in background
-//            if (downloadImages) {
-//                new TriggerPictureDownloadTask().execute(userOnPicture);
-//            }
         }
 
         viewHolder.userInfo.setText(builder.toSpannableString());
         viewHolder.statusText.setText(statusText);
-//        String text = th.getStatusDate(response) ;
         String text = tweet.getCreatedAt().toString(); // TODO format
         viewHolder.timeClientInfo.setText((text));
 //Debug.stopMethodTracing();

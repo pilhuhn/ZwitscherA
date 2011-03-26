@@ -109,7 +109,7 @@ public class PicHelper {
                 return bi;
             }
         }
-        catch (Exception e) {
+        catch (IOException e) {
             return null;
         }
         return null;

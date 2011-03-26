@@ -300,8 +300,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     @SuppressWarnings("unused")
     public void threadView(View v) {
-        TwitterHelper th = new TwitterHelper(ctx, account);
-
         Intent i = new Intent(this,ThreadListActivity.class);
         i.putExtra("account",account);
         i.putExtra("startId", status.getId());
@@ -314,8 +312,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     @SuppressWarnings("unused")
     public void favorite(View v) {
-        TwitterHelper th = new TwitterHelper(ctx, account);
-
         ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
 
         UpdateRequest request = new UpdateRequest(UpdateType.FAVORITE);
@@ -679,7 +675,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      * so that a click on the image in the gallery can start a browser
      * window to the image service to browser the full size one.
      */
-    private class BitmapWithUrl {
+    private static class BitmapWithUrl {
         Bitmap bitmap;
         String url;
 
@@ -693,7 +689,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      * Helper that just holds the urls of the full image service
      * url and the link to the thumbnail
      */
-    private class UrlPair {
+    private static class UrlPair {
         String fullUrl;
         String thumbnailUrl;
 

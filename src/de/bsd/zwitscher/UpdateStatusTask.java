@@ -1,7 +1,6 @@
 package de.bsd.zwitscher;
 
 import de.bsd.zwitscher.account.Account;
-import twitter4j.StatusUpdate;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 */
 class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
-    StatusUpdate update;
     private Context context;
     private ProgressBar progressBar;
     private Account account;
