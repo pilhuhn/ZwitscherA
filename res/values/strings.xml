@@ -96,7 +96,7 @@
     <string name="help_back_button">Go back to the previous page</string>
     <string name="help_camera">Take a picture with the camera. See preferences for picture upload services.</string>
     <string name="help_direct_button">Send the message via mail</string>
-    <string name="help_favorite">Add/remote the status as/from favorite(s)</string>
+    <string name="help_favorite">Add/remove the status as/from favorite(s)</string>
     <string name="help_post_button">Write new message</string>
     <string name="help_reload_button">Reload the timeline (from the server)</string>
     <string name="help_reply_button">Reply to the current status</string>
