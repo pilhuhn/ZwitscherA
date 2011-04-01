@@ -134,7 +134,17 @@
                      android:text="Send"
                      android:onClick="send"
                      android:src="@drawable/direct_button"
+                     android:id="@+id/SendButton"
                 />
+
+        <Button android:id="@+id/ril_button"
+                android:text="RIL"
+                android:layout_below="@id/TimeTextView"
+                android:layout_toRightOf="@id/SendButton"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:onClick="readItLater"
+                android:visibility="gone"/>
 
 
         <ImageButton android:id="@+id/DoneButton"

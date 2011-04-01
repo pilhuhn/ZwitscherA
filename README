@@ -44,9 +44,15 @@ As Twitter by default does not enable xAuth, the third parameter
 needs to be set to false to go through the "normal" oAuth procedure of
 logging in.
 
-Zwitscher has meanwhile progressed enough to be available on the Android market.
-For this version you don't need to obtain any tokens.
+Support for ReadItlater (http://http://readitlaterlist.com/)
+
+If you want to add Suppor for ReadItlater, you need to get a Token
+and put it into src/de/bsd/zwitscher/other/ReaditLaterToken.java
+
 
 
 ==========================
+
+Zwitscher has meanwhile progressed enough to be available on the Android market.
+For this version you don't need to obtain any tokens.
 

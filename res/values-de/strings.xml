@@ -119,6 +119,11 @@
     <string name="wrote">schrieb</string>
     <string name="message_from_zwitscher">Nachricht von Zwitscher</string>
     <string name="click_here">&lt;--- Hier berühren</string>
+    <string name="read_it_later_enable">ReadItLater nutzen</string>
+    <string name="read_it_later_username">Benutzername</string>
+    <string name="read_it_later_password">Password</string>
+    <string name="read_it_later_support">Einstellungen für ReadItLater</string>
+
 
 
 

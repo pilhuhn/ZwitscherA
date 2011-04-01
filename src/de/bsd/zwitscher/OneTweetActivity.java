@@ -17,6 +17,7 @@ import com.google.api.translate.Translate;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
+import de.bsd.zwitscher.other.ReadItLaterStore;
 import twitter4j.Place;
 import twitter4j.Status;
 import android.app.Activity;
@@ -215,6 +216,13 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             TextView hintView = (TextView) findViewById(R.id.HintView);
             hintView.setVisibility(View.GONE);
         }
+        boolean supportRIL = prefs.getBoolean("ril_enable",false);
+        if (supportRIL) {
+            Button rilButton = (Button) findViewById(R.id.ril_button);
+            rilButton.setVisibility(View.VISIBLE);
+            rilButton.setEnabled(true);
+        }
+
 	}
 
     /**
@@ -337,6 +345,36 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     }
 
+    /**
+     * Add the current status to the ReadIt Later list.
+     * @param v
+     */
+    @SuppressWarnings("unused")
+    public void readItLater(View v) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String user = prefs.getString("ril_user","");
+        String password = prefs.getString("ril_password","");
+
+        if (user.equals("") || password.equals("")) {
+            Toast.makeText(this,"No user/passwrod for ReadItLater given",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // TODO make this async
+        ReadItLaterStore store = new ReadItLaterStore(user,password);
+        String url;
+        if (account.isStatusNet())
+            url = "https://identi.ca/notice/" + status.getId();
+        else
+            url = "https://twitter.com/#!/" + status.getUser().getScreenName() + "/status/" + status.getId();
+        String result = store.store(status,!account.isStatusNet(),url);
+        int time;
+        if (result.startsWith("200"))
+            time = Toast.LENGTH_SHORT;
+        else
+            time = Toast.LENGTH_LONG;
+        Toast.makeText(this,"Result from adding: " + result,time).show();
+    }
 
     //////////////// speak related stuff ////////////////////
 
