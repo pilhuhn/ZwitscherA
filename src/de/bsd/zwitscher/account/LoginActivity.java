@@ -144,11 +144,13 @@ public class LoginActivity extends Activity {
 
     /**
      * Call the TabWidget activity that does the work.
+     * @param account Logged in account
      */
     private void proceed(Account account) {
         Intent i = new Intent().setClass(this,TabWidget.class);
         i.putExtra("account",account);
         startActivity(i);
+        finish();
     }
 
 }
