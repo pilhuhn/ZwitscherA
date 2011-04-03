@@ -7,7 +7,6 @@
 <string name="dent_sent">Envoyé Dent</string>
 <string name="direct_message_sent">Courier privée a été envoyé</string>
 <string name="hello">Ecrivez votre Tweet au-dessus:</string>
-<string name="app_name"></string>
 <string name="loading">Obtenir de messages...</string>
 <string name="no_connect">Connexion impossible à Twitter</string>
 <string name="TweetButton">Envoyer!</string>
@@ -19,8 +18,6 @@
 <string name="mentions">Mentions</string>
 <string name="searches">Recherches</string>
 <string name="location">Location:</string>
-<string name="geo"></string>
-<string name="web"></string>
 <string name="tweet_count">Nombre de tweets:</string>
 <string name="follower_count">Nombre de suiveurs:</string>
 <string name="following_count">Nombre de suivis:</string>
@@ -31,18 +28,21 @@
 <string name="send_direct_to">Envoie courier privé à</string>
 <string name="getting_tweets">Obtenir des messages</string>
 <string name="getting_conversation">Obtenir une conversation</string>
-<string name="follow_user">Suivre l'utilisateur</string>
-<string name="unfollow_user">Arrêter de suivre l'utilisateur</string>
+<string name="follow_user">Suivre l\'utilisateur</string>
+<string name="unfollow_user">Arrêter de suivre l\'utilisateur</string>
 <string name="add">Ajouter</string>
 <string name="from">de</string>
-<string name="get_user_detail">Obtenir les informations sur l'utilisateur ...</string>
+<string name="get_user_detail">Obtenir les informations sur l\'utilisateur ...</string>
 <string name="get_preview">"Chargement des prévisus..."</string>
 <string name="From">De</string>
 <string name="to">à</string>
 <string name="please_sync_lists">Merci de synchronizer les listes</string>
 <string name="no_searches_found">Aucune rechercher sauvegardé trouvé - devez-vous resynchroniser ?</string>
 <string name="updating">Obtenir</string>
-<string name="login_common">Vouz devez vous connecter à Twitter pour autoriser Zwitscher. <br/><br/>Pour ceci, cliquer sur "Get pin from Twitter", puis connectez-vous dans le navigateur, notez le code PIN et ensuite dans l'écran de départ démarrer Zwitscher à nouveau en renseigner le code PIN obtenu précédemment. Ensuite cliquer sur "Set pin"<br/><br/>Vous n'aurez à suivre cette procédure qu'à la connexion initiale</string>
+<string name="login_common">Vouz devez vous connecter à Twitter pour autoriser Zwitscher.
+    <br/><br/>Pour ceci, cliquer sur "Get pin from Twitter", puis connectez-vous dans le navigateur, notez le code PIN
+    et ensuite dans l\'écran de départ démarrer Zwitscher à nouveau en renseigner le code PIN obtenu précédemment.
+    Ensuite cliquer sur "Set pin"<br/><br/>Vous n\'aurez à suivre cette procédure qu\'à la connexion initiale</string>
 <string name="please_log_in">Connectez-vous au service s.v.p.</string>
 <string name="username">Utilisateur</string>
 <string name="password">Mot de passe</string>
@@ -59,15 +59,15 @@
 <string name="prefs_filter">Filtre</string>
 <string name="prefs_filter_descr">Déclarez des expressions, séparées par des virgules, pour filtrer les tweets</string>
 <string name="prefs_min_old">Ancienneté minimale des tweets</string>
-<string name="prefs_min_old_descr">Minimum d'ancienneté des tweets à afficher après un rechargement avec nouveaux tweets</string>
+<string name="prefs_min_old_descr">Minimum d\'ancienneté des tweets à afficher après un rechargement avec nouveaux tweets</string>
 <string name="prefs_max_old">Anciens tweets par défaut</string>
-<string name="prefs_max_old_descr">Nombre d'anciens tweets à afficher lorsqu'il n'y pas pas de nouveaux tweets sur le serveur</string>
-<string name="prefs_pic_loading">Chargement de l'image</string>
-<string name="prefs_pic_loading_descr">Configuration réseau requise pour le chargement de l'image</string>
+<string name="prefs_max_old_descr">Nombre d\'anciens tweets à afficher lorsqu\'il n\'y pas pas de nouveaux tweets sur le serveur</string>
+<string name="prefs_pic_loading">Chargement de l\'image</string>
+<string name="prefs_pic_loading_descr">Configuration réseau requise pour le chargement de l\'image</string>
 <string name="prefs_pic_roaming">Roaming (images)</string>
-<string name="prefs_pic_roaming_descr">Autoriser le téléchargement d'images lors d'itinérance</string>
-<string name="prefs_pictureService">Service d'image</string>
-<string name="prefs_pictureService_descr">sélectionner un service pour l'envoi d'image</string>
+<string name="prefs_pic_roaming_descr">Autoriser le téléchargement d\'images lors d\'itinérance</string>
+<string name="prefs_pictureService">Service d\'image</string>
+<string name="prefs_pictureService_descr">sélectionner un service pour l\'envoi d\'image</string>
 <string name="prefs_extra_loading">Chargement de timelines additionnelles</string>
 <string name="prefs_extra_loading_descr">Configuration réseau requise pour le chargement de timelines additionnelles (quand positionné sur la timeline home)</string>
 <string name="prefs_extra_roaming">Itinérance (timelines)</string>
@@ -76,7 +76,7 @@
 <string name="help_common">Cette page affiche toutes les images utilisées par Zwitscher</string>
 <string name="help_add_list">Ajouter une utilisateur à une liste</string>
 <string name="help_back_button">Retour à la page précédente</string>
-<string name="help_camera">Prendre une photo avec la caméra. Voir les préférences pour le service d'envoi d'images</string>
+<string name="help_camera">Prendre une photo avec la caméra. Voir les préférences pour le service d\'envoi d\'images</string>
 <string name="help_direct_button">Envoyer le message par couriel</string>
 <string name="help_favorite">Ajouter/Retirer le statut comme/des favori(s)</string>
 <string name="help_post_button">Ecrire un nouveau message</string>
@@ -89,19 +89,8 @@
 <string name="help_threads">Monter la conversation ou ce fil de discussion est présent</string>
 <string name="help_to_top">Sauter au haut de la liste</string>
 <string name="help_translate">Traduire le statut actuel</string>
-<string name="help_user_unknown">Aucun image de l'utilisateur chargée</string>
+<string name="help_user_unknown">Aucun image de l\'utilisateur chargée</string>
 <string name="help_select_user">Choisir un utilisateur</string>
-<string name="help_more"></string>
-<string name="select_account_select"></string>
-<string name="select_account_pick"></string>
-<string name="select_account_new"></string>
-<string name="new_account_create_title"></string>
-<string name="new_account_switch"></string>
-<string name="new_account_create"></string>
-<string name="menu_switch_account"></string>
-<string name="select_account_delete"></string>
-<string name="really_delete"></string>
-<string name="menu_clean_statuses"></string>
 <string name="search_hint">Chercher des messages</string>
 <string name="wrote">à écrit</string>
 <string name="message_from_zwitscher">Message de Zwitscher</string>
