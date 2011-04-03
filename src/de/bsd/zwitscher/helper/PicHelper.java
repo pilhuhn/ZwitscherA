@@ -131,15 +131,20 @@ public class PicHelper {
 
     /**
      * Remove the stored user pictures
+     * @param olderThan Only delete pictures that are older than the passed time
      */
-    public void cleanup() {
+    public void cleanup(long olderThan) {
         File baseDir = Environment.getExternalStorageDirectory();
         File iconDir = new File(baseDir, APP_BASE_DIR + "files/user_profiles");
 
         File[] files = iconDir.listFiles();
         if (files!=null) {
             for (File file : files) {
-                file.delete();
+                if (file.lastModified()< olderThan) {
+                    boolean success = file.delete();
+                    if (!success)
+                        Log.e("PicHelper","Could not delete " + file.getAbsolutePath());
+                }
             }
         }
     }

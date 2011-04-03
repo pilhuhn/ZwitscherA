@@ -3,6 +3,7 @@ package de.bsd.zwitscher.helper;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.widget.TabWidget;
 import de.bsd.zwitscher.TweetDB;
 
 /**
@@ -40,6 +41,8 @@ public class CleanupTask extends AsyncTask<Integer,Void,Void> {
 
         TweetDB tdb = new TweetDB(context,-1); // account id does not matter
         tdb.cleanStatuses(tOld);
+        PicHelper ph = new PicHelper();
+        ph.cleanup(tOld);
 
         return null;
     }
