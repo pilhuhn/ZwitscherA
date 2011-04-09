@@ -83,6 +83,9 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
         if (result.getUpdateType()==UpdateType.UPLOAD_PIC) {
             TextView textView = (TextView) result.view;
+            if (textView==null)
+                return;
+
             if (textView.getText().length()==0)
                 textView.setText(result.getMessage());
             else
@@ -90,6 +93,9 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
         } else if (result.getUpdateType() == UpdateType.FAVORITE) {
             ImageButton favoriteButton = (ImageButton) result.view;
+            if (favoriteButton==null || result.status == null)
+                return;
+
             if (result.status.isFavorited())
                 favoriteButton.setImageResource(R.drawable.favorite_on);
             else
