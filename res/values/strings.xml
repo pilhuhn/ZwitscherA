@@ -129,6 +129,8 @@
     <string name="read_it_later_password">Password</string>
     <string name="read_it_later_support">Support for ReadItLater</string>
     <string name="ril">Read later</string>
-
+    <string name="unset">Unset</string>
+    <string name="set">Set</string>
+    <string name="invalid">Invalid</string>
 
 </resources>

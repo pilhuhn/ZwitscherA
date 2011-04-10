@@ -123,11 +123,7 @@
     <string name="read_it_later_username">Benutzername</string>
     <string name="read_it_later_password">Password</string>
     <string name="read_it_later_support">Einstellungen für ReadItLater</string>
-
-
-
-
-
-
-
+    <string name="unset">Ungesetzt</string>
+    <string name="set">Gesetzt</string>
+    <string name="invalid">Ungültig</string>
 </resources>

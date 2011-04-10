@@ -7,20 +7,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Date;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import twitter4j.Annotations;
-import twitter4j.GeoLocation;
-import twitter4j.HashtagEntity;
-import twitter4j.Place;
-import twitter4j.RateLimitStatus;
 import twitter4j.Status;
-import twitter4j.URLEntity;
-import twitter4j.User;
-import twitter4j.UserMentionEntity;
 
 /**
  * Post a message to ReadItLater
@@ -36,13 +27,14 @@ public class ReadItLaterStore {
         this.password = password;
     }
 
-    private static String baseUrl ="https://readitlaterlist.com/v2/send?";
+    private static final String BASE_URL ="https://readitlaterlist.com/v2/";
 
     public String store(Status tweet,boolean isTwitter,String articleUrl) {
 
         // https://readitlaterlist.com/v2/add?username=name&password=123&apikey=yourapikey&url=http://google.com&title=Google
 
-        StringBuilder sb = new StringBuilder(baseUrl);
+        StringBuilder sb = new StringBuilder(BASE_URL);
+        sb.append("send?");
         sb.append("username=").append(user).append("&");
         sb.append("password=").append(password).append("&");
         sb.append("apikey=").append(ReaditLaterToken.token);
@@ -102,6 +94,40 @@ public class ReadItLaterStore {
         }
 
         return result;
+    }
+
+    /**
+     * Verify the account
+     * @return true if verified, false otherwise
+     */
+    public boolean verifyAccount() {
+
+        StringBuilder sb = new StringBuilder(BASE_URL);
+        sb.append("auth?");
+        sb.append("username=").append(user).append("&");
+        sb.append("password=").append(password).append("&");
+        sb.append("apikey=").append(ReaditLaterToken.token);
+        String targetUrl = sb.toString();
+
+
+        try {
+            URL url = new URL(targetUrl);
+            System.out.println("Writing to " + targetUrl);
+
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.connect();
+            int code = conn.getResponseCode();
+            if (code==200)
+                return true;
+
+            return false;
+
+
+
+        } catch (IOException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+            return false;
+        }
     }
 
 }
