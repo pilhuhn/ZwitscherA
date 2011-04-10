@@ -360,20 +360,20 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             return;
         }
 
-        // TODO make this async
-        ReadItLaterStore store = new ReadItLaterStore(user,password);
         String url;
         if (account.isStatusNet())
             url = "https://identi.ca/notice/" + status.getId();
         else
             url = "https://twitter.com/#!/" + status.getUser().getScreenName() + "/status/" + status.getId();
-        String result = store.store(status,!account.isStatusNet(),url);
-        int time;
-        if (result.startsWith("200"))
-            time = Toast.LENGTH_SHORT;
-        else
-            time = Toast.LENGTH_LONG;
-        Toast.makeText(this,"Result from adding: " + result,time).show();
+
+        UpdateRequest request = new UpdateRequest(UpdateType.LATER_READING);
+        request.status = status;
+        request.url = url;
+        request.extUser = user;
+        request.extPassword = password;
+
+        new UpdateStatusTask(this,pg, account).execute(request);
+
     }
 
     //////////////// speak related stuff ////////////////////

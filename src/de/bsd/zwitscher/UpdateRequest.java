@@ -18,6 +18,9 @@ public class UpdateRequest {
     Status status;
     String picturePath;
     View view;
+    String url;         // for external apps
+    String extUser;     // for extranal apps
+    String extPassword; // for external apps
 
     public UpdateRequest(UpdateType updateType) {
         this.updateType = updateType;

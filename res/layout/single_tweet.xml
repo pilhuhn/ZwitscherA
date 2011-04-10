@@ -136,7 +136,7 @@
                 />
 
         <Button android:id="@+id/ril_button"
-                android:text="RIL"
+                android:text="@string/ril"
                 android:layout_below="@id/ThreadButton"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"

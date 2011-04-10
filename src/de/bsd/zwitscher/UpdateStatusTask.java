@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import de.bsd.zwitscher.other.ReadItLaterStore;
 
 /**
 * Task that does async updates to the server
@@ -70,6 +71,20 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                         ret.setMessage("Picture upload failed");
                     }
                 }
+                break;
+            case LATER_READING:
+
+                ReadItLaterStore store = new ReadItLaterStore(request.extUser,request.extPassword);
+                String result = store.store(request.status,!account.isStatusNet(),request.url);
+                boolean success;
+                if (result.startsWith("200")) {
+                    success = true;
+                }
+                else {
+                    success = false;
+                }
+
+                ret = new UpdateResponse(request.updateType,success,result);
                 break;
             default:
                 throw new IllegalArgumentException("Update type not supported yet : " + request.updateType);
