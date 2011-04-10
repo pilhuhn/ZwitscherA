@@ -52,8 +52,8 @@
 			  android:enabled="false"
 			  android:text="@string/geo"
 			  android:layout_below="@id/CharCount"
-			  android:layout_width="128px"
-			  android:layout_height="128px"
+			  android:layout_width="96dp"
+			  android:layout_height="96dp"
 			  android:layout_alignBaseline="@id/ClearButton"
 			  android:layout_toRightOf="@id/ClearButton"/>
 

@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".NewTweetActivity">
+        <activity android:name=".NewTweetActivity" android:windowSoftInputMode="stateAlwaysVisible">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT" />
