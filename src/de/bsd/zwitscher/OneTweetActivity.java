@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.*;
@@ -17,7 +18,6 @@ import com.google.api.translate.Translate;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
-import de.bsd.zwitscher.other.ReadItLaterStore;
 import twitter4j.Place;
 import twitter4j.Status;
 import android.app.Activity;
@@ -185,16 +185,23 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         TextView tweetView = (TextView)findViewById(R.id.TweetTextView);
         tweetView.setText(status.getText());
 
-        TextView timeCientView = (TextView)findViewById(R.id.TimeTextView);
+        TextView timeClientView = (TextView)findViewById(R.id.TimeTextView);
         TwitterHelper th = new TwitterHelper(this, account);
         String s = getString(R.string.via);
         String text = th.getStatusDate(status) + s + status.getSource();
         String from = getString(R.string.from);
         if (status.getPlace()!=null) {
             Place place = status.getPlace();
-            text += " " + from + " " + place.getFullName();
+            text += " " + from + " " ;
+            if (place.getFullName()!=null)
+                text += "<a href=\"geo:0,0?q=" + place.getFullName() + ","+ place.getCountry() + "\">";
+            text += place.getFullName();
+            if (place.getFullName()!=null)
+                text += "</a>";
+
         }
-        timeCientView.setText(Html.fromHtml(text));
+        timeClientView.setText(Html.fromHtml(text));
+        timeClientView.setMovementMethod(LinkMovementMethod.getInstance());
 
 
         // Update Button state depending on Status' properties
@@ -228,7 +235,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Display display of the details of a user from pressing
      * the user icon button.
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
     public void displayUserDetail(View v) {
@@ -247,7 +254,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     /**
      * Trigger replying to the current status.
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
 	public void reply(View v) {
@@ -262,7 +269,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Trigger replying to all users mentioned via @xxx in the
      * current status. Opens an editor Window first
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
 	public void replyAll(View v) {
@@ -276,7 +283,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     /**
      * Trigger a resent of the current status
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
 	public void retweet(View v) {
@@ -289,7 +296,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Do the classical re-send thing by prefixing with 'RT'.
      * Opens an editor window first.
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
 	public void classicRetweet(View v) {
@@ -304,7 +311,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Starts a view that shows the conversation around the current
      * status.
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
     public void threadView(View v) {
@@ -316,7 +323,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     /**
      * Marks the current status as (non) favorite
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
     public void favorite(View v) {
@@ -333,7 +340,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Start sending a direct message to the user that sent this
      * status.
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
     public void directMessage(View v) {
@@ -347,7 +354,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     /**
      * Add the current status to the ReadIt Later list.
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
     public void readItLater(View v) {
@@ -401,6 +408,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     /**
      * Speak the current status via TTS
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
     public void speak(View v)
@@ -449,7 +457,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Translate the current status by calling Google translate.
      * Target language is the users current locale.
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
 	public void translate(View v) {
@@ -477,7 +485,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     /**
      * Finishes this screen and returns to the list of statuses
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
 	public void done(View v) {
