@@ -105,7 +105,7 @@ public class Account implements Parcelable {
      * @return Human readable identifier of this account
      */
     public String getAccountIdentifier() {
-        if (serverUrl!=null && !serverUrl.isEmpty()) {
+        if (serverUrl!=null && !(serverUrl.length() == 0)) {
             return name + "@" + serverUrl;
         }
         else {
