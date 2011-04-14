@@ -39,7 +39,7 @@ public class NewAccountActivity extends Activity {
         TwitterHelper th = new TwitterHelper(this,null);
         try {
             // Try to generate a token and insert it.
-            Account newAccount = th.generateAccount(username, password, service, shouldSwitch);
+            Account newAccount = th.generateAccountWithXauth(username, password, service, shouldSwitch);
 
             Intent intent = new Intent(this, TabWidget.class);
             intent.putExtra("account",newAccount);
