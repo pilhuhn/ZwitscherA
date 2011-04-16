@@ -18,6 +18,11 @@ import com.google.api.translate.Translate;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
+import greendroid.app.GDActivity;
+import greendroid.widget.QuickAction;
+import greendroid.widget.QuickActionBar;
+import greendroid.widget.QuickActionGrid;
+import greendroid.widget.QuickActionWidget;
 import twitter4j.Place;
 import twitter4j.Status;
 import android.app.Activity;
@@ -44,7 +49,8 @@ import java.util.*;
  *
  * @author Heiko W. Rupp
  */
-public class OneTweetActivity extends Activity implements OnInitListener, OnUtteranceCompletedListener {
+public class OneTweetActivity extends Activity implements OnInitListener, OnUtteranceCompletedListener,
+        QuickActionWidget.OnQuickActionClickListener {
 
 	Context ctx = this;
 	Status status ;
@@ -214,8 +220,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         if (status.isFavorited())
             favoriteButton.setImageResource(R.drawable.favorite_on);
 
-        ImageButton translateButon = (ImageButton) findViewById(R.id.TranslateButton);
-        translateButon.setEnabled(networkHelper.isOnline());
+//        ImageButton translateButon = (ImageButton) findViewById(R.id.TranslateButton);
+//        translateButon.setEnabled(networkHelper.isOnline());
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isNewUser = prefs.getBoolean("newUser",true);
@@ -224,13 +230,56 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             hintView.setVisibility(View.GONE);
         }
         boolean supportRIL = prefs.getBoolean("ril_enable",false);
-        if (supportRIL) {
-            Button rilButton = (Button) findViewById(R.id.ril_button);
-            rilButton.setVisibility(View.VISIBLE);
-            rilButton.setEnabled(true);
-        }
+//        if (supportRIL) {
+//            Button rilButton = (Button) findViewById(R.id.ril_button);
+//            rilButton.setVisibility(View.VISIBLE);
+//            rilButton.setEnabled(true);
+//        }
 
 	}
+
+
+    public void showGD(View v) {
+         QuickActionWidget mBar = new QuickActionGrid(this);
+        mBar.addQuickAction(new QuickAction(this,R.drawable.reply_all_button,R.string.replyall));
+        mBar.addQuickAction(new QuickAction(this,R.drawable.direct_button,R.string.direct)); // TODO Wrong drawable
+        mBar.addQuickAction(new QuickAction(this,R.drawable.rt_button_cl,R.string.classicretweet));
+        mBar.addQuickAction(new QuickAction(this,R.drawable.direct_button,R.string.ril)); //  TODO wrong button
+        mBar.addQuickAction(new QuickAction(this,R.drawable.direct_button,R.string.forward));
+        mBar.addQuickAction(new QuickAction(this,R.drawable.translate,R.string.translate));
+        mBar.addQuickAction(new QuickAction(this,R.drawable.speaker,R.string.speak));
+
+        mBar.setDismissOnClick(true);
+        mBar.setOnQuickActionClickListener(this);
+        mBar.show(v);
+    }
+
+    @Override
+    public void onQuickActionClicked(QuickActionWidget widget, int position) {
+        System.out.println("oQAC " + position);
+        View v = widget.getContentView();
+        switch (position) {
+        case 0:
+            replyAll(v);
+            break;
+        case 1:
+            directMessage(v);
+            break;
+        case 2:
+            classicRetweet(v);
+            break;
+        case 3:
+            replyAll(v);
+            break;
+        case 4: send(v);
+            break;
+        case 5: speak(v); break;
+
+        default:
+            System.err.println("oQAC " + position + " : " + widget.toString());
+        }
+    }
+
 
     /**
      * Display display of the details of a user from pressing
@@ -576,7 +625,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         }
         return bitmaps;
     }
-
 
 
     /**

@@ -66,6 +66,10 @@
     <string name="user">User</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="forward">Forward</string>
+    <string name="speak">Speak</string>
+    <string name="translate">Translate</string>
+    <string name="more">More...</string>
 
 
 

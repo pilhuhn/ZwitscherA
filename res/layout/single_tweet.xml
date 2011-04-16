@@ -60,6 +60,7 @@
                      android:onClick="reply"
                      android:src="@drawable/reply_button"
                      android:text="Reply"/>
+<!--
         <ImageButton android:id="@+id/ReplyAllButton"
                      android:layout_below="@id/TimeTextView"
                      android:layout_width="wrap_content"
@@ -68,15 +69,18 @@
                      android:onClick="replyAll"
                      android:src="@drawable/reply_all_button"
                      android:text="Reply All"/>
+-->
 
         <ImageButton android:id="@+id/RetweetButton"
                      android:layout_below="@id/TimeTextView"
-                     android:layout_toRightOf="@id/ReplyAllButton"
+                     android:layout_toRightOf="@id/ReplyButton"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:onClick="retweet"
                      android:src="@drawable/rt_button"
                      android:text="Retweet"/>
+
+<!--
         <ImageButton android:id="@+id/ClassicRetweetButton"
                      android:layout_below="@id/TimeTextView"
                      android:layout_toRightOf="@id/RetweetButton"
@@ -92,23 +96,36 @@
                      android:layout_toRightOf="@id/ClassicRetweetButton"
                      android:onClick="directMessage"
                      android:text="Direct"/>
+-->
 
 
         <ImageButton android:id="@+id/ThreadButton"
-                     android:layout_below="@id/ReplyButton"
+                     android:layout_below="@id/TimeTextView"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:onClick="threadView"
                      android:src="@drawable/threads"
+                     android:layout_toRightOf="@id/RetweetButton"
                      android:text="Thread"/>
         <ImageButton android:id="@+id/FavoriteButton"
-                     android:layout_below="@id/ReplyButton"
+                     android:layout_below="@id/TimeTextView"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:layout_toRightOf="@id/ThreadButton"
                      android:onClick="favorite"
                      android:src="@drawable/favorite_off"
                      android:text="Favorite"/>
+
+        <Button android:id="@+id/morebutton"
+                android:layout_below="@id/TimeTextView"
+                android:layout_toRightOf="@id/FavoriteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="showGD"
+                android:text="@string/more"
+                />
+
+<!--
         <ImageButton android:id="@+id/TranslateButton"
                      android:layout_below="@id/ReplyButton"
                      android:layout_toRightOf="@id/FavoriteButton"
@@ -142,15 +159,18 @@
                 android:layout_width="wrap_content"
                 android:onClick="readItLater"
                 android:visibility="visible"/>
+-->
 
 
         <ImageButton android:id="@+id/DoneButton"
-                     android:layout_below="@id/ril_button"
+                     android:layout_below="@id/ThreadButton"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:onClick="done"
                      android:src="@drawable/back_button"
                      android:text="Done!"/>
+
+
         <Gallery xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/gallery"
                  android:layout_width="fill_parent"
                  android:layout_height="wrap_content"
