@@ -18,9 +18,7 @@ import com.google.api.translate.Translate;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
-import greendroid.app.GDActivity;
 import greendroid.widget.QuickAction;
-import greendroid.widget.QuickActionBar;
 import greendroid.widget.QuickActionGrid;
 import greendroid.widget.QuickActionWidget;
 import twitter4j.Place;
@@ -60,6 +58,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     TextToSpeech tts;
     TextView titleTextView;
     private Account account;
+    private boolean supportRIL;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -229,7 +228,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             TextView hintView = (TextView) findViewById(R.id.HintView);
             hintView.setVisibility(View.GONE);
         }
-        boolean supportRIL = prefs.getBoolean("ril_enable",false);
+        supportRIL = prefs.getBoolean("ril_enable",false);
 //        if (supportRIL) {
 //            Button rilButton = (Button) findViewById(R.id.ril_button);
 //            rilButton.setVisibility(View.VISIBLE);
@@ -244,10 +243,12 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         mBar.addQuickAction(new QuickAction(this,R.drawable.reply_all_button,R.string.replyall));
         mBar.addQuickAction(new QuickAction(this,R.drawable.direct_button,R.string.direct)); // TODO Wrong drawable
         mBar.addQuickAction(new QuickAction(this,R.drawable.rt_button_cl,R.string.classicretweet));
-        mBar.addQuickAction(new QuickAction(this,R.drawable.direct_button,R.string.ril)); //  TODO wrong button
         mBar.addQuickAction(new QuickAction(this,R.drawable.direct_button,R.string.forward));
         mBar.addQuickAction(new QuickAction(this,R.drawable.translate,R.string.translate));
         mBar.addQuickAction(new QuickAction(this,R.drawable.speaker,R.string.speak));
+        if (supportRIL)
+            mBar.addQuickAction(new QuickAction(this,R.drawable.direct_button,R.string.ril)); //  TODO wrong button
+
 
         mBar.setDismissOnClick(true);
         mBar.setOnQuickActionClickListener(this);
@@ -268,12 +269,16 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         case 2:
             classicRetweet(v);
             break;
-        case 3:
-            replyAll(v);
+        case 3: send(v);
             break;
-        case 4: send(v);
+        case 4: translate(v);
             break;
-        case 5: speak(v); break;
+        case 5: speak(v);
+            break;
+        case 6:
+            readItLater(v);
+            break;
+
 
         default:
             System.err.println("oQAC " + position + " : " + widget.toString());
