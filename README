@@ -11,6 +11,14 @@ native Json support in the Android libraries
 I did not really set a target Android platform - at the end
 it has to work on my HTC Desire with Android 2.2.
 
+Zwitscher hat been translated into some languages - if you want
+to help translating into new languages, ping me.
+Translations are / can be done via myGengo-strings at
+http://mygengo.com/string/p/zwitscher-1/
+
+If you find issues or want new features, please open
+an issue on the github tracker at https://github.com/pilhuhn/ZwitscherA/issues
+
 ===== ATTENTION ON HACKING THE SOURCE =========
 
 As Twitter.com is not really ready to handle open source projects,
@@ -36,9 +44,15 @@ As Twitter by default does not enable xAuth, the third parameter
 needs to be set to false to go through the "normal" oAuth procedure of
 logging in.
 
-Zwitscher has meanwhile progressed enough to be available on the Android market.
-For this version you don't need to obtain any tokens.
+Support for ReadItlater (http://http://readitlaterlist.com/)
+
+If you want to add Suppor for ReadItlater, you need to get a Token
+and put it into src/de/bsd/zwitscher/other/ReaditLaterToken.java
+
 
 
 ==========================
+
+Zwitscher has meanwhile progressed enough to be available on the Android market.
+For this version you don't need to obtain any tokens.
 

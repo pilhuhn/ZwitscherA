@@ -59,5 +59,22 @@
                     android:entryValues="@array/pictureServiceVals"
                     />
 
+    <PreferenceScreen android:title="@string/read_it_later_support">
+        <CheckBoxPreference android:title="@string/read_it_later_enable"
+                            android:key="ril_enable"
+                            android:id="@+id/prefs_enable_read_it_later"/>
+        <EditTextPreference android:id="@+id/prefs_ril_user"
+                            android:key="ril_user"
+                            android:title="@string/read_it_later_username"
+                            android:dependency="ril_enable"
+                            android:layout="?android:attr/preferenceLayoutChild"
+                            />
+        <EditTextPreference android:id="@+id/prefs_ril_password"
+                            android:dependency="ril_enable"
+                            android:key="ril_password"
+                            android:title="@string/read_it_later_password"
+                            android:layout="?android:attr/preferenceLayoutChild"
+                            android:password="true"/>
+    </PreferenceScreen>
 
 </PreferenceScreen>

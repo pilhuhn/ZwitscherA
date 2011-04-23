@@ -1,7 +1,6 @@
 package de.bsd.zwitscher;
 
 import de.bsd.zwitscher.account.Account;
-import twitter4j.StatusUpdate;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import de.bsd.zwitscher.other.ReadItLaterStore;
 
 /**
 * Task that does async updates to the server
@@ -21,7 +21,6 @@ import android.widget.Toast;
 */
 class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
-    StatusUpdate update;
     private Context context;
     private ProgressBar progressBar;
     private Account account;
@@ -73,6 +72,20 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                     }
                 }
                 break;
+            case LATER_READING:
+
+                ReadItLaterStore store = new ReadItLaterStore(request.extUser,request.extPassword);
+                String result = store.store(request.status,!account.isStatusNet(),request.url);
+                boolean success;
+                if (result.startsWith("200")) {
+                    success = true;
+                }
+                else {
+                    success = false;
+                }
+
+                ret = new UpdateResponse(request.updateType,success,result);
+                break;
             default:
                 throw new IllegalArgumentException("Update type not supported yet : " + request.updateType);
         }
@@ -85,6 +98,9 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
         if (result.getUpdateType()==UpdateType.UPLOAD_PIC) {
             TextView textView = (TextView) result.view;
+            if (textView==null)
+                return;
+
             if (textView.getText().length()==0)
                 textView.setText(result.getMessage());
             else
@@ -92,6 +108,9 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
         } else if (result.getUpdateType() == UpdateType.FAVORITE) {
             ImageButton favoriteButton = (ImageButton) result.view;
+            if (favoriteButton==null || result.status == null)
+                return;
+
             if (result.status.isFavorited())
                 favoriteButton.setImageResource(R.drawable.favorite_on);
             else

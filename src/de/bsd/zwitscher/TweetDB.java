@@ -30,7 +30,7 @@ public class TweetDB {
     private static final String TABLE_USERS = "users";
     private static final String TABLE_SEARCHES = "searches";
     public static final String TABLE_DIRECTS = "directs";
-    public static final String[] DATA_TABLES = {TABLE_STATUSES,
+    private static final String[] DATA_TABLES = {TABLE_STATUSES,
         TABLE_LAST_READ,TABLE_LISTS,TABLE_USERS,TABLE_SEARCHES,TABLE_DIRECTS};
     static final String STATUS = "STATUS";
     static final String ACCOUNT_ID = "ACCOUNT_ID";
@@ -39,7 +39,7 @@ public class TweetDB {
     private final String account;
 
 	public TweetDB(Context context, int accountId) {
-		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 5);
+		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 6);
         account = String.valueOf(accountId);
 
 	}
@@ -67,6 +67,7 @@ public class TweetDB {
 
             );
             db.execSQL("CREATE INDEX STATUS_CTIME_IDX ON " + TABLE_STATUSES + "(ctime)");
+            db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_STATUSES + "(ID, LIST_ID, " + ACCOUNT_ID +")");
 
             db.execSQL(CREATE_TABLE + TABLE_DIRECTS + " (" +
                     "ID LONG, " +
@@ -76,6 +77,7 @@ public class TweetDB {
                     "UNIQUE (ID, " + ACCOUNT_ID + ")" +
                     ")"
             );
+            db.execSQL("CREATE UNIQUE INDEX DIRECTS_ID_IDX ON " + TABLE_DIRECTS + "(ID, " + ACCOUNT_ID +")");
 
 			db.execSQL(CREATE_TABLE + TABLE_LAST_READ + " (" + //
 					"list_id LONG, " + //
@@ -85,6 +87,8 @@ public class TweetDB {
                     "UNIQUE (LIST_ID, " + ACCOUNT_ID + ")" +
                     ")"
 			);
+            db.execSQL("CREATE UNIQUE INDEX LAST_R_ID_IDX ON " + TABLE_LAST_READ + "(list_ID, " + ACCOUNT_ID +")");
+
 			db.execSQL(CREATE_TABLE + TABLE_LISTS + " (" + //
 					"name TEXT, " + //
 					"id LONG, " +
@@ -93,15 +97,19 @@ public class TweetDB {
                     "UNIQUE (ID, " + ACCOUNT_ID + ")" +
                     " )"
 			);
+            db.execSQL("CREATE UNIQUE INDEX LISTS_ID_IDX ON " + TABLE_LISTS + "(ID, " + ACCOUNT_ID +")");
 
             db.execSQL(CREATE_TABLE + TABLE_USERS + " (" +
                     "userId LONG, " + //
                     ACCOUNT_ID + " LONG, " +
                     "user_json STRING ," +
                     "screenname STRING, " +
+                    "last_modified LONG, " +
                     "UNIQUE (USERID, " + ACCOUNT_ID + ")" +
                 ")"
             );
+            db.execSQL("CREATE INDEX L_M_IDX ON " + TABLE_USERS + " (last_modified)");
+            db.execSQL("CREATE UNIQUE INDEX USERS_ID_IDX ON " + TABLE_USERS + "(userID, " + ACCOUNT_ID +")");
 
             db.execSQL(CREATE_TABLE + TABLE_ACCOUNTS + " (" +
                     "id INTEGER, " + // 0
@@ -126,6 +134,7 @@ public class TweetDB {
                     "UNIQUE (ID, " + ACCOUNT_ID + ")" +
                 ")"
             );
+            db.execSQL("CREATE UNIQUE INDEX SEARCH_ID_IDX ON " + TABLE_SEARCHES + "(ID, " + ACCOUNT_ID +")");
 		}
 
 		@Override
@@ -136,11 +145,11 @@ public class TweetDB {
             }
             if (oldVersion<3) {
                 db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_STATUSES + "(ID, LIST_ID, " + ACCOUNT_ID +")");
-                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_DIRECTS + "(ID, " + ACCOUNT_ID +")");
-                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_LAST_READ + "(list_ID, " + ACCOUNT_ID +")");
-                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_LISTS + "(ID, " + ACCOUNT_ID +")");
-                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_USERS + "(userID, " + ACCOUNT_ID +")");
-                db.execSQL("CREATE UNIQUE INDEX STATUS_IDX ON " + TABLE_SEARCHES + "(ID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX DIRECTS_ID_IDX ON " + TABLE_DIRECTS + "(ID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX LAST_R_ID_IDX ON " + TABLE_LAST_READ + "(list_ID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX LISTS_ID_IDX ON " + TABLE_LISTS + "(ID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX USERS_ID_IDX ON " + TABLE_USERS + "(userID, " + ACCOUNT_ID +")");
+                db.execSQL("CREATE UNIQUE INDEX SEARCH_ID_IDX ON " + TABLE_SEARCHES + "(ID, " + ACCOUNT_ID +")");
             }
             if (oldVersion<4) {
                 db.execSQL(CREATE_TABLE + TABLE_ACCOUNTS + " (" +
@@ -161,7 +170,10 @@ public class TweetDB {
             if (oldVersion<5) {
                 db.execSQL("CREATE INDEX STATUS_CTIME_IDX ON " + TABLE_STATUSES + "(ctime)");
             }
-
+            if (oldVersion<6) {
+                db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN last_modified LONG DEFAULT 0");
+                db.execSQL("CREATE INDEX L_M_IDX ON " + TABLE_USERS + " (last_modified)");
+            }
 		}
 
 	}
@@ -464,9 +476,10 @@ public class TweetDB {
         db.close();
     }
 
-    public void cleanStatuses(long cutOff) {
+    public void cleanStatusesAndUsers(long cutOff) {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_STATUSES + " WHERE ctime < " + cutOff);
+        db.execSQL("DELETE FROM " + TABLE_USERS + " WHERE last_modified < " + cutOff);
         db.close();
 
     }
@@ -740,8 +753,15 @@ public class TweetDB {
      */
     public void storeValues(String table, List<ContentValues> values) {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
-        for (ContentValues val : values) {
-            db.insertWithOnConflict(table,null,val,SQLiteDatabase.CONFLICT_IGNORE);
+        try {
+            db.beginTransaction();
+            for (ContentValues val : values) {
+                db.insertWithOnConflict(table,null,val,SQLiteDatabase.CONFLICT_IGNORE);
+            }
+            db.setTransactionSuccessful();
+        }
+        finally {
+            db.endTransaction();
         }
         db.close();
     }

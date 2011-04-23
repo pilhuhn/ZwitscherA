@@ -35,6 +35,7 @@ import twitter4j.json.DataObjectFactory;
 public class TabWidget extends TabActivity {
 
     static final String LIST_ID = "list_id";
+    static final long SEVEN_DAYS = 7 * 86400 * 1000L;
     TabHost tabHost;
 	TabHost.TabSpec homeSpec;
     ProgressBar pg;
@@ -262,7 +263,8 @@ public class TabWidget extends TabActivity {
 
     private void cleanImages() {
         PicHelper ph = new PicHelper();
-        ph.cleanup();
+        long now = System.currentTimeMillis();
+        ph.cleanup(now - SEVEN_DAYS);
     }
 
     /**

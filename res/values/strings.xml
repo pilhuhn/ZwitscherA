@@ -10,6 +10,8 @@
     <string name="reply">reply</string>
     <string name="replyall">replyAll</string>
     <string name="tweet_sent">Tweet sent</string>
+    <string name="dent_sent">Dent sent</string>
+    <string name="direct_message_sent">Direct message sent</string>
     <string name="hello">Enter your tweet text below:</string>
     <string name="app_name">Zwitscher</string>
     <string name="loading">Loading Tweets ...</string>
@@ -94,7 +96,7 @@
     <string name="help_back_button">Go back to the previous page</string>
     <string name="help_camera">Take a picture with the camera. See preferences for picture upload services.</string>
     <string name="help_direct_button">Send the message via mail</string>
-    <string name="help_favorite">Add/remote the status as/from favorite(s)</string>
+    <string name="help_favorite">Add/remove the status as/from favorite(s)</string>
     <string name="help_post_button">Write new message</string>
     <string name="help_reload_button">Reload the timeline (from the server)</string>
     <string name="help_reply_button">Reply to the current status</string>
@@ -121,6 +123,14 @@
     <string name="search_hint">Search messages</string>
     <string name="wrote">wrote</string>
     <string name="message_from_zwitscher">Message from Zwitscher</string>
-
+    <string name="click_here">&lt;--- press here</string>
+    <string name="read_it_later_enable">Enable support for ReadItLater</string>
+    <string name="read_it_later_username">Username</string>
+    <string name="read_it_later_password">Password</string>
+    <string name="read_it_later_support">Support for ReadItLater</string>
+    <string name="ril">Read later</string>
+    <string name="unset">Unset</string>
+    <string name="set">Set</string>
+    <string name="invalid">Invalid</string>
 
 </resources>

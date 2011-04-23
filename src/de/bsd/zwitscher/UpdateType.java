@@ -11,5 +11,6 @@ public enum UpdateType {
     RETWEET,
     FAVORITE,
     DIRECT,
-    UPLOAD_PIC;
+    UPLOAD_PIC,
+    LATER_READING;
 }

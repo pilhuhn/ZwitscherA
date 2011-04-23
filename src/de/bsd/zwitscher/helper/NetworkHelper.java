@@ -18,12 +18,10 @@ public class NetworkHelper {
 
     ConnectivityManager cManager;
     SharedPreferences preferences;
-    TelephonyManager telephonyManager;
 
     public NetworkHelper(Context context) {
         cManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
     }
 
     public boolean mayDownloadImages() {

@@ -2,12 +2,14 @@ package de.bsd.zwitscher;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Html;
 import android.view.View;
 import android.view.Window;
@@ -32,7 +34,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Show details about a user and allow to follow
+ * Show details about a user and allow to (un)follow
+ * the user or add it to a list.
  *
  * @author Heiko W. Rupp
  */
@@ -66,6 +69,9 @@ public class UserDetailActivity extends Activity  {
             TextView userNameView = (TextView) findViewById(R.id.UserName);
             userNameView.setText(userName);
         }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.edit().putBoolean("newUser",false).commit();
     }
 
     public void onResume() {
@@ -89,7 +95,8 @@ public class UserDetailActivity extends Activity  {
 
     /**
      * Fill data of the passed user in the form fields.
-     * @param user
+     * @param user User object to display
+     * @param weAreFollowing True if we are following that user
      */
     private void fillDetails(User user, boolean weAreFollowing) {
         if (user!=null) {
@@ -212,7 +219,7 @@ public class UserDetailActivity extends Activity  {
 
     /**
      * Called from the back button to finish the activity
-     * @param v
+     * @param v View object touched
      */
     @SuppressWarnings("unused")
     public void done(View v) {
@@ -221,9 +228,9 @@ public class UserDetailActivity extends Activity  {
 
    /**
     * Allow sending a direct message to the user.
-    * Calles from the direct button.
-    * @todo check if he follows us and thus sending is possible at all.
-    * @param v
+    * Called from the direct button.
+    * TODO check if he follows us and thus sending is possible at all.
+    * @param v View object touched
     */
     @SuppressWarnings("unused")
     public void directMessage(View v) {
@@ -236,7 +243,7 @@ public class UserDetailActivity extends Activity  {
     }
     /**
      * Called from the followUser button
-     * @param v
+     * @param v View object touched
      */
     @SuppressWarnings("unused")
     public void followUser(View v) {
@@ -251,7 +258,7 @@ public class UserDetailActivity extends Activity  {
     /**
      * Start a browser to view user on server
      * Triggered from a button
-     * @param v
+     * @param v View object touched
      */
     @SuppressWarnings("unused")
     public void viewOnWeb(View v) {
@@ -264,7 +271,7 @@ public class UserDetailActivity extends Activity  {
     /**
      * View users's recent tweets
      * Triggered from a button
-     * @param v
+     * @param v View object touched
      */
     @SuppressWarnings("unused")
     public void showUserTweets(View v) {
@@ -279,8 +286,9 @@ public class UserDetailActivity extends Activity  {
     }
 
     /**
+     * Add the user to a list
      * Called from the addToList button
-     * @param v
+     * @param v View object touched
      */
     @SuppressWarnings("unused")
     public void addToList(View v) {
@@ -302,22 +310,26 @@ public class UserDetailActivity extends Activity  {
         startActivityForResult(intent, 1);
     }
 
+    /**
+     * Callback that is called after the user has selected a list
+     * @param requestCode selection code of the original event
+     * @param resultCode result (ok, not ok)
+     * @param data Data from the called Intent
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode==1 && resultCode==RESULT_OK) {
-            Object o = data.getExtras().get("data");
-            System.out.println("res : " + o);
-
+            String o = (String) data.getExtras().get("data");
 
             TweetDB tdb = new TweetDB(this,account.getId());
             Set<Map.Entry<String, Integer>> userListsEntries;
 
-            int listId =-1;
+            int listId;
             userListsEntries = tdb.getLists().entrySet();
             for (Map.Entry<String, Integer> userList : userListsEntries) {
-                if (userList.getKey().equals((String)o)) {
+                if (userList.getKey().equals(o)) {
                     listId = userList.getValue();
                     thTwitterHelper.addUserToLists(theUser.getId(),listId);
                 }

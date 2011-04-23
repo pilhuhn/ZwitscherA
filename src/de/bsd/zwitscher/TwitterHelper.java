@@ -376,7 +376,14 @@ public class TwitterHelper {
 		Log.i("TwitterHelper", "Sending update: " + request.statusUpdate);
 		try {
 			twitter.updateStatus(request.statusUpdate);
-            updateResponse.setMessage("Tweet sent");
+
+            String sentMessage;
+            if (account.isStatusNet())
+                sentMessage = context.getString(R.string.dent_sent);
+            else
+                sentMessage = context.getString((R.string.tweet_sent));
+
+            updateResponse.setMessage(sentMessage);
             updateResponse.setSuccess();
 		} catch (TwitterException e) {
             updateResponse.setMessage( e.getLocalizedMessage());
@@ -429,7 +436,8 @@ public class TwitterHelper {
         try {
             twitter.sendDirectMessage((int)request.id,request.message);
             updateResponse.setSuccess();
-            updateResponse.setMessage("Direct message sent");
+            String msg = context.getString(R.string.direct_message_sent);
+            updateResponse.setMessage(msg);
         } catch (TwitterException e) {
             updateResponse.setFailure();
             updateResponse.setMessage(e.getLocalizedMessage());
@@ -465,7 +473,6 @@ public class TwitterHelper {
         Log.i("getUserList","Now we have " + statuses.size());
 
         MetaList<Status> metaList = new MetaList<Status>(statuses,numOriginal,filled);
-Log.d("getUsetList", "Returning " + metaList);
         return metaList;
 	}
 

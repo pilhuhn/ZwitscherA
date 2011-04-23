@@ -2,6 +2,8 @@
 <resources>
     <string name="status">status</string>
     <string name="tweet_sent">Tweet gesendet</string>
+    <string name="dent_sent">Dent gesendet</string>
+    <string name="direct_message_sent">Private Nachricht gesendet</string>
     <string name="hello">Geben Sie den Text ein:</string>
     <string name="app_name">Zwitscher</string>
     <string name="loading">Lade Tweets ...</string>
@@ -116,10 +118,12 @@
     <string name="search_hint">Nachrichten suchen</string>
     <string name="wrote">schrieb</string>
     <string name="message_from_zwitscher">Nachricht von Zwitscher</string>
-
-
-
-
-
-
+    <string name="click_here">&lt;--- Hier berühren</string>
+    <string name="read_it_later_enable">ReadItLater nutzen</string>
+    <string name="read_it_later_username">Benutzername</string>
+    <string name="read_it_later_password">Password</string>
+    <string name="read_it_later_support">Einstellungen für ReadItLater</string>
+    <string name="unset">Ungesetzt</string>
+    <string name="set">Gesetzt</string>
+    <string name="invalid">Ungültig</string>
 </resources>

@@ -1,11 +1,14 @@
 package de.bsd.zwitscher;
 
 
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.*;
@@ -182,16 +185,23 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         TextView tweetView = (TextView)findViewById(R.id.TweetTextView);
         tweetView.setText(status.getText());
 
-        TextView timeCientView = (TextView)findViewById(R.id.TimeTextView);
+        TextView timeClientView = (TextView)findViewById(R.id.TimeTextView);
         TwitterHelper th = new TwitterHelper(this, account);
         String s = getString(R.string.via);
         String text = th.getStatusDate(status) + s + status.getSource();
         String from = getString(R.string.from);
         if (status.getPlace()!=null) {
             Place place = status.getPlace();
-            text += " " + from + " " + place.getFullName();
+            text += " " + from + " " ;
+            if (place.getFullName()!=null)
+                text += "<a href=\"geo:0,0?q=" + place.getFullName() + ","+ place.getCountry() + "\">";
+            text += place.getFullName();
+            if (place.getFullName()!=null)
+                text += "</a>";
+
         }
-        timeCientView.setText(Html.fromHtml(text));
+        timeClientView.setText(Html.fromHtml(text));
+        timeClientView.setMovementMethod(LinkMovementMethod.getInstance());
 
 
         // Update Button state depending on Status' properties
@@ -206,12 +216,26 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
         ImageButton translateButon = (ImageButton) findViewById(R.id.TranslateButton);
         translateButon.setEnabled(networkHelper.isOnline());
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isNewUser = prefs.getBoolean("newUser",true);
+        if (!isNewUser) {
+            TextView hintView = (TextView) findViewById(R.id.HintView);
+            hintView.setVisibility(View.GONE);
+        }
+        boolean supportRIL = prefs.getBoolean("ril_enable",false);
+        if (supportRIL) {
+            Button rilButton = (Button) findViewById(R.id.ril_button);
+            rilButton.setVisibility(View.VISIBLE);
+            rilButton.setEnabled(true);
+        }
+
 	}
 
     /**
      * Display display of the details of a user from pressing
      * the user icon button.
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
     public void displayUserDetail(View v) {
@@ -230,7 +254,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     /**
      * Trigger replying to the current status.
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
 	public void reply(View v) {
@@ -245,7 +269,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Trigger replying to all users mentioned via @xxx in the
      * current status. Opens an editor Window first
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
 	public void replyAll(View v) {
@@ -259,7 +283,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     /**
      * Trigger a resent of the current status
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
 	public void retweet(View v) {
@@ -272,7 +296,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Do the classical re-send thing by prefixing with 'RT'.
      * Opens an editor window first.
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
 	public void classicRetweet(View v) {
@@ -287,12 +311,10 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Starts a view that shows the conversation around the current
      * status.
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
     public void threadView(View v) {
-        TwitterHelper th = new TwitterHelper(ctx, account);
-
         Intent i = new Intent(this,ThreadListActivity.class);
         i.putExtra("account",account);
         i.putExtra("startId", status.getId());
@@ -301,12 +323,10 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     /**
      * Marks the current status as (non) favorite
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
     public void favorite(View v) {
-        TwitterHelper th = new TwitterHelper(ctx, account);
-
         ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
 
         UpdateRequest request = new UpdateRequest(UpdateType.FAVORITE);
@@ -320,7 +340,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Start sending a direct message to the user that sent this
      * status.
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
     public void directMessage(View v) {
@@ -332,6 +352,36 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     }
 
+    /**
+     * Add the current status to the ReadIt Later list.
+     * @param v View that has been clicked
+     */
+    @SuppressWarnings("unused")
+    public void readItLater(View v) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String user = prefs.getString("ril_user","");
+        String password = prefs.getString("ril_password","");
+
+        if (user.equals("") || password.equals("")) {
+            Toast.makeText(this,"No user/passwrod for ReadItLater given",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        String url;
+        if (account.isStatusNet())
+            url = "https://identi.ca/notice/" + status.getId();
+        else
+            url = "https://twitter.com/#!/" + status.getUser().getScreenName() + "/status/" + status.getId();
+
+        UpdateRequest request = new UpdateRequest(UpdateType.LATER_READING);
+        request.status = status;
+        request.url = url;
+        request.extUser = user;
+        request.extPassword = password;
+
+        new UpdateStatusTask(this,pg, account).execute(request);
+
+    }
 
     //////////////// speak related stuff ////////////////////
 
@@ -358,6 +408,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     /**
      * Speak the current status via TTS
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
     public void speak(View v)
@@ -406,7 +457,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Translate the current status by calling Google translate.
      * Target language is the users current locale.
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
 	public void translate(View v) {
@@ -434,7 +485,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     /**
      * Finishes this screen and returns to the list of statuses
-     * @param v
+     * @param v View that has been clicked
      */
     @SuppressWarnings("unused")
 	public void done(View v) {
@@ -670,7 +721,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      * so that a click on the image in the gallery can start a browser
      * window to the image service to browser the full size one.
      */
-    private class BitmapWithUrl {
+    private static class BitmapWithUrl {
         Bitmap bitmap;
         String url;
 
@@ -684,7 +735,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      * Helper that just holds the urls of the full image service
      * url and the link to the thumbnail
      */
-    private class UrlPair {
+    private static class UrlPair {
         String fullUrl;
         String thumbnailUrl;
 

@@ -13,6 +13,13 @@
                      android:padding="4px"
                      android:onClick="displayUserDetail"
                      android:id="@+id/UserPictureImageView"/>
+        <TextView android:id="@+id/HintView"
+                  android:layout_height="wrap_content"
+                  android:layout_width="wrap_content"
+                  android:layout_toRightOf="@id/UserPictureImageView"
+                  android:text="@string/click_here"
+                  android:textColor="#AAAA00"
+                  />
         <TextView android:text="@+id/TextView01"
                   android:id="@+id/TextView01"
                   android:layout_width="wrap_content"
@@ -20,6 +27,7 @@
                   android:paddingLeft="5px"
                   android:paddingRight="5px"
                   android:layout_toRightOf="@id/UserPictureImageView"
+                  android:layout_below="@id/HintView"
                   android:layout_height="wrap_content"/>
 
         <TextView android:id="@+id/TweetTextView"
@@ -124,11 +132,20 @@
                      android:text="Send"
                      android:onClick="send"
                      android:src="@drawable/direct_button"
+                     android:id="@+id/SendButton"
                 />
+
+        <Button android:id="@+id/ril_button"
+                android:text="@string/ril"
+                android:layout_below="@id/ThreadButton"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:onClick="readItLater"
+                android:visibility="visible"/>
 
 
         <ImageButton android:id="@+id/DoneButton"
-                     android:layout_below="@id/SpeakButton"
+                     android:layout_below="@id/ril_button"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:onClick="done"
