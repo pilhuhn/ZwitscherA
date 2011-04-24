@@ -57,6 +57,7 @@
                      android:onClick="reply"
                      android:src="@drawable/reply_button"
                      android:text="Reply"/>
+<!--
         <ImageButton android:id="@+id/ReplyAllButton"
                      android:layout_below="@id/TweetTextView"
                      android:layout_width="wrap_content"
@@ -65,15 +66,17 @@
                      android:onClick="replyAll"
                      android:src="@drawable/reply_all_button"
                      android:text="Reply All"/>
+-->
 
         <ImageButton android:id="@+id/RetweetButton"
                      android:layout_below="@id/TweetTextView"
-                     android:layout_toRightOf="@id/ReplyAllButton"
+                     android:layout_toRightOf="@id/ReplyButton"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:onClick="retweet"
                      android:src="@drawable/rt_button"
                      android:text="Retweet"/>
+<!--
         <ImageButton android:id="@+id/ClassicRetweetButton"
                      android:layout_below="@id/TweetTextView"
                      android:layout_toRightOf="@id/RetweetButton"
@@ -89,24 +92,26 @@
                      android:layout_toRightOf="@id/ClassicRetweetButton"
                      android:onClick="directMessage"
                      android:text="Direct"/>
-        <ImageButton android:id="@+id/FavoriteButton"
-                     android:layout_below="@id/TweetTextView"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:layout_toRightOf="@id/DirectButton"
-                     android:onClick="favorite"
-                     android:src="@drawable/favorite_off"
-                     android:text="Favorite"/>
-
+-->
         <ImageButton android:id="@+id/ThreadButton"
                      android:layout_below="@id/TweetTextView"
-                     android:layout_toRightOf="@id/FavoriteButton"
+                     android:layout_toRightOf="@id/RetweetButton"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:onClick="threadView"
                      android:src="@drawable/threads"
                      android:text="Thread"/>
+        <ImageButton android:id="@+id/FavoriteButton"
+                     android:layout_below="@id/TweetTextView"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_toRightOf="@id/ThreadButton"
+                     android:onClick="favorite"
+                     android:src="@drawable/favorite_off"
+                     android:text="Favorite"/>
 
+
+<!--
         <ImageButton android:id="@+id/TranslateButton"
                      android:layout_below="@id/TweetTextView"
                      android:layout_toRightOf="@id/ThreadButton"
@@ -129,10 +134,12 @@
                      android:layout_toRightOf="@id/SpeakButton"
                      android:text="Send"
                      android:onClick="send"
-                     android:src="@drawable/direct_button"
+                     android:src="@drawable/forward_button"
                      android:id="@+id/SendButton"
                 />
+-->
 
+<!--
         <Button android:id="@+id/ril_button"
                 android:text="RIL"
                 android:layout_below="@id/ThreadButton"
@@ -140,10 +147,20 @@
                 android:layout_width="wrap_content"
                 android:onClick="readItLater"
                 android:visibility="gone"/>
+-->
 
+        <ImageButton android:id="@+id/morebutton"
+                android:layout_below="@id/TweetTextView"
+                android:layout_toRightOf="@id/FavoriteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="showGD"
+                android:text="@string/more"
+                android:src="@drawable/more"
+                />
 
         <ImageButton android:id="@+id/DoneButton"
-                     android:layout_below="@id/ril_button"
+                     android:layout_below="@id/ReplyButton"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:onClick="done"

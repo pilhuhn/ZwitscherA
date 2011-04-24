@@ -124,7 +124,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/ThreadButton"
                 android:onClick="directMessage"
-                android:src="@drawable/direct_button"
+                android:src="@drawable/forward_button"
                 android:text="Direct"/>
     </LinearLayout>
     <LinearLayout

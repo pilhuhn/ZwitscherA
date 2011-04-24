@@ -237,17 +237,21 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
 	}
 
-
+    /**
+     * Called from the more-button.
+     * @param v Button that calls the Grid
+     */
+    @SuppressWarnings("unused")
     public void showGD(View v) {
          QuickActionWidget mBar = new QuickActionGrid(this);
-        mBar.addQuickAction(new QuickAction(this,R.drawable.reply_all_button,R.string.replyall));
-        mBar.addQuickAction(new QuickAction(this,R.drawable.direct_button,R.string.direct)); // TODO Wrong drawable
-        mBar.addQuickAction(new QuickAction(this,R.drawable.rt_button_cl,R.string.classicretweet));
-        mBar.addQuickAction(new QuickAction(this,R.drawable.direct_button,R.string.forward));
+        mBar.addQuickAction(new QuickAction(this, R.drawable.reply_all_button, R.string.replyall));
+        mBar.addQuickAction(new QuickAction(this, R.drawable.direct_button, R.string.direct));
+        mBar.addQuickAction(new QuickAction(this, R.drawable.rt_button_cl, R.string.classicretweet));
+        mBar.addQuickAction(new QuickAction(this, R.drawable.forward_button, R.string.forward));
         mBar.addQuickAction(new QuickAction(this,R.drawable.translate,R.string.translate));
         mBar.addQuickAction(new QuickAction(this,R.drawable.speaker,R.string.speak));
         if (supportRIL)
-            mBar.addQuickAction(new QuickAction(this,R.drawable.direct_button,R.string.ril)); //  TODO wrong button
+            mBar.addQuickAction(new QuickAction(this,R.drawable.ril,R.string.ril));
 
 
         mBar.setDismissOnClick(true);
@@ -399,7 +403,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     @SuppressWarnings("unused")
     public void directMessage(View v) {
         Intent i = new Intent(this, NewTweetActivity.class);
-        i.putExtra("account",account);
+        i.putExtra("account", account);
         i.putExtra(getString(R.string.status), status);
         i.putExtra("op", getString(R.string.direct));
         startActivity(i);
