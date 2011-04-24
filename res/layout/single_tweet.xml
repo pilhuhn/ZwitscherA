@@ -116,13 +116,14 @@
                      android:src="@drawable/favorite_off"
                      android:text="Favorite"/>
 
-        <Button android:id="@+id/morebutton"
+        <ImageButton android:id="@+id/morebutton"
                 android:layout_below="@id/TimeTextView"
                 android:layout_toRightOf="@id/FavoriteButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="showGD"
                 android:text="@string/more"
+                android:src="@drawable/more"
                 />
 
 <!--
