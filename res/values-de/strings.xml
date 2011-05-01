@@ -126,4 +126,6 @@
     <string name="unset">Ungesetzt</string>
     <string name="set">Gesetzt</string>
     <string name="invalid">Ungültig</string>
+    <string name="wantToRemove">Wollen Sie [%s] wirklich löschen?</string>
+
 </resources>

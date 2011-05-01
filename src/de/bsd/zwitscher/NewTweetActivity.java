@@ -128,17 +128,14 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
         // Add a listener to count the text length.
         edittext.addTextChangedListener(new TextWatcher() {
-            @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 // Not needed
             }
 
-            @Override
             public void afterTextChanged(Editable editable) {
                 // Not needed
             }
 
-            @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
 
                 int tlen = edittext.getText().length();
@@ -156,7 +153,6 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
         tweetButton.setOnClickListener(new OnClickListener() {
 
-            @Override
             public void onClick(View v) {
                 StatusUpdate up  = new StatusUpdate(edittext.getText().toString());
                 // add location  if enabled in preferences and checked on tweet
@@ -186,8 +182,6 @@ public class NewTweetActivity extends Activity implements LocationListener {
         final Button clearButton = (Button) findViewById(R.id.ClearButton);
         clearButton.setOnClickListener(new OnClickListener() {
 
-
-            @Override
             public void onClick(View v) {
                 edittext.setText("");
 
@@ -352,22 +346,18 @@ public class NewTweetActivity extends Activity implements LocationListener {
     }
 
 
-    @Override
     public void onLocationChanged(Location location) {
         // TODO: Customise this generated block
     }
 
-    @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // TODO: Customise this generated block
     }
 
-    @Override
     public void onProviderEnabled(String provider) {
         // TODO: Customise this generated block
     }
 
-    @Override
     public void onProviderDisabled(String provider) {
         // TODO: Customise this generated block
     }

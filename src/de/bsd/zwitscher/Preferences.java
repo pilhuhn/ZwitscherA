@@ -30,7 +30,6 @@ public class Preferences extends PreferenceActivity implements SharedPreferences
 
     }
 
-    @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
         Preference p = findPreference(key);

@@ -704,7 +704,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 adapter.addImages(bitmaps);
                 g.setAdapter(adapter);
                 g.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         String url = bitmaps.get(position).url;
                         Uri uri = Uri.parse(url);
