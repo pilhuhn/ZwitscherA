@@ -132,5 +132,6 @@
     <string name="unset">Unset</string>
     <string name="set">Set</string>
     <string name="invalid">Invalid</string>
+    <string name="wantToRemove">Are you sure you want to remove [%s] ?</string>
 
 </resources>

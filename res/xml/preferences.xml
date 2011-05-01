@@ -16,6 +16,8 @@
     <de.bsd.zwitscher.preferences.ExpandableListPreference android:title="@string/prefs_filter"
                                                            android:summary="@string/prefs_filter_descr"
                                                            android:key="filter"
+                                                           separator=","
+                                                           askBeforeDelete="true"
                                                            />
 
     <ListPreference android:title="@string/prefs_min_old"

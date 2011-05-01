@@ -95,4 +95,5 @@
 <string name="wrote">à écrit</string>
 <string name="message_from_zwitscher">Message de Zwitscher</string>
 <string name="click_here">&lt;--- cliquez ici</string>
+<string name="wantToRemove">Vraiment effacer [%s] ?</string>
 </resources>
