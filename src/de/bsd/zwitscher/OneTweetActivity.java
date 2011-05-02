@@ -259,7 +259,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         mBar.show(v);
     }
 
-    @Override
     public void onQuickActionClicked(QuickActionWidget widget, int position) {
         System.out.println("oQAC " + position);
         View v = widget.getContentView();
