@@ -294,21 +294,23 @@ public class TwitterHelper {
 
     /**
      * Get an auth token the classical OAuth way
+     * 
      * @param pin
+     * @return the newly created account
      * @throws Exception
      */
-	public void generateAuthToken(String pin) throws Exception{
+	public Account generateAccountWithOauth(String pin) throws Exception{
         Twitter twitterInstance = new TwitterFactory().getInstance();
         twitterInstance.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
         RequestToken requestToken = getRequestToken(false); // twitterInstance.getOAuthRequestToken();
 		AccessToken accessToken = twitterInstance.getOAuthAccessToken(requestToken, pin);
 
-
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		Editor editor = preferences.edit();
-		editor.putString("accessToken", accessToken.getToken());
-		editor.putString("accessTokenSecret", accessToken.getTokenSecret());
-		editor.commit();
+        int newId = tweetDB.getNewAccountId();
+        Account account = new Account(newId,accessToken.getScreenName(),accessToken.getToken(),accessToken.getTokenSecret(),null,"twitter",true);
+  		
+	    tweetDB.insertOrUpdateAccount(account);
+	    
+	    return account;
 	}
 
     /**
@@ -323,7 +325,7 @@ public class TwitterHelper {
      * @return id of the account
      * @throws Exception when anything goes wrong (e.g wrong username/password etc.)
      */
-    public Account generateAccount(String username, String password, String service, boolean makeDefault) throws Exception {
+    public Account generateAccountWithXauth(String username, String password, String service, boolean makeDefault) throws Exception {
         ConfigurationBuilder cb = new ConfigurationBuilder();
         Twitter twitterInstance;
         Account account = null;
