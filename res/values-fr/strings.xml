@@ -96,4 +96,5 @@
 <string name="message_from_zwitscher">Message de Zwitscher</string>
 <string name="click_here">&lt;--- cliquez ici</string>
 <string name="wantToRemove">Vraiment effacer [%s] ?</string>
+<string name="addFilterExpression">Ajouter filtre</string>
 </resources>

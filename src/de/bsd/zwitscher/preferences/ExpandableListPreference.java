@@ -25,7 +25,9 @@ import de.bsd.zwitscher.R;
  * A preference that allows to add/remove values. Items are stored in the key
  * separated by the passed separator; default separator is comma (',').
  *
- * @attr ref separator A separator to separate the items in the preferences entry.
+ * @attr separator A separator to separate the items in the preferences entry.
+ * @attr hint A hint that is displayed in the edit text box. This is a reference to a string resource.
+ * @attr askBeforeDelete Should an alert be shown before deleting an entry?
  *
  * @author Heiko W. Rupp
  */
@@ -40,6 +42,7 @@ public class ExpandableListPreference extends DialogPreference implements TextVi
     String separator;
     boolean askBeforeDelete = true;
     private static final String DEFAULT_SEPARATOR = ",";
+    String hint;
 
     public ExpandableListPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -51,6 +54,10 @@ public class ExpandableListPreference extends DialogPreference implements TextVi
             separator = separ;
 
         askBeforeDelete = attrs.getAttributeBooleanValue(null,"askBeforeDelete",true);
+
+        int hint1 = attrs.getAttributeResourceValue(null, "hint", 0);
+        if (hint1!=0)
+            hint = context.getString(hint1);
 
         setPersistent(false); // we are persisting
         setDialogLayoutResource(R.layout.expandable_list_preference);
@@ -65,6 +72,8 @@ public class ExpandableListPreference extends DialogPreference implements TextVi
         super.onBindDialogView(view);    // Passed view is the expandable_list_preference layout.
         inputField = (EditText) view.findViewById(R.id.elp_input);
         inputField.setOnEditorActionListener(this);
+        if (hint!=null)
+            inputField.setHint(hint);
 
         listView = (ListView) view.findViewById(R.id.elp_list);
         // get persisted values and fill into items
