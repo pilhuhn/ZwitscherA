@@ -377,10 +377,12 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                         publishProgress(mentionsString);
                         long mentionLast = tdb.getLastRead(-1);
                         Paging paging;
-                        paging = new Paging().count(100);
+                        paging = new Paging();
 
                         if (mentionLast>0)
                             paging.setSinceId(mentionLast);
+                        else
+                            paging.setCount(50);
                         MetaList<twitter4j.Status> mentions = th.getTimeline(paging,-1,false);
                         newMentions = mentions.getNumOriginal();
                         if (mentions.getList().size()>0) {
