@@ -36,6 +36,7 @@ class StatusAdapter<T extends TwitterResponse> extends ArrayAdapter<T> {
     TwitterHelper th;
     private Context extContext;
     boolean downloadImages;
+    LayoutInflater inflater;
 
 
     public StatusAdapter(Context context, Account account, int textViewResourceId, List<T> objects) {
@@ -45,7 +46,7 @@ class StatusAdapter<T extends TwitterResponse> extends ArrayAdapter<T> {
         ph = new PicHelper();
         th = new TwitterHelper(context, account);
         downloadImages = new NetworkHelper(context).mayDownloadImages();
-
+        inflater =  (LayoutInflater) extContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -56,8 +57,7 @@ class StatusAdapter<T extends TwitterResponse> extends ArrayAdapter<T> {
 
         // Use ViewHolder pattern to only inflate once
         if (convertView ==null) {
-            LayoutInflater li = (LayoutInflater) extContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = li.inflate(R.layout.tweet_list_item,parent,false);
+            convertView = inflater.inflate(R.layout.tweet_list_item,parent,false);
 
             viewHolder = new ViewHolder();
             viewHolder.iv = (ImageView) convertView.findViewById(R.id.ListImageView);

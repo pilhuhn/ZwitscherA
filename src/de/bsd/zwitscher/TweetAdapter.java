@@ -17,7 +17,6 @@ import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.PicHelper;
 import de.bsd.zwitscher.helper.SpannableBuilder;
 import twitter4j.Tweet;
-import twitter4j.User;
 
 /**
  * Adapter for individual list rows of
@@ -30,13 +29,14 @@ class TweetAdapter<T extends Tweet> extends ArrayAdapter<T> {
     private List<T> items;
     PicHelper ph;
     private Context extContext;
+    LayoutInflater inflater;
 
     public TweetAdapter(Context context, Account account, int textViewResourceId, List<T> objects) {
         super(context, textViewResourceId, objects);
         extContext = context;
         items = objects;
         ph = new PicHelper();
-
+        inflater = (LayoutInflater) extContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -47,8 +47,8 @@ class TweetAdapter<T extends Tweet> extends ArrayAdapter<T> {
 
         // Use ViewHolder pattern to only inflate once
         if (convertView ==null) {
-            LayoutInflater li = (LayoutInflater) extContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = li.inflate(R.layout.tweet_list_item,null);
+
+            convertView = inflater.inflate(R.layout.tweet_list_item,null);
 
             viewHolder = new ViewHolder();
             viewHolder.iv = (ImageView) convertView.findViewById(R.id.ListImageView);
