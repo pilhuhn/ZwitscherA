@@ -145,7 +145,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
      * @param id
      * @return true as the click was consumed
      */
-    @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view,
             int position, long id) {
         Log.i("TLA","Long click, pos=" + position + ",id="+id);
@@ -184,7 +183,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
      * @return List of status items along with some counts
      */
 	private MetaList<Status> getTimlinesFromTwitter(boolean fromDbOnly, String filter) {
-		Paging paging = new Paging().count(100);
+		Paging paging = new Paging();
 
 		MetaList<Status> myStatuses;
 
@@ -192,6 +191,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     	long last = tdb.getLastRead(list_id);
     	if (last>0 )//&& !Debug.isDebuggerConnected())
     		paging.sinceId(last);
+        else
+            paging.setCount(50); // 50 Tweets if we don't have the timeline yet
 
         switch (list_id) {
         case 0:
@@ -277,13 +278,11 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     	new GetTimeLineTask(this).execute(fromDbOnly);
     }
 
-    @Override
     public void onScrollStateChanged(AbsListView absListView, int i) {
         // nothing to do for us
     }
 
     @SuppressWarnings("unchecked")
-    @Override
     public void onScroll(AbsListView absListView, int firstVisible, int visibleCount, int totalCount) {
 
         boolean loadMore = /* maybe add a padding */
@@ -310,6 +309,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                         }
                     } else if (item instanceof Status) {
                         Status last = (Status) item;
+                        if (statuses==null)
+                            statuses = new ArrayList<Status>();
 
                         List<Status> newStatuses = th.getStatuesFromDb(last.getId(),7,list_id);
                         for (Status status : newStatuses ) {
