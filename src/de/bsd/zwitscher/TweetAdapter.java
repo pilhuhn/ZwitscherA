@@ -24,19 +24,11 @@ import twitter4j.Tweet;
  *
  * @author Heiko W. Rupp
  */
-class TweetAdapter<T extends Tweet> extends ArrayAdapter<T> {
+class TweetAdapter<T extends Tweet> extends AbstractAdapter<T> {
 
-    private List<T> items;
-    PicHelper ph;
-    private Context extContext;
-    LayoutInflater inflater;
 
     public TweetAdapter(Context context, Account account, int textViewResourceId, List<T> objects) {
         super(context, textViewResourceId, objects);
-        extContext = context;
-        items = objects;
-        ph = new PicHelper();
-        inflater = (LayoutInflater) extContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -99,13 +91,6 @@ class TweetAdapter<T extends Tweet> extends ArrayAdapter<T> {
         viewHolder.timeClientInfo.setText((text));
 //Debug.stopMethodTracing();
         return convertView;
-    }
-
-    static class ViewHolder {
-        ImageView iv;
-        TextView statusText;
-        TextView userInfo;
-        TextView timeClientInfo;
     }
 
 }

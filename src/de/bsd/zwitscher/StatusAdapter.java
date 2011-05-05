@@ -29,24 +29,16 @@ import java.util.List;
  *
  * @author Heiko W. Rupp
  */
-class StatusAdapter<T extends TwitterResponse> extends ArrayAdapter<T> {
+class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
-    private List<T> items;
-    PicHelper ph;
     TwitterHelper th;
-    private Context extContext;
     boolean downloadImages;
-    LayoutInflater inflater;
 
 
     public StatusAdapter(Context context, Account account, int textViewResourceId, List<T> objects) {
         super(context, textViewResourceId, objects);
-        extContext = context;
-        items = objects;
-        ph = new PicHelper();
         th = new TwitterHelper(context, account);
         downloadImages = new NetworkHelper(context).mayDownloadImages();
-        inflater =  (LayoutInflater) extContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -143,13 +135,6 @@ class StatusAdapter<T extends TwitterResponse> extends ArrayAdapter<T> {
         viewHolder.timeClientInfo.setText((text));
 //Debug.stopMethodTracing();
         return convertView;
-    }
-
-    static class ViewHolder {
-        ImageView iv;
-        TextView statusText;
-        TextView userInfo;
-        TextView timeClientInfo;
     }
 
 }
