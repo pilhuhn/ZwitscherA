@@ -3,6 +3,7 @@
 		  android:id="@+id/preferences"
 		  android:titleCondensed="Prefs"
 		  android:title="Preferences"
+          android:icon="@drawable/wrench"
 		  android:enabled="true"
 		  android:visible="true"/>
     <item android:enabled="true" android:id="@+id/reloadLists"
