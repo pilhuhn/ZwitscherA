@@ -73,7 +73,7 @@
     <string name="prefs_location_enabled">Location enabled</string>
     <string name="prefs_location_enabled_descr">Shall Zwitscher add location to status updates?</string>
     <string name="prefs_filter">Filter</string>
-    <string name="prefs_filter_descr">Provide Expressions, separated by Comma to filter tweets</string>
+    <string name="prefs_filter_descr">Provide Expressions to filter tweets</string>
     <string name="prefs_min_old">Min old tweets</string>
     <string name="prefs_min_old_descr">Minumum of old tweets to display after a reload with new tweets</string>
     <string name="prefs_max_old">Default old tweets</string>

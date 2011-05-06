@@ -67,7 +67,7 @@
     <string name="prefs_location_enabled">Position senden</string>
     <string name="prefs_location_enabled_descr">Soll Zwitscher die Position bei neuen Nachrichten mitsenden?</string>
     <string name="prefs_filter">Filter</string>
-    <string name="prefs_filter_descr">Geben Sie durch Komma getrennte Ausdrücke an, um Tweets zu filtern.</string>
+    <string name="prefs_filter_descr">Geben Sie Ausdrücke an, um Tweets zu filtern.</string>
     <string name="prefs_min_old">Minimum alte Tweets</string>
     <string name="prefs_min_old_descr">Minimum an alten Tweets,die nach einem Reload zu neuen Tweets angezeigt werden.</string>
     <string name="prefs_max_old">Standardanzahl alte Tweets</string>

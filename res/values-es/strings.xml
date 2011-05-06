@@ -42,7 +42,7 @@
 <string name="please_sync_lists">Por favor sincronice listados</string>
 <string name="no_searches_found">No se encontraron búsquedas guardadas -  necesita sincronizar?</string>
 <string name="updating">Actualizando</string>
-<string name="login_common">Necesita acceder a Twitter para autorizar Zwitscher. 
+<string name="login_common">Necesita acceder a Twitter para autorizar Zwitscher.
 Para hacer esto, haga click en "Obtener PIN de Twitter", a continuación, iniciar sesión en el navegador, escriba el PIN, y desde la pantalla de inicio, ejecute Zwitscher nuevamente e introduzca el PIN. A continuación haga clic en "Establecer PIN"
 Sólo tienes que hacer esto una vez en el inicio de sesión
 </string>
@@ -60,7 +60,7 @@ Sólo tienes que hacer esto una vez en el inicio de sesión
 <string name="prefs_location_enabled">Ubicación habilitada</string>
 <string name="prefs_location_enabled_descr">Debería Zwitscher añadir ubicación para las actualizaciones de estado?</string>
 <string name="prefs_filter">Filtro</string>
-<string name="prefs_filter_descr">Proporcionar las expresiones, separadas por comas para filtrar tweets</string>
+<string name="prefs_filter_descr">Proporcionar las expresiones para filtrar tweets</string>
 <string name="prefs_min_old">Mínimo de tweets antiguos</string>
 <string name="prefs_min_old_descr">Mínimo de tweets antiguos que se mostrarán después cargar nuevos tweets</string>
 <string name="prefs_max_old">Tweets antiguos por defecto</string>
