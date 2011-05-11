@@ -190,7 +190,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
     	long last = tdb.getLastRead(list_id);
     	if (last>0 )//&& !Debug.isDebuggerConnected())
-    		paging.sinceId(last);
+    		paging.sinceId(last).setCount(200);
         else
             paging.setCount(50); // 50 Tweets if we don't have the timeline yet
 
@@ -379,8 +379,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                         Paging paging;
                         paging = new Paging();
 
-                        if (mentionLast>0)
+                        if (mentionLast>0) {
+                            paging.setCount(200);
                             paging.setSinceId(mentionLast);
+                        }
                         else
                             paging.setCount(50);
                         MetaList<twitter4j.Status> mentions = th.getTimeline(paging,-1,false);
