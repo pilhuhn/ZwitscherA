@@ -24,7 +24,7 @@ import twitter4j.Tweet;
  *
  * @author Heiko W. Rupp
  */
-class TweetAdapter<T extends Tweet> extends AbstractAdapter<T> {
+public class TweetAdapter<T extends Tweet> extends AbstractAdapter<T> {
 
 
     public TweetAdapter(Context context, Account account, int textViewResourceId, List<T> objects) {

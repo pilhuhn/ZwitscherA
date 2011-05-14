@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author Heiko W. Rupp
  */
-class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
+public class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
     TwitterHelper th;
     boolean downloadImages;

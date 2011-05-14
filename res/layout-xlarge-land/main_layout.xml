@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="horizontal">
+
+    <fragment android:name="de.bsd.zwitscher.h.TimelinesFragment"
+              android:id="@+id/h_timelines_list_fragment"
+              android:layout_height="fill_parent"
+              android:layout_width="160dp"
+              />
+    <fragment android:name="de.bsd.zwitscher.h.TweetsFragment"
+              android:id="@+id/h_tweets_fragment"
+              android:layout_height="fill_parent"
+              android:layout_width="600dp"
+              />
+    <FrameLayout android:id="@+id/details" android:layout_weight="1"
+            android:layout_width="0px" android:layout_height="fill_parent"
+            />
+<!--
+    <fragment android:name="de.bsd.zwitscher.h.TweetsFragment"
+              android:id="@+id/h_tweets_fragment"
+              android:layout_height="fill_parent"
+              android:layout_width="640dp"
+              />
+-->
+</LinearLayout>

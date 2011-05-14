@@ -13,6 +13,7 @@ import de.bsd.zwitscher.TabWidget;
 import de.bsd.zwitscher.TweetDB;
 import de.bsd.zwitscher.TwitterConsumerToken;
 import de.bsd.zwitscher.TwitterHelper;
+import de.bsd.zwitscher.h.MainActivity;
 
 public class LoginActivity extends Activity {
 
@@ -150,7 +151,12 @@ public class LoginActivity extends Activity {
 	 */
 	private void proceed(Account account) {
         AccountHolder.getInstance().setAccount(account);
-		Intent i = new Intent().setClass(this, TabWidget.class);
+
+		Intent i;
+        if (true)
+            i = new Intent().setClass(this, MainActivity.class);
+        else
+            i = new Intent().setClass(this, TabWidget.class);
 		startActivity(i);
 		finish();
 	}
