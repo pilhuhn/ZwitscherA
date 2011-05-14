@@ -113,7 +113,7 @@ public class TabWidget extends TabActivity {
         Intent sentIntent = new Intent().setClass(this,TweetListActivity.class);
         sentIntent.putExtra(LIST_ID, -3);
         homeSpec = tabHost.newTabSpec("sent")
-                .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_direct)) // TODO other icon
+                .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_sent)) 
                 .setContent(sentIntent);
         tabHost.addTab(homeSpec);
 
@@ -121,7 +121,7 @@ public class TabWidget extends TabActivity {
         Intent favsIntent = new Intent().setClass(this,TweetListActivity.class);
         favsIntent.putExtra(LIST_ID, -4);
         homeSpec = tabHost.newTabSpec("favs")
-                .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_direct)) // TODO other icon
+                .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_favorite))
                 .setContent(favsIntent);
         tabHost.addTab(homeSpec);
 
