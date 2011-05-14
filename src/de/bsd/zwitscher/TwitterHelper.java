@@ -73,7 +73,15 @@ public class TwitterHelper {
                 if (!fromDbOnly)
 				    statuses = twitter.getMentions(paging);
 				break;
-
+// -2 is directs
+            case -3 :
+                if (!fromDbOnly)
+                    statuses = twitter.getUserTimeline(paging);
+                    break;
+            case -4 :
+                if (!fromDbOnly)
+                    statuses = twitter.getFavorites(); // TODO paging?  TODO favorites only live - or how to sync them?
+                break;
 			default:
 				statuses = new ArrayList<Status>();
 			}
@@ -294,7 +302,7 @@ public class TwitterHelper {
 
     /**
      * Get an auth token the classical OAuth way
-     * 
+     *
      * @param pin
      * @return the newly created account
      * @throws Exception
@@ -307,9 +315,9 @@ public class TwitterHelper {
 
         int newId = tweetDB.getNewAccountId();
         Account account = new Account(newId,accessToken.getScreenName(),accessToken.getToken(),accessToken.getTokenSecret(),null,"twitter",true);
-  		
+
 	    tweetDB.insertOrUpdateAccount(account);
-	    
+
 	    return account;
 	}
 

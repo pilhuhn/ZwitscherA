@@ -16,6 +16,9 @@
 <string name="list">Listes</string>
 <string name="direct">Courier</string>
 <string name="mentions">Mentions</string>
+    <string name="sent">Envoyée</string>
+    <string name="favorites">Aimée</string>
+
 <string name="searches">Recherches</string>
 <string name="location">Location:</string>
 <string name="tweet_count">Nombre de tweets:</string>

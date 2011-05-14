@@ -204,6 +204,12 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             // see below at getDirectsFromTwitter
             myStatuses = new MetaList<Status>();
             break;
+        case -3:
+            myStatuses = th.getTimeline(paging,list_id,fromDbOnly);
+            break;
+        case -4:
+            myStatuses = th.getTimeline(paging,list_id,fromDbOnly);
+            break;
         default:
         	myStatuses = th.getUserList(paging,list_id, fromDbOnly);
         	break;
@@ -358,20 +364,27 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             }
             else {
                 String directsString = context.getString(R.string.direct);
-                if (list_id>-2) {
-                    String mentionsString = context.getString(R.string.mentions);
-                    String homeString = context.getString(R.string.home_timeline);
-                    if (list_id<=0)
-                        publishProgress(list_id==-1? mentionsString : homeString);
-                    else
-                        publishProgress("");
+                if (list_id>-5 && list_id!=-2) {
+                    String updating;
+                    switch (list_id) {
+                        case 0: updating = context.getString(R.string.home_timeline);
+                            break;
+                        case -1: updating = context.getString(R.string.mentions);
+                            break;
+                        case -3: updating = context.getString(R.string.sent);
+                            break;
+                        case -4: updating = context.getString(R.string.favorites);
+                            break;
+                        default: updating = "";
+                    }
+                    publishProgress(updating);
                     String filter = getFilter();
                     data = getTimlinesFromTwitter(fromDbOnly, filter);
                     // Also check for mentions + directs (if allowed in prefs)
                     NetworkHelper networkHelper = new NetworkHelper(context);
 
                     if (list_id<=0 && !fromDbOnly && networkHelper.mayReloadAdditional()) { // TODO make this block nicer
-                        publishProgress(mentionsString);
+                        publishProgress(context.getString(R.string.mentions));
                         long mentionLast = tdb.getLastRead(-1);
                         Paging paging;
                         paging = new Paging();
@@ -405,7 +418,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     publishProgress(directsString);
                     data = getDirectsFromTwitter(fromDbOnly);
                 }
-                else { // list id < -2 ==> saved search
+                else { // list id < -4 ==> saved search
                     String s = context.getString(R.string.searches);
                     publishProgress(s);
                     data = getSavedSearchFromTwitter(-list_id,fromDbOnly);
@@ -417,7 +430,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         @SuppressWarnings("unchecked")
 		@Override
 		protected void onPostExecute(MetaList result) {
-            if (list_id<-2)
+            if (list_id<-4)
 	            setListAdapter(new TweetAdapter(context, account, R.layout.tweet_list_item, result.getList()));
             else
 	            setListAdapter(new StatusAdapter(context, account, R.layout.tweet_list_item, result.getList()));
