@@ -8,3 +8,4 @@ src/de/bsd/zwitscher/other/ReaditLaterToken.java
 *.iws
 gen
 Thumbs.db
+fssort.ini
