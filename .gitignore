@@ -7,3 +7,4 @@ src/de/bsd/zwitscher/other/ReaditLaterToken.java
 *.ipr
 *.iws
 gen
+Thumbs.db
