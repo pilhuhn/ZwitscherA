@@ -122,13 +122,11 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
         if (statuses!=null) {
          Intent i = new Intent(this,OneTweetActivity.class);
-         i.putExtra("account",account);
          i.putExtra(getString(R.string.status), statuses.get(position));
          startActivity(i);
         }
         else if (directs!=null) {
            Intent i = new Intent(this, NewTweetActivity.class);
-           i.putExtra("account",account);
            i.putExtra("user",directs.get(position).getSender());
            i.putExtra("op",getString(R.string.direct));
            startActivity(i);
@@ -149,7 +147,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             int position, long id) {
         Log.i("TLA","Long click, pos=" + position + ",id="+id);
         Intent i = new Intent(this, NewTweetActivity.class);
-        i.putExtra("account",account);
         if (statuses!=null) {
            i.putExtra(getString(R.string.status), statuses.get(position));
            i.putExtra("op",getString(R.string.reply));

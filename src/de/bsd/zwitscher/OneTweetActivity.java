@@ -107,7 +107,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
                 Intent i = new Intent(this,UserDetailActivity.class);
                 i.putExtra("userName",userName);
-                i.putExtra("account",account);
                 startActivity(i);
                 finish();
             } else if (dataString.matches("http://twitter.com/[a-zA-Z0-9_]*\\?.*")) {
@@ -117,7 +116,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 String userName = dataString.substring(19,dataString.indexOf("?"));
                 Intent i = new Intent(this,UserDetailActivity.class);
                 i.putExtra("userName",userName);
-                i.putExtra("account",account);
                 startActivity(i);
                 finish();
             }
@@ -240,7 +238,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     @SuppressWarnings("unused")
     public void displayUserDetail(View v) {
         Intent i = new Intent(this, UserDetailActivity.class);
-        i.putExtra("account",account);
         User theUser;
         if (status.getRetweetedStatus()==null) {
             theUser = status.getUser();
@@ -259,7 +256,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     @SuppressWarnings("unused")
 	public void reply(View v) {
 		Intent i = new Intent(this, NewTweetActivity.class);
-        i.putExtra("account",account);
 		i.putExtra(getString(R.string.status), status);
 		i.putExtra("op", getString(R.string.reply));
 		startActivity(i);
@@ -274,7 +270,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     @SuppressWarnings("unused")
 	public void replyAll(View v) {
 		Intent i = new Intent(this, NewTweetActivity.class);
-        i.putExtra("account",account);
 		i.putExtra(getString(R.string.status), status);
 		i.putExtra("op", getString(R.string.replyall));
 		startActivity(i);
@@ -301,7 +296,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     @SuppressWarnings("unused")
 	public void classicRetweet(View v) {
 		Intent i = new Intent(this, NewTweetActivity.class);
-        i.putExtra("account",account);
 		i.putExtra(getString(R.string.status), status);
 		i.putExtra("op", getString(R.string.classicretweet));
 		startActivity(i);
@@ -316,7 +310,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     @SuppressWarnings("unused")
     public void threadView(View v) {
         Intent i = new Intent(this,ThreadListActivity.class);
-        i.putExtra("account",account);
         i.putExtra("startId", status.getId());
         startActivity(i);
     }
@@ -345,7 +338,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     @SuppressWarnings("unused")
     public void directMessage(View v) {
         Intent i = new Intent(this, NewTweetActivity.class);
-        i.putExtra("account",account);
         i.putExtra(getString(R.string.status), status);
         i.putExtra("op", getString(R.string.direct));
         startActivity(i);

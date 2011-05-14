@@ -107,7 +107,6 @@ public class ThreadListActivity extends ListActivity {
 
         if (statuses!=null) {
             Intent i = new Intent(this,OneTweetActivity.class);
-            i.putExtra("account",account);
             i.putExtra(getString(R.string.status), statuses.get(position));
             startActivity(i);
         }
@@ -138,7 +137,6 @@ public class ThreadListActivity extends ListActivity {
     @SuppressWarnings("unused")
     public void post(View v) {
         Intent i = new Intent(this, NewTweetActivity.class);
-        i.putExtra("account",account);
         startActivity(i);
     }
 
