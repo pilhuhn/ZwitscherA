@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="vertical">
+
+    <fragment android:name="de.bsd.zwitscher.h.OneTweetFragment"
+              android:id="@+id/h_one_tweet_fragment"
+              android:layout_width="fill_parent"
+              android:layout_height="400dp"
+              />
+
+    <FrameLayout android:id="@+id/h_misc_frame" android:layout_weight="1"
+            android:layout_width="fill_parent" android:layout_height="0px"
+            />
+
+</LinearLayout>
