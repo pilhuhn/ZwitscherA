@@ -122,13 +122,11 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
         if (statuses!=null) {
          Intent i = new Intent(this,OneTweetActivity.class);
-         i.putExtra("account",account);
          i.putExtra(getString(R.string.status), statuses.get(position));
          startActivity(i);
         }
         else if (directs!=null) {
            Intent i = new Intent(this, NewTweetActivity.class);
-           i.putExtra("account",account);
            i.putExtra("user",directs.get(position).getSender());
            i.putExtra("op",getString(R.string.direct));
            startActivity(i);
@@ -145,12 +143,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
      * @param id
      * @return true as the click was consumed
      */
-    @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view,
             int position, long id) {
         Log.i("TLA","Long click, pos=" + position + ",id="+id);
         Intent i = new Intent(this, NewTweetActivity.class);
-        i.putExtra("account",account);
         if (statuses!=null) {
            i.putExtra(getString(R.string.status), statuses.get(position));
            i.putExtra("op",getString(R.string.reply));
@@ -184,14 +180,16 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
      * @return List of status items along with some counts
      */
 	private MetaList<Status> getTimlinesFromTwitter(boolean fromDbOnly, String filter) {
-		Paging paging = new Paging().count(100);
+		Paging paging = new Paging();
 
 		MetaList<Status> myStatuses;
 
 
     	long last = tdb.getLastRead(list_id);
     	if (last>0 )//&& !Debug.isDebuggerConnected())
-    		paging.sinceId(last);
+    		paging.sinceId(last).setCount(200);
+        else
+            paging.setCount(50); // 50 Tweets if we don't have the timeline yet
 
         switch (list_id) {
         case 0:
@@ -205,6 +203,12 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         case -2:
             // see below at getDirectsFromTwitter
             myStatuses = new MetaList<Status>();
+            break;
+        case -3:
+            myStatuses = th.getTimeline(paging,list_id,fromDbOnly);
+            break;
+        case -4:
+            myStatuses = th.getTimeline(paging,list_id,fromDbOnly);
             break;
         default:
         	myStatuses = th.getUserList(paging,list_id, fromDbOnly);
@@ -277,13 +281,11 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     	new GetTimeLineTask(this).execute(fromDbOnly);
     }
 
-    @Override
     public void onScrollStateChanged(AbsListView absListView, int i) {
         // nothing to do for us
     }
 
     @SuppressWarnings("unchecked")
-    @Override
     public void onScroll(AbsListView absListView, int firstVisible, int visibleCount, int totalCount) {
 
         boolean loadMore = /* maybe add a padding */
@@ -310,6 +312,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                         }
                     } else if (item instanceof Status) {
                         Status last = (Status) item;
+                        if (statuses==null)
+                            statuses = new ArrayList<Status>();
 
                         List<Status> newStatuses = th.getStatuesFromDb(last.getId(),7,list_id);
                         for (Status status : newStatuses ) {
@@ -360,26 +364,37 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             }
             else {
                 String directsString = context.getString(R.string.direct);
-                if (list_id>-2) {
-                    String mentionsString = context.getString(R.string.mentions);
-                    String homeString = context.getString(R.string.home_timeline);
-                    if (list_id<=0)
-                        publishProgress(list_id==-1? mentionsString : homeString);
-                    else
-                        publishProgress("");
+                if (list_id>-5 && list_id!=-2) {
+                    String updating;
+                    switch (list_id) {
+                        case 0: updating = context.getString(R.string.home_timeline);
+                            break;
+                        case -1: updating = context.getString(R.string.mentions);
+                            break;
+                        case -3: updating = context.getString(R.string.sent);
+                            break;
+                        case -4: updating = context.getString(R.string.favorites);
+                            break;
+                        default: updating = "";
+                    }
+                    publishProgress(updating);
                     String filter = getFilter();
                     data = getTimlinesFromTwitter(fromDbOnly, filter);
                     // Also check for mentions + directs (if allowed in prefs)
                     NetworkHelper networkHelper = new NetworkHelper(context);
 
                     if (list_id<=0 && !fromDbOnly && networkHelper.mayReloadAdditional()) { // TODO make this block nicer
-                        publishProgress(mentionsString);
+                        publishProgress(context.getString(R.string.mentions));
                         long mentionLast = tdb.getLastRead(-1);
                         Paging paging;
-                        paging = new Paging().count(100);
+                        paging = new Paging();
 
-                        if (mentionLast>0)
+                        if (mentionLast>0) {
+                            paging.setCount(200);
                             paging.setSinceId(mentionLast);
+                        }
+                        else
+                            paging.setCount(50);
                         MetaList<twitter4j.Status> mentions = th.getTimeline(paging,-1,false);
                         newMentions = mentions.getNumOriginal();
                         if (mentions.getList().size()>0) {
@@ -403,7 +418,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     publishProgress(directsString);
                     data = getDirectsFromTwitter(fromDbOnly);
                 }
-                else { // list id < -2 ==> saved search
+                else { // list id < -4 ==> saved search
                     String s = context.getString(R.string.searches);
                     publishProgress(s);
                     data = getSavedSearchFromTwitter(-list_id,fromDbOnly);
@@ -415,7 +430,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         @SuppressWarnings("unchecked")
 		@Override
 		protected void onPostExecute(MetaList result) {
-            if (list_id<-2)
+            if (list_id<-4)
 	            setListAdapter(new TweetAdapter(context, account, R.layout.tweet_list_item, result.getList()));
             else
 	            setListAdapter(new StatusAdapter(context, account, R.layout.tweet_list_item, result.getList()));

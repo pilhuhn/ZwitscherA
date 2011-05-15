@@ -47,14 +47,7 @@ public class MultiSelectListActivity extends ListActivity implements AdapterView
         listView.setOnItemClickListener(this);
     }
 
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//    }
-
-    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        // TODO: Customise this generated block
         ListView listView = getListView();
         String item = (String) listView.getItemAtPosition(position);
 

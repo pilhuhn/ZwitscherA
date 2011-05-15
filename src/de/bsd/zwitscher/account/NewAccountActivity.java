@@ -41,8 +41,8 @@ public class NewAccountActivity extends Activity {
             // Try to generate a token and insert it.
             Account newAccount = th.generateAccountWithXauth(username, password, service, shouldSwitch);
 
+            AccountHolder.getInstance().setAccount(newAccount);
             Intent intent = new Intent(this, TabWidget.class);
-            intent.putExtra("account",newAccount);
             startActivity(intent);
             finish();
 

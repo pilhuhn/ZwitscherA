@@ -112,7 +112,6 @@ public class ListOfListsActivity extends AbstractListActivity {
             if (listId!=-1) {
                 Intent intent = new Intent().setClass(this,TweetListActivity.class);
                 intent.putExtra(TabWidget.LIST_ID, listId);
-                intent.putExtra("account",account);
 
                 startActivity(intent);
             }
@@ -122,7 +121,6 @@ public class ListOfListsActivity extends AbstractListActivity {
                 if (text.equals(search.getName())) {
                     Intent intent = new Intent().setClass(this,TweetListActivity.class);
                     intent.putExtra(TabWidget.LIST_ID, (-search.getId()));
-                    intent.putExtra("account",account);
                     Log.d("ListsOfLists", "Saved search with id " + search.getId());
 
                     startActivity(intent);

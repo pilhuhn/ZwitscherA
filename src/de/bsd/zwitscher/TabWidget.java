@@ -11,6 +11,7 @@ import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
+import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.account.AccountStuffActivity;
 import de.bsd.zwitscher.helper.CleanupTask;
 import de.bsd.zwitscher.helper.PicHelper;
@@ -53,7 +54,7 @@ public class TabWidget extends TabActivity {
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
 
-        account = getIntent().getExtras().getParcelable("account");
+        account = AccountHolder.getInstance().getAccount();
         accountId = account.getId();
         Log.i("TabWidget","Account=" + account);
 
@@ -68,7 +69,7 @@ public class TabWidget extends TabActivity {
         super.onResume();
 
         Log.i("TabWidget","onResume");
-        Account tmp = getIntent().getExtras().getParcelable("account");
+        Account tmp = AccountHolder.getInstance().getAccount();
         if (!tmp.equals(account)) {
             // New account, so re-setup tabs
             tabHost.clearAllTabs();
@@ -84,7 +85,6 @@ public class TabWidget extends TabActivity {
         tabHost = getTabHost();
         Intent homeIntent = new Intent().setClass(this,TweetListActivity.class);
         homeIntent.putExtra(LIST_ID, 0);
-        homeIntent.putExtra("account",account);
 
         String tmp = getString(R.string.home_timeline);
         homeSpec = tabHost.newTabSpec("tmp")
@@ -94,7 +94,6 @@ public class TabWidget extends TabActivity {
 
         Intent mentionsIntent = new Intent().setClass(this,TweetListActivity.class);
         mentionsIntent.putExtra(LIST_ID, -1);
-        mentionsIntent.putExtra("account",account);
 
         tmp= getString(R.string.mentions);
         homeSpec = tabHost.newTabSpec("mentions")
@@ -105,25 +104,43 @@ public class TabWidget extends TabActivity {
         tmp = getString(R.string.direct);
         Intent directIntent = new Intent().setClass(this,TweetListActivity.class);
         directIntent.putExtra(LIST_ID, -2);
-        directIntent.putExtra("account", account);
         homeSpec = tabHost.newTabSpec("directs")
                 .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_direct))
                 .setContent(directIntent);
         tabHost.addTab(homeSpec);
 
+
         if (account.getServerType().equalsIgnoreCase("twitter")) {
             tmp = getString(R.string.list);
             Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
             listsIntent.putExtra("list",0);
-            listsIntent.putExtra("account",account);
             homeSpec = tabHost.newTabSpec("lists")
                     .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_list))
                     .setContent(listsIntent);
             tabHost.addTab(homeSpec);
+        }
+
+        tmp = getString(R.string.sent);
+        Intent sentIntent = new Intent().setClass(this,TweetListActivity.class);
+        sentIntent.putExtra(LIST_ID, -3);
+        homeSpec = tabHost.newTabSpec("sent")
+                .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_sent))
+                .setContent(sentIntent);
+        tabHost.addTab(homeSpec);
+
+        tmp = getString(R.string.favorites);
+        Intent favsIntent = new Intent().setClass(this,TweetListActivity.class);
+        favsIntent.putExtra(LIST_ID, -4);
+        homeSpec = tabHost.newTabSpec("favs")
+                .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_favorite))
+                .setContent(favsIntent);
+        tabHost.addTab(homeSpec);
+
+
+        if (account.getServerType().equalsIgnoreCase("twitter")) {
 
             Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
             searchIntent.putExtra("list",1);
-            searchIntent.putExtra("account",account);
             tmp = getString(R.string.searches);
             homeSpec = tabHost.newTabSpec("searches")
                     .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_search))

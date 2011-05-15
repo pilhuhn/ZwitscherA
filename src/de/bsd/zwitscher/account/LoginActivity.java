@@ -65,7 +65,7 @@ public class LoginActivity extends Activity {
 	/**
 	 * Triggers a call to the twitter auth url, where the user will login using
 	 * username and password and get a pin back
-	 * 
+	 *
 	 * @param v
 	 */
 	@SuppressWarnings("unused")
@@ -89,7 +89,7 @@ public class LoginActivity extends Activity {
 	/**
 	 * Now generate an auth token from the pin, the user provided (obtained from
 	 * Twitter), store the pin and auth token and proceed to the TabWidget.
-	 * 
+	 *
 	 * @param v
 	 */
 	@SuppressWarnings("unused")
@@ -120,7 +120,7 @@ public class LoginActivity extends Activity {
 	/**
 	 * Obtain a auth token the xAuth way by providing username and password and
 	 * then proceed to the TabWidget. Also works for identi.ca
-	 * 
+	 *
 	 * @param v
 	 *            Source view
 	 */
@@ -151,13 +151,13 @@ public class LoginActivity extends Activity {
 
 	/**
 	 * Call the TabWidget activity that does the work.
-	 * 
+	 *
 	 * @param account
 	 *            Logged in account
 	 */
 	private void proceed(Account account) {
+        AccountHolder.getInstance().setAccount(account);
 		Intent i = new Intent().setClass(this, TabWidget.class);
-		i.putExtra("account", account);
 		startActivity(i);
 		finish();
 	}

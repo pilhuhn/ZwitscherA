@@ -70,6 +70,8 @@
     <string name="speak">Speak</string>
     <string name="translate">Translate</string>
     <string name="more">More...</string>
+    <string name="sent">Sent</string>
+    <string name="favorites">Favorites</string>
 
 
 
@@ -77,7 +79,7 @@
     <string name="prefs_location_enabled">Location enabled</string>
     <string name="prefs_location_enabled_descr">Shall Zwitscher add location to status updates?</string>
     <string name="prefs_filter">Filter</string>
-    <string name="prefs_filter_descr">Provide Expressions, separated by Comma to filter tweets</string>
+    <string name="prefs_filter_descr">Provide Expressions to filter tweets</string>
     <string name="prefs_min_old">Min old tweets</string>
     <string name="prefs_min_old_descr">Minumum of old tweets to display after a reload with new tweets</string>
     <string name="prefs_max_old">Default old tweets</string>
@@ -137,5 +139,6 @@
     <string name="set">Set</string>
     <string name="invalid">Invalid</string>
     <string name="wantToRemove">Are you sure you want to remove [%s] ?</string>
+    <string name="addFilterExpression">Add filter expr.</string>
 
 </resources>

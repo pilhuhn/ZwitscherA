@@ -6,18 +6,12 @@
                         android:key="location"
                         android:summary="@string/prefs_location_enabled_descr"/>
 
-<!--
-    <EditTextPreference android:title="@string/prefs_filter"
-                        android:summary="@string/prefs_filter_descr"
-                        android:key="filter"
-                        android:hint="http://4sq.com/,http://shz.am/"
-                        />
--->
     <de.bsd.zwitscher.preferences.ExpandableListPreference android:title="@string/prefs_filter"
                                                            android:summary="@string/prefs_filter_descr"
                                                            android:key="filter"
                                                            separator=","
                                                            askBeforeDelete="true"
+                                                           hint="@string/addFilterExpression"
                                                            />
 
     <ListPreference android:title="@string/prefs_min_old"

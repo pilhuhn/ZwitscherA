@@ -7,26 +7,3 @@
     android:textSize="16sp" >
 </TextView>
 
-<!--
-
-        <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_height="wrap_content"
-              android:layout_width="wrap_content"
-              android:orientation="horizontal"
-        >
-    <TextView
-            android:id="@+id/elp_i_t"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:padding="10dp"
-            android:textSize="16sp" >
-    </TextView>
-    <Button android:id="@+id/elp_i_b"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="del"
-            />
-</LinearLayout>
--->

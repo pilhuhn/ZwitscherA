@@ -21,6 +21,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
+import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.User;
@@ -76,7 +77,7 @@ public class UserDetailActivity extends Activity  {
 
     public void onResume() {
         super.onResume();
-        account = getIntent().getExtras().getParcelable("account");
+        account = AccountHolder.getInstance().getAccount();
         thTwitterHelper = new TwitterHelper(this, account);
         userId = bundle.getInt("userId");
         String userName = bundle.getString("userName");
@@ -237,7 +238,6 @@ public class UserDetailActivity extends Activity  {
        Intent i = new Intent(this, NewTweetActivity.class);
        i.putExtra("user",theUser);
        i.putExtra("op", getString(R.string.direct));
-       i.putExtra("account",account);
        startActivity(i);
 
     }
@@ -279,7 +279,6 @@ public class UserDetailActivity extends Activity  {
 
         Intent intent = new Intent().setClass(this,TweetListActivity.class);
         intent.putExtra("userId",userId);
-        intent.putExtra("account", account);
 
         startActivity(intent);
 

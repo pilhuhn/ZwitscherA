@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  this is a single entry in the ListView created by ArrayAdapter -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="4dip"
+        >
+
+    <TextView
+        android:id="@+id/ListUserView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="1dp"
+        android:paddingLeft="2dp"
+        android:textSize="10sp"
+        android:autoLink="none"
+        android:focusable="false"
+     />
+    <TextView
+        android:id="@+id/ListTimeView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/ListUserView"
+        android:paddingLeft="3dp"
+        android:padding="1dp"
+        android:textSize="12sp"
+        android:autoLink="none"
+        android:focusable="false"
+        android:layout_alignBaseline="@id/ListUserView"
+     />
+
+    <!-- left column -->
+    <ImageView android:id="@+id/ListImageView"
+               android:layout_width="64px"
+			android:layout_height="64px"
+			android:src="@drawable/user_unknown"
+			android:scaleType="fitXY"
+			android:padding="2px"
+            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:layout_below="@id/ListUserView"
+            android:focusable="false"
+            />
+
+    <!-- right column -->
+        <TextView
+            android:id="@+id/ListTextView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/ListImageView"
+            android:paddingBottom="2dp"
+            android:paddingTop="1dp"
+            android:paddingLeft="3dp"
+            android:paddingRight="2dp"
+            android:textSize="16sp"
+            android:autoLink="none"
+            android:layout_below="@id/ListUserView"
+            android:focusable="false"
+         />
+</RelativeLayout>

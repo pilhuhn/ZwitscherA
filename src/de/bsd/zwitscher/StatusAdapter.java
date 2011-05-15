@@ -29,23 +29,16 @@ import java.util.List;
  *
  * @author Heiko W. Rupp
  */
-class StatusAdapter<T extends TwitterResponse> extends ArrayAdapter<T> {
+class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
-    private List<T> items;
-    PicHelper ph;
     TwitterHelper th;
-    private Context extContext;
     boolean downloadImages;
 
 
     public StatusAdapter(Context context, Account account, int textViewResourceId, List<T> objects) {
         super(context, textViewResourceId, objects);
-        extContext = context;
-        items = objects;
-        ph = new PicHelper();
         th = new TwitterHelper(context, account);
         downloadImages = new NetworkHelper(context).mayDownloadImages();
-
     }
 
     @Override
@@ -56,8 +49,7 @@ class StatusAdapter<T extends TwitterResponse> extends ArrayAdapter<T> {
 
         // Use ViewHolder pattern to only inflate once
         if (convertView ==null) {
-            LayoutInflater li = (LayoutInflater) extContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = li.inflate(R.layout.tweet_list_item,parent,false);
+            convertView = inflater.inflate(R.layout.tweet_list_item,parent,false);
 
             viewHolder = new ViewHolder();
             viewHolder.iv = (ImageView) convertView.findViewById(R.id.ListImageView);
@@ -143,13 +135,6 @@ class StatusAdapter<T extends TwitterResponse> extends ArrayAdapter<T> {
         viewHolder.timeClientInfo.setText((text));
 //Debug.stopMethodTracing();
         return convertView;
-    }
-
-    static class ViewHolder {
-        ImageView iv;
-        TextView statusText;
-        TextView userInfo;
-        TextView timeClientInfo;
     }
 
 }

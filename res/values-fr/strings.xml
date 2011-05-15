@@ -16,6 +16,9 @@
 <string name="list">Listes</string>
 <string name="direct">Courier</string>
 <string name="mentions">Mentions</string>
+    <string name="sent">Envoyée</string>
+    <string name="favorites">Aimée</string>
+
 <string name="searches">Recherches</string>
 <string name="location">Location:</string>
 <string name="tweet_count">Nombre de tweets:</string>
@@ -57,7 +60,7 @@
 <string name="prefs_location_enabled">Localisation autorisée</string>
 <string name="prefs_location_enabled_descr">Est-ce que Zwitscher doit ajouter la localisation aux modifications de statut?</string>
 <string name="prefs_filter">Filtre</string>
-<string name="prefs_filter_descr">Déclarez des expressions, séparées par des virgules, pour filtrer les tweets</string>
+<string name="prefs_filter_descr">Déclarez des expressions pour filtrer les tweets</string>
 <string name="prefs_min_old">Ancienneté minimale des tweets</string>
 <string name="prefs_min_old_descr">Minimum d\'ancienneté des tweets à afficher après un rechargement avec nouveaux tweets</string>
 <string name="prefs_max_old">Anciens tweets par défaut</string>
@@ -96,4 +99,5 @@
 <string name="message_from_zwitscher">Message de Zwitscher</string>
 <string name="click_here">&lt;--- cliquez ici</string>
 <string name="wantToRemove">Vraiment effacer [%s] ?</string>
+<string name="addFilterExpression">Ajouter filtre</string>
 </resources>

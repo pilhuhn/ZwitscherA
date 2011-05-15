@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
+import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.GeoLocation;
 import twitter4j.Status;
@@ -54,7 +55,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         charCountView = (TextView) findViewById(R.id.CharCount);
-        account = getIntent().getExtras().getParcelable("account");
+        account = AccountHolder.getInstance().getAccount();
 
 
         final Button tweetButton = (Button) findViewById(R.id.TweetButton);
