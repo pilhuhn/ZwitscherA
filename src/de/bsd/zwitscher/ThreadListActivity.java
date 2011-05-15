@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
+import de.bsd.zwitscher.account.AccountHolder;
 import twitter4j.Status;
 
 import java.util.ArrayList;
@@ -51,9 +52,9 @@ public class ThreadListActivity extends ListActivity {
         ImageButton reloadButton = (ImageButton) findViewById(R.id.tweet_list_reload_button);
         reloadButton.setVisibility(View.GONE);
 
+        account = AccountHolder.getInstance().getAccount();
         // Pull the start id ( = id of the calling s
         Intent i = getIntent();
-        account = i.getParcelableExtra("account");
         Bundle b = i.getExtras();
         long startId = 0;
         if (b!=null)

@@ -16,6 +16,7 @@ import com.google.api.translate.Language;
 import com.google.api.translate.Translate;
 
 import de.bsd.zwitscher.account.Account;
+import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.Place;
@@ -76,7 +77,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         Intent intent = getIntent();
         String dataString = intent.getDataString();
         Bundle bundle = intent.getExtras();
-        account = intent.getParcelableExtra("account");
+        account = AccountHolder.getInstance().getAccount();
 
         // If this is not null, we are called from another app
         if ( dataString!=null) {
@@ -379,7 +380,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     public void onInit(int status) {
         String statusString = status == 0 ? "Success" : "Failure";
-        System.out.println("speak"+" onInit " + statusString);
+        System.out.println("speak" + " onInit " + statusString);
     }
 
     public void onUtteranceCompleted(String utteranceId) {
