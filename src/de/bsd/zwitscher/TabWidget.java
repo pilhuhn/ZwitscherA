@@ -109,11 +109,22 @@ public class TabWidget extends TabActivity {
                 .setContent(directIntent);
         tabHost.addTab(homeSpec);
 
+
+        if (account.getServerType().equalsIgnoreCase("twitter")) {
+            tmp = getString(R.string.list);
+            Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
+            listsIntent.putExtra("list",0);
+            homeSpec = tabHost.newTabSpec("lists")
+                    .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_list))
+                    .setContent(listsIntent);
+            tabHost.addTab(homeSpec);
+        }
+
         tmp = getString(R.string.sent);
         Intent sentIntent = new Intent().setClass(this,TweetListActivity.class);
         sentIntent.putExtra(LIST_ID, -3);
         homeSpec = tabHost.newTabSpec("sent")
-                .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_sent)) 
+                .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_sent))
                 .setContent(sentIntent);
         tabHost.addTab(homeSpec);
 
@@ -125,14 +136,8 @@ public class TabWidget extends TabActivity {
                 .setContent(favsIntent);
         tabHost.addTab(homeSpec);
 
+
         if (account.getServerType().equalsIgnoreCase("twitter")) {
-            tmp = getString(R.string.list);
-            Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
-            listsIntent.putExtra("list",0);
-            homeSpec = tabHost.newTabSpec("lists")
-                    .setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_list))
-                    .setContent(listsIntent);
-            tabHost.addTab(homeSpec);
 
             Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
             searchIntent.putExtra("list",1);
