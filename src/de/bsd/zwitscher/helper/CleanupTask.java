@@ -10,7 +10,7 @@ import de.bsd.zwitscher.TweetDB;
  * which in the background cleans out the oldest tweets, users and user images
  * @author Heiko W. Rupp
  */
-public class CleanupTask extends AsyncTask<Integer,Void,Void> {
+public class CleanupTask extends AsyncTask<Void,Void,Void> {
 
     private Context context;
     long MILLIS = 1000;
@@ -33,7 +33,7 @@ public class CleanupTask extends AsyncTask<Integer,Void,Void> {
     }
 
     @Override
-    protected Void doInBackground(Integer... params) {
+    protected Void doInBackground(Void... params) {
 
         // Clean tweets that are a older than a week
         long tOld = System.currentTimeMillis() - WEEK;
