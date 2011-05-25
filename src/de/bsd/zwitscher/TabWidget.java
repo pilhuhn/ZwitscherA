@@ -55,6 +55,16 @@ public class TabWidget extends TabActivity {
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
 
         account = AccountHolder.getInstance().getAccount();
+        /*
+         * When the application got killed/swapped out, TabWidget will be called first,
+         * so we need to re-create the account.
+         */
+        if (account==null) {
+            TweetDB tdb = new TweetDB(this,-1);
+            account = tdb.getDefaultAccount();
+            AccountHolder.getInstance().setAccount(account);
+        }
+
         accountId = account.getId();
         Log.i("TabWidget","Account=" + account);
 
