@@ -37,11 +37,13 @@ public class ThreadListActivity extends ListActivity {
 
         thisActivity = this;
 
-        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+        if (android.os.Build.VERSION.SDK_INT<11)
+            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         // Set the layout of the list activity
         setContentView(R.layout.tweet_list_layout);
 
-        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
+        if (android.os.Build.VERSION.SDK_INT<11)
+            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
 
@@ -156,16 +158,21 @@ public class ThreadListActivity extends ListActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            pg.setVisibility(ProgressBar.VISIBLE);
-            String s = getString(R.string.getting_conversation)+ "...";
-            titleTextBox.setText(s);
+            if (pg!=null)
+                pg.setVisibility(ProgressBar.VISIBLE);
+            if (titleTextBox!=null) {
+                String s = getString(R.string.getting_conversation)+ "...";
+                titleTextBox.setText(s);
+            }
 
         }
 
         @Override
         protected void onPostExecute(List<twitter4j.Status> statusList) {
-            pg.setVisibility(ProgressBar.INVISIBLE);
-            titleTextBox.setText("");
+            if (pg!=null)
+                pg.setVisibility(ProgressBar.INVISIBLE);
+            if (titleTextBox!=null)
+                titleTextBox.setText("");
 
             setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, account, R.layout.tweet_list_item, statusList));
             statuses = statusList;

@@ -48,9 +48,11 @@ public class TabWidget extends TabActivity {
 		super.onCreate(savedInstanceState);
 
         Log.i("TabWidget","onCreate");
-        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+        if (android.os.Build.VERSION.SDK_INT<11)
+            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.tabs);
-        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
+        if (android.os.Build.VERSION.SDK_INT<11)
+            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
 
@@ -87,7 +89,8 @@ public class TabWidget extends TabActivity {
             setupTabs();
         }
         Log.i("TabWidget","Account=" + account);
-        titleTextBox.setText(account.getAccountIdentifier());
+        if (titleTextBox!=null) // TODO how to do this on Honeycomb?
+            titleTextBox.setText(account.getAccountIdentifier());
     }
 
     private void setupTabs() {
@@ -162,7 +165,10 @@ public class TabWidget extends TabActivity {
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		 MenuInflater inflater = getMenuInflater();
+        if (android.os.Build.VERSION.SDK_INT<11)
 		    inflater.inflate(R.menu.main_menu, menu);
+        else
+            inflater.inflate(R.menu.main_menu_honey,menu);
 		    return true;
 	}
 
@@ -203,6 +209,13 @@ public class TabWidget extends TabActivity {
             List<Account> allAccounts = tmpDb.getAccountsForSelection();
             for (Account a : allAccounts)
                 System.out.println(a);
+            break;
+        case R.id.refresh:
+            // TODO forward to the inner list's reload/referesh
+            break;
+        case R.id.send:
+            i = new Intent(this,NewTweetActivity.class);
+            startActivity(i);
             break;
 	    default:
 	        return super.onOptionsItemSelected(item);

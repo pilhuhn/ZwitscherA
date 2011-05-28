@@ -50,9 +50,11 @@ public class NewTweetActivity extends Activity implements LocationListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+        if (android.os.Build.VERSION.SDK_INT<11)
+            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         setContentView(R.layout.new_tweet);
-        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
+        if (android.os.Build.VERSION.SDK_INT<11)
+            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         charCountView = (TextView) findViewById(R.id.CharCount);
         account = AccountHolder.getInstance().getAccount();

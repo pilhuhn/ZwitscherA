@@ -72,5 +72,5 @@
     </application>
 
     <uses-sdk android:minSdkVersion="8"
-              android:targetSdkVersion="8"/> <!-- TODO v11 is not compatible with custom window title due to ActionBar -->
+              android:targetSdkVersion="11"/> <!-- TODO v11 is not compatible with custom window title due to ActionBar -->
 </manifest>

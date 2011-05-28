@@ -465,7 +465,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            titleTextBox.setText(updating +" "+ values[0] + "...");
+            if(titleTextBox!=null)
+                titleTextBox.setText(updating +" "+ values[0] + "...");
         }
     }
 

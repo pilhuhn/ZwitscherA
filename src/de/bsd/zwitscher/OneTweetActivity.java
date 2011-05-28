@@ -60,12 +60,14 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+        if (android.os.Build.VERSION.SDK_INT<11)
+            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 
 		setContentView(R.layout.single_tweet);
         setupspeak();
 
-        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
+        if (android.os.Build.VERSION.SDK_INT<11)
+            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         titleTextView = (TextView) findViewById(R.id.title_msg_box);
 
@@ -580,7 +582,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pg.setVisibility(ProgressBar.VISIBLE);
+            if (pg!=null)
+                pg.setVisibility(ProgressBar.VISIBLE);
         }
 
         protected Bitmap doInBackground(User... users) {
@@ -599,7 +602,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         protected void onPostExecute(Bitmap result) {
         	if (result!=null)
         		userPictureView.setImageBitmap(result);
-            pg.setVisibility(ProgressBar.INVISIBLE);
+            if (pg!=null)
+                pg.setVisibility(ProgressBar.INVISIBLE);
         }
     }
 
@@ -617,9 +621,12 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pg.setVisibility(ProgressBar.VISIBLE);
-            String text = getString(R.string.get_preview);
-            titleTextView.setText(text);
+            if (pg!=null)
+                pg.setVisibility(ProgressBar.VISIBLE);
+            if (titleTextView!=null) {
+                String text = getString(R.string.get_preview);
+                titleTextView.setText(text);
+            }
         }
 
         @Override
@@ -649,7 +656,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 });
             }
 
-            titleTextView.setText("");
+            if (titleTextView!=null)
+                titleTextView.setText("");
+            if (pg!=null)
             pg.setVisibility(ProgressBar.INVISIBLE);
         }
     }

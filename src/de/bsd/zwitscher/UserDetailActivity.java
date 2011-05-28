@@ -55,9 +55,11 @@ public class UserDetailActivity extends Activity  {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+        if (android.os.Build.VERSION.SDK_INT<11)
+            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         setContentView(R.layout.user_detail);
-        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
+        if (android.os.Build.VERSION.SDK_INT<11)
+            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
         followButton = (Button) findViewById(R.id.userDetail_follow_button);
@@ -345,9 +347,12 @@ public class UserDetailActivity extends Activity  {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pg.setVisibility(ProgressBar.VISIBLE);
-            String s = getString(R.string.get_user_detail);
-            titleTextBox.setText(s);
+            if (pg!=null)
+                pg.setVisibility(ProgressBar.VISIBLE);
+            if (titleTextBox!=null) {
+                String s = getString(R.string.get_user_detail);
+                titleTextBox.setText(s);
+            }
         }
 
 
@@ -390,8 +395,10 @@ public class UserDetailActivity extends Activity  {
             theUser = user;
             fillDetails(user,isFriend);
             findViewById(R.id.userDetail_follow_button).setEnabled(true);
-            pg.setVisibility(ProgressBar.INVISIBLE);
-            titleTextBox.setText("");
+            if (pg!=null)
+                pg.setVisibility(ProgressBar.INVISIBLE);
+            if (titleTextBox!=null)
+                titleTextBox.setText("");
         }
     }
 }

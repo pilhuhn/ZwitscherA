@@ -131,5 +131,7 @@
     <string name="invalid">Ungültig</string>
     <string name="wantToRemove">Wollen Sie [%s] wirklich löschen?</string>
     <string name="addFilterExpression">Filterausdruck hinzuf.</string>
+    <string name="refresh">Aktualisieren</string>
+
 
 </resources>
