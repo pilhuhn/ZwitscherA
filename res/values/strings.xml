@@ -137,5 +137,6 @@
     <string name="wantToRemove">Are you sure you want to remove [%s] ?</string>
     <string name="addFilterExpression">Add filter expr.</string>
     <string name="refresh">Refresh</string>
+    <string name="pickUser">Pick User</string>
 
 </resources>

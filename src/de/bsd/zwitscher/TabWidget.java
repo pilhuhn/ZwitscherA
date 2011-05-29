@@ -169,7 +169,7 @@ public class TabWidget extends TabActivity {
 		    inflater.inflate(R.menu.main_menu, menu);
         else
             inflater.inflate(R.menu.main_menu_honey,menu);
-		    return true;
+        return true;
 	}
 
 	@Override

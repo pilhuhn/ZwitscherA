@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +16,9 @@ import android.location.LocationManager;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -34,6 +38,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import twitter4j.User;
 
+/**
+ * This activity is called when the user wants to write a new tweet/dent.
+ * This can be for a new message, a new direct message or also when replying
+ * to an existing message.
+ */
 public class NewTweetActivity extends Activity implements LocationListener {
 
 	EditText edittext;
@@ -50,12 +59,14 @@ public class NewTweetActivity extends Activity implements LocationListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (android.os.Build.VERSION.SDK_INT<11)
+        if (android.os.Build.VERSION.SDK_INT<11) {
             requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-        setContentView(R.layout.new_tweet);
-        if (android.os.Build.VERSION.SDK_INT<11)
+            setContentView(R.layout.new_tweet);
             getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
-        pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+            pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+        }
+        else
+            setContentView(R.layout.new_tweet_honeycomb);
         charCountView = (TextView) findViewById(R.id.CharCount);
         account = AccountHolder.getInstance().getAccount();
 
@@ -63,7 +74,8 @@ public class NewTweetActivity extends Activity implements LocationListener {
         final Button tweetButton = (Button) findViewById(R.id.TweetButton);
         edittext = (EditText) findViewById(R.id.edittext);
         edittext.setSelected(true);
-        tweetButton.setEnabled(false);
+        if (tweetButton!=null)
+            tweetButton.setEnabled(false);
 
         Bundle bundle = getIntent().getExtras();
         if (bundle!=null) {
@@ -143,56 +155,50 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
                 int tlen = edittext.getText().length();
 
-                if (tlen >0 ) {
-                    tweetButton.setEnabled(true);
+                if (tweetButton!=null) {
+                    if (tlen >0 ) {
+                        tweetButton.setEnabled(true);
+                    }
+                    else
+                        tweetButton.setEnabled(false);
                 }
-                else
-                    tweetButton.setEnabled(false);
 
                 charCountView.setText(String.valueOf(140-tlen));
             }
         });
 
+    }
 
-        tweetButton.setOnClickListener(new OnClickListener() {
-
-            public void onClick(View v) {
-                StatusUpdate up  = new StatusUpdate(edittext.getText().toString());
-                // add location  if enabled in preferences and checked on tweet
-                CheckBox box = (CheckBox) findViewById(R.id.GeoCheckBox);
-                boolean locationEnabled = box.isChecked();
-                if (locationEnabled) {
-                    Location location = getCurrentLocation();
-                    if (location!=null) {
-                        GeoLocation geoLocation = new GeoLocation(location.getLatitude(),location.getLongitude());
-                        up.setLocation(geoLocation);
-                    }
-                }
-                if (origStatus!=null) {
-                    up.setInReplyToStatusId(origStatus.getId());
-                }
-                if (toUser==null)
-                    tweet(up);
-                else
-                    direct(toUser,edittext.getText().toString());
-                origStatus=null;
-                switchOffLocationUpdates();
-                finish();
-
-            }
-        });
-
-        final Button clearButton = (Button) findViewById(R.id.ClearButton);
-        clearButton.setOnClickListener(new OnClickListener() {
-
-            public void onClick(View v) {
-                edittext.setText("");
-
-            }
-        });
+    public void clear(View v) {
+        edittext.setText("");
 
     }
 
+
+    public void finallySend(View v) {
+        StatusUpdate up  = new StatusUpdate(edittext.getText().toString());
+        // add location  if enabled in preferences and checked on tweet
+        CheckBox box = (CheckBox) findViewById(R.id.GeoCheckBox);
+        boolean locationEnabled = box.isChecked();
+        if (locationEnabled) {
+            Location location = getCurrentLocation();
+            if (location!=null) {
+                GeoLocation geoLocation = new GeoLocation(location.getLatitude(),location.getLongitude());
+                up.setLocation(geoLocation);
+            }
+        }
+        if (origStatus!=null) {
+            up.setInReplyToStatusId(origStatus.getId());
+        }
+        if (toUser==null)
+            tweet(up);
+        else
+            direct(toUser,edittext.getText().toString());
+        origStatus=null;
+        switchOffLocationUpdates();
+        finish();
+
+    }
 
 
     private Location getCurrentLocation() {
@@ -350,19 +356,54 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
 
     public void onLocationChanged(Location location) {
-        // TODO: Customise this generated block
     }
 
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        // TODO: Customise this generated block
     }
 
     public void onProviderEnabled(String provider) {
-        // TODO: Customise this generated block
     }
 
     public void onProviderDisabled(String provider) {
-        // TODO: Customise this generated block
     }
 
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (android.os.Build.VERSION.SDK_INT>=11) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.new_tweet_menu_honey,menu);
+
+            ActionBar actionBar = this.getActionBar();
+            actionBar.setDisplayHomeAsUpEnabled(true);
+
+            return true;
+        }
+        return false;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+            case R.id.send:
+                finallySend(null);
+                break;
+            case R.id.camera:
+                takePicture(null);
+                break;
+            case R.id.clear:
+                clear(null);
+                break;
+            case R.id.pickUser:
+                selectUser(null);
+                break;
+
+            default:
+                Log.e(getClass().getName(),"Unknown menu item: " + item.toString());
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }
