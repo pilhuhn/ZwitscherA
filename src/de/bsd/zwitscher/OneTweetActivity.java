@@ -335,7 +335,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     @SuppressWarnings("unused")
     public void favorite(View v) {
-        ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
+        ImageView favoriteButton = (ImageView) findViewById(R.id.FavoriteButton);
 
         UpdateRequest request = new UpdateRequest(UpdateType.FAVORITE);
         request.status = status;

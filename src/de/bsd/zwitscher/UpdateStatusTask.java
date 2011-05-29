@@ -1,5 +1,6 @@
 package de.bsd.zwitscher;
 
+import android.widget.ImageView;
 import de.bsd.zwitscher.account.Account;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -107,7 +108,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                 textView.append(" " + result.getMessage());
 
         } else if (result.getUpdateType() == UpdateType.FAVORITE) {
-            ImageButton favoriteButton = (ImageButton) result.view;
+            ImageView favoriteButton = (ImageView) result.view;
             if (favoriteButton==null || result.status == null)
                 return;
 
