@@ -1,6 +1,7 @@
 package de.bsd.zwitscher;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -91,9 +92,9 @@ public class UserDetailActivity extends Activity  {
         }
 
         if (userId!=0)
-            new UserDetailDownloadTask().execute(userId);
+            new UserDetailDownloadTask(this).execute(userId);
         else
-            new UserDetailDownloadTask().execute(userName);
+            new UserDetailDownloadTask(this).execute(userName);
     }
 
     /**
@@ -118,21 +119,6 @@ public class UserDetailActivity extends Activity  {
                 colorString = "#" + colorString;
             getWindow().setTitleColor(Color.parseColor(colorString));
             boolean downloadImages = new NetworkHelper(this).mayDownloadImages();
-            if (downloadImages) {
-                String profileBackgroundImageUrl = user.getProfileBackgroundImageUrl();
-                if (!profileBackgroundImageUrl.equals("")) {
-                    try {
-                        URL url = new URL(profileBackgroundImageUrl);
-                        InputStream is = url.openStream();
-                        Drawable background = Drawable.createFromStream(is,"lala");
-                        getWindow().setBackgroundDrawable(background);
-                    } catch (IOException e) {
-                        e.printStackTrace();  // TODO: Customise this generated block
-                    } catch (OutOfMemoryError oome) {
-                        oome.printStackTrace();
-                    }
-                }
-            }
             String textColorString = user.getProfileTextColor();
             if (textColorString.equals(""))
                 textColorString = colorString;
@@ -344,6 +330,12 @@ public class UserDetailActivity extends Activity  {
      */
     private class UserDetailDownloadTask extends AsyncTask<Object,Void, Object[]> {
 
+        private Context context;
+
+        private UserDetailDownloadTask(Context context) {
+            this.context = context;
+        }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -377,12 +369,31 @@ public class UserDetailActivity extends Activity  {
                 return new Object[]{};
             }
 
+            boolean downloadImages = new NetworkHelper(context).mayDownloadImages();
+            Drawable background = null;
+            if (downloadImages) {
+                String profileBackgroundImageUrl = user.getProfileBackgroundImageUrl();
+                if (!profileBackgroundImageUrl.equals("")) {
+                    try {
+                        URL url = new URL(profileBackgroundImageUrl);
+                        InputStream is = url.openStream();
+                        background = Drawable.createFromStream(is,"lala");
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (OutOfMemoryError oome) {
+                        oome.printStackTrace();
+                    }
+                }
+            }
+
 
             Boolean isFriend = thTwitterHelper.areWeFollowing(userId);
             weAreFollowing = isFriend;
-            Object[] res = new Object[2];
+            Object[] res = new Object[3];
             res[0] = user;
             res[1] = isFriend;
+            res[2] = background;
             return res;
         }
 
@@ -399,6 +410,10 @@ public class UserDetailActivity extends Activity  {
                 pg.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)
                 titleTextBox.setText("");
+
+            Drawable background = (Drawable) params[2];
+            if (background!=null)
+                getWindow().setBackgroundDrawable(background);
         }
     }
 }
