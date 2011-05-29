@@ -132,6 +132,10 @@
     <string name="wantToRemove">Wollen Sie [%s] wirklich löschen?</string>
     <string name="addFilterExpression">Filterausdruck hinzuf.</string>
     <string name="refresh">Aktualisieren</string>
+    <string name="viewOnWeb">Im Web ansehen</string>
+    <string name="usersTweets">Tweets des Benutzers</string>
+
+
 
 
 </resources>

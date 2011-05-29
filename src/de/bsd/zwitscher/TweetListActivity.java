@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -54,7 +55,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         super.onCreate(savedInstanceState);
 
         Activity theParent = getParent();
-        if (!(theParent instanceof TabWidget)) {
+        if ((!(theParent instanceof TabWidget)) && (android.os.Build.VERSION.SDK_INT<11)) {
             // We have no enclosing TabWidget, so we need to request the custom title
             requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         }
@@ -64,7 +65,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
 
         // Get the windows progress bar from the enclosing TabWidget
-        if (!(theParent instanceof TabWidget)) {
+        if ((!(theParent instanceof TabWidget)) && (android.os.Build.VERSION.SDK_INT<11)) {
             // We have no enclosing TabWidget, so we need our window here
             getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
             pg = (ProgressBar) findViewById(R.id.title_progress_bar);

@@ -19,7 +19,8 @@
         <meta-data android:name="android.app.default_searchable"
                    android:value=".MySearchActivity" />
 
-        <activity android:name=".TweetListActivity"/>
+        <activity android:name=".TweetListActivity" android:hardwareAccelerated="true">
+        </activity>
 
 		<activity android:name=".TabWidget"/>
 

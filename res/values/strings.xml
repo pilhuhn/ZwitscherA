@@ -138,5 +138,7 @@
     <string name="addFilterExpression">Add filter expr.</string>
     <string name="refresh">Refresh</string>
     <string name="pickUser">Pick User</string>
+    <string name="viewOnWeb">View on Web</string>
+    <string name="usersTweets">User\'s tweets</string>
 
 </resources>

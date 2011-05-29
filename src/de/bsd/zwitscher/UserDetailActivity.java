@@ -1,5 +1,6 @@
 package de.bsd.zwitscher;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -56,15 +61,18 @@ public class UserDetailActivity extends Activity  {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (android.os.Build.VERSION.SDK_INT<11)
+        if (android.os.Build.VERSION.SDK_INT<11) {
             requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-        setContentView(R.layout.user_detail);
-        if (android.os.Build.VERSION.SDK_INT<11)
+            setContentView(R.layout.user_detail);
             getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
+        }
+        else
+            setContentView(R.layout.user_detail_honeycomb);
         pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
         followButton = (Button) findViewById(R.id.userDetail_follow_button);
-        followButton.setEnabled(false);
+        if (followButton!=null)
+            followButton.setEnabled(false);
 
 
         bundle = getIntent().getExtras();
@@ -108,8 +116,12 @@ public class UserDetailActivity extends Activity  {
             String uName = "<b>" + user.getName() + "</b>" + " (" + user.getScreenName() + ")";
             userNameView.setText(Html.fromHtml(uName));
             userId = user.getId();
-            findViewById(R.id.view_users_tweets_button).setEnabled(true);
-            findViewById(R.id.view_user_on_web_button).setEnabled(true);
+            View usersTweetsButton = findViewById(R.id.view_users_tweets_button);
+            if (usersTweetsButton!=null)
+                usersTweetsButton.setEnabled(true);
+            View viewOnWebButton = findViewById(R.id.view_user_on_web_button);
+            if (viewOnWebButton!=null)
+                viewOnWebButton.setEnabled(true);
 
             String colorString = user.getProfileBackgroundColor();
             if (colorString.equals("")) {
@@ -188,10 +200,13 @@ public class UserDetailActivity extends Activity  {
             listedView.setText("" + user.getListedCount());
 
 
-            followButton.setEnabled(true);
-            setFollowingButton(weAreFollowing);
+            if (followButton!=null) {
+                followButton.setEnabled(true);
+                setFollowingButton(weAreFollowing);
+            }
             ImageButton addToListButton = (ImageButton) findViewById(R.id.userDetail_addListButton);
-            addToListButton.setEnabled(true);
+            if (addToListButton!=null)
+                addToListButton.setEnabled(true);
         }
     }
 
@@ -243,6 +258,7 @@ public class UserDetailActivity extends Activity  {
         }
     }
 
+
     /**
      * Start a browser to view user on server
      * Triggered from a button
@@ -255,6 +271,7 @@ public class UserDetailActivity extends Activity  {
         i.setData(Uri.parse(u));
         startActivity(i);
     }
+
 
     /**
      * View users's recent tweets
@@ -322,6 +339,49 @@ public class UserDetailActivity extends Activity  {
                 }
             }
         }
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (android.os.Build.VERSION.SDK_INT>=11) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.user_detail_menu_honey,menu);
+
+            ActionBar actionBar = this.getActionBar();
+            actionBar.setDisplayHomeAsUpEnabled(true);
+
+            return true;
+        }
+        return false;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+            case R.id.follow:
+                followUser(null);
+                break;
+            case R.id.addToList:
+                addToList(null);
+                break;
+            case R.id.direct:
+                directMessage(null);
+                break;
+            case R.id.viewOnWeb:
+                viewOnWeb(null);
+                break;
+            case R.id.usersTweets:
+                showUserTweets(null);
+                break;
+
+            default:
+                Log.e(getClass().getName(), "Unknown menu item: " + item.toString());
+
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -405,7 +465,9 @@ public class UserDetailActivity extends Activity  {
             Boolean isFriend = (Boolean) params[1];
             theUser = user;
             fillDetails(user,isFriend);
-            findViewById(R.id.userDetail_follow_button).setEnabled(true);
+            View followButton = findViewById(R.id.userDetail_follow_button);
+            if (followButton!=null)
+                followButton.setEnabled(true);
             if (pg!=null)
                 pg.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)
