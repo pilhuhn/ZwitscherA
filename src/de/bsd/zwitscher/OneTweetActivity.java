@@ -1,6 +1,7 @@
 package de.bsd.zwitscher;
 
 
+import android.app.ActionBar;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
@@ -9,6 +10,9 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.*;
@@ -60,16 +64,17 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-        if (android.os.Build.VERSION.SDK_INT<11)
+        if (android.os.Build.VERSION.SDK_INT<11) {
             requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+		    setContentView(R.layout.single_tweet);
+            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.window_title);
+            pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+            titleTextView = (TextView) findViewById(R.id.title_msg_box);
+        }
+        else
+            setContentView(R.layout.single_tweet_honeycomb);
 
-		setContentView(R.layout.single_tweet);
         setupspeak();
-
-        if (android.os.Build.VERSION.SDK_INT<11)
-            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
-        pg = (ProgressBar) findViewById(R.id.title_progress_bar);
-        titleTextView = (TextView) findViewById(R.id.title_msg_box);
 
         userPictureView = (ImageView) findViewById(R.id.UserPictureImageView);
 
@@ -208,15 +213,19 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         // Update Button state depending on Status' properties
         ImageButton threadButton = (ImageButton) findViewById(R.id.ThreadButton);
         if (status.getInReplyToScreenName()==null) {
-            threadButton.setEnabled(false);
+            if (threadButton!=null)  // TODO Honeycomb?
+                threadButton.setEnabled(false);
         }
 
-        ImageButton favoriteButton = (ImageButton) findViewById(R.id.FavoriteButton);
-        if (status.isFavorited())
-            favoriteButton.setImageResource(R.drawable.favorite_on);
+        ImageView favoriteButton = (ImageView) findViewById(R.id.FavoriteButton);
+        if (favoriteButton!=null) {
+            if (status.isFavorited())
+                favoriteButton.setImageResource(R.drawable.favorite_on);
+        }
 
         ImageButton translateButon = (ImageButton) findViewById(R.id.TranslateButton);
-        translateButon.setEnabled(networkHelper.isOnline());
+        if (translateButon!=null)
+            translateButon.setEnabled(networkHelper.isOnline());
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isNewUser = prefs.getBoolean("newUser",true);
@@ -227,8 +236,11 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         boolean supportRIL = prefs.getBoolean("ril_enable",false);
         if (supportRIL) {
             Button rilButton = (Button) findViewById(R.id.ril_button);
-            rilButton.setVisibility(View.VISIBLE);
-            rilButton.setEnabled(true);
+            if (rilButton!=null) {
+                rilButton.setVisibility(View.VISIBLE);
+
+                rilButton.setEnabled(true);
+            }
         }
 
 	}
@@ -544,6 +556,68 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         }
         return urlPairs;
     }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (android.os.Build.VERSION.SDK_INT>=11) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.one_tweet_menu_honey,menu);
+
+            ActionBar actionBar = this.getActionBar();
+            actionBar.setDisplayHomeAsUpEnabled(true);
+
+            return true;
+        }
+        return false;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+            case R.id.reply:
+                reply(null);
+                break;
+            case R.id.retweet:
+                retweet(null);
+                break;
+            case R.id.direct:
+                directMessage(null);
+                break;
+            case R.id.thread:
+                threadView(null);
+                break;
+            case R.id.replyAll:
+                replyAll(null);
+                break;
+            case R.id.cl_retweet:
+                classicRetweet(null);
+                break;
+            case R.id.favorite:
+                favorite(null);
+                break;
+            case R.id.translate:
+                translate(null);
+                break;
+            case R.id.forward:
+                send(null);
+                break;
+            case R.id.speak:
+                speak(null);
+                break;
+            case R.id.ril:
+                readItLater(null);
+                break;
+
+            default:
+                Log.e(getClass().getName(),"Unknown menu item: " + item.toString());
+        }
+
+        return super.onOptionsItemSelected(item);
+
+    }
+
 
     /**
      * Load thumbnails of linked images for the passed listOfUrlPairs

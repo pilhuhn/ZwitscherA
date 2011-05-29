@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/direct"
+          android:icon="@drawable/direct_button"
+          android:title="@string/direct"
+          android:showAsAction="ifRoom"
+          />
+    <item android:id="@+id/reply"
+          android:icon="@drawable/reply_button"
+          android:showAsAction="always"
+          android:title="@string/reply"
+          />
+    <item android:id="@+id/thread"
+          android:icon="@drawable/threads"
+          android:title="@string/show_thread"
+          android:showAsAction="always"
+          />
+    <item android:id="@+id/retweet"
+          android:icon="@drawable/rt_button"
+          android:showAsAction="always"
+          android:title="@string/retweet"
+          />
+
+
+    <item android:id="@+id/replyAll"
+          android:icon="@drawable/reply_all_button"
+          android:title="@string/replyall"
+          />
+
+    <item android:id="@+id/cl_retweet"
+          android:title="@string/classicretweet"
+          />
+
+    <item android:id="@+id/favorite"
+          android:icon="@drawable/favorite_off"
+          android:title="@string/favorite"
+          />
+
+    <item android:id="@+id/translate"
+          android:icon="@drawable/translate"
+          android:title="@string/translate"
+          />
+
+    <item android:title="@string/forward"
+          android:id="@+id/forward"
+          />
+
+    <item android:title="@string/speak"
+          android:id="@+id/speak"
+          />
+
+    <item android:id="@+id/ril"
+          android:title="@string/ril"
+          />
+
+</menu>

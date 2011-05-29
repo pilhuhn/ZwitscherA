@@ -19,7 +19,7 @@
     <string name="TweetButton">Tweet this!</string>
     <string name="ClearButton">Clear!</string>
     <string name="home_timeline">Home</string>
-    <string name="classicretweet">ClassicRetweet</string>
+    <string name="classicretweet">Classic Retweet</string>
     <string name="list">Lists</string>
     <string name="direct">Directs</string>
     <string name="mentions">Mentions</string>
@@ -140,5 +140,10 @@
     <string name="pickUser">Pick User</string>
     <string name="viewOnWeb">View on Web</string>
     <string name="usersTweets">User\'s tweets</string>
-
+    <string name="retweet">Retweet</string>
+    <string name="show_thread">Thread</string>
+    <string name="translate">Translate</string>
+    <string name="forward">Forward</string>
+    <string name="speak">Read out loud</string>
+    <string name="favorite">Favorite</string>
 </resources>
