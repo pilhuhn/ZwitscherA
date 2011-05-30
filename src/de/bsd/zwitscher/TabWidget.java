@@ -210,6 +210,7 @@ public class TabWidget extends TabActivity {
             for (Account a : allAccounts)
                 System.out.println(a);
             break;
+        /// below are Honeycomb ActionBar items
         case R.id.refresh:
             // TODO forward to the inner list's reload/referesh
             break;

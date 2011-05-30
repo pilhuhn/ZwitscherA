@@ -61,20 +61,22 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         }
 
         // Set the layout of the list activity
-        setContentView(R.layout.tweet_list_layout);
+        if (Build.VERSION.SDK_INT<11)
+            setContentView(R.layout.tweet_list_layout);
+        else
+            setContentView(R.layout.tweet_list_layout_honeycomb);
 
 
         // Get the windows progress bar from the enclosing TabWidget
         if ((!(theParent instanceof TabWidget)) && (android.os.Build.VERSION.SDK_INT<11)) {
             // We have no enclosing TabWidget, so we need our window here
-            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
+            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.window_title);
             pg = (ProgressBar) findViewById(R.id.title_progress_bar);
             titleTextBox = (TextView) findViewById(R.id.title_msg_box);
 
 
             ImageButton imageButton = (ImageButton) findViewById(R.id.back_button);
             imageButton.setVisibility(View.VISIBLE);
-
         }
         lv = getListView();
         lv.setOnScrollListener(this);
