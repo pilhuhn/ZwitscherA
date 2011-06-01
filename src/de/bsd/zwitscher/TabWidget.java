@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -182,7 +183,8 @@ public class TabWidget extends TabActivity {
 			startActivity(i);
 			break;
 	    case R.id.reloadLists:
-	  		syncLists();
+//	  		syncLists();
+            new SyncSLTask(this).execute();
 	  		break;
         case R.id.DevelResetLastRead:
             resetLastRead();
@@ -224,6 +226,36 @@ public class TabWidget extends TabActivity {
 	    return true;
 	}
 
+
+    private class SyncSLTask extends AsyncTask<Void,Void,Void> {
+
+        private Context context;
+
+        private SyncSLTask(Context context) {
+            this.context = context;
+        }
+
+        ProgressDialog dialog;
+        protected void onPostExecute(Void aVoid) {
+            dialog.hide();
+            dialog.cancel();
+
+        }
+
+        protected void onPreExecute() {
+            dialog = new ProgressDialog(context);
+            dialog.setIndeterminate(true);
+            dialog.setTitle("Syncing...");
+            dialog.setCancelable(false);
+            dialog.show();
+
+        }
+
+        protected Void doInBackground(Void... voids) {
+            syncLists();
+            return null;
+        }
+    }
 	/**
 	 * Synchronize lists between what is available in the db
 	 * and on twitter.

@@ -133,6 +133,11 @@ public class LoginActivity extends Activity {
 		Spinner spinner = (Spinner) findViewById(R.id.spinner1);
 		String service = spinner.getSelectedItem().toString();
 
+        new CreateAccountTask(this,user,password,service,true);
+        finish();
+
+/*
+
 		TwitterHelper th = new TwitterHelper(this, null); // pass a null
 															// account, which is
 															// uninitialized
@@ -147,6 +152,7 @@ public class LoginActivity extends Activity {
 					Toast.LENGTH_LONG).show();
 
 		}
+*/
 	}
 
 	/**

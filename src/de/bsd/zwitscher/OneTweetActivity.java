@@ -473,7 +473,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             Language targetLanguage;
             String locale = Locale.getDefault().getLanguage();
             targetLanguage = Language.fromString(locale);
-			String result = Translate.execute(status.getText(), Language.AUTO_DETECT, targetLanguage);
+			String result = Translate.execute(status.getText(), Language.AUTO_DETECT, targetLanguage); // TODO fails on Honeycomb "NetworkOnMainThreadException"
 			AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 			builder.setMessage(result);
 			builder.setTitle("Translation result");

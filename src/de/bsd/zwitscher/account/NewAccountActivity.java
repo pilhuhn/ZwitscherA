@@ -36,6 +36,9 @@ public class NewAccountActivity extends Activity {
 
         boolean shouldSwitch = switchBox.isChecked();
 
+        new CreateAccountTask(this,username,password,service,shouldSwitch).execute();
+//        finish();
+/*
         TwitterHelper th = new TwitterHelper(this,null);
         try {
             // Try to generate a token and insert it.
@@ -50,6 +53,7 @@ public class NewAccountActivity extends Activity {
             e.printStackTrace();  // TODO: Customise this generated block
             Toast.makeText(this,"Login failed: " + e.getLocalizedMessage(),Toast.LENGTH_LONG);
         }
+*/
 
     }
 }

@@ -18,4 +18,12 @@
         <attr name="android:galleryItemBackground" />
     </declare-styleable>
 
+    <style name="MyActionBar" parent="android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">#88aa88</item>
+    </style>
+
+    <style name="ZwitscherStyle" parent="android:style/Theme.Holo">
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
+    </style>
+
 </resources>
