@@ -2,10 +2,10 @@ package de.bsd.zwitscher.account;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.widget.Toast;
+import de.bsd.zwitscher.R;
 import de.bsd.zwitscher.TabWidget;
 import de.bsd.zwitscher.TwitterHelper;
 
@@ -47,7 +47,7 @@ public class CreateAccountTask extends AsyncTask<Void,Void,String> {
     protected void onPreExecute() {
         dialog = new ProgressDialog(context);
         dialog.setIndeterminate(true);
-        dialog.setTitle("Syncing...");
+        dialog.setTitle(context.getString(R.string.logging_in));
         dialog.setCancelable(false);
         dialog.show();
 

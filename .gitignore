@@ -1,6 +1,5 @@
 bin
 out
-src/de/bsd/zwitscher/TwitterConsumerToken.java
 src/de/bsd/zwitscher/StatusNetConsumerToken.java
 src/de/bsd/zwitscher/other/ReaditLaterToken.java
 *.iml

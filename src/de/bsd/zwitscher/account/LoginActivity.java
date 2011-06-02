@@ -2,11 +2,8 @@ package de.bsd.zwitscher.account;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -42,18 +39,8 @@ public class LoginActivity extends Activity {
 			proceed(account);
 		}
 
-		// SharedPreferences preferences =
-		// PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		//
-		// String accessTokenToken = preferences.getString("accessToken",null);
-		// String accessTokenSecret =
-		// preferences.getString("accessTokenSecret",null);
-		// if (accessTokenToken!=null && accessTokenSecret!=null) {
-		// proceed();
-		// return;
-		// }
-
-		if (TwitterConsumerToken.xAuthEnabled) { // TODO what about laconica
+        // TODO change this here, as identi.ca / status.net has nothing to do with Twitter xauth/oauth
+		if (TwitterConsumerToken.xAuthEnabled) { // TODO what about identi.ca
 													// etc? -> 2 step 1st type
 													// 2nd user/pass
 			setContentView(R.layout.login_layout_classic);

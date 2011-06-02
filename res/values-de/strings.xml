@@ -140,6 +140,8 @@
     <string name="forward">Weiterleiten</string>
     <string name="speak">Vorlesen</string>
     <string name="favorite">Favorisieren</string>
+    <string name="translating">Übersetze ...</string>
+    <string name="logging_in">Einloggen ...</string>
 
 
 

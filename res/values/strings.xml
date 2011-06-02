@@ -146,4 +146,6 @@
     <string name="forward">Forward</string>
     <string name="speak">Read out loud</string>
     <string name="favorite">Favorite</string>
+    <string name="translating">Translating...</string>
+    <string name="logging_in">Logging in...</string>
 </resources>
