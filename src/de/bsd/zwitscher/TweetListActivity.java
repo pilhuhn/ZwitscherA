@@ -3,6 +3,7 @@ package de.bsd.zwitscher;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +13,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.*;
@@ -268,6 +272,42 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         tweets = messages.getList();
 
         return messages;
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Activity theParent = getParent();
+        if ((!(theParent instanceof TabWidget) && Build.VERSION.SDK_INT>=11)) {
+
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.list_activity_menu_honey,menu);
+
+            ActionBar actionBar = this.getActionBar();
+            actionBar.setDisplayHomeAsUpEnabled(true);
+
+            return true;
+        }
+
+        return false;
+
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+            case R.id.refresh:
+                reload(null);
+                break;
+            case R.id.to_top:
+                scrollToTop(null);
+                break;
+            default:
+                Log.e(getClass().getName(),"Unknown item " + item);
+
+        }
+
+        return super.onOptionsItemSelected(item);    // TODO: Customise this generated block
     }
 
     /**

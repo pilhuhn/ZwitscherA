@@ -2,9 +2,11 @@
     <item android:id="@+id/refresh"
           android:title="@string/refresh"
           android:icon="@drawable/reload_button"
+          android:enabled="false"
           android:showAsAction="always"/>
     <item android:id="@+id/send"
-          android:showAsAction="always"
+          android:showAsAction="always|withText"
+          android:title="@string/new_message"
           android:icon="@drawable/post_button"
         />
 	<item android:alphabeticShortcut="P"

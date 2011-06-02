@@ -142,8 +142,6 @@
     <string name="favorite">Favorisieren</string>
     <string name="translating">Übersetze ...</string>
     <string name="logging_in">Einloggen ...</string>
-
-
-
+    <string name="new_message">Neue Nachr.</string>
 
 </resources>
