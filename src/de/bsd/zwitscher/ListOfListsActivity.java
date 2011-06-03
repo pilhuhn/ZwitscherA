@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -40,7 +41,7 @@ public class ListOfListsActivity extends AbstractListActivity {
 
         mode = getIntent().getIntExtra("list",0);
 
-        setContentView(R.layout.tweet_list_layout);
+        setContentView(R.layout.tweet_list_layout); // TODO use a honey comb optimized version
 
         ImageButton reloadButton = (ImageButton) findViewById(R.id.tweet_list_reload_button);
         if (mode==0)
@@ -154,8 +155,9 @@ public class ListOfListsActivity extends AbstractListActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-//            setProgressBarVisibility(true);
-            pg.setVisibility(ProgressBar.VISIBLE);
+            setProgressBarVisibility(true);
+            if (pg!=null)
+                pg.setVisibility(ProgressBar.VISIBLE);
 
         }
 
@@ -193,8 +195,10 @@ public class ListOfListsActivity extends AbstractListActivity {
             super.onPostExecute(aVoid);
 
             setProgressBarVisibility(false);
-            pg.setVisibility(ProgressBar.INVISIBLE);
-            titleTextBox.setText("");
+            if (pg!=null)
+                pg.setVisibility(ProgressBar.INVISIBLE);
+            if (titleTextBox!=null)
+                titleTextBox.setText("");
         }
 
         @Override
@@ -209,7 +213,8 @@ public class ListOfListsActivity extends AbstractListActivity {
                 Toast.makeText(context, list + ": " + num + " new", Toast.LENGTH_SHORT).show();
             } else { // len =1
 
-                titleTextBox.setText(updating + " " + list + "...");
+                if (titleTextBox!=null)
+                    titleTextBox.setText(updating + " " + list + "...");
             }
             // Support Progress bar with a determinate value
 //            int i = values[0];
