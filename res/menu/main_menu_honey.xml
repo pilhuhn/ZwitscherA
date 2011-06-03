@@ -1,4 +1,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/ProgressBar"
+          android:actionLayout="@layout/progress"
+          android:visible="true"
+          android:showAsAction="always"
+          />
     <item android:id="@+id/refresh"
           android:title="@string/refresh"
           android:icon="@drawable/reload_button"

@@ -7,7 +7,9 @@ import java.util.Map.Entry;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -90,8 +92,10 @@ public class TabWidget extends TabActivity {
             setupTabs();
         }
         Log.i("TabWidget","Account=" + account);
-        if (titleTextBox!=null) // TODO how to do this on Honeycomb?
+        if (titleTextBox!=null)
             titleTextBox.setText(account.getAccountIdentifier());
+        if (Build.VERSION.SDK_INT>=11)
+            getActionBar().setSubtitle(account.getAccountIdentifier());
     }
 
     private void setupTabs() {
@@ -168,8 +172,11 @@ public class TabWidget extends TabActivity {
 		 MenuInflater inflater = getMenuInflater();
         if (android.os.Build.VERSION.SDK_INT<11)
 		    inflater.inflate(R.menu.main_menu, menu);
-        else
+        else {
             inflater.inflate(R.menu.main_menu_honey,menu);
+            pg = (ProgressBar) menu.findItem(R.id.ProgressBar).getActionView();
+            pg.setVisibility(View.GONE);
+        }
         return true;
 	}
 

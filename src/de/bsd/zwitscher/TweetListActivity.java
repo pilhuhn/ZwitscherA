@@ -390,9 +390,14 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             updating = context.getString(R.string.updating);
             if (pg!=null)
                 pg.setVisibility(ProgressBar.VISIBLE);
+            String s = getString(R.string.getting_tweets)+ "...";
             if(titleTextBox!=null) {
-                String s = getString(R.string.getting_tweets)+ "...";
                 titleTextBox.setText(s);
+            }
+            if (Build.VERSION.SDK_INT>=11) {
+                ActionBar ab = getActionBar();
+                if (ab!=null)
+                    ab.setSubtitle(s);
             }
         }
 
@@ -488,6 +493,11 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 pg.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)
                 titleTextBox.setText(account.getAccountIdentifier());
+            if (Build.VERSION.SDK_INT>=11) {
+                ActionBar ab = getActionBar();
+                if (ab!=null)
+                    ab.setSubtitle(account.getAccountIdentifier());
+            }
 	        getListView().requestLayout();
             if (newMentions>0) {
                 String s = getString(R.string.new_mentions);
@@ -499,6 +509,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 Toast.makeText(context,newDirects + " " + s,Toast.LENGTH_LONG).show();
                 newDirects=0;
             }
+
 
             // Only do the next if we actually did an update from twitter
             if (!fromDbOnly) {
@@ -512,6 +523,12 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             super.onProgressUpdate(values);
             if(titleTextBox!=null)
                 titleTextBox.setText(updating +" "+ values[0] + "...");
+            if (Build.VERSION.SDK_INT>=11) {
+                ActionBar ab = getActionBar();
+                if (ab!=null)
+                    ab.setSubtitle(updating +" "+ values[0] + "...");
+            }
+
         }
     }
 
