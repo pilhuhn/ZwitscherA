@@ -284,6 +284,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             ActionBar actionBar = this.getActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
 
+            pg = (ProgressBar) menu.findItem(R.id.ProgressBar).getActionView();
+
             return true;
         }
 

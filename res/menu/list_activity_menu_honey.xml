@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/ProgressBar"
+          android:actionLayout="@layout/progress"
+          android:visible="true"
+          android:showAsAction="always"
+          />
     <item android:id="@+id/send"
           android:showAsAction="always|withText"
           android:title="@string/new_message"
