@@ -304,6 +304,9 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             case R.id.to_top:
                 scrollToTop(null);
                 break;
+            case R.id.send:
+                post(null);
+                break;
             default:
                 Log.e(getClass().getName(),"Unknown item " + item);
 
