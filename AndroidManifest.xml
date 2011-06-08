@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.bsd.zwitscher"
           android:installLocation="preferExternal"
-          android:versionName="0.74"
-          android:versionCode="74"
+          android:versionName="0.76"
+          android:versionCode="76"
           >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -60,7 +60,7 @@
 
         <activity android:name=".ThreadListActivity" android:hardwareAccelerated="true"/>
         <activity android:name=".UserDetailActivity"/>
-        <activity android:name=".ListOfListsActivity"/>
+        <activity android:name=".ListOfListsActivity" android:hardwareAccelerated="true"/>
         <activity android:name=".MultiSelectListActivity"/>
         <activity android:name=".HelpActivity" android:label="@string/help"/>
         <activity android:name=".ErrorDisplayActivity" android:label="Error during update"/>

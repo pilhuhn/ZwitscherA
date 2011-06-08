@@ -143,5 +143,8 @@
     <string name="translating">Übersetze ...</string>
     <string name="logging_in">Einloggen ...</string>
     <string name="new_message">Neue Nachr.</string>
+    <string name="reply">Antwort</string>
+    <string name="replyall">Allen antworten</string>
+    <string name="classicretweet">Klassischer RT</string>
 
 </resources>

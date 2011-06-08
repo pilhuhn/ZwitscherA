@@ -5,11 +5,11 @@
     <item android:id="@+id/direct"
           android:icon="@drawable/direct_button"
           android:title="@string/direct"
-          android:showAsAction="ifRoom"
+          android:showAsAction="ifRoom|withText"
           />
     <item android:id="@+id/reply"
           android:icon="@drawable/reply_button"
-          android:showAsAction="always"
+          android:showAsAction="always|withText"
           android:title="@string/reply"
           />
     <item android:id="@+id/thread"
@@ -19,7 +19,7 @@
           />
     <item android:id="@+id/retweet"
           android:icon="@drawable/rt_button"
-          android:showAsAction="always"
+          android:showAsAction="always|withText"
           android:title="@string/retweet"
           />
 
