@@ -43,6 +43,14 @@ public abstract class AbstractListActivity extends ListActivity {
 
     }
 
+    protected void onResume() {
+        super.onResume();
+        Activity theParent = getParent();
+        if (theParent instanceof TabWidget) {
+            ((TabWidget) theParent).setInnerActivity(this);
+        }
+    }
+
     /**
      * Scrolls to top, called from the ToTop button
      * @param v

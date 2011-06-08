@@ -1,4 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/to_top"
+          android:icon="@drawable/to_top_button"
+          android:showAsAction="always"/>
     <item android:id="@+id/ProgressBar"
           android:actionLayout="@layout/progress"
           android:visible="true"
@@ -7,8 +10,6 @@
     <item android:id="@+id/refresh"
           android:title="@string/refresh"
           android:icon="@drawable/reload_button"
-          android:enabled="false"
-          android:visible="false"
           android:showAsAction="always"/>
     <item android:id="@+id/send"
           android:showAsAction="always|withText"

@@ -45,8 +45,9 @@ public class TabWidget extends TabActivity {
     TextView titleTextBox;
     int accountId;
     Account account;
+    private AbstractListActivity listActivity;
 
-	@Override
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -180,6 +181,11 @@ public class TabWidget extends TabActivity {
         return true;
 	}
 
+    public void setInnerActivity(AbstractListActivity listActivity) {
+
+        this.listActivity = listActivity;
+    }
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent i;
@@ -221,12 +227,17 @@ public class TabWidget extends TabActivity {
             break;
         /// below are Honeycomb ActionBar items
         case R.id.refresh:
-            // TODO forward to the inner list's reload/referesh
+            // forward to the inner list's reload/referesh
+            if (listActivity!=null)
+                listActivity.reload(null);
             break;
         case R.id.send:
             i = new Intent(this,NewTweetActivity.class);
             startActivity(i);
             break;
+        case R.id.to_top:
+            if (listActivity!=null)
+                listActivity.scrollToTop(null);
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }

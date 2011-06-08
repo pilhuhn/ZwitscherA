@@ -20,24 +20,4 @@
         android:smoothScrollbar="false"
 	    android:drawSelectorOnTop="false"/>
 
-    <LinearLayout android:layout_height="wrap_content"
-                  android:layout_width="fill_parent"
-                  android:orientation="horizontal">
-        <ImageButton
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_gravity="left"
-            android:onClick="scrollToTop"
-            android:src="@drawable/to_top_button"
-                />
-        <ImageButton
-            android:id="@+id/tweet_list_reload_button"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:onClick="reload"
-            android:src="@drawable/reload_button"
-            android:layout_gravity="right"
-                />
-    </LinearLayout>
-
 </LinearLayout>
