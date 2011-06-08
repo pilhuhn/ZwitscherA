@@ -41,13 +41,22 @@ public class ListOfListsActivity extends AbstractListActivity {
 
         mode = getIntent().getIntExtra("list",0);
 
-        setContentView(R.layout.tweet_list_layout); // TODO use a honey comb optimized version
+        View reloadButton;
+        if (Build.VERSION.SDK_INT<11) {
+            setContentView(R.layout.tweet_list_layout);
+            reloadButton = (ImageButton) findViewById(R.id.tweet_list_reload_button);
+            if (mode==0)
+                reloadButton.setEnabled(true);
+            else
+                reloadButton.setEnabled(false);  // disabled for stored searches (for now), as the tweets are not persisted
 
-        ImageButton reloadButton = (ImageButton) findViewById(R.id.tweet_list_reload_button);
-        if (mode==0)
-            reloadButton.setEnabled(true);
-        else
-            reloadButton.setEnabled(false);  // disabled for stored searches (for now), as the tweets are not persisted
+        }
+        else {
+            setContentView(R.layout.tweet_list_layout_honeycomb);
+// TODO enable/disable reload button
+        }
+
+
     }
 
 
@@ -113,6 +122,7 @@ public class ListOfListsActivity extends AbstractListActivity {
             if (listId!=-1) {
                 Intent intent = new Intent().setClass(this,TweetListActivity.class);
                 intent.putExtra(TabWidget.LIST_ID, listId);
+                intent.putExtra("listName",text);
 
                 startActivity(intent);
             }
@@ -122,7 +132,7 @@ public class ListOfListsActivity extends AbstractListActivity {
                 if (text.equals(search.getName())) {
                     Intent intent = new Intent().setClass(this,TweetListActivity.class);
                     intent.putExtra(TabWidget.LIST_ID, (-search.getId()));
-                    Log.d("ListsOfLists", "Saved search with id " + search.getId());
+                    intent.putExtra("listName",text);
 
                     startActivity(intent);
                 }

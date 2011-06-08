@@ -50,6 +50,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     int newMentions=0;
     private int newDirects=0;
     Integer userId=null;
+    String listname = null;
 
     /**
      * Called when the activity is first created.
@@ -92,6 +93,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         if (intentInfo==null) {
             list_id = 0;
         } else {
+            listname = intentInfo.getString("listName");
             list_id = intentInfo.getInt(TabWidget.LIST_ID);
             if (intentInfo.containsKey("userId")) {
                 // Display tweets of a single user
@@ -498,8 +500,12 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 titleTextBox.setText(account.getAccountIdentifier());
             if (Build.VERSION.SDK_INT>=11) {
                 ActionBar ab = getActionBar();
-                if (ab!=null)
-                    ab.setSubtitle(account.getAccountIdentifier());
+                if (ab!=null) {
+                    String s = account.getAccountIdentifier();
+                    if (listname!=null)
+                        s+= ": " + listname;
+                    ab.setSubtitle(s);
+                }
             }
 	        getListView().requestLayout();
             if (newMentions>0) {
