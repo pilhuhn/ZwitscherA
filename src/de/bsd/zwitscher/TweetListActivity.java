@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,9 +19,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.*;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ImageButton;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 import de.bsd.zwitscher.helper.MetaList;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import twitter4j.DirectMessage;
@@ -384,6 +392,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         boolean fromDbOnly = false;
         String updating;
         Context context;
+        Dialog dialog = null;
 
         private GetTimeLineTask(Context context) {
             this.context = context;
@@ -393,9 +402,16 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         protected void onPreExecute() {
             super.onPreExecute();
             updating = context.getString(R.string.updating);
+            String s = getString(R.string.getting_tweets)+ "...";
+
             if (pg!=null)
                 pg.setVisibility(ProgressBar.VISIBLE);
-            String s = getString(R.string.getting_tweets)+ "...";
+            else {
+                dialog = new Dialog(context);
+                dialog.setTitle(s);
+                dialog.setCancelable(false);
+                dialog.show();
+            }
             if(titleTextBox!=null) {
                 titleTextBox.setText(s);
             }
@@ -491,11 +507,9 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 	            setListAdapter(new StatusAdapter(context, account, R.layout.tweet_list_item, result.getList()));
 
             if (result.getList().size()==0) {
-                Toast.makeText(context,"Got no result from the server",Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Got no result from the server", Toast.LENGTH_LONG).show();
             }
 
-            if (pg!=null)
-                pg.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)
                 titleTextBox.setText(account.getAccountIdentifier());
             if (Build.VERSION.SDK_INT>=11) {
@@ -525,6 +539,13 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 Log.i("GTLTask", " scroll to " + result.getNumOriginal());
                 getListView().setSelection(result.getNumOriginal() - 1);
             }
+            if (pg!=null)
+                pg.setVisibility(ProgressBar.INVISIBLE);
+            else {
+                if (dialog!=null)
+                    dialog.cancel();
+            }
+
 		}
 
         @Override

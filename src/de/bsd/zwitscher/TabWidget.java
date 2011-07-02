@@ -176,7 +176,7 @@ public class TabWidget extends TabActivity {
         else {
             inflater.inflate(R.menu.main_menu_honey,menu);
             pg = (ProgressBar) menu.findItem(R.id.ProgressBar).getActionView();
-            pg.setVisibility(View.GONE);
+            pg.setVisibility(ProgressBar.INVISIBLE);
         }
         return true;
 	}
