@@ -161,11 +161,7 @@ public class UserDetailActivity extends Activity  {
 
             PicHelper picHelper = new PicHelper();
             Bitmap bitmap;
-            if (downloadImages)
-                bitmap = picHelper.fetchUserPic(user);
-            else
                 bitmap = picHelper.getBitMapForUserFromFile(user);
-
             if (bitmap!=null) {
                 ImageView iv = (ImageView) findViewById(R.id.UserPictureImageView);
                 iv.setImageBitmap(bitmap);
@@ -445,6 +441,9 @@ public class UserDetailActivity extends Activity  {
                         oome.printStackTrace();
                     }
                 }
+                PicHelper picHelper = new PicHelper(); // TODO optimize
+                picHelper.fetchUserPic(user);
+
             }
 
 
