@@ -1,10 +1,15 @@
 package de.bsd.zwitscher;
 
+import android.app.ActionBar;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
@@ -65,6 +70,34 @@ public class ThreadListActivity extends ListActivity {
         new GetConversationTask().execute(startId);
 
     }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        if (android.os.Build.VERSION.SDK_INT>=11) {
+            inflater.inflate(R.menu.thread_activity_menu_honey,menu);
+            pg = (ProgressBar) menu.findItem(R.id.ProgressBar).getActionView();
+
+            ActionBar actionBar = this.getActionBar();
+            actionBar.setDisplayHomeAsUpEnabled(true);
+
+        }
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                Log.e(getClass().getName(), "Unknown item " + item);
+
+        }
+
+        return super.onOptionsItemSelected(item);    // TODO: Customise this generated block
+    }
+
+
 
     /**
      * Do the magic of getting the coversation starting with the status with
