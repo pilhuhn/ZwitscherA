@@ -541,10 +541,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             }
             if (pg!=null)
                 pg.setVisibility(ProgressBar.INVISIBLE);
-            else {
-                if (dialog!=null)
-                    dialog.cancel();
-            }
+            if (dialog!=null)
+                dialog.cancel();
 
 		}
 

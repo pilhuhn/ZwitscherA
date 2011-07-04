@@ -2,6 +2,7 @@ package de.bsd.zwitscher;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -387,6 +388,7 @@ public class UserDetailActivity extends Activity  {
     private class UserDetailDownloadTask extends AsyncTask<Object,Void, Object[]> {
 
         private Context context;
+        Dialog dialog;
 
         private UserDetailDownloadTask(Context context) {
             this.context = context;
@@ -397,6 +399,13 @@ public class UserDetailActivity extends Activity  {
             super.onPreExecute();
             if (pg!=null)
                 pg.setVisibility(ProgressBar.VISIBLE);
+            else {
+                dialog = new Dialog(context);
+                dialog.setTitle(R.string.get_user_detail);
+                dialog.setCancelable(false);
+                dialog.show();
+
+            }
             if (titleTextBox!=null) {
                 String s = getString(R.string.get_user_detail);
                 titleTextBox.setText(s);
@@ -471,6 +480,8 @@ public class UserDetailActivity extends Activity  {
                 pg.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)
                 titleTextBox.setText("");
+            if (dialog!=null)
+                dialog.cancel();
 
             Drawable background = (Drawable) params[2];
             if (background!=null)
