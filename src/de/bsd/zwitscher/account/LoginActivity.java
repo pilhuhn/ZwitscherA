@@ -1,9 +1,12 @@
 package de.bsd.zwitscher.account;
 
+import java.util.concurrent.ExecutionException;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -120,8 +123,16 @@ public class LoginActivity extends Activity {
 		Spinner spinner = (Spinner) findViewById(R.id.spinner1);
 		String service = spinner.getSelectedItem().toString();
 
-        new CreateAccountTask(this,user,password,service,true);
-        finish();
+        try {
+            new CreateAccountTask(this,user,password,service,true).execute().get();
+            Log.i("Login.xauth","Account created");
+            proceed();
+        } catch (InterruptedException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        } catch (ExecutionException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+//        finish();
 
 /*
 
@@ -141,6 +152,12 @@ public class LoginActivity extends Activity {
 		}
 */
 	}
+
+    private void proceed() {
+        Intent i = new Intent().setClass(this, TabWidget.class);
+        startActivity(i);
+        finish();
+    }
 
 	/**
 	 * Call the TabWidget activity that does the work.
