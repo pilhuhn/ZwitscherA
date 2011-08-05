@@ -149,4 +149,9 @@
     <string name="translating">Translating...</string>
     <string name="logging_in">Logging in...</string>
     <string name="new_message">New Msg</string>
+    <string name="take_picture_via">Take picture via:</string>
+    <string name="take_image_small">Take small image</string>
+    <string name="take_image_large">Take large image</string>
+    <string name="from_gallery">Select from Gallery</string>
+    <string name="ShortenUrls">Shorten urls</string>
 </resources>

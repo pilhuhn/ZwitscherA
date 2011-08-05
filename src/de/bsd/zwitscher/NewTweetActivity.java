@@ -1,19 +1,32 @@
 package de.bsd.zwitscher;
 
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
+import android.renderscript.Font;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -28,6 +41,7 @@ import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.helper.PicHelper;
+import de.bsd.zwitscher.helper.UrlHelper;
 import twitter4j.GeoLocation;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
@@ -35,7 +49,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import twitter4j.User;
 
 /**
@@ -174,6 +187,35 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
     }
 
+    public void shortenUrls(View v) {
+        String text = edittext.getText().toString();
+        Map<Integer,String> urls = new HashMap<Integer,String>();
+        String[] tokens = text.split(" ");
+
+        for (int i = 0 ; i < tokens.length ; i++) {
+            String token = tokens[i];
+            if (token.startsWith("http://") || token.startsWith("https://")) {
+                urls.put(i,token);
+            }
+        }
+        try {
+            Map<Integer,String> replacements = new UrlShortenerTask(this,urls.size()).execute(urls).get();
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < tokens.length ; i++) {
+                if (replacements.containsKey(i))
+                    builder.append(replacements.get(i));
+                else
+                    builder.append(tokens[i]);
+                builder.append(" ");
+            }
+            String newText = builder.toString();
+            edittext.setText(newText);
+
+        } catch (Exception e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+
+    }
 
     public void finallySend(View v) {
         StatusUpdate up  = new StatusUpdate(edittext.getText().toString());
@@ -297,16 +339,47 @@ public class NewTweetActivity extends Activity implements LocationListener {
     }
 
     /**
-     * Trigger taking a picture
-     * Called from the camera button.
-     * Image size is small
+     * Trigger taking a picture, called from the camera button.
+     * Actually we present a menu from which the user will be able to take a picture
+     * or select one from the gallery of pictures taken
      * @param v
      */
     @SuppressWarnings("unused")
     public void takePicture(View v) {
 
-        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, 1);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(R.string.take_picture_via);
+        builder.setItems(R.array.take_picture_items,
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Intent intent;
+                    switch (i) {
+                    case 0:
+
+                        intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(intent, 1);
+                        break;
+                    case 1:
+
+                        Uri tmpUri = Uri.fromFile(getTempFile(getApplicationContext()));
+                        intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT,tmpUri);
+                        startActivityForResult(intent, 3);
+
+                        break;
+                    case 2:
+                        intent =  new Intent(Intent.ACTION_PICK);
+                        intent.setType("image/*");
+                        startActivityForResult(intent, 4);
+                    }
+
+                }
+            });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
     }
 
 
@@ -338,6 +411,25 @@ public class NewTweetActivity extends Activity implements LocationListener {
                 String user = item.substring(0,item.indexOf(", "));
                 edittext.append("@" + user + " ");
             }
+        } else if (requestCode==3 && resultCode==RESULT_OK) {
+            // large size image
+            File file = getTempFile(this);
+
+            UpdateRequest req = new UpdateRequest(UpdateType.UPLOAD_PIC);
+            req.picturePath = file.getAbsolutePath();
+            req.view = edittext;
+            new UpdateStatusTask(this,pg, account).execute(req);
+
+        } else if (requestCode==4 && resultCode==RESULT_OK) {
+            // image from gallery
+            Uri selectedImageUri = data.getData();
+            picturePath = getPath(selectedImageUri);
+
+            UpdateRequest req = new UpdateRequest(UpdateType.UPLOAD_PIC);
+            req.picturePath = picturePath;
+            req.view = edittext;
+            new UpdateStatusTask(this,pg, account).execute(req);
+
         }
     }
 
@@ -398,6 +490,9 @@ public class NewTweetActivity extends Activity implements LocationListener {
             case R.id.pickUser:
                 selectUser(null);
                 break;
+            case R.id.shortenUrls:
+                shortenUrls(null);
+                break;
 
             default:
                 Log.e(getClass().getName(),"Unknown menu item: " + item.toString());
@@ -405,5 +500,69 @@ public class NewTweetActivity extends Activity implements LocationListener {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private File getTempFile(Context context){
+        File path = new File( Environment.getExternalStorageDirectory(), context.getPackageName() );
+
+        if(!path.exists())
+            path.mkdir();
+
+        return new File(path, "image.tmp");
+    }
+
+    // Taken from http://stackoverflow.com/questions/2169649/open-an-image-in-androids-built-in-gallery-app-programmatically/2636538#2636538
+    public String getPath(Uri uri) {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = managedQuery(uri, projection, null, null, null);
+        int column_index = cursor
+            .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
+    }
+
+    private class UrlShortenerTask extends AsyncTask<Map<Integer,String>,Integer,Map<Integer,String>>{
+
+        private Context context;
+        private int num;
+        private ProgressDialog dialog;
+
+        private UrlShortenerTask(Context context,int num) {
+            this.context = context;
+            this.num = num;
+        }
+
+        protected Map<Integer,String> doInBackground(Map<Integer,String>... maps) {
+
+            Map<Integer,String> res = new HashMap<Integer, String>(maps[0].size());
+            int i=0;
+            for (Map.Entry<Integer,String> entry: maps[0].entrySet()) {
+                int id = entry.getKey();
+                String oldUrl = entry.getValue();
+
+                String shortUrl = UrlHelper.shortenUrl(oldUrl);
+                res.put(id,shortUrl);
+                i++;
+                publishProgress(i);
+            }
+
+            return res;
+        }
+
+        protected void onPreExecute() {
+            dialog = new ProgressDialog(context);
+            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            dialog.show();
+        }
+
+        protected void onPostExecute(Map<Integer, String> integerStringMap) {
+            if (dialog!=null)
+                dialog.cancel();
+        }
+
+        protected void onProgressUpdate(Integer... values) {
+            int val = values[0]*10000/num;
+            dialog.setProgress(val);
+        }
     }
 }

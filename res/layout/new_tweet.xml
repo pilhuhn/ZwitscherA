@@ -72,7 +72,18 @@
                  android:layout_height="wrap_content"
                  android:layout_below="@id/CharCount"
                  android:layout_toRightOf="@id/nt_CameraButton"
+                 android:id="@+id/nt_select_user"
                  />
+    <Button android:id="@+id/ShortenButton"
+            android:text="@string/ShortenUrls"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/CharCount"
+            android:layout_toRightOf="@id/nt_select_user"
+            android:layout_alignParentRight="true"
+            android:onClick="shortenUrls"
+        />
+
     <Button android:id="@+id/TweetButton"
             android:text="@string/TweetButton"
             android:layout_width="wrap_content"

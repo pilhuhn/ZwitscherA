@@ -21,4 +21,8 @@
     <item android:id="@+id/pickUser"
           android:title="@string/pickUser"
           />
+
+    <item android:id="@+id/shortenUrls"
+          android:title="@string/ShortenUrls"
+          android:showAsAction="ifRoom"/>
 </menu>

@@ -146,5 +146,11 @@
     <string name="reply">Antwort</string>
     <string name="replyall">Allen antworten</string>
     <string name="classicretweet">Klassischer RT</string>
+    <string name="take_picture_via">Bild auswählen:</string>
+    <string name="take_image_small">Von der Kamera (klein)</string>
+    <string name="take_image_large">Von der Kamera (groß)</string>
+    <string name="from_gallery">Aus dem Album</string>
+    <string name="ShortenUrls">URLS kürzen</string>
+
 
 </resources>
