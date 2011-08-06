@@ -40,12 +40,13 @@
         android:layout_below="@id/CharCount"
             />
 
-	<Button android:id="@+id/ClearButton"
+	<ImageButton android:id="@+id/ClearButton"
 			android:text="@string/ClearButton"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
             android:layout_below="@id/CharCount"
             android:layout_toRightOf="@id/new_tweet_back_button"
+            android:src="@drawable/clear"
 		/>
 
 	<CheckBox android:id="@+id/GeoCheckBox"
@@ -72,13 +73,25 @@
                  android:layout_height="wrap_content"
                  android:layout_below="@id/CharCount"
                  android:layout_toRightOf="@id/nt_CameraButton"
+                 android:id="@+id/nt_select_user"
                  />
-    <Button android:id="@+id/TweetButton"
+    <ImageButton android:id="@+id/ShortenButton"
+            android:text="@string/ShortenUrls"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ClearButton"
+            android:layout_toRightOf="@id/new_tweet_back_button"
+            android:onClick="shortenUrls"
+            android:src="@drawable/shorten_url"
+        />
+
+    <ImageButton android:id="@+id/TweetButton"
             android:text="@string/TweetButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/nt_CameraButton"
             android:layout_alignParentRight="true"
+            android:src="@drawable/send_letter"
         />
 
 

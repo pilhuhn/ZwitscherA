@@ -2,6 +2,11 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 <!-- Items listed here show up left to right in the action bar -->
+    <item android:id="@+id/shortenUrls"
+          android:title="@string/ShortenUrls"
+          android:icon="@drawable/shorten_url"
+          android:showAsAction="ifRoom"/>
+
     <item android:id="@+id/camera"
           android:showAsAction="ifRoom"
           android:icon="@drawable/camera"
@@ -10,19 +15,17 @@
     <item android:id="@+id/clear"
           android:showAsAction="always"
           android:title="@string/ClearButton"
+          android:icon="@drawable/clear"
           />
 
     <item android:id="@+id/send"
-          android:showAsAction="always"
+          android:showAsAction="always|withText"
           android:title="@string/TweetButton"
-          android:icon="@drawable/post_button"
+          android:icon="@drawable/send_letter"
         />
 
     <item android:id="@+id/pickUser"
           android:title="@string/pickUser"
           />
 
-    <item android:id="@+id/shortenUrls"
-          android:title="@string/ShortenUrls"
-          android:showAsAction="ifRoom"/>
 </menu>

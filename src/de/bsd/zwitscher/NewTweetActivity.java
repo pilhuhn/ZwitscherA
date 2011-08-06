@@ -36,6 +36,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
@@ -84,7 +85,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
         account = AccountHolder.getInstance().getAccount();
 
 
-        final Button tweetButton = (Button) findViewById(R.id.TweetButton);
+        final ImageButton tweetButton = (ImageButton) findViewById(R.id.TweetButton);
         edittext = (EditText) findViewById(R.id.edittext);
         edittext.setSelected(true);
         if (tweetButton!=null)
