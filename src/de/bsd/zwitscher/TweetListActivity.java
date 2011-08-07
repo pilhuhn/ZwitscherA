@@ -298,6 +298,9 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
             return true;
         }
+        else if (theParent instanceof TabWidget) {
+            return theParent.onCreateOptionsMenu(menu);
+        }
 
         return false;
 
