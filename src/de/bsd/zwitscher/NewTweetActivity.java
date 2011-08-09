@@ -4,13 +4,13 @@ package de.bsd.zwitscher;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.Set;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,14 +26,12 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.renderscript.Font;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -61,7 +59,6 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
 	EditText edittext;
 	Status origStatus;
-	Pattern p = Pattern.compile(".*?(@\\w+ )*.*");
     ProgressBar pg;
     User toUser = null;
     TextView charCountView;
@@ -101,24 +98,31 @@ public class NewTweetActivity extends Activity implements LocationListener {
             User directUser = (User) bundle.get("user"); // set when coming from user detail view
             if (op!=null) {
                 origStatus = (Status) bundle.get("status");
-                Log.i("Replying..", "Orig is " + origStatus);
+
                 if (op.equals(getString(R.string.reply))) {
+                    Set<String> hashTags = getHashTags(origStatus.getText());
                     textOben.setText(origStatus.getText());
-                    edittext.setText("@"+origStatus.getUser().getScreenName()+" ");
+                    StringBuilder builder = new StringBuilder();
+                    builder.append("@").append(origStatus.getUser().getScreenName()).append(" ");
+                    for (String hashTag : hashTags) {
+                        builder.append(hashTag).append(" ");
+                    }
+
+                    edittext.setText(builder.toString());
                 } else if (op.equals(getString(R.string.replyall))) {
                     textOben.setText(origStatus.getText());
                     String oText = origStatus.getText();
-//					Matcher m = p.matcher(oText);
+
                     StringBuilder sb = new StringBuilder();
                     sb.append("@");
                     sb.append(origStatus.getUser().getScreenName()).append(" ");
-//					if (m.matches()) {
-//						for (int i = 1; i < m.groupCount() ; i++) {
-//							sb.append(m.group(i));
-//							sb.append(" ");
-//						}
-//					}
+
                     findUsers (sb,oText);
+                    Set<String> hashTags = getHashTags(origStatus.getText());
+                    for (String hashTag : hashTags) {
+                        sb.append(hashTag).append(" ");
+                    }
+
                     edittext.setText(sb.toString());
                 } else if (op.equals(getString(R.string.classicretweet))) {
                     textOben.setText(origStatus.getText());
@@ -181,6 +185,17 @@ public class NewTweetActivity extends Activity implements LocationListener {
             }
         });
 
+    }
+
+    private Set<String> getHashTags(String text) {
+        String[] tokens = text.split(" ");
+
+        Set<String> tags = new HashSet<String>();
+        for (String token : tokens) {
+            if (token.startsWith("#"))
+                tags.add(token);
+            }
+        return tags;
     }
 
     public void clear(View v) {
@@ -255,8 +270,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
 	}
 
 	/** Extract the @users from the passed oText and put them into sb
-	 * Should go away in favor of a RegExp
-	 * @deprecated
+	 * TODO optimize
 	 */
 	private void findUsers(StringBuilder sb, String oText) {
 		if (!oText.contains("@"))
