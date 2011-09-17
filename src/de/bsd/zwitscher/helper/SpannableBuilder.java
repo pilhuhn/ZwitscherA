@@ -128,12 +128,13 @@ public class SpannableBuilder {
     private static class Holder {
         String text;
         int style;
-        int len;
+        int len=0;
 
         Holder(String text, int typeface) {
             this.text = text;
             this.style = typeface;
-            this.len = text.length();
+            if (text!=null)
+                this.len = text.length();
         }
     }
 }
