@@ -1,6 +1,5 @@
 package de.bsd.zwitscher.helper;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,18 +76,18 @@ public class UrlHelper {
             conn.setRequestMethod("HEAD");
             conn.connect();
             code = conn.getResponseCode();
-            System.out.println("Response code: " + code);
+            System.out.println("Response code: " + code + ", result: " + conn.getURL());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (code==200)
+        if (code==200 || code==204)
             return conn.getURL().toString();
         if (code==301) {
             String tmp = conn.getHeaderField("Location");
             System.out.println("Tmp location: " + tmp);
             return expandUrl(tmp);
         }
-        return null;
+        return inputUrl;
     }
 
     public static void main(String[] args) {

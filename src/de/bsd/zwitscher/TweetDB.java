@@ -30,6 +30,7 @@ public class TweetDB {
     private static final String TABLE_USERS = "users";
     private static final String TABLE_SEARCHES = "searches";
     public static final String TABLE_DIRECTS = "directs";
+    public static final String TABLE_URLS = "urls";
     private static final String[] DATA_TABLES = {TABLE_STATUSES,
         TABLE_LAST_READ,TABLE_LISTS,TABLE_USERS,TABLE_SEARCHES,TABLE_DIRECTS};
     static final String STATUS = "STATUS";
@@ -39,7 +40,7 @@ public class TweetDB {
     private final String account;
 
 	public TweetDB(Context context, int accountId) {
-		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 6);
+		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 7);
         account = String.valueOf(accountId);
 
 	}
@@ -135,6 +136,14 @@ public class TweetDB {
                 ")"
             );
             db.execSQL("CREATE UNIQUE INDEX SEARCH_ID_IDX ON " + TABLE_SEARCHES + "(ID, " + ACCOUNT_ID +")");
+
+            db.execSQL(CREATE_TABLE + TABLE_URLS + " ("+
+                    "src TEXT, " +
+                    "target TEXT, " +
+                    "last_modified LONG " +
+                    ")"
+            );
+            db.execSQL("CREATE UNIQUE INDEX URL_SRC_IDX ON " + TABLE_URLS + "(src)");
 		}
 
 		@Override
@@ -174,6 +183,15 @@ public class TweetDB {
                 db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN last_modified LONG DEFAULT 0");
                 db.execSQL("CREATE INDEX L_M_IDX ON " + TABLE_USERS + " (last_modified)");
             }
+            if (oldVersion<7) {
+                db.execSQL(CREATE_TABLE + TABLE_URLS + " ("+
+                        "src TEXT, " +
+                        "target TEXT, " +
+                        "last_modified LONG " +
+                        ")"
+                );
+                db.execSQL("CREATE UNIQUE INDEX URL_SRC_IDX ON " + TABLE_URLS + "(src)");
+            }
 		}
 
 	}
@@ -181,7 +199,7 @@ public class TweetDB {
     /**
      * Return the id of the status that was last read
      * @param list_id id of the list
-     * @return
+     * @return id of the status that was last read
      */
 	long getLastRead(int list_id) {
 		SQLiteDatabase db = tdHelper.getReadableDatabase();
@@ -227,7 +245,7 @@ public class TweetDB {
 
     /**
      * Return Infos about all lists in the DB
-     * @return
+     * @return Map with Listname,id pairs
      * @todo return the json object
      */
 	Map<String, Integer> getLists() {
@@ -473,6 +491,7 @@ public class TweetDB {
         db.execSQL("DELETE FROM " + TABLE_DIRECTS);
         db.execSQL("DELETE FROM " + TABLE_USERS);
         db.execSQL("DELETE FROM " + TABLE_LAST_READ);
+        db.execSQL("DELETE FROM " + TABLE_URLS);
         db.close();
     }
 
@@ -480,6 +499,7 @@ public class TweetDB {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_STATUSES + " WHERE ctime < " + cutOff);
         db.execSQL("DELETE FROM " + TABLE_USERS + " WHERE last_modified < " + cutOff);
+        db.execSQL("DELETE FROM " + TABLE_URLS + " WHERE last_modified < " + cutOff);
         db.close();
 
     }
@@ -530,7 +550,7 @@ public class TweetDB {
 
     /**
      * Return a list of all users stored
-     * @return
+     * @return list fo json objects in string representation
      */
     public List<String> getUsers() {
         SQLiteDatabase db = tdHelper.getReadableDatabase();
@@ -556,7 +576,7 @@ public class TweetDB {
      * Insert a user into the database.
      * @param userId The Id of the user to insert
      * @param json JSON representation of the User object
-     * @param screenName
+     * @param screenName screenname of that user
      */
     public void insertUser(int userId, String json, String screenName) {
         ContentValues cv = new ContentValues(4);
@@ -851,4 +871,21 @@ public class TweetDB {
         db.close();
     }
 
+
+    public String getTargetUrl(String input) {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        Cursor c = db.query(TABLE_URLS,new String[]{"target"},"src = ?",new String[]{input},null,null,null);
+        String ret;
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            ret = c.getString(0);
+        }
+        else {
+            ret = input;
+        }
+        c.close();
+        db.close();
+
+        return ret;
+    }
 }

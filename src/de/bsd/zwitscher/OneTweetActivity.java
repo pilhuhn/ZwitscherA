@@ -24,6 +24,8 @@ import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
+import de.bsd.zwitscher.helper.UrlHelper;
+import de.bsd.zwitscher.helper.UrlPair;
 import twitter4j.Place;
 import twitter4j.Status;
 import android.app.Activity;
@@ -52,7 +54,6 @@ import java.util.*;
  */
 public class OneTweetActivity extends Activity implements OnInitListener, OnUtteranceCompletedListener {
 
-	Context ctx = this;
 	Status status ;
     ImageView userPictureView;
     ProgressBar pg;
@@ -157,9 +158,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
         // Check if the tweet contains urls to picture services and load thumbnails
         // if needed
-        List<UrlPair> pictureUrls = parseForPictureUrls(status);
-        if (!pictureUrls.isEmpty())
-            new DownloadImagePreviewsTask(this).execute(pictureUrls);
+        new DownloadImagePreviewsTask(this, status).execute();
 
         TextView tv01 = (TextView) findViewById(R.id.TextView01);
         StringBuilder sb = new StringBuilder("<b>");
@@ -190,7 +189,21 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         }
 
         TextView tweetView = (TextView)findViewById(R.id.TweetTextView);
-        tweetView.setText(status.getText());
+//        tweetView.setText(status.getText());
+        String[] tokens = status.getText().split(" ");
+        StringBuilder builder = new StringBuilder();
+        TweetDB tweetDB = new TweetDB(this,account.getId());
+        for (String token : tokens) {
+            if (token.startsWith("http://t.co")) {
+                String target = tweetDB.getTargetUrl(token);
+                builder.append(target);
+            }
+            else {
+                builder.append(token);
+            }
+            builder.append(" ");
+        }
+        tweetView.setText(builder.toString());
 
         TextView timeClientView = (TextView)findViewById(R.id.TimeTextView);
         TwitterHelper th = new TwitterHelper(this, account);
@@ -495,8 +508,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             String locale = strings[1];
             Language targetLanguage = Language.fromString(locale);
             try {
-                String result = Translate.execute(text, Language.AUTO_DETECT, targetLanguage);
-                return result;
+                return Translate.execute(text, Language.AUTO_DETECT, targetLanguage);
             } catch (Exception e) {
                 e.printStackTrace();
                 return e.getLocalizedMessage();
@@ -572,6 +584,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         // We have urls, so check for picture services
         for (String url :  urls) {
             Log.d("One tweet","Url = " + url);
+            url = UrlHelper.expandUrl(url); // expand link shorteners TODO that ultimatively needs to go into the main parsing for all kinds of links
             String finalUrlString;
             if (url.contains("yfrog.com")) {
                 finalUrlString = url + ".th.jpg";
@@ -666,14 +679,14 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         List<BitmapWithUrl> bitmaps = new ArrayList<BitmapWithUrl>(listOfUrlPairs.size());
 
         for (UrlPair urlPair : listOfUrlPairs) {
-            Log.i("loadThumbail", "URL to load is " + urlPair.thumbnailUrl);
+            Log.i("loadThumbail", "URL to load is " + urlPair.getTarget());
 
             try {
-                URL picUrl = new URL(urlPair.thumbnailUrl);
+                URL picUrl = new URL(urlPair.getTarget());
                 BufferedInputStream in = new BufferedInputStream(picUrl.openStream());
                 Bitmap bitmap = BitmapFactory.decodeStream(in);
                 in.close();
-                BitmapWithUrl bwu = new BitmapWithUrl(bitmap,urlPair.fullUrl);
+                BitmapWithUrl bwu = new BitmapWithUrl(bitmap,urlPair.getSrc());
                 bitmaps.add(bwu);
             }
             catch (Exception e) {
@@ -721,12 +734,14 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     /**
      * Background task to download the thumbnails of linked images
      */
-    private class DownloadImagePreviewsTask extends AsyncTask<List<UrlPair>,Void,List<BitmapWithUrl>> {
+    private class DownloadImagePreviewsTask extends AsyncTask<Void,Void,List<BitmapWithUrl>> {
 
         private Context context;
+        private twitter4j.Status status;
 
-        private DownloadImagePreviewsTask(Context context) {
+        private DownloadImagePreviewsTask(Context context, twitter4j.Status status) {
             this.context = context;
+            this.status = status;
         }
 
         @Override
@@ -741,10 +756,11 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         }
 
         @Override
-        protected List<BitmapWithUrl> doInBackground(List<UrlPair>... urls) {
+        protected List<BitmapWithUrl> doInBackground(Void... params) {
+            List<UrlPair> pictureUrls = parseForPictureUrls(status);
             List<BitmapWithUrl> bitmapList=null;
             if (downloadPictures)
-                bitmapList = loadThumbnails(urls[0]);
+                bitmapList = loadThumbnails(pictureUrls);
             return bitmapList;
         }
 
@@ -843,17 +859,4 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         }
     }
 
-    /**
-     * Helper that just holds the urls of the full image service
-     * url and the link to the thumbnail
-     */
-    private static class UrlPair {
-        String fullUrl;
-        String thumbnailUrl;
-
-        private UrlPair(String fullImageUrl, String thumbnailUrl) {
-            this.fullUrl = fullImageUrl;
-            this.thumbnailUrl = thumbnailUrl;
-        }
-    }
 }

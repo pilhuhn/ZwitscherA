@@ -20,6 +20,9 @@ import android.util.Log;
 
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.MetaList;
+import de.bsd.zwitscher.helper.NetworkHelper;
+import de.bsd.zwitscher.helper.UrlHelper;
+import de.bsd.zwitscher.helper.UrlPair;
 import twitter4j.*;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
@@ -754,7 +757,9 @@ Log.d("FillUp","Return: " + i);
         if (statuses.isEmpty())
             return;
 
+
         List<ContentValues> values = new ArrayList<ContentValues>(statuses.size());
+        List<UrlPair> urls = new ArrayList<UrlPair>();
         long now = System.currentTimeMillis();
         for (Status status : statuses) {
             String json = DataObjectFactory.getRawJSON(status);
@@ -766,8 +771,29 @@ Log.d("FillUp","Return: " + i);
             cv.put("STATUS",json);
             cv.put("ctime",now);
             values.add(cv);
+            urls.addAll(fetchUrls(status.getText())); // TODO needs to happen in parallel somehow
         }
         tweetDB.storeValues(TweetDB.TABLE_STATUSES,values);
+        persistUrls(urls);
+    }
+
+    private List<UrlPair> fetchUrls(String text) {
+        ArrayList<UrlPair> result = new ArrayList<UrlPair>();
+        NetworkHelper helper = new NetworkHelper(context);
+
+        if (!helper.isOnline()) {
+            return result;
+        }
+
+        String[] tokens = text.split(" ");
+        for (String token : tokens) {
+            if (token.startsWith("http://t.co")) {
+                String res = UrlHelper.expandUrl(token);
+                UrlPair pair = new UrlPair(token,res);
+                result.add(pair);
+            }
+        }
+        return result;
     }
 
     private void persistDirects(Collection<DirectMessage> directs) {
@@ -787,6 +813,22 @@ Log.d("FillUp","Return: " + i);
         tweetDB.storeValues(TweetDB.TABLE_DIRECTS,values);
 
     }
+
+    private void persistUrls(Collection<UrlPair> urlPairs) {
+        if (urlPairs.isEmpty())
+            return;
+
+        List<ContentValues> values = new ArrayList<ContentValues>(urlPairs.size());
+        for (UrlPair pair : urlPairs) {
+            ContentValues cv = new ContentValues(3);
+            cv.put("src",pair.getSrc());
+            cv.put("target",pair.getTarget());
+            cv.put("last_modified",System.currentTimeMillis());
+            values.add(cv);
+        }
+        tweetDB.storeValues(TweetDB.TABLE_URLS,values);
+    }
+
     /**
      * Update an existing status object in the database with the passed one.
      *
