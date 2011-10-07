@@ -3,6 +3,8 @@ package de.bsd.zwitscher.account;
 import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import de.bsd.zwitscher.TabWidget;
 import de.bsd.zwitscher.TweetDB;
 import de.bsd.zwitscher.TwitterConsumerToken;
 import de.bsd.zwitscher.TwitterHelper;
+import de.bsd.zwitscher.helper.NetworkHelper;
 
 public class LoginActivity extends Activity {
 
@@ -40,7 +43,27 @@ public class LoginActivity extends Activity {
 		Account account = tweetDB.getDefaultAccount();
 		if (account != null) {
 			proceed(account);
+            return;
 		}
+
+        /*
+         * We have no valid account yet, so first check if the user has networking,
+         * as networking is needed for initial login.
+         */
+        NetworkHelper nh = new NetworkHelper(this);
+        if (!nh.isOnline()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("You seem to be offline. Please turn on networking and come back.")
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                            LoginActivity.this.finish();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
 
         // TODO change this here, as identi.ca / status.net has nothing to do with Twitter xauth/oauth
 		if (TwitterConsumerToken.xAuthEnabled) { // TODO what about identi.ca
