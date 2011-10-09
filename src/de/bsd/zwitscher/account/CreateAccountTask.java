@@ -32,13 +32,11 @@ public class CreateAccountTask extends AsyncTask<Void,Void,String> {
 
     protected String doInBackground(Void... voids) {
         TwitterHelper th = new TwitterHelper(context,null);
-        Account account = null;
         try {
-            account = th.generateAccountWithXauth(username, password, service, shouldSwitch);
+            Account account = th.generateAccountWithXauth(username, password, service, shouldSwitch);
             AccountHolder.getInstance().setAccount(account);
             return "OK";
         } catch (Exception e) {
-            e.printStackTrace();  // TODO: Customise this generated block
             return "Login failed  " + e.getLocalizedMessage();
         }
 

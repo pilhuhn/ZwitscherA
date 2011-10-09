@@ -22,6 +22,7 @@ public class NewAccountActivity extends Activity {
 	}
 
 
+    @SuppressWarnings("unused")
     public void create(View v) {
 
         Spinner serviceSpinner = (Spinner) findViewById(R.id.new_account_spinner);

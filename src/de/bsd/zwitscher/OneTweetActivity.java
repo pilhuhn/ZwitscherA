@@ -558,13 +558,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      * @return List of Bitmaps to display
      */
     private List<UrlPair> parseForPictureUrls(Status status) {
-        URL[] urlArray = status.getURLs();
         Set<String> urls = new HashSet<String>();
-        if (urlArray!=null) {
-            for (URL url : urlArray) {
-                urls.add(url.toString());
-            }
-        }
 
         // Nothing provided by twitter, so parse the text
         if (urls.size()==0) {

@@ -786,51 +786,6 @@ public class TweetDB {
         db.close();
     }
 
-    /**
-     * Get a direct message from th DB
-     *
-     * @param id ID of the message to look up
-     * @return JSON string of the message or null if not found
-     */
-    public String getDirectById(long id) {
-
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
-        String ret = null;
-
-        Cursor c;
-        c = db.query(TABLE_DIRECTS,new String[]{"message_json"},"id = ? AND " + ACCOUNT_ID_IS,new String[] { String.valueOf(id), account},null, null, null);
-        if (c.getCount()>0) {
-            c.moveToFirst();
-            ret = c.getString(0);
-        }
-        return ret;
-    }
-
-    /**
-     * Get the last <i>number</i> direct messages from the DB
-     * @param number Numer of messages to get
-     * @return List of messages or empyt list
-     */
-    public List<String> getDirects(int number) {
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
-        List<String > ret = new ArrayList<String>();
-
-        Cursor c;
-        c = db.query(TABLE_DIRECTS,new String[]{"message_json"},ACCOUNT_ID_IS,new String[] { account},null, null, "ID DESC",String.valueOf(number));
-        if (c.getCount()>0) {
-            c.moveToFirst();
-            do {
-                String json = c.getString(0);
-                ret.add(json);
-            } while ((c.moveToNext()));
-        }
-
-        c.close();
-        db.close();
-
-        return ret;
-    }
-
 
     public void storeSavedSearch(String name, String query, int id, String json) {
         ContentValues cv = new ContentValues(5);

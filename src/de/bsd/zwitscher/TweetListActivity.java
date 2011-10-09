@@ -132,7 +132,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
      * @param parent Parent view
      * @param view Clicked view
      * @param position Position in the list that was clicked
-     * @param id
+     * @param id row Id of the item that was clicked
      */
     public void onItemClick(AdapterView<?> parent, View view,
             int position, long id) {
@@ -157,7 +157,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
      * @param parent Parent view
      * @param view Clicked view
      * @param position Position in the List that was clicked
-     * @param id
+     * @param id row id of the item that was clicked
      * @return true as the click was consumed
      */
     public boolean onItemLongClick(AdapterView<?> parent, View view,
@@ -191,9 +191,11 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
      * <li>>0 : User list</li>
      * </ul>
      * This method may trigger a network call if fromDbOnly is false.
+     * The filter if not null is a regular expression, that if matches filters the
+     * tweet.
      *
      * @param fromDbOnly If true only statuses already in the DB are returned
-     * @param filter
+     * @param filter Filter expression to filter out tweets. If null no filtering happens.
      * @return List of status items along with some counts
      */
 	private MetaList<Status> getTimlinesFromTwitter(boolean fromDbOnly, String filter) {
@@ -241,7 +243,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     	statuses = new ArrayList<Status>();
 		List<Status> data = new ArrayList<Status>(myStatuses.getList().size());
 		for (Status status : myStatuses.getList()) {
-			if ((filter==null) || (filter!= null && !status.getText().matches(filter))) {
+			if ((filter==null) || (!status.getText().matches(filter))) {
 				data.add(status);
 				statuses.add(status);
 			} else {
@@ -330,7 +332,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
     /**
      * Called from the reload button
-     * @param v
+     * @param v view that was pressed
      */
     @SuppressWarnings("unused")
     public void reload(View v) {
@@ -427,6 +429,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
 
 		@Override
+        @SuppressWarnings("unchecked")
 		protected MetaList doInBackground(Boolean... params) {
             fromDbOnly = params[0];
 	        MetaList data;

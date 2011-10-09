@@ -30,7 +30,7 @@ public class UrlHelper {
 //     {"id":"r2W","url":"http:\/\/b1t.it\/r2W"}
 
         try {
-            HttpURLConnection conn = null;
+            HttpURLConnection conn;
             URL url = new URL (SHORTENER);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
