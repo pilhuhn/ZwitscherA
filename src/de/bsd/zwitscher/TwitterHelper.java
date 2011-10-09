@@ -1,7 +1,6 @@
 package de.bsd.zwitscher;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,10 +18,8 @@ import android.text.format.DateUtils;
 import android.util.Log;
 
 import de.bsd.zwitscher.account.Account;
+import de.bsd.zwitscher.helper.ExpandUrlRunner;
 import de.bsd.zwitscher.helper.MetaList;
-import de.bsd.zwitscher.helper.NetworkHelper;
-import de.bsd.zwitscher.helper.UrlHelper;
-import de.bsd.zwitscher.helper.UrlPair;
 import twitter4j.*;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
@@ -90,9 +87,7 @@ public class TwitterHelper {
 			}
             if (statuses==null)
                 statuses=new ArrayList<Status>();
-//            for (Status status : statuses) { // TODO persist in one go
-//                persistStatus(tweetDB, status,list_id);
-//            }
+
             persistStatus(statuses,list_id);
 
         }
@@ -549,11 +544,11 @@ Log.d("FillUp","Return: " + i);
      * Get a single status. If directOnly is false, we first look in the local
      * db if it is already present. Otherwise we directly go to the server.
      *
-     * @param statusId
-     * @param list_id
-     * @param directOnly
-     * @param alsoPersist
-     * @return
+     * @param statusId Id of the status to fetch
+     * @param list_id id of the timeline
+     * @param directOnly If true only call out to the server. Otherwise try to look up in local db.
+     * @param alsoPersist Should the fetched status be persisted? Required directOnly = false and no db hit.
+     * @return the obtained Status
      */
     public Status getStatusById(long statusId, Long list_id, boolean directOnly, boolean alsoPersist) {
         Status status = null;
@@ -598,9 +593,10 @@ Log.d("FillUp","Return: " + i);
 
     /**
      * Search the status table for statuses of the current user
-     * that match the passed query entry.
-     * @param query
-     * @return
+     * that match the passed query entry. If the query starts with
+     * 'from:', statuses from the passed user are looked up
+     * @param query Query [from:user |ÊsearchTerm ]
+     * @return Statuses found or an empty list.
      */
     public List<Status> searchStatues(String query) {
         Log.i("searchStatuses", "Query= " + query);
@@ -754,13 +750,11 @@ Log.d("FillUp","Return: " + i);
     }
 
     private void persistStatus(Collection<Status> statuses, long list_id) {
-        if (statuses.isEmpty())
-            return;
 
 
         List<ContentValues> values = new ArrayList<ContentValues>(statuses.size());
-        List<UrlPair> urls = new ArrayList<UrlPair>();
         long now = System.currentTimeMillis();
+        List<String> urls = new ArrayList<String>();
         for (Status status : statuses) {
             String json = DataObjectFactory.getRawJSON(status);
             ContentValues cv = new ContentValues(6);
@@ -768,32 +762,27 @@ Log.d("FillUp","Return: " + i);
             cv.put("I_REP_TO", status.getInReplyToStatusId());
             cv.put("LIST_ID", list_id);
             cv.put("ACCOUNT_ID",accountId);
-            cv.put("STATUS",json);
-            cv.put("ctime",now);
+            cv.put("STATUS", json);
+            cv.put("ctime", now);
             values.add(cv);
-            urls.addAll(fetchUrls(status.getText())); // TODO needs to happen in parallel somehow
+            urls.addAll(parseUrls(status.getText()));
         }
         tweetDB.storeValues(TweetDB.TABLE_STATUSES,values);
-        persistUrls(urls);
+        Thread urlFetchThread = new Thread(new ExpandUrlRunner(context,urls));
+        urlFetchThread.start();
+
     }
 
-    private List<UrlPair> fetchUrls(String text) {
-        ArrayList<UrlPair> result = new ArrayList<UrlPair>();
-        NetworkHelper helper = new NetworkHelper(context);
-
-        if (!helper.isOnline()) {
-            return result;
-        }
+    private List<String> parseUrls(String text) {
+        List<String> ret = new ArrayList<String>();
 
         String[] tokens = text.split(" ");
         for (String token : tokens) {
             if (token.startsWith("http://t.co")) {
-                String res = UrlHelper.expandUrl(token);
-                UrlPair pair = new UrlPair(token,res);
-                result.add(pair);
+                ret.add(token);
             }
         }
-        return result;
+        return ret;
     }
 
     private void persistDirects(Collection<DirectMessage> directs) {
@@ -814,28 +803,12 @@ Log.d("FillUp","Return: " + i);
 
     }
 
-    private void persistUrls(Collection<UrlPair> urlPairs) {
-        if (urlPairs.isEmpty())
-            return;
-
-        List<ContentValues> values = new ArrayList<ContentValues>(urlPairs.size());
-        for (UrlPair pair : urlPairs) {
-            ContentValues cv = new ContentValues(3);
-            cv.put("src",pair.getSrc());
-            cv.put("target",pair.getTarget());
-            cv.put("last_modified",System.currentTimeMillis());
-            values.add(cv);
-        }
-        tweetDB.storeValues(TweetDB.TABLE_URLS,values);
-    }
-
     /**
      * Update an existing status object in the database with the passed one.
      *
      * @param status Updated status object
-     * @throws IOException
      */
-    private void updateStatus(Status status) throws IOException {
+    private void updateStatus(Status status){
 
         // Serialize and then store in DB
         String json = DataObjectFactory.getRawJSON(status);

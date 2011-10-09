@@ -20,4 +20,12 @@ public class UrlPair {
     public String getTarget() {
         return target;
     }
+
+    @Override
+    public String toString() {
+        return "UrlPair{" +
+                "src='" + src + '\'' +
+                ", target='" + target + '\'' +
+                '}';
+    }
 }
