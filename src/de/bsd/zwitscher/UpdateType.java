@@ -12,5 +12,6 @@ public enum UpdateType {
     FAVORITE,
     DIRECT,
     UPLOAD_PIC,
-    LATER_READING;
+    LATER_READING,
+    QUEUED;
 }

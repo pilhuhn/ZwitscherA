@@ -1,5 +1,9 @@
 package de.bsd.zwitscher;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 import android.widget.ImageView;
 import de.bsd.zwitscher.account.Account;
 import android.app.Notification;
@@ -9,10 +13,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.other.ReadItLaterStore;
 
 /**
@@ -45,6 +49,30 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
         UpdateRequest request = requests[0];
         UpdateResponse ret=null;
+
+        NetworkHelper nh = new NetworkHelper(context);
+        if (!nh.isOnline()) {
+
+            // We are not online, queue the request
+
+            TweetDB tdb = new TweetDB(context,account.getId());
+
+            UpdateResponse response = null;
+            try {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ObjectOutputStream out = new ObjectOutputStream(bos);
+                out.writeObject(request);
+                out.close();
+
+                tdb.persistUpdate(bos.toByteArray());
+
+                response = new UpdateResponse(UpdateType.QUEUED,true,"Queued for later sending");
+            } catch (IOException e) {
+                e.printStackTrace();  // TODO: Customise this generated block
+                response = new UpdateResponse(UpdateType.QUEUED,false,e.getMessage());
+            }
+            return response;
+        }
 
         switch (request.updateType) {
             case UPDATE:
@@ -135,6 +163,8 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
         String head =  result.getUpdateType() + " failed:";
         String text =  result.getMessage();
         String message ="";
+        if (result.getUpdateType()==UpdateType.QUEUED)
+            message = "Queueing failed : "+ result.getMessage();
         if (result.getUpdateType()==UpdateType.UPDATE)
             message= result.getUpdate().getStatus();
         if (result.getUpdateType()==UpdateType.DIRECT)

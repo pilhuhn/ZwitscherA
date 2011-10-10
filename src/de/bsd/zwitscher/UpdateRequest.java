@@ -1,5 +1,7 @@
 package de.bsd.zwitscher;
 
+import java.io.Serializable;
+
 import android.view.View;
 import twitter4j.Status;
 import twitter4j.StatusUpdate;
@@ -9,7 +11,7 @@ import twitter4j.StatusUpdate;
  *
  * @author Heiko W. Rupp
  */
-public class UpdateRequest {
+public class UpdateRequest implements Serializable {
 
     UpdateType updateType;
     String message;
@@ -19,7 +21,7 @@ public class UpdateRequest {
     String picturePath;
     View view;
     String url;         // for external apps
-    String extUser;     // for extranal apps
+    String extUser;     // for external apps
     String extPassword; // for external apps
 
     public UpdateRequest(UpdateType updateType) {

@@ -1,5 +1,8 @@
 package de.bsd.zwitscher;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -337,6 +341,28 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     @SuppressWarnings("unused")
     public void reload(View v) {
         fillListViewFromTimeline(false);
+        // Now check and process items that were created while we were offline
+
+        // TODO need to put that in a background task
+        TweetDB tdb = new TweetDB(this,account.getId());
+        List<Pair<Integer,byte[]>> list = tdb.getUpdatesForAccount();
+        for (Pair pair : list) {
+            try {
+                byte[] bytes = (byte[]) pair.second;
+                ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes));
+                UpdateRequest usr = (UpdateRequest) ois.readObject();
+                ois.close();
+                if (usr.updateType == UpdateType.UPDATE) {
+                    th.updateStatus(usr);
+                    tdb.removeUpdate((Integer) pair.first);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();  // TODO: Customise this generated block
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();  // TODO: Customise this generated block
+            }
+        }
+
     }
 
 

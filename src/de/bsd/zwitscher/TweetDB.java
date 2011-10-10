@@ -13,6 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.util.Log;
+import android.util.Pair;
 import de.bsd.zwitscher.account.Account;
 
 /**
@@ -31,6 +32,7 @@ public class TweetDB {
     private static final String TABLE_SEARCHES = "searches";
     public static final String TABLE_DIRECTS = "directs";
     public static final String TABLE_URLS = "urls";
+    public static final String TABLE_UPDATES = "updates";
     private static final String[] DATA_TABLES = {TABLE_STATUSES,
         TABLE_LAST_READ,TABLE_LISTS,TABLE_USERS,TABLE_SEARCHES,TABLE_DIRECTS};
     static final String STATUS = "STATUS";
@@ -144,6 +146,13 @@ public class TweetDB {
                     ")"
             );
             db.execSQL("CREATE UNIQUE INDEX URL_SRC_IDX ON " + TABLE_URLS + "(src)");
+
+            db.execSQL(CREATE_TABLE + TABLE_UPDATES + " (" +
+                    "id INTEGER PRIMARY KEY, " +
+                    ACCOUNT_ID + " LONG, " +
+                    "content BLOB " +
+                    ")"
+            );
 		}
 
 		@Override
@@ -191,6 +200,13 @@ public class TweetDB {
                         ")"
                 );
                 db.execSQL("CREATE UNIQUE INDEX URL_SRC_IDX ON " + TABLE_URLS + "(src)");
+
+                db.execSQL(CREATE_TABLE + TABLE_UPDATES + " (" +
+                        "_id INTEGER PRIMARY KEY, " + // PK -> auto increment when pk==null
+                        ACCOUNT_ID + " LONG, " +
+                        "content BLOB " +
+                        ")"
+                );
             }
 		}
 
@@ -842,5 +858,42 @@ public class TweetDB {
         db.close();
 
         return ret;
+    }
+
+    public void persistUpdate(byte[] request) {
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        ContentValues cv = new ContentValues(3);
+
+        cv.put("id", (Integer) null);
+        cv.put(ACCOUNT_ID,account);
+        cv.put("content",request);
+        db.insert(TABLE_UPDATES,null,cv);
+        db.close();
+    }
+
+    public List<Pair<Integer,byte[]>> getUpdatesForAccount() {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        Cursor c = db.query(TABLE_UPDATES,new String[]{"id","content"},ACCOUNT_ID_IS,new String[]{account},null,null,null);
+        List<Pair<Integer,byte[]>> ret = new ArrayList<Pair<Integer, byte[]>>();
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            do {
+                int id = c.getInt(0);
+                byte[] content = c.getBlob(1);
+                Pair p = new Pair(id,content);
+                ret.add(p);
+            }
+            while( c.moveToNext());
+        }
+        c.close();
+        db.close();
+
+        return ret;
+    }
+
+    public void removeUpdate(int id) {
+        SQLiteDatabase db = tdHelper.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_UPDATES + " WHERE id = " + id);
+        db.close();
     }
 }
