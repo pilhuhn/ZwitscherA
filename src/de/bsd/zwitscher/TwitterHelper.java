@@ -396,6 +396,7 @@ public class TwitterHelper {
 		} catch (TwitterException e) {
             updateResponse.setMessage( e.getLocalizedMessage());
             updateResponse.setFailure();
+            updateResponse.setStatusCode(e.getStatusCode());
         }
         return updateResponse;
 	}
@@ -403,12 +404,13 @@ public class TwitterHelper {
 	public UpdateResponse retweet(UpdateRequest request) {
         UpdateResponse response = new UpdateResponse(request.updateType,request.id);
 		try {
-			twitter.retweetStatus(request.id);
+			Status tmp = twitter.retweetStatus(request.id);
             response.setSuccess();
 			response.setMessage("Retweeted successfully");
 		} catch (TwitterException e) {
             response.setFailure();
             response.setMessage(e.getLocalizedMessage());
+            response.setStatusCode(e.getStatusCode());
 		}
         return response;
 	}
@@ -430,9 +432,10 @@ public class TwitterHelper {
             updateStatus(status); // explicitly update in DB - we know it is there.
 			updateResponse.setSuccess();
             updateResponse.setMessage("(Un)favorite set");
-		} catch (Exception e) {
+		} catch (TwitterException e) {
             updateResponse.setFailure();
             updateResponse.setMessage(e.getLocalizedMessage());
+            updateResponse.setStatusCode(e.getStatusCode());
 		}
         updateResponse.setStatus(status);
         return updateResponse;
@@ -450,6 +453,7 @@ public class TwitterHelper {
             updateResponse.setFailure();
             updateResponse.setMessage(e.getLocalizedMessage());
             updateResponse.setOrigMessage(request.message);
+            updateResponse.setStatusCode(e.getStatusCode());
         }
         return updateResponse;
     }

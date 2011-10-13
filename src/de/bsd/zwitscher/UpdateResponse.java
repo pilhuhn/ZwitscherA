@@ -21,6 +21,7 @@ public class UpdateResponse {
     Status status;
     View view;
     String origMessage;
+    int statusCode;
 
     public UpdateResponse(UpdateType updateType, boolean success, String message) {
         this.message = message;
@@ -99,5 +100,28 @@ public class UpdateResponse {
 
     public void setOrigMessage(String origMessage) {
         this.origMessage = origMessage;
+    }
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    @Override
+    public String toString() {
+        return "UpdateResponse{" +
+                "update=" + update +
+                ", id=" + id +
+                ", message='" + message + '\'' +
+                ", success=" + success +
+                ", updateType=" + updateType +
+                ", status=" + status +
+                ", view=" + view +
+                ", origMessage='" + origMessage + '\'' +
+                ", statusCode=" + statusCode +
+                '}';
     }
 }

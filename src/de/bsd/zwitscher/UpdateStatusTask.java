@@ -55,23 +55,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
             // We are not online, queue the request
 
-            TweetDB tdb = new TweetDB(context,account.getId());
-
-            UpdateResponse response = null;
-            try {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ObjectOutputStream out = new ObjectOutputStream(bos);
-                out.writeObject(request);
-                out.close();
-
-                tdb.persistUpdate(bos.toByteArray());
-
-                response = new UpdateResponse(UpdateType.QUEUED,true,"Queued for later sending");
-            } catch (IOException e) {
-                e.printStackTrace();  // TODO: Customise this generated block
-                response = new UpdateResponse(UpdateType.QUEUED,false,e.getMessage());
-            }
-            return response;
+            return queueUpUpdate(request, "Offline - Queued for later sending");
         }
 
         switch (request.updateType) {
@@ -118,7 +102,38 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
             default:
                 throw new IllegalArgumentException("Update type not supported yet : " + request.updateType);
         }
+
+        if (ret!=null && ret.getStatusCode()==502)
+            ret = queueUpUpdate(request,"Server seems down, queued for later sending. [" + ret.getMessage() + "]");
+
         return ret;
+    }
+
+    /**
+     * Queue up the Update request for later sending.
+     * @param request Request to queue up
+     * @param message Reason why this was queued
+     * @return a new surrogate request to continue processing with
+     * @see de.bsd.zwitscher.helper.FlushQueueTask
+     */
+    private UpdateResponse queueUpUpdate(UpdateRequest request, String message) {
+        TweetDB tdb = new TweetDB(context,account.getId());
+
+        UpdateResponse response = null;
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(bos);
+            out.writeObject(request);
+            out.close();
+
+            tdb.persistUpdate(bos.toByteArray());
+
+            response = new UpdateResponse(UpdateType.QUEUED,true,message);
+        } catch (IOException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+            response = new UpdateResponse(UpdateType.QUEUED,false,e.getMessage());
+        }
+        return response;
     }
 
     protected void onPostExecute(UpdateResponse result) {
@@ -153,6 +168,10 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
             createNotification(result);
     }
 
+    /**
+     * Create a notification for the (Android) system wide message center and put a message there
+     * @param result Result of a status update
+     */
     private void createNotification(UpdateResponse result) {
         String ns = Context.NOTIFICATION_SERVICE;
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(ns);

@@ -13,6 +13,8 @@ import twitter4j.StatusUpdate;
  */
 public class UpdateRequest implements Serializable {
 
+    private static final long serialVersionUID = -1L;
+
     UpdateType updateType;
     String message;
     long id;
@@ -26,5 +28,9 @@ public class UpdateRequest implements Serializable {
 
     public UpdateRequest(UpdateType updateType) {
         this.updateType = updateType;
+    }
+
+    public UpdateType getUpdateType() {
+        return updateType;
     }
 }

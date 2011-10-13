@@ -23,7 +23,6 @@ public class ExpandUrlRunner implements Runnable {
         this.urls = urls;
         this.context = context;
         tweetDB = new TweetDB(context,-1); // Dummy account, does not matter
-        System.out.println("handler started");
     }
 
     @Override
@@ -31,7 +30,6 @@ public class ExpandUrlRunner implements Runnable {
 
         List<UrlPair> pairs = fetchUrls(urls);
         persistUrls(pairs);
-        System.out.println("Handler done");
     }
 
     private List<UrlPair> fetchUrls(List<String> srcUrls) {
