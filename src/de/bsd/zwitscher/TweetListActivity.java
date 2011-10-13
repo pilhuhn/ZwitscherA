@@ -484,6 +484,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                         }
 
                         if (list_id==0) { // Fetch directs only if original list was homes
+/* TODO re-enable when auth is fixed
                             publishProgress(directsString);
                             MetaList<DirectMessage> directs = getDirectsFromTwitter(false);
                             newDirects = directs.getNumOriginal();
@@ -491,6 +492,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                                 long id = mentions.getList().get(0).getId();
                                 tdb.updateOrInsertLastRead(-2,id);
                             }
+*/
                         }
 
                     }
