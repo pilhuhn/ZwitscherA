@@ -74,12 +74,16 @@ public class UrlHelper {
             URL url = new URL (inputUrl);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("HEAD");
-            conn.connect();
+            conn.setRequestProperty("Accept-Encoding", "identity"); // Disable GZIP compression.
+            conn.getHeaderFields();
             code = conn.getResponseCode();
             System.out.println("Response code: " + code + ", result: " + conn.getURL());
         } catch (IOException e) {
             System.err.println("Input URL was " + inputUrl);
             e.printStackTrace();
+        } finally {
+            if (conn!=null)
+                conn.disconnect();
         }
         if (code==200 || code==204)
             return conn.getURL().toString();
