@@ -29,7 +29,7 @@ import java.util.Set;
  */
 public class ListOfListsActivity extends AbstractListActivity {
 
-    Set<Map.Entry<String,Pair<String,Integer>>> userListsEntries;
+    Set<Map.Entry<Integer,Pair<String,String>>> userListsEntries;
     int mode;
     ArrayAdapter<String> adapter;
 
@@ -64,14 +64,15 @@ public class ListOfListsActivity extends AbstractListActivity {
         List<String> result = new ArrayList<String>();
 
         if (mode==0) {
+            // Display users lists
             userListsEntries = tdb.getLists().entrySet();
-            for (Map.Entry<String, Pair<String, Integer>> userList : userListsEntries) {
-                Pair<String,Integer> ownerIdPair = userList.getValue();
+            for (Map.Entry<Integer, Pair<String, String>> userList : userListsEntries) {
+                Pair<String, String> nameOwnerPair = userList.getValue();
                 String listname;
-                if (account.getName().equals(ownerIdPair.first))
-                    listname = userList.getKey();
+                if (account.getName().equals(nameOwnerPair.second))
+                    listname = nameOwnerPair.first;
                 else
-                    listname = "@" + ownerIdPair.first + "/" + userList.getKey();
+                    listname = "@" + nameOwnerPair.second + "/" + nameOwnerPair.first;
                 result.add(listname);
             }
             if (result.isEmpty()) {
@@ -114,27 +115,27 @@ public class ListOfListsActivity extends AbstractListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
 
         String text = (String) getListView().getItemAtPosition(position);
-        if (text.startsWith("@")) {
-            int slash = text.indexOf("/");
-            text = text.substring(slash+1);
-        }
 
         if (mode==0) { // User list
             int listId = -1 ;
             String ownerName = account.getName();
-            for (Map.Entry<String, Pair<String, Integer>> entry : userListsEntries) {
-                if (entry.getKey().equals(text)) {
-                    Pair<String,Integer> ownerIdPair = entry.getValue();
-                    listId = ownerIdPair.second;
-                    ownerName = ownerIdPair.first;
+            for (Map.Entry<Integer, Pair<String, String>> entry : userListsEntries) {
+                Pair<String,String> nameOwnerPair = entry.getValue();
+                if (text.startsWith("@") && text.equals("@"+nameOwnerPair.second +"/" +nameOwnerPair.first)) {
+                    listId = entry.getKey();
+                    ownerName = nameOwnerPair.second;
+                }
+                else if (!text.startsWith("@") && text.equals(nameOwnerPair.first)) {
+                    listId = entry.getKey();
+                    ownerName = nameOwnerPair.second;
                 }
             }
 
             if (listId!=-1) {
                 Intent intent = new Intent().setClass(this,TweetListActivity.class);
                 intent.putExtra(TabWidget.LIST_ID, listId);
-                intent.putExtra("listName",text);
-                intent.putExtra("name",ownerName);
+                intent.putExtra("userListid",listId);
+                intent.putExtra("userListOwner",ownerName);
 
                 startActivity(intent);
             }
@@ -187,16 +188,16 @@ public class ListOfListsActivity extends AbstractListActivity {
         @Override
         protected Void doInBackground(Void... params) {
 
-            for (Map.Entry<String, Pair<String, Integer>> entry : userListsEntries) {
+            for (Map.Entry<Integer, Pair<String, String>> entry : userListsEntries) {
 
                 publishProgress(entry.getKey());
 
                 Paging paging = new Paging();
                 paging.setCount(100);
-                Pair<String,Integer> ownerIdPair = entry.getValue();
+                Pair<String, String> nameOwnerPair = entry.getValue();
 
-                int listId = ownerIdPair.second;
-                String screenName = ownerIdPair.first;
+                int listId = entry.getKey();
+                String screenName = nameOwnerPair.second;
                 long lastFetched = tdb.getLastRead(listId);
                 if (lastFetched>0)
                     paging.setSinceId(lastFetched);

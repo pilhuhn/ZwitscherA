@@ -264,11 +264,11 @@ public class TweetDB {
 
     /**
      * Return Infos about all lists in the DB
-     * @return Map with Listname,json pairs
+     * @return Map with List Id and Pair (listname,list owner )
      */
-	Map<String, Pair<String,Integer>> getLists() {
+	Map<Integer, Pair<String, String>> getLists() {
 		SQLiteDatabase db = tdHelper.getReadableDatabase();
-		Map<String, Pair<String, Integer>> ret = new HashMap<String, Pair<String, Integer>>();
+		Map<Integer, Pair<String, String>> ret = new HashMap<Integer, Pair<String, String>>();
 		Cursor c = db.query(TABLE_LISTS, new String[] {"name","owner_name","id"}, ACCOUNT_ID_IS, new String[]{account}, null, null, "name");
 		if (c.getCount()>0){
 			c.moveToFirst();
@@ -276,8 +276,8 @@ public class TweetDB {
 				String name = c.getString(0);  // 0 = name
 				String owner = c.getString(1); // 1 = list owner screen name
                 Integer id = c.getInt(2);
-                Pair<String,Integer> pair = new Pair<String, Integer>(owner,id);
-				ret.put(name, pair);
+                Pair<String,String> pair = new Pair<String, String>(name,owner);
+				ret.put(id, pair);
 			} while (c.moveToNext());
 		}
 		c.close();

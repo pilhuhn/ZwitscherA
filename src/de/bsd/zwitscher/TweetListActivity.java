@@ -2,6 +2,7 @@ package de.bsd.zwitscher;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -14,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -59,8 +61,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     int newMentions=0;
     private int newDirects=0;
     Integer userId=null;
-    String listname = null;
-    private String screenName;
+    int userListId = -1;
+    private String userListOwner;
 
     /**
      * Called when the activity is first created.
@@ -103,8 +105,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         if (intentInfo==null) {
             list_id = 0;
         } else {
-            listname = intentInfo.getString("listName");
-            screenName = intentInfo.getString("name");
+            userListId = intentInfo.getInt("userListid");
+            userListOwner = intentInfo.getString("userListOwner");
             list_id = intentInfo.getInt(TabWidget.LIST_ID);
             if (intentInfo.containsKey("userId")) {
                 // Display tweets of a single user
@@ -233,7 +235,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             myStatuses = th.getTimeline(paging,list_id,fromDbOnly);
             break;
         default:
-        	myStatuses = th.getUserList(paging,list_id, screenName, fromDbOnly);
+        	myStatuses = th.getUserList(paging,list_id, userListOwner, fromDbOnly);
         	break;
         }
 
@@ -530,8 +532,16 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 ActionBar ab = getActionBar();
                 if (ab!=null) {
                     String s = account.getAccountIdentifier();
-                    if (listname!=null)
-                        s+= ": " + listname;
+                    Map<Integer,Pair<String,String>> userLists = tdb.getLists();
+                    if (userListId !=-1) {
+                        Pair<String,String> nameOwnerPair = userLists.get(userListId);
+                        String tmp;
+                        if (nameOwnerPair.second.equals(account.getName()))
+                            tmp = nameOwnerPair.first;
+                        else
+                            tmp = "@" +nameOwnerPair.second + "/" + nameOwnerPair.first;
+                        s+= ": " + tmp;
+                    }
                     ab.setSubtitle(s);
                 }
             }

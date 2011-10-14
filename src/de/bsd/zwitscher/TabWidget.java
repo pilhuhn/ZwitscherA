@@ -285,11 +285,10 @@ public class TabWidget extends TabActivity {
         TweetDB tdb = new TweetDB(this,accountId);
         if (account.getServerType().equalsIgnoreCase("twitter")) {
             List<UserList> userLists = th.getUserLists();
-            Map<String,Pair<String,Integer>> storedLists = tdb.getLists();
+            Map<Integer, Pair<String, String>> storedLists = tdb.getLists();
             List<Integer> storedListIds = new ArrayList<Integer>(storedLists.size());
-            for (Pair<String,Integer> ownerListPair : storedLists.values()) {
-                storedListIds.add(ownerListPair.second);
-            }
+            storedListIds.addAll(storedLists.keySet());
+
             // Check for lists to add
             for (UserList userList : userLists) {
                 if (!storedListIds.contains(userList.getId())) {
@@ -297,9 +296,8 @@ public class TabWidget extends TabActivity {
                 }
             }
             // check for outdated lists and remove them
-            for (Entry<String, Pair<String, Integer>> entry : storedLists.entrySet()) {
-                Pair<String,Integer> ownerIdPair = entry.getValue();
-                Integer id = ownerIdPair.second;
+            for (Entry<Integer, Pair<String, String>> entry : storedLists.entrySet()) {
+                Integer id = entry.getKey();
                 boolean found = false;
                 for (UserList userList2 : userLists) {
                     if (userList2.getId() == id) {

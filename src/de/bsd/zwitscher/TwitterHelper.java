@@ -464,15 +464,6 @@ public class TwitterHelper {
         List<Status> statuses;
         if (!fromDbOnly) {
             try {
-                /*
-                10-13 08:46:12.737: WARN/System.err(28234): Got exception: 404:The URI requested is invalid or the resource requested, such as a user, does not exists.
-                10-13 08:46:12.737: WARN/System.err(28234): error - Not found
-                10-13 08:46:12.737: WARN/System.err(28234): request - /1/pilhuhn/lists/25708605/statuses.json?per_page=50&include_entities=false
-                 */
-
-                // We need to be careful here - the listOwnerScreenName is ourselves in the case of a
-                // list we created but someone else if we've subscribed to a list. Unfortunately
-                // list Id is not enough
                 statuses = twitter.getUserListStatuses(screenName, listId, paging);
                 int size = statuses.size();
                 Log.i("getUserList","Got " + size + " statuses from Twitter");

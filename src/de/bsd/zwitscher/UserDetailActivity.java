@@ -299,11 +299,12 @@ public class UserDetailActivity extends Activity  {
         TweetDB tdb = new TweetDB(this,account.getId());
 
         List<String> data = new ArrayList<String>();
-        Set<Map.Entry<String,Pair<String,Integer>>> userListsEntries;
+        Set<Map.Entry<Integer,Pair<String,String>>> userListsEntries;
 
         userListsEntries = tdb.getLists().entrySet();
-        for (Map.Entry<String, Pair<String, Integer>> userList : userListsEntries) {
-            data.add(userList.getKey());
+        for (Map.Entry<Integer, Pair<String, String>> userList : userListsEntries) {
+            if (userList.getValue().second.equals(account.getName()))
+                data.add(userList.getValue().first);
         }
 
         Intent intent = new Intent(this,MultiSelectListActivity.class);
@@ -327,14 +328,14 @@ public class UserDetailActivity extends Activity  {
             String o = (String) data.getExtras().get("data");
 
             TweetDB tdb = new TweetDB(this,account.getId());
-            Set<Map.Entry<String,Pair<String,Integer>>> userListsEntries;
+            Set<Map.Entry<Integer,Pair<String,String>>> userListsEntries;
 
             int listId;
             userListsEntries = tdb.getLists().entrySet();
-            for (Map.Entry<String, Pair<String, Integer>> userList : userListsEntries) {
-                if (userList.getKey().equals(o)) {
-                    Pair<String,Integer> ownerIdPair = userList.getValue();
-                    listId = ownerIdPair.second;
+            for (Map.Entry<Integer, Pair<String, String>> userList : userListsEntries) {
+                Pair<String,String> nameOwnerPair = userList.getValue();
+                if (o.equals(nameOwnerPair.first) && nameOwnerPair.second.equals(account.getName())) {
+                    listId = userList.getKey();
                     thTwitterHelper.addUserToLists(theUser.getId(),listId);
                 }
             }
