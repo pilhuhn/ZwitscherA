@@ -114,6 +114,10 @@ public class ListOfListsActivity extends AbstractListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
 
         String text = (String) getListView().getItemAtPosition(position);
+        if (text.startsWith("@")) {
+            int slash = text.indexOf("/");
+            text = text.substring(slash+1);
+        }
 
         if (mode==0) { // User list
             int listId = -1 ;
