@@ -210,8 +210,9 @@ public class TwitterHelper {
 
         List<UserList> userLists;
 		try {
-			String username = twitter.getScreenName();
-			userLists = twitter.getUserLists(username, -1);
+			String username = account.getName();
+			userLists = twitter.getUserLists(username, -1); // Lists I created
+            userLists.addAll( twitter.getUserListSubscriptions(username, -1) ); // Lists from other users
 			return userLists;
 		} catch (Exception e) {
             // called from background task, so no toast allowed
@@ -458,14 +459,21 @@ public class TwitterHelper {
         return updateResponse;
     }
 
-	public MetaList<Status> getUserList(Paging paging, int listId, boolean fromDbOnly) {
+	public MetaList<Status> getUserList(Paging paging, int listId, String screenName, boolean fromDbOnly) {
 
         List<Status> statuses;
         if (!fromDbOnly) {
             try {
-                String listOwnerScreenName = twitter.getScreenName();
+                /*
+                10-13 08:46:12.737: WARN/System.err(28234): Got exception: 404:The URI requested is invalid or the resource requested, such as a user, does not exists.
+                10-13 08:46:12.737: WARN/System.err(28234): error - Not found
+                10-13 08:46:12.737: WARN/System.err(28234): request - /1/pilhuhn/lists/25708605/statuses.json?per_page=50&include_entities=false
+                 */
 
-                statuses = twitter.getUserListStatuses(listOwnerScreenName, listId, paging);
+                // We need to be careful here - the listOwnerScreenName is ourselves in the case of a
+                // list we created but someone else if we've subscribed to a list. Unfortunately
+                // list Id is not enough
+                statuses = twitter.getUserListStatuses(screenName, listId, paging);
                 int size = statuses.size();
                 Log.i("getUserList","Got " + size + " statuses from Twitter");
 

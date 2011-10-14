@@ -96,7 +96,7 @@ public class TweetDB {
 					"name TEXT, " + //
 					"id LONG, " +
                     ACCOUNT_ID + " LONG, " +
-                    "list_json TEXT, " +
+                    "owner_name TEXT, " +
                     "UNIQUE (ID, " + ACCOUNT_ID + ")" +
                     " )"
 			);
@@ -202,11 +202,14 @@ public class TweetDB {
                 db.execSQL("CREATE UNIQUE INDEX URL_SRC_IDX ON " + TABLE_URLS + "(src)");
 
                 db.execSQL(CREATE_TABLE + TABLE_UPDATES + " (" +
-                        "_id INTEGER PRIMARY KEY, " + // PK -> auto increment when pk==null
+                        "id INTEGER PRIMARY KEY, " + // PK -> auto increment when pk==null
                         ACCOUNT_ID + " LONG, " +
                         "content BLOB " +
                         ")"
                 );
+
+                db.execSQL("DELETE FROM " + TABLE_LISTS);
+                db.execSQL("ALTER TABLE " + TABLE_LISTS + " RENAME COLUMN list_json TO owner_name");
             }
 		}
 
@@ -261,19 +264,20 @@ public class TweetDB {
 
     /**
      * Return Infos about all lists in the DB
-     * @return Map with Listname,id pairs
-     * @todo return the json object
+     * @return Map with Listname,json pairs
      */
-	Map<String, Integer> getLists() {
+	Map<String, Pair<String,Integer>> getLists() {
 		SQLiteDatabase db = tdHelper.getReadableDatabase();
-		Map<String,Integer> ret = new HashMap<String,Integer>();
-		Cursor c = db.query(TABLE_LISTS, new String[] {"name","id"}, ACCOUNT_ID_IS, new String[]{account}, null, null, "name");
+		Map<String, Pair<String, Integer>> ret = new HashMap<String, Pair<String, Integer>>();
+		Cursor c = db.query(TABLE_LISTS, new String[] {"name","owner_name","id"}, ACCOUNT_ID_IS, new String[]{account}, null, null, "name");
 		if (c.getCount()>0){
 			c.moveToFirst();
 			do {
-				String name = c.getString(0);
-				Integer id = c.getInt(1);
-				ret.put(name, id);
+				String name = c.getString(0);  // 0 = name
+				String owner = c.getString(1); // 1 = list owner screen name
+                Integer id = c.getInt(2);
+                Pair<String,Integer> pair = new Pair<String, Integer>(owner,id);
+				ret.put(name, pair);
 			} while (c.moveToNext());
 		}
 		c.close();
@@ -285,14 +289,14 @@ public class TweetDB {
      * Add a new list to the database
      * @param name Name of the lise
      * @param id Id of the list
-     * @param json Full json string object of the list
+     * @param owner_name screen name of the list owner
      */
-	public void addList(String name, int id, String json) {
+	public void addList(String name, int id, String owner_name) {
 		ContentValues cv = new ContentValues();
 		cv.put("name", name);
 		cv.put("id",id);
         cv.put(ACCOUNT_ID,account);
-        cv.put("list_json", json);
+        cv.put("owner_name", owner_name);
 
 		SQLiteDatabase db = tdHelper.getWritableDatabase();
 		db.insert(TABLE_LISTS, null, cv);

@@ -1,5 +1,6 @@
 package de.bsd.zwitscher;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -9,6 +10,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Window;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -28,7 +30,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TabHost;
-import twitter4j.json.DataObjectFactory;
 
 /**
  * Activity that creates the Tab bar and starts the various
@@ -284,16 +285,21 @@ public class TabWidget extends TabActivity {
         TweetDB tdb = new TweetDB(this,accountId);
         if (account.getServerType().equalsIgnoreCase("twitter")) {
             List<UserList> userLists = th.getUserLists();
-            Map<String,Integer> storedLists = tdb.getLists();
+            Map<String,Pair<String,Integer>> storedLists = tdb.getLists();
+            List<Integer> storedListIds = new ArrayList<Integer>(storedLists.size());
+            for (Pair<String,Integer> ownerListPair : storedLists.values()) {
+                storedListIds.add(ownerListPair.second);
+            }
             // Check for lists to add
             for (UserList userList : userLists) {
-                if (!storedLists.containsValue(userList.getId())) {
-                    tdb.addList(userList.getName(),userList.getId(), DataObjectFactory.getRawJSON(userList));
+                if (!storedListIds.contains(userList.getId())) {
+                    tdb.addList(userList.getName(),userList.getId(), userList.getUser().getScreenName());
                 }
             }
             // check for outdated lists and remove them
-            for (Entry<String, Integer> entry : storedLists.entrySet()) {
-                Integer id = entry.getValue();
+            for (Entry<String, Pair<String, Integer>> entry : storedLists.entrySet()) {
+                Pair<String,Integer> ownerIdPair = entry.getValue();
+                Integer id = ownerIdPair.second;
                 boolean found = false;
                 for (UserList userList2 : userLists) {
                     if (userList2.getId() == id) {

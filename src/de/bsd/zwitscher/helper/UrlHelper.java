@@ -78,6 +78,7 @@ public class UrlHelper {
             code = conn.getResponseCode();
             System.out.println("Response code: " + code + ", result: " + conn.getURL());
         } catch (IOException e) {
+            System.err.println("Input URL was " + inputUrl);
             e.printStackTrace();
         }
         if (code==200 || code==204)

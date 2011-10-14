@@ -1,18 +1,15 @@
 package de.bsd.zwitscher;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import de.bsd.zwitscher.helper.CaseInsensitiveStringComparator;
 import de.bsd.zwitscher.helper.MetaList;
@@ -32,7 +29,7 @@ import java.util.Set;
  */
 public class ListOfListsActivity extends AbstractListActivity {
 
-    Set<Map.Entry<String, Integer>> userListsEntries;
+    Set<Map.Entry<String,Pair<String,Integer>>> userListsEntries;
     int mode;
     ArrayAdapter<String> adapter;
 
@@ -44,7 +41,7 @@ public class ListOfListsActivity extends AbstractListActivity {
         View reloadButton;
         if (Build.VERSION.SDK_INT<11) {
             setContentView(R.layout.tweet_list_layout);
-            reloadButton = (ImageButton) findViewById(R.id.tweet_list_reload_button);
+            reloadButton = findViewById(R.id.tweet_list_reload_button);
             if (mode==0)
                 reloadButton.setEnabled(true);
             else
@@ -68,8 +65,14 @@ public class ListOfListsActivity extends AbstractListActivity {
 
         if (mode==0) {
             userListsEntries = tdb.getLists().entrySet();
-            for (Map.Entry<String, Integer> userList : userListsEntries) {
-                result.add(userList.getKey());
+            for (Map.Entry<String, Pair<String, Integer>> userList : userListsEntries) {
+                Pair<String,Integer> ownerIdPair = userList.getValue();
+                String listname;
+                if (account.getName().equals(ownerIdPair.first))
+                    listname = userList.getKey();
+                else
+                    listname = "@" + ownerIdPair.first + "/" + userList.getKey();
+                result.add(listname);
             }
             if (result.isEmpty()) {
                 String s = getString(R.string.please_sync_lists);
@@ -112,17 +115,22 @@ public class ListOfListsActivity extends AbstractListActivity {
 
         String text = (String) getListView().getItemAtPosition(position);
 
-        if (mode==0) {
+        if (mode==0) { // User list
             int listId = -1 ;
-            for (Map.Entry<String,Integer> userList : userListsEntries) {
-                if (userList.getKey().equals(text))
-                    listId = userList.getValue();
+            String ownerName = account.getName();
+            for (Map.Entry<String, Pair<String, Integer>> entry : userListsEntries) {
+                if (entry.getKey().equals(text)) {
+                    Pair<String,Integer> ownerIdPair = entry.getValue();
+                    listId = ownerIdPair.second;
+                    ownerName = ownerIdPair.first;
+                }
             }
 
             if (listId!=-1) {
                 Intent intent = new Intent().setClass(this,TweetListActivity.class);
                 intent.putExtra(TabWidget.LIST_ID, listId);
                 intent.putExtra("listName",text);
+                intent.putExtra("name",ownerName);
 
                 startActivity(intent);
             }
@@ -143,7 +151,7 @@ public class ListOfListsActivity extends AbstractListActivity {
     /**
      * Trigger updating the user lists. This is only
      * supported for lists and not for searches (those are not persisted)
-     * @param v
+     * @param v View that was pressed
      */
     @Override
     public void reload(View v) {
@@ -175,23 +183,26 @@ public class ListOfListsActivity extends AbstractListActivity {
         @Override
         protected Void doInBackground(Void... params) {
 
-            for (Map.Entry<String,Integer> userList : userListsEntries) {
+            for (Map.Entry<String, Pair<String, Integer>> entry : userListsEntries) {
 
-                publishProgress(userList.getKey());
+                publishProgress(entry.getKey());
 
                 Paging paging = new Paging();
                 paging.setCount(100);
-                int listId = userList.getValue();
+                Pair<String,Integer> ownerIdPair = entry.getValue();
+
+                int listId = ownerIdPair.second;
+                String screenName = ownerIdPair.first;
                 long lastFetched = tdb.getLastRead(listId);
                 if (lastFetched>0)
                     paging.setSinceId(lastFetched);
-                MetaList<twitter4j.Status> list = th.getUserList(paging, listId, false);
+                MetaList<twitter4j.Status> list = th.getUserList(paging, listId, screenName, false);
                 long newOnes = list.getNumOriginal();
                 if (newOnes>0) {
                     long maxId = list.getList().get(0).getId();
                     tdb.updateOrInsertLastRead(listId,maxId);
 
-                    publishProgress(userList.getKey(),newOnes);
+                    publishProgress(entry.getKey(),newOnes);
 
                 }
             }

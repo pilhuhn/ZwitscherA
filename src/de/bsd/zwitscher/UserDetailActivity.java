@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,6 +33,7 @@ import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.User;
+import twitter4j.UserList;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -297,10 +299,10 @@ public class UserDetailActivity extends Activity  {
         TweetDB tdb = new TweetDB(this,account.getId());
 
         List<String> data = new ArrayList<String>();
-        Set<Map.Entry<String, Integer>> userListsEntries;
+        Set<Map.Entry<String,Pair<String,Integer>>> userListsEntries;
 
         userListsEntries = tdb.getLists().entrySet();
-        for (Map.Entry<String, Integer> userList : userListsEntries) {
+        for (Map.Entry<String, Pair<String, Integer>> userList : userListsEntries) {
             data.add(userList.getKey());
         }
 
@@ -325,13 +327,14 @@ public class UserDetailActivity extends Activity  {
             String o = (String) data.getExtras().get("data");
 
             TweetDB tdb = new TweetDB(this,account.getId());
-            Set<Map.Entry<String, Integer>> userListsEntries;
+            Set<Map.Entry<String,Pair<String,Integer>>> userListsEntries;
 
             int listId;
             userListsEntries = tdb.getLists().entrySet();
-            for (Map.Entry<String, Integer> userList : userListsEntries) {
+            for (Map.Entry<String, Pair<String, Integer>> userList : userListsEntries) {
                 if (userList.getKey().equals(o)) {
-                    listId = userList.getValue();
+                    Pair<String,Integer> ownerIdPair = userList.getValue();
+                    listId = ownerIdPair.second;
                     thTwitterHelper.addUserToLists(theUser.getId(),listId);
                 }
             }

@@ -60,6 +60,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     private int newDirects=0;
     Integer userId=null;
     String listname = null;
+    private String screenName;
 
     /**
      * Called when the activity is first created.
@@ -103,6 +104,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             list_id = 0;
         } else {
             listname = intentInfo.getString("listName");
+            screenName = intentInfo.getString("name");
             list_id = intentInfo.getInt(TabWidget.LIST_ID);
             if (intentInfo.containsKey("userId")) {
                 // Display tweets of a single user
@@ -231,7 +233,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             myStatuses = th.getTimeline(paging,list_id,fromDbOnly);
             break;
         default:
-        	myStatuses = th.getUserList(paging,list_id, fromDbOnly);
+        	myStatuses = th.getUserList(paging,list_id, screenName, fromDbOnly);
         	break;
         }
 
