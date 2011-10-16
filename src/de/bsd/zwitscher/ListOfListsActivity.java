@@ -190,11 +190,11 @@ public class ListOfListsActivity extends AbstractListActivity {
 
             for (Map.Entry<Integer, Pair<String, String>> entry : userListsEntries) {
 
-                publishProgress(entry.getKey());
+                Pair<String, String> nameOwnerPair = entry.getValue();
+                publishProgress(nameOwnerPair.first);
 
                 Paging paging = new Paging();
                 paging.setCount(100);
-                Pair<String, String> nameOwnerPair = entry.getValue();
 
                 int listId = entry.getKey();
                 String screenName = nameOwnerPair.second;
@@ -207,7 +207,7 @@ public class ListOfListsActivity extends AbstractListActivity {
                     long maxId = list.getList().get(0).getId();
                     tdb.updateOrInsertLastRead(listId,maxId);
 
-                    publishProgress(entry.getKey(),newOnes);
+                    publishProgress(nameOwnerPair.first,newOnes);
 
                 }
             }
