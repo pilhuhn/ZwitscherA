@@ -4,14 +4,11 @@ import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.EditText;
 import android.widget.Toast;
 import de.bsd.zwitscher.R;
 import de.bsd.zwitscher.TabWidget;
@@ -19,7 +16,13 @@ import de.bsd.zwitscher.TwitterHelper;
 import twitter4j.http.RequestToken;
 
 /**
- * // TODO: Document this
+ * Activity to run the login at Twitter via OAuth game.
+ * This displays a web view, which Twitter shows where the
+ * user enters his credentials. Then on load of the result page
+ * it gets the content of the page (via injecting JavaScript, that
+ * calls us back) and then runs the TwitterHelper#generateAccountWithOauth
+ * to obtain the account tokens. We then forward to the main view.
+ *
  * @author Heiko W. Rupp
  */
 public class TwitterLoginActivity extends Activity {
@@ -34,9 +37,11 @@ public class TwitterLoginActivity extends Activity {
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setSavePassword(false);
         webSettings.setSaveFormData(false);
+
         webSettings.setJavaScriptEnabled(true);
-        myWebView.addJavascriptInterface(new MyJavaScriptClient(),"HTMLOUT");
+
         myWebView.setWebViewClient(new MyWebViewClient());
+        myWebView.addJavascriptInterface(new MyJavaScriptClient(), "HTMLOUT");
 
         try {
             RequestToken rt = new GetRequestTokenTask().execute().get();
@@ -54,23 +59,6 @@ public class TwitterLoginActivity extends Activity {
     }
 
     @SuppressWarnings("unused")
-    public void setPin(View v) {
-
-        EditText et = (EditText) findViewById(R.id.pinInput);
-        String pin = et.getText().toString();
-        try {
-            Account acct = new GenerateAccountWithOauthTask().execute(pin).get();
-                Intent i = new Intent().setClass(this, TabWidget.class);
-                startActivity(i);
-                finish();
-// TODO make this some included activity that returns data to the caller ?
-
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(),
-                    "Error: " + e.getMessage(), 15000).show();
-            e.printStackTrace();
-        }
-    }
 
     private class GetRequestTokenTask extends AsyncTask<Void,Void,RequestToken> {
         @Override
@@ -104,34 +92,57 @@ public class TwitterLoginActivity extends Activity {
         }
     }
 
+    /**
+     * Class that injects the JavaScript callback when the 2nd auth
+     * page was reached.
+     */
     private class MyWebViewClient extends WebViewClient {
-        @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            super.onPageStarted(view, url, favicon);    // TODO: Customise this generated block
-            System.out.println("on ps " + url);
-        }
 
         @Override
         public void onPageFinished(WebView view, String url) {
-            super.onPageFinished(view, url);    // TODO: Customise this generated block
-            System.out.println("on pf " + url);
+            super.onPageFinished(view, url);
             if (url.equals("https://api.twitter.com/oauth/authorize")) {
-                System.out.println("Hit!");
-                myWebView.loadUrl("javascript:window.HTMLOUT.setHTML('document.getElementsById('code-desc')');");
+                myWebView.loadUrl("javascript:window.HTMLOUT.obtain(document.body.innerHTML);");
+                // not sure why the following fails, but doesn't really matter
+                // myWebView.loadUrl("javascript:window.HTMLOUT.setHTML(document.getElementById('code-desc'));");
             }
-        }
-
-        @Override
-        public void onLoadResource(WebView view, String url) {
-            super.onLoadResource(view, url);    // TODO: Customise this generated block
-            System.out.println("on lr " + url);
         }
     }
 
+    /**
+     * This class holds the callback that we inject in MyWebViewClient#onPageFinished
+     */
     public class MyJavaScriptClient {
 
-        public void setHtml(String html) {
+        /**
+         * Called from the java script in the web view. We parse the
+         * html obtained and then generate an account with the help of the
+         * passed pin
+         * @param html Html as evaluated by the javascript
+         */
+        @SuppressWarnings("unused")
+        public void obtain(String html) {
             System.out.println("html is " + html);
+            int i = html.indexOf("<code>");
+            if (i!=-1) {
+                html = html.substring(i+6);
+                i = html.indexOf("</code>");
+                html = html.substring(0,i);
+
+
+
+            System.out.println("html is now");
+            try {
+                Account acct = new GenerateAccountWithOauthTask().execute(html).get();
+                    Intent intent = new Intent().setClass(TwitterLoginActivity.this, TabWidget.class);
+                    startActivity(intent);
+                    finish();
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(),
+                        "Error: " + e.getMessage(), 15000).show();
+                e.printStackTrace();
+            }
+            }
         }
     }
 }
