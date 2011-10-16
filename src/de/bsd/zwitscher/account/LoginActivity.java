@@ -195,4 +195,9 @@ public class LoginActivity extends Activity {
 		finish();
 	}
 
+    public void foo(View v) {
+        Intent i = new Intent(this,TwitterLoginActivity.class);
+        startActivity(i);
+    }
+
 }

@@ -120,7 +120,6 @@ public class TabWidget extends TabActivity {
                 .setContent(mentionsIntent);
         tabHost.addTab(homeSpec);
 
-/*
         tmp = getString(R.string.direct);
         Intent directIntent = new Intent().setClass(this,TweetListActivity.class);
         directIntent.putExtra(LIST_ID, -2);
@@ -128,7 +127,6 @@ public class TabWidget extends TabActivity {
                 .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_direct))
                 .setContent(directIntent);
         tabHost.addTab(homeSpec);
-*/
 
 
         if (account.getServerType().equalsIgnoreCase("twitter")) {

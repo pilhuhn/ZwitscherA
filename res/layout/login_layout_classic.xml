@@ -44,4 +44,10 @@
             android:id="@+id/login_login"
             android:onClick="loginXauth"
         />
+
+    <Button android:text="Login with twitter OAuth"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:onClick="foo"
+            />
 </LinearLayout>
