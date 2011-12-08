@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import android.util.Log;
 import android.widget.ImageView;
 import de.bsd.zwitscher.account.Account;
 import android.app.Notification;
@@ -155,10 +156,15 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
             if (favoriteButton==null || result.status == null)
                 return;
 
-            if (result.status.isFavorited())
-                favoriteButton.setImageResource(R.drawable.favorite_on);
-            else
-                favoriteButton.setImageResource(R.drawable.favorite_off);
+            try {
+                if (result.status.isFavorited())
+                    favoriteButton.setImageResource(R.drawable.favorite_on);
+                else
+                    favoriteButton.setImageResource(R.drawable.favorite_off);
+                }
+            catch (Exception e) {
+                Log.i("UpdateStatusTask", "Favorite button seems to be gone");
+            }
         }
 
 
