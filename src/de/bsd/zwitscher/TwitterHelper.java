@@ -243,9 +243,12 @@ public class TwitterHelper {
 
         if (account!=null) {
             if (account.getServerType().equalsIgnoreCase("twitter")) {
-                Twitter twitterInstance = new TwitterFactory().getOAuthAuthorizedInstance(
-                        TwitterConsumerToken.consumerKey,
-                        TwitterConsumerToken.consumerSecret,
+                ConfigurationBuilder cb = new ConfigurationBuilder();
+                cb.setIncludeEntitiesEnabled(true);
+                Configuration conf = cb.build();
+                Twitter twitterInstance = new TwitterFactory(conf).getOAuthAuthorizedInstance(
+                        Tokens.consumerKey,
+                        Tokens.consumerSecret,
                         new AccessToken(account.getAccessTokenKey(), account.getAccessTokenSecret()));
                 return twitterInstance;
             }
@@ -256,6 +259,7 @@ public class TwitterHelper {
                 cb.setOAuthAccessTokenURL("https://identi.ca/api/oauth/access_token");
                 cb.setOAuthAuthorizationURL("https://identi.ca/api/oauth/authorize");
                 cb.setOAuthRequestTokenURL("https://identi.ca/api/oauth/request_token");
+                cb.setIncludeEntitiesEnabled(true);
                 Configuration conf = cb.build() ;
 
 
@@ -289,7 +293,7 @@ public class TwitterHelper {
 
 
         Twitter twitterInstance = new TwitterFactory().getInstance();
-        twitterInstance.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
+        twitterInstance.setOAuthConsumer(Tokens.consumerKey, Tokens.consumerSecret);
         RequestToken requestToken = twitterInstance.getOAuthRequestToken();
         Editor editor = preferences.edit();
         editor.putString("requestToken", requestToken.getToken());
@@ -308,7 +312,7 @@ public class TwitterHelper {
      */
 	public Account generateAccountWithOauth(String pin) throws Exception{
         Twitter twitterInstance = new TwitterFactory().getInstance();
-        twitterInstance.setOAuthConsumer(TwitterConsumerToken.consumerKey, TwitterConsumerToken.consumerSecret);
+        twitterInstance.setOAuthConsumer(Tokens.consumerKey, Tokens.consumerSecret);
         RequestToken requestToken = getRequestToken(false); // twitterInstance.getOAuthRequestToken();
 		AccessToken accessToken = twitterInstance.getOAuthAccessToken(requestToken, pin);
 
@@ -338,8 +342,8 @@ public class TwitterHelper {
         Account account = null;
 
         if (service.equalsIgnoreCase("twitter")) {
-            cb.setOAuthConsumerKey(TwitterConsumerToken.consumerKey);
-            cb.setOAuthConsumerSecret(TwitterConsumerToken.consumerSecret);
+            cb.setOAuthConsumerKey(Tokens.consumerKey);
+            cb.setOAuthConsumerSecret(Tokens.consumerSecret);
             Configuration conf = cb.build() ;
             twitterInstance = new TwitterFactory(conf).getInstance(username,password);
             AccessToken accessToken = twitterInstance.getOAuthAccessToken();
@@ -907,8 +911,8 @@ Log.d("FillUp","Return: " + i);
             props.put(PropertyConfiguration.MEDIA_PROVIDER,mProvider);
             props.put(PropertyConfiguration.OAUTH_ACCESS_TOKEN,accessTokenToken);
             props.put(PropertyConfiguration.OAUTH_ACCESS_TOKEN_SECRET,accessTokenSecret);
-            props.put(PropertyConfiguration.OAUTH_CONSUMER_KEY,TwitterConsumerToken.consumerKey);
-            props.put(PropertyConfiguration.OAUTH_CONSUMER_SECRET,TwitterConsumerToken.consumerSecret);
+            props.put(PropertyConfiguration.OAUTH_CONSUMER_KEY, Tokens.consumerKey);
+            props.put(PropertyConfiguration.OAUTH_CONSUMER_SECRET, Tokens.consumerSecret);
             Configuration conf = new PropertyConfiguration(props);
 
             ImageUploaderFactory factory = new ImageUploaderFactory(conf);
