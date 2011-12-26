@@ -21,14 +21,17 @@ import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.ExpandUrlRunner;
 import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.*;
+import twitter4j.auth.AccessToken;
+import twitter4j.auth.Authorization;
+import twitter4j.auth.BasicAuthorization;
+import twitter4j.auth.OAuthAuthorization;
+import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 import twitter4j.conf.PropertyConfiguration;
-import twitter4j.http.AccessToken;
-import twitter4j.http.RequestToken;
 import twitter4j.json.DataObjectFactory;
 import twitter4j.media.ImageUpload;
-import twitter4j.media.ImageUploaderFactory;
+import twitter4j.media.ImageUploadFactory;
 import twitter4j.media.MediaProvider;
 
 public class TwitterHelper {
@@ -245,11 +248,17 @@ public class TwitterHelper {
             if (account.getServerType().equalsIgnoreCase("twitter")) {
                 ConfigurationBuilder cb = new ConfigurationBuilder();
                 cb.setIncludeEntitiesEnabled(true);
+                cb.setJSONStoreEnabled(true);
                 Configuration conf = cb.build();
-                Twitter twitterInstance = new TwitterFactory(conf).getOAuthAuthorizedInstance(
+                OAuthAuthorization auth = new OAuthAuthorization(conf);
+                auth.setOAuthAccessToken(new AccessToken(account.getAccessTokenKey(), account.getAccessTokenSecret()));
+                auth.setOAuthConsumer(Tokens.consumerKey,Tokens.consumerSecret);
+                Twitter twitterInstance = new TwitterFactory(conf).getInstance(auth);
+/*
                         Tokens.consumerKey,
                         Tokens.consumerSecret,
                         new AccessToken(account.getAccessTokenKey(), account.getAccessTokenSecret()));
+*/
                 return twitterInstance;
             }
             else if (account.getServerType().equalsIgnoreCase("identi.ca")) {
@@ -260,10 +269,11 @@ public class TwitterHelper {
                 cb.setOAuthAuthorizationURL("https://identi.ca/api/oauth/authorize");
                 cb.setOAuthRequestTokenURL("https://identi.ca/api/oauth/request_token");
                 cb.setIncludeEntitiesEnabled(true);
+                cb.setJSONStoreEnabled(true);
                 Configuration conf = cb.build() ;
 
-
-                Twitter twitterInstance = new TwitterFactory(conf).getInstance(account.getName(),account.getPassword());
+                BasicAuthorization auth = new BasicAuthorization(account.getName(),account.getPassword());
+                Twitter twitterInstance = new TwitterFactory(conf).getInstance(auth);
                 return twitterInstance;
             }
         }
@@ -344,8 +354,11 @@ public class TwitterHelper {
         if (service.equalsIgnoreCase("twitter")) {
             cb.setOAuthConsumerKey(Tokens.consumerKey);
             cb.setOAuthConsumerSecret(Tokens.consumerSecret);
+            cb.setIncludeEntitiesEnabled(true);
+            cb.setJSONStoreEnabled(true);
             Configuration conf = cb.build() ;
-            twitterInstance = new TwitterFactory(conf).getInstance(username,password);
+            BasicAuthorization auth = new BasicAuthorization(username,password);
+            twitterInstance = new TwitterFactory(conf).getInstance(auth);
             AccessToken accessToken = twitterInstance.getOAuthAccessToken();
             int newId = tweetDB.getNewAccountId();
             account = new Account(newId,username,accessToken.getToken(),accessToken.getTokenSecret(),null,"twitter",makeDefault);
@@ -362,9 +375,11 @@ public class TwitterHelper {
 //            cb.setOAuthAuthenticationURL();
             cb.setOAuthAuthorizationURL("https://identi.ca/api/oauth/authorize");
             cb.setOAuthRequestTokenURL("https://identi.ca/api/oauth/request_token");
+            cb.setJSONStoreEnabled(true);
             Configuration conf = cb.build() ;
             TwitterFactory twitterFactory = new TwitterFactory(conf);
-            twitterInstance = twitterFactory.getInstance(username, password);
+            BasicAuthorization auth = new BasicAuthorization(username,password);
+            twitterInstance = twitterFactory.getInstance(auth);
             // Trigger a fetch to validate the credentials
             Paging paging = new Paging();
             paging.setCount(1);
@@ -643,7 +658,7 @@ Log.d("FillUp","Return: " + i);
      * @param cachedOnly If true, only a cached version of the object or null is returned. Otherwise a request to the server is made
      * @return User object or null, if it can not be obtained.
      */
-    public User getUserById(int userId, boolean cachedOnly) {
+    public User getUserById(long userId, boolean cachedOnly) {
         User user = null;
         boolean existing = false;
 
@@ -712,7 +727,7 @@ Log.d("FillUp","Return: " + i);
      * @return True in case of success
      * @todo make async
      */
-    public boolean followUnfollowUser(int userId, boolean doFollow ) {
+    public boolean followUnfollowUser(long userId, boolean doFollow ) {
         try {
             if (doFollow)
                 twitter.createFriendship(userId);
@@ -732,7 +747,7 @@ Log.d("FillUp","Return: " + i);
      * @param listId ids of the list to put the user on
      * @return true if successful
      */
-    public boolean addUserToLists(int userId, int listId) {
+    public boolean addUserToLists(long userId, int listId) {
         try {
             twitter.addUserListMember(listId,userId);
         } catch (TwitterException e) {
@@ -772,7 +787,14 @@ Log.d("FillUp","Return: " + i);
             cv.put("STATUS", json);
             cv.put("ctime", now);
             values.add(cv);
-            urls.addAll(parseUrls(status.getText()));
+//            urls.addAll(parseUrls(status.getText()));
+/*
+            if (status.getURLEntities()!=null) {
+                for (URLEntity ue: status.getURLEntities()) {
+                    urls.add(ue.getExpandedURL().toString());
+                }
+            }
+*/
         }
         tweetDB.storeValues(TweetDB.TABLE_STATUSES,values);
         Thread urlFetchThread = new Thread(new ExpandUrlRunner(context,urls));
@@ -915,7 +937,7 @@ Log.d("FillUp","Return: " + i);
             props.put(PropertyConfiguration.OAUTH_CONSUMER_SECRET, Tokens.consumerSecret);
             Configuration conf = new PropertyConfiguration(props);
 
-            ImageUploaderFactory factory = new ImageUploaderFactory(conf);
+            ImageUploadFactory factory = new ImageUploadFactory(conf);
             ImageUpload upload = factory.getInstance(mProvider);
             String url = upload.upload(file);
             return url;
@@ -930,10 +952,10 @@ Log.d("FillUp","Return: " + i);
      * @param userId id of the user to verify
      * @return true if we are following, false otherwise
      */
-    public boolean areWeFollowing(Integer userId) {
+    public boolean areWeFollowing(Long userId) {
 
         try {
-            int myId = twitter.getId();
+            long myId = twitter.getId();
             Relationship rel = twitter.showFriendship(myId,userId);
             return rel.isSourceFollowingTarget();
         } catch (TwitterException e) {

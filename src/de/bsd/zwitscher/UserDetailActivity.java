@@ -58,7 +58,7 @@ public class UserDetailActivity extends Activity  {
     User theUser;
     boolean weAreFollowing = false;
     Button followButton ;
-    private int userId;
+    private long userId;
     private Account account;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -336,7 +336,7 @@ public class UserDetailActivity extends Activity  {
                 Pair<String,String> nameOwnerPair = userList.getValue();
                 if (o.equals(nameOwnerPair.first) && nameOwnerPair.second.equals(account.getName())) {
                     listId = userList.getKey();
-                    thTwitterHelper.addUserToLists(theUser.getId(),listId);
+                    thTwitterHelper.addUserToLists(theUser.getId(),listId); // TODO make async
                 }
             }
         }
@@ -420,11 +420,11 @@ public class UserDetailActivity extends Activity  {
         @Override
         protected Object[] doInBackground(Object... params) {
 
-            Integer userId;
+            Long userId;
             User user;
 
             if (params[0] instanceof Integer) {
-                userId = (Integer) params[0];
+                userId = (Long) params[0];
                 user = thTwitterHelper.getUserById(userId, false);
             }
             else if (params[0] instanceof String) {

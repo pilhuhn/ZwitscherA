@@ -13,7 +13,7 @@ import android.widget.Toast;
 import de.bsd.zwitscher.R;
 import de.bsd.zwitscher.TabWidget;
 import de.bsd.zwitscher.TwitterHelper;
-import twitter4j.http.RequestToken;
+import twitter4j.auth.RequestToken;
 
 /**
  * Activity to run the login at Twitter via OAuth game.
