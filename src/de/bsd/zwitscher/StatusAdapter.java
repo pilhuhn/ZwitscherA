@@ -5,20 +5,19 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.NetworkHelper;
-import de.bsd.zwitscher.helper.PicHelper;
 import de.bsd.zwitscher.helper.SpannableBuilder;
 import de.bsd.zwitscher.helper.TriggerPictureDownloadTask;
 import twitter4j.DirectMessage;
+import twitter4j.MediaEntity;
 import twitter4j.Status;
 import twitter4j.TwitterResponse;
+import twitter4j.URLEntity;
 import twitter4j.User;
 
 import java.util.List;
@@ -95,7 +94,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
                     .appendSpace()
                     .append(status.getUser().getName(), Typeface.BOLD);
             }
-            statusText = status.getText();
+            statusText = textWithReplaceTokens(status);
 
         }
         else if (response instanceof DirectMessage) {
@@ -135,6 +134,39 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
         viewHolder.timeClientInfo.setText((text));
 //Debug.stopMethodTracing();
         return convertView;
+    }
+
+    private String textWithReplaceTokens(Status status) {
+
+        String[] tokens = status.getText().split(" ");
+        StringBuilder builder = new StringBuilder();
+        for (String token : tokens) {
+            boolean found=false;
+            if (status.getMediaEntities()!=null) {
+                for (MediaEntity me : status.getMediaEntities()) {
+                    if (me.getURL().toString().equals(token)) {
+                        builder.append(me.getDisplayURL());
+                        found=true;
+                        break;
+                    }
+                }
+            }
+            if (!found && status.getURLEntities()!=null) {
+                for (URLEntity ue : status.getURLEntities()) {
+                    if (ue.getURL().toString().equals(token)) {
+                        builder.append(ue.getDisplayURL());
+                        found=true;
+                        break;
+                    }
+                }
+            }
+            if (!found)
+                builder.append(token);
+
+            builder.append(" "); // TODO not at the end
+        }
+        return builder.toString();
+
     }
 
 }

@@ -615,7 +615,12 @@ builder                                .append(ue.getExpandedURL());
         if (mediaEntities!=null) {
             for (MediaEntity me : mediaEntities) {
                 URL url = me.getURL();
-                String target = me.getMediaURL().toString()+ ":thumb";
+                String target;
+                target = me.getMediaURL().toString();
+                if (android.os.Build.VERSION.SDK_INT<11) // TODO decide on screen size and not API version
+                    target = target+ ":thumb";
+                else
+                    target = target+ ":small";
                 UrlPair pair = new UrlPair(url.toString(), target);
                 urlPairs.add(pair);
             }

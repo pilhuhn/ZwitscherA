@@ -534,12 +534,14 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     Map<Integer,Pair<String,String>> userLists = tdb.getLists();
                     if (userListId !=-1) {
                         Pair<String,String> nameOwnerPair = userLists.get(userListId);
-                        String tmp;
-                        if (nameOwnerPair.second.equals(account.getName()))
-                            tmp = nameOwnerPair.first;
-                        else
-                            tmp = "@" +nameOwnerPair.second + "/" + nameOwnerPair.first;
-                        s+= ": " + tmp;
+                        if (nameOwnerPair!=null) {
+                            String tmp;
+                            if (nameOwnerPair.second.equals(account.getName()))
+                                tmp = nameOwnerPair.first;
+                            else
+                                tmp = "@" +nameOwnerPair.second + "/" + nameOwnerPair.first;
+                            s+= ": " + tmp;
+                        }
                     }
                     ab.setSubtitle(s);
                 }
