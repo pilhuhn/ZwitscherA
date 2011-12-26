@@ -113,7 +113,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 userId = intentInfo.getInt("userId");
                 // This is a one off list. So don't offer the reload button
                 ImageButton tweet_list_reload_button = (ImageButton) findViewById(R.id.tweet_list_reload_button);
-                tweet_list_reload_button.setVisibility(View.INVISIBLE);
+                if (tweet_list_reload_button!=null)
+                    tweet_list_reload_button.setVisibility(View.INVISIBLE);
             }
         }
 

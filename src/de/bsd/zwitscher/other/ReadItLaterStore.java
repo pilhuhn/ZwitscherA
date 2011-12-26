@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import de.bsd.zwitscher.Tokens;
 import twitter4j.Status;
 
 /**
@@ -37,7 +38,7 @@ public class ReadItLaterStore {
         sb.append("send?");
         sb.append("username=").append(user).append("&");
         sb.append("password=").append(password).append("&");
-        sb.append("apikey=").append(ReaditLaterToken.token);
+        sb.append("apikey=").append(Tokens.readItLaterToken);
         String targetUrl = sb.toString();
 
 
@@ -106,7 +107,7 @@ public class ReadItLaterStore {
         sb.append("auth?");
         sb.append("username=").append(user).append("&");
         sb.append("password=").append(password).append("&");
-        sb.append("apikey=").append(ReaditLaterToken.token);
+        sb.append("apikey=").append(Tokens.readItLaterToken);
         String targetUrl = sb.toString();
 
 

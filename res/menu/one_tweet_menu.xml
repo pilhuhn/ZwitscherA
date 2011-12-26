@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/cl_retweet"
+          android:title="@string/classicretweet"
+          />
+    <item android:id="@+id/direct"
+          android:icon="@drawable/direct_button"
+          android:title="@string/direct"
+          />
+
+    <item android:title="@string/speak"
+          android:id="@+id/speak"
+          android:icon="@drawable/speaker"
+          />
+
+    <item android:id="@+id/ril"
+          android:title="@string/ril"
+          />
+
+    <item android:title="@string/forward"
+          android:id="@+id/forward"
+          />
+</menu>

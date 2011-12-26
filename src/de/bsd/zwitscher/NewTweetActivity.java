@@ -181,7 +181,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
                         tweetButton.setEnabled(false);
                 }
 
-                charCountView.setText(String.valueOf(140-tlen));
+                charCountView.setText(String.valueOf(140-tlen)); // TODO if url detected 4 twitter, decrease by 20 chars
             }
         });
 

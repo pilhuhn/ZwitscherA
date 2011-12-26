@@ -77,22 +77,6 @@
                      android:onClick="retweet"
                      android:src="@drawable/rt_button"
                      android:text="Retweet"/>
-        <ImageButton android:id="@+id/ClassicRetweetButton"
-                     android:layout_below="@id/TimeTextView"
-                     android:layout_toRightOf="@id/RetweetButton"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:onClick="classicRetweet"
-                     android:src="@drawable/rt_button_cl"
-                     android:text="Classic Retweet"/>
-        <Button android:id="@+id/DirectButton"
-                     android:layout_below="@id/TimeTextView"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:layout_toRightOf="@id/ClassicRetweetButton"
-                     android:onClick="directMessage"
-                     android:text="Direct"/>
-
 
         <ImageButton android:id="@+id/ThreadButton"
                      android:layout_below="@id/ReplyButton"
@@ -117,41 +101,15 @@
                      android:onClick="translate"
                      android:src="@drawable/translate"
                      android:text="Translate"/>
-        <ImageButton android:id="@+id/SpeakButton"
-                     android:layout_below="@id/ReplyButton"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:onClick="speak"
-                     android:src="@drawable/speaker"
-                     android:layout_toRightOf="@id/TranslateButton"
-                     android:text="Speak"/>
-        <ImageButton android:layout_below="@id/ReplyButton"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:layout_toRightOf="@id/SpeakButton"
-                     android:text="Send"
-                     android:onClick="send"
-                     android:src="@drawable/direct_button"
-                     android:id="@+id/SendButton"
-                />
-
-        <Button android:id="@+id/ril_button"
-                android:text="@string/ril"
-                android:layout_below="@id/ThreadButton"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:onClick="readItLater"
-                android:visibility="visible"/>
-
 
         <ImageButton android:id="@+id/DoneButton"
-                     android:layout_below="@id/ril_button"
+                     android:layout_below="@id/ThreadButton"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:onClick="done"
                      android:src="@drawable/back_button"
                      android:text="Done!"/>
-        <Gallery xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/gallery"
+        <Gallery android:id="@+id/gallery"
                  android:layout_width="fill_parent"
                  android:layout_height="wrap_content"
                  android:layout_below="@id/DoneButton"

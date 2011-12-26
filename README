@@ -23,16 +23,20 @@ an issue on the github tracker at https://github.com/pilhuhn/ZwitscherA/issues
 
 As Twitter.com is not really ready to handle open source projects,
 you need to register the app at Twitter and then provide a class
-TwitterConsumerToken that looks like this with the values Twitter
+Token (renamed from TwitterConsumerToken) that looks like this with the values Twitter
 provided you with put in:
 
 package de.bsd.zwitscher;
 
-public class TwitterConsumerToken {
+public class Tokens {
 
 	public static String consumerKey = "replaceWithKey";
 	public static String consumerSecret = "replaceWithSecret";
 	public static boolean xAuthEnabled = false;
+
+    public static final String readItLaterToken = "";
+
+    public static String tweetMarkerToken = "";
 
 }
 
@@ -44,11 +48,18 @@ As Twitter by default does not enable xAuth, the third parameter
 needs to be set to false to go through the "normal" oAuth procedure of
 logging in.
 
-Support for ReadItlater (http://http://readitlaterlist.com/)
+
+== Support for ReadItlater (http://http://readitlaterlist.com/)
+
 
 If you want to add Suppor for ReadItlater, you need to get a Token
-and put it into src/de/bsd/zwitscher/other/ReaditLaterToken.java
+and put it into above Token file as well
 
+== Support for TweetMarker
+
+Zwitscher can now also sync last read information with
+TweetMarker.com (and thus with clients like Twitterriffic).
+To enable this, you also need to have a token in above tokens file
 
 
 ==========================

@@ -24,8 +24,8 @@ import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
-import de.bsd.zwitscher.helper.UrlHelper;
 import de.bsd.zwitscher.helper.UrlPair;
+import twitter4j.MediaEntity;
 import twitter4j.Place;
 import twitter4j.Status;
 import android.app.Activity;
@@ -40,6 +40,7 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.util.Log;
 import android.view.View;
+import twitter4j.URLEntity;
 import twitter4j.User;
 
 import java.io.BufferedInputStream;
@@ -190,20 +191,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
         TextView tweetView = (TextView)findViewById(R.id.TweetTextView);
 //        tweetView.setText(status.getText());
-        String[] tokens = status.getText().split(" ");
-        StringBuilder builder = new StringBuilder();
-        TweetDB tweetDB = new TweetDB(this,account.getId());
-        for (String token : tokens) {
-            if (token.startsWith("http://t.co")) {
-                String target = tweetDB.getTargetUrl(token);
-                builder.append(target);
-            }
-            else {
-                builder.append(token);
-            }
-            builder.append(" ");
-        }
-        tweetView.setText(builder.toString());
+        setTweetText(tweetView);
 
         TextView timeClientView = (TextView)findViewById(R.id.TimeTextView);
         TwitterHelper th = new TwitterHelper(this, account);
@@ -258,6 +246,67 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         }
 
 	}
+
+    private void setTweetText(TextView tweetView) {
+        String[] tokens = status.getText().split(" ");
+        StringBuilder builder = new StringBuilder();
+        TweetDB tweetDB = new TweetDB(this,account.getId());
+        List<String> urlsToGo = new ArrayList<String>();
+/*
+        for (String token : tokens) {
+            if (token.startsWith("http://t.co")) {
+                String target = tweetDB.getTargetUrl(token); //  if that fails, retry in background and then re-display text
+                builder.append(target);
+                if (target.startsWith("http://t.co"))
+                    urlsToGo.add(target);
+            }
+            else {
+                builder.append(token);
+            }
+            builder.append(" ");
+        }
+*/
+        for (String token: tokens) {
+            if (token.startsWith("http")) {
+                boolean found=false;
+                if (status.getMediaEntities()!=null) {
+                    for (MediaEntity me : status.getMediaEntities()) {
+                        if (me.getURL().toString().equals(token)) {
+                            builder.append(me.getDisplayURL());
+                            found=true;
+                            break;
+                        }
+                     }
+                }
+
+                if (!found && status.getURLEntities()!=null) {
+                    for (URLEntity ue : status.getURLEntities()) {
+                        if (ue.getURL().toString().equals(token)) {
+//                            builder.append("<a href=\"")
+builder                                .append(ue.getExpandedURL());
+//                                .append("\">")
+//                                    .append(ue.getDisplayURL()).append("</a>");
+                            found=true;
+                            break;
+                        }
+                    }
+                }
+                if (!found)
+                    builder.append(token);
+            }
+            else {
+                builder.append(token);
+            }
+            builder.append(" ");
+        }
+        tweetView.setText(builder.toString());
+        if (urlsToGo.size()>0) {
+            // we have unresolved links - try to fetch them now
+            // TODO figure out how to best do it, as
+            // we need not only to fetch the urls in background, but
+            // also do the image previw magic again
+        }
+    }
 
     /**
      * Display display of the details of a user from pressing
@@ -559,9 +608,32 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     private List<UrlPair> parseForPictureUrls(Status status) {
         Set<String> urls = new HashSet<String>();
+        ArrayList<UrlPair> urlPairs = new ArrayList<UrlPair>();
+
+
+        MediaEntity[] mediaEntities = status.getMediaEntities();
+        if (mediaEntities!=null) {
+            for (MediaEntity me : mediaEntities) {
+                URL url = me.getURL();
+                String target = me.getMediaURL().toString()+ ":thumb";
+                UrlPair pair = new UrlPair(url.toString(), target);
+                urlPairs.add(pair);
+            }
+        }
+        if (urlPairs.size()>0)
+            return urlPairs; // Urls provided by twitter, so we're done.
+
+        URLEntity[] ures = status.getURLEntities();
+        if (ures!=null) {
+            for (URLEntity ue : ures) {
+                URL url = ue.getExpandedURL();
+                urls.add(url.toString());
+            }
+        }
+
 
         // Nothing provided by twitter, so parse the text
-        if (urls.size()==0) {
+        if (urls.size()==0 && urlPairs.size()==0) {
             String[] tokens = status.getText().split(" ");
             for (String token : tokens) {
                 if (token.startsWith("http://") || token.startsWith("https://")) {
@@ -570,16 +642,16 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             }
         }
         if (urls.size()==0)
-            return Collections.emptyList();
+            return urlPairs;
 
-        ArrayList<UrlPair> urlPairs = new ArrayList<UrlPair>(urls.size());
+
 
 
         // We have urls, so check for picture services
         for (String url :  urls) {
             Log.d("One tweet","Url = " + url);
-            url = UrlHelper.expandUrl(url); // expand link shorteners TODO that ultimatively needs to go into the main parsing for all kinds of links
-            String finalUrlString;
+//            url = UrlHelper.expandUrl(url); // expand link shorteners TODO that ultimatively needs to go into the main parsing for all kinds of links
+            String finalUrlString="";
             if (url.contains("yfrog.com")) {
                 finalUrlString = url + ".th.jpg";
             }
@@ -591,10 +663,36 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             else if (url.contains("plixi.com")) {
                 finalUrlString = "http://api.plixi.com/api/tpapi.svc/imagefromurl?size=thumbnail&url=" +  url;
             }
-            else {
-                Log.d("OTA::loadThumbnails", "Url " + url + " not supported for preview");
-                continue;
+            else if (url.contains("twimg")) {
+                finalUrlString = url;
             }
+
+            else {
+                String screenName;
+                long statusId;
+                if (!status.isRetweet()) {
+                    screenName = status.getUser().getScreenName();
+                    statusId = status.getId();
+                }
+                else {
+                    screenName = status.getRetweetedStatus().getUser().getScreenName();
+                    statusId = status.getRetweetedStatus().getId();
+                }
+                String twitterPic = "http://twitter.com/" + screenName + "/status/" + statusId +
+                        "/photo";
+                if (url.startsWith(twitterPic)) {
+                    // TODO forward to
+                    // "http://twitter.com/#!" + status.getUser().getScreenName() + "/status/" + status.getId()
+                    // and then grab the image url from there
+//                    finalUrlString = UrlHelper.grabPictureUrlFromTwitter(url);
+                    finalUrlString = url; //TODO
+                }
+                else {
+                    Log.d("OTA::loadThumbnails", "Url " + url + " not supported for preview");
+                    continue;
+                }
+            }
+
             UrlPair pair = new UrlPair(url,finalUrlString);
             urlPairs.add(pair);
         }
@@ -602,16 +700,18 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
         if (android.os.Build.VERSION.SDK_INT>=11) {
-            MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.one_tweet_menu_honey,menu);
 
             ActionBar actionBar = this.getActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
-
-            return true;
         }
-        return false;
+        else {
+            inflater.inflate(R.menu.one_tweet_menu,menu);
+
+        }
+        return true;
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

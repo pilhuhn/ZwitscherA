@@ -530,7 +530,7 @@ public class TweetDB {
      * @param userId Id of the user
      * @return Basic JSON string of the user info or null.
      */
-    public String getUserById(int userId) {
+    public String getUserById(long userId) {
 
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         String ret = null;
@@ -598,7 +598,7 @@ public class TweetDB {
      * @param json JSON representation of the User object
      * @param screenName screenname of that user
      */
-    public void insertUser(int userId, String json, String screenName) {
+    public void insertUser(long userId, String json, String screenName) {
         ContentValues cv = new ContentValues(4);
         cv.put("userId",userId);
         cv.put(ACCOUNT_ID,account);
@@ -616,7 +616,7 @@ public class TweetDB {
      * @param json
      * @todo Still needed with conflict resolution on insert?
      */
-    public void updateUser(int userId, String json) {
+    public void updateUser(long userId, String json) {
         ContentValues cv = new ContentValues(1);
         cv.put("user_json",json);
 

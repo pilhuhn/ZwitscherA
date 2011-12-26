@@ -3,7 +3,7 @@ package de.bsd.zwitscher;
 /**
  * Class that holds the twitter consumer token
  */
-public class TwitterConsumerToken {
+public class Tokens {
 
 	public static String consumerKey = "-replace me-";
 	public static String consumerSecret = "-replace -me";
@@ -12,5 +12,8 @@ public class TwitterConsumerToken {
     // future version of the code will have a changed logic.
     public static boolean xAuthEnabled = true;
 
+    // TODO if you build Zwitscher on your own, you need to fill in a read it later token here
+    public static final String readItLaterToken = "";
 
+    public static String tweetMarkerToken = "";
 }

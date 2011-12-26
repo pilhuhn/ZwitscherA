@@ -16,7 +16,7 @@ import android.widget.Toast;
 import de.bsd.zwitscher.R;
 import de.bsd.zwitscher.TabWidget;
 import de.bsd.zwitscher.TweetDB;
-import de.bsd.zwitscher.TwitterConsumerToken;
+import de.bsd.zwitscher.Tokens;
 import de.bsd.zwitscher.TwitterHelper;
 import de.bsd.zwitscher.helper.NetworkHelper;
 
@@ -66,7 +66,7 @@ public class LoginActivity extends Activity {
         }
 
         // TODO change this here, as identi.ca / status.net has nothing to do with Twitter xauth/oauth
-		if (TwitterConsumerToken.xAuthEnabled) { // TODO what about identi.ca
+		if (Tokens.xAuthEnabled) { // TODO what about identi.ca
 													// etc? -> 2 step 1st type
 													// 2nd user/pass
 			setContentView(R.layout.login_layout_classic);
