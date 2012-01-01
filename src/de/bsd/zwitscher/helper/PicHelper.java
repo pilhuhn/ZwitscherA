@@ -51,7 +51,7 @@ public class PicHelper {
 		try {
 			if (externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
 				File iconFile = getPictureFileForUser(username);
-				if (iconFile.exists() && iconFile.lastModified() > System.currentTimeMillis() - ONE_DAY)
+				if (iconFile!=null && iconFile.exists() && iconFile.lastModified() > System.currentTimeMillis() - ONE_DAY)
 					found = true;
 			}
 			if (found)
@@ -103,6 +103,8 @@ public class PicHelper {
         try {
             if (externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
                 File iconFile = getPictureFileForUser(username);
+                if (iconFile==null)
+                    return null;
                 FileInputStream fis = new FileInputStream(iconFile);
                 Bitmap bi = BitmapFactory.decodeStream(fis);
                 fis.close();
@@ -121,6 +123,9 @@ public class PicHelper {
      * @return File object of the matching file
      */
     private File getPictureFileForUser(String username) {
+        if (username==null)
+            return null;
+
 		File baseDir = Environment.getExternalStorageDirectory();
 		File iconDir = new File(baseDir, APP_BASE_DIR + "files/user_profiles");
 		if (!iconDir.exists())
