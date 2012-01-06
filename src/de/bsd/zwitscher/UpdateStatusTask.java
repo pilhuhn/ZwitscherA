@@ -76,7 +76,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                         StatusUpdate statusUpdate = request.statusUpdate;
                         String tmp = th.postPicture(request.picturePath, statusUpdate.getStatus()); // TODO remove place holder here
 
-                        String res = statusUpdate.getStatus().replace("@@@@_image__url_@@@@",tmp);
+                        String res = statusUpdate.getStatus() + " " + tmp;
                         StatusUpdate up = new StatusUpdate(res);
                         up.setAnnotations(statusUpdate.getAnnotations());
                         up.setInReplyToStatusId(statusUpdate.getInReplyToStatusId());

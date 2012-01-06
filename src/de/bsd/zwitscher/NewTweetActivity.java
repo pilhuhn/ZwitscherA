@@ -67,6 +67,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
     String picturePath = null;
     LocationManager locationManager;
     private Account account;
+    private int picUrlCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,7 +184,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
                         tweetButton.setEnabled(false);
                 }
 
-                charCountView.setText(String.valueOf(140-tlen)); // TODO if url detected 4 twitter, decrease by 20 chars
+                charCountView.setText(String.valueOf(140-tlen- picUrlCount)); // TODO if url detected 4 twitter, decrease by 20 chars
             }
         });
 
@@ -427,16 +428,10 @@ public class NewTweetActivity extends Activity implements LocationListener {
             picturePath = picHelper.storeBitmap(bitmap, "tmp-pic", Bitmap.CompressFormat.JPEG, 100); // TODO adjust quality per network
             Log.d("NewTweetActivity.onActivityResult","path: " + picturePath);
 
-//            UpdateRequest req = new UpdateRequest(UpdateType.UPLOAD_PIC);
-//            req.picturePath = picturePath;
-//            req.view = edittext;
-//
-//            new UpdateStatusTask(this,pg, account).execute(req);
-
             if (provider.equals("twitter"))
                 Toast.makeText(this,R.string.picture_attached,Toast.LENGTH_SHORT).show();
             else
-                edittext.setText(edittext.getText().toString() + "@@@@_image__url_@@@@");
+                picUrlCount=21;
         } else if (requestCode==2 && resultCode==RESULT_OK) {
             String item = (String) data.getExtras().get("data");
             if (item.contains(", ")) {
@@ -447,12 +442,12 @@ public class NewTweetActivity extends Activity implements LocationListener {
             // large size image
             File file = getTempFile(this);
 
-//            UpdateRequest req = new UpdateRequest(UpdateType.UPLOAD_PIC);
             Toast.makeText(this,R.string.picture_attached,Toast.LENGTH_SHORT).show();
 
             picturePath = file.getAbsolutePath();
-//            req.view = edittext;
-//            new UpdateStatusTask(this,pg, account).execute(req);
+
+            if(!provider.equals("twitter"))
+                picUrlCount=21;
 
         } else if (requestCode==4 && resultCode==RESULT_OK) {
             // image from gallery
@@ -460,10 +455,8 @@ public class NewTweetActivity extends Activity implements LocationListener {
             picturePath = getPath(selectedImageUri);
             Toast.makeText(this,R.string.picture_attached,Toast.LENGTH_SHORT).show();
 
-//            UpdateRequest req = new UpdateRequest(UpdateType.UPLOAD_PIC);
-//            req.picturePath = picturePath;
-//            req.view = edittext;
-//            new UpdateStatusTask(this,pg, account).execute(req);
+            if(!provider.equals("twitter"))
+                picUrlCount=21;
 
         }
     }
