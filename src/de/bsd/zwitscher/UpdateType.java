@@ -13,5 +13,6 @@ public enum UpdateType {
     DIRECT,
     UPLOAD_PIC,
     LATER_READING,
-    QUEUED;
+    QUEUED,
+    REPORT_AS_SPAMMER;
 }

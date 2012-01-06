@@ -1,9 +1,12 @@
 package de.bsd.zwitscher;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.ImageView;
 import de.bsd.zwitscher.account.Account;
@@ -19,6 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.other.ReadItLaterStore;
+import twitter4j.StatusUpdate;
+import twitter4j.media.MediaProvider;
 
 /**
 * Task that does async updates to the server
@@ -59,8 +64,30 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
             return queueUpUpdate(request, "Offline - Queued for later sending");
         }
 
+        MediaProvider mediaProvider = th.getMediaProvider();
+
         switch (request.updateType) {
             case UPDATE:
+                if (request.picturePath!=null) {
+                    if (mediaProvider.equals(MediaProvider.TWITTER)) {
+                        request.statusUpdate.setMedia(new File(request.picturePath));
+                    }
+                    else {
+                        StatusUpdate statusUpdate = request.statusUpdate;
+                        String tmp = th.postPicture(request.picturePath, statusUpdate.getStatus()); // TODO remove place holder here
+
+                        String res = statusUpdate.getStatus().replace("@@@@_image__url_@@@@",tmp);
+                        StatusUpdate up = new StatusUpdate(res);
+                        up.setAnnotations(statusUpdate.getAnnotations());
+                        up.setInReplyToStatusId(statusUpdate.getInReplyToStatusId());
+                        up.setLocation(statusUpdate.getLocation());
+                        up.setPlaceId(statusUpdate.getPlaceId());
+                        up.setPossiblySensitive(statusUpdate.isPossiblySensitive());
+                        up.setDisplayCoordinates(statusUpdate.isDisplayCoordinates());
+
+                        request.statusUpdate = up;
+                    }
+                }
                 ret = th.updateStatus(request);
                 break;
             case FAVORITE:
@@ -74,7 +101,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                 break;
             case UPLOAD_PIC:
                 if (request.picturePath!=null) {
-                    String url = th.postPicture(request.picturePath);
+                    String url = th.postPicture(request.picturePath, request.message);
                     if (url!=null) {
                         ret = new UpdateResponse(request.updateType,request.view,url);
                         ret.setSuccess();
@@ -99,6 +126,10 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                 }
 
                 ret = new UpdateResponse(request.updateType,success,result);
+                break;
+            case REPORT_AS_SPAMMER:
+                th.reportAsSpammer(request.id);
+                ret = new UpdateResponse(request.updateType,true,"OK");
                 break;
             default:
                 throw new IllegalArgumentException("Update type not supported yet : " + request.updateType);
@@ -140,6 +171,10 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
     protected void onPostExecute(UpdateResponse result) {
         if (progressBar!=null)
             progressBar.setVisibility(ProgressBar.INVISIBLE);
+
+        if (result==null) {
+            Toast.makeText(context,"No result - should not happen",Toast.LENGTH_SHORT).show();
+        }
 
         if (result.getUpdateType()==UpdateType.UPLOAD_PIC) {
             TextView textView = (TextView) result.view;

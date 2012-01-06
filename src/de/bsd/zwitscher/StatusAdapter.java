@@ -153,7 +153,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
             }
             if (!found && status.getURLEntities()!=null) {
                 for (URLEntity ue : status.getURLEntities()) {
-                    if (ue.getURL().toString().equals(token)) {
+                    if (ue.getURL()!=null && ue.getURL().toString().equals(token)) {
                         builder.append(ue.getDisplayURL());
                         found=true;
                         break;

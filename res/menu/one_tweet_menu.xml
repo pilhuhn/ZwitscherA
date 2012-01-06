@@ -21,4 +21,7 @@
     <item android:title="@string/forward"
           android:id="@+id/forward"
           />
+    <item android:id="@+id/report_as_spam"
+          android:title="@string/report_as_spammer"
+          />
 </menu>

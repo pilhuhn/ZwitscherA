@@ -22,7 +22,6 @@ import de.bsd.zwitscher.helper.ExpandUrlRunner;
 import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.*;
 import twitter4j.auth.AccessToken;
-import twitter4j.auth.Authorization;
 import twitter4j.auth.BasicAuthorization;
 import twitter4j.auth.OAuthAuthorization;
 import twitter4j.auth.RequestToken;
@@ -243,12 +242,14 @@ public class TwitterHelper {
         if (account==null)
             account = getDefaultAccount();
 
+        MediaProvider mediaProvider = getMediaProvider();
 
         if (account!=null) {
             if (account.getServerType().equalsIgnoreCase("twitter")) {
                 ConfigurationBuilder cb = new ConfigurationBuilder();
                 cb.setIncludeEntitiesEnabled(true);
                 cb.setJSONStoreEnabled(true);
+                cb.setMediaProvider(mediaProvider.toString());
                 Configuration conf = cb.build();
                 OAuthAuthorization auth = new OAuthAuthorization(conf);
                 auth.setOAuthAccessToken(new AccessToken(account.getAccessTokenKey(), account.getAccessTokenSecret()));
@@ -757,13 +758,13 @@ Log.d("FillUp","Return: " + i);
         return true;
     }
 
-    public List<Status> getUserTweets(int userId) {
+    public List<Status> getUserTweets(Long userId) {
 
         Paging paging = new Paging();
         paging.setCount(30);
         List<Status> ret = null;
         try {
-            ret = twitter.getUserTimeline(userId,paging);
+            ret = twitter.getUserTimeline(userId, paging);
         } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
             return Collections.emptyList();
@@ -907,24 +908,17 @@ Log.d("FillUp","Return: " + i);
     }
 
     /**
-     * Upload a picture to a remote picture service like yfrog.
+     * Upload a picture to a remote picture service like yfrog and post it to twitter.
+     *
      * @param fileName Path on file system to the picture
+     * @param message Message of the update
      * @return Url where this was stored on the remote service or null on error
      */
-    public String postPicture(String fileName) {
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String provider = preferences.getString("pictureService","yfrog");
+    public String postPicture(String fileName, String message) {
 
         try {
             File file = new File(fileName);
-            MediaProvider mProvider ;
-            if (provider.equals("yfrog"))
-                mProvider = MediaProvider.YFROG;
-            else if (provider.equals("twitpic"))
-                mProvider = MediaProvider.TWITPIC;
-            else
-                throw new IllegalArgumentException("Picture provider " + provider + " unknown");
+            MediaProvider mProvider =getMediaProvider();
 
             String accessTokenToken = account.getAccessTokenKey();
             String accessTokenSecret = account.getAccessTokenSecret();
@@ -939,12 +933,31 @@ Log.d("FillUp","Return: " + i);
 
             ImageUploadFactory factory = new ImageUploadFactory(conf);
             ImageUpload upload = factory.getInstance(mProvider);
-            String url = upload.upload(file);
+            String url;
+            url = upload.upload(file,message);
             return url;
         } catch (Exception e) {
             e.printStackTrace();  // TODO: Customise this generated block
         }
         return null;
+    }
+
+    MediaProvider getMediaProvider() {
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String provider = preferences.getString("pictureService","yfrog");
+
+        MediaProvider mProvider ;
+        if (provider.equals("yfrog"))
+            mProvider = MediaProvider.YFROG;
+        else if (provider.equals("twitpic"))
+            mProvider = MediaProvider.TWITPIC;
+        else if (provider.equals("twitter"))
+            mProvider = MediaProvider.TWITTER;
+        else
+            throw new IllegalArgumentException("Picture provider " + provider + " unknown");
+
+        return mProvider;
     }
 
     /**
@@ -961,6 +974,18 @@ Log.d("FillUp","Return: " + i);
         } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
             return false;
+        }
+    }
+
+    /**
+     * Reports the passed user as spammer
+     * @param userId id of the user
+     */
+    public void reportAsSpammer(long userId) {
+        try {
+            twitter.reportSpam(userId);
+        } catch (TwitterException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
         }
     }
 

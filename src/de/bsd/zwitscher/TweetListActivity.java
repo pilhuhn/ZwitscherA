@@ -60,7 +60,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     ListView lv;
     int newMentions=0;
     private int newDirects=0;
-    Integer userId=null;
+    Long userId=null;
     int userListId = -1;
     private String userListOwner;
 
@@ -110,7 +110,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             list_id = intentInfo.getInt(TabWidget.LIST_ID);
             if (intentInfo.containsKey("userId")) {
                 // Display tweets of a single user
-                userId = intentInfo.getInt("userId");
+                userId = intentInfo.getLong("userId");
                 // This is a one off list. So don't offer the reload button
                 ImageButton tweet_list_reload_button = (ImageButton) findViewById(R.id.tweet_list_reload_button);
                 if (tweet_list_reload_button!=null)

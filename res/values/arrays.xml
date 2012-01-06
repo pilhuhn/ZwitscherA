@@ -28,10 +28,12 @@
     <string-array name="pictureService">
         <item>YFrog</item>
         <item>TwitPic</item>
+        <item>Twitter</item>
     </string-array>
     <string-array name="pictureServiceVals">
         <item>yfrog</item>
         <item>twitpic</item>
+        <item>twitter</item>
     </string-array>
     <string-array name="services">
         <item>Twitter</item>

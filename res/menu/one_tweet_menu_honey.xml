@@ -55,4 +55,8 @@
           android:title="@string/ril"
           />
 
+    <item android:id="@+id/report_as_spam"
+          android:title="@string/report_as_spammer"
+          />
+
 </menu>

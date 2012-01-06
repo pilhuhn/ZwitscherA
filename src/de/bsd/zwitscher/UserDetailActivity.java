@@ -28,12 +28,12 @@ import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.User;
-import twitter4j.UserList;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,7 +93,7 @@ public class UserDetailActivity extends Activity  {
         super.onResume();
         account = AccountHolder.getInstance().getAccount();
         thTwitterHelper = new TwitterHelper(this, account);
-        userId = bundle.getInt("userId");
+        userId = bundle.getLong("userId");
         String userName = bundle.getString("userName");
 
         // If the user is in the DB, show the saved state while reloading its data
@@ -423,7 +423,7 @@ public class UserDetailActivity extends Activity  {
             Long userId;
             User user;
 
-            if (params[0] instanceof Integer) {
+            if (params[0] instanceof Long) {
                 userId = (Long) params[0];
                 user = thTwitterHelper.getUserById(userId, false);
             }
@@ -473,6 +473,12 @@ public class UserDetailActivity extends Activity  {
         @Override
         protected void onPostExecute(Object[] params) {
             super.onPostExecute(params);
+
+            if (params==null || params.length==0 || params[0]==null) {
+                Toast.makeText(context,R.string.failed_to_load_user_info,Toast.LENGTH_LONG).show();
+                return;
+            }
+
             User user = (User) params[0];
             Boolean isFriend = (Boolean) params[1];
             theUser = user;

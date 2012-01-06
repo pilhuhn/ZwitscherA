@@ -154,4 +154,9 @@
     <string name="take_image_large">Take large image</string>
     <string name="from_gallery">Select from Gallery</string>
     <string name="ShortenUrls">Shorten urls</string>
+    <string name="report_as_spammer">Report spammer</string>
+    <string name="failed_to_load_user_info">Failed to load user details</string>
+    <string name="url_shortening_failed">URL shortening failed: [%s]</string>
+    <string name="trying_to_send">Trying to send ...</string>
+    <string name="picture_attached">Image attached</string>
 </resources>

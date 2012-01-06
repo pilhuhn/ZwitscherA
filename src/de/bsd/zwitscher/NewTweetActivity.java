@@ -37,6 +37,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.helper.PicHelper;
@@ -49,6 +50,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import twitter4j.User;
+import twitter4j.media.MediaProvider;
 
 /**
  * This activity is called when the user wants to write a new tweet/dent.
@@ -62,7 +64,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
     ProgressBar pg;
     User toUser = null;
     TextView charCountView;
-    String picturePath;
+    String picturePath = null;
     LocationManager locationManager;
     private Account account;
 
@@ -228,7 +230,8 @@ public class NewTweetActivity extends Activity implements LocationListener {
             edittext.setText(newText);
 
         } catch (Exception e) {
-            e.printStackTrace();  // TODO: Customise this generated block
+            String tmp = getString(R.string.url_shortening_failed,e.getMessage());
+            Toast.makeText(this,tmp,Toast.LENGTH_LONG).show();
         }
 
     }
@@ -302,7 +305,9 @@ public class NewTweetActivity extends Activity implements LocationListener {
 	public void tweet(StatusUpdate update) {
         UpdateRequest request = new UpdateRequest(UpdateType.UPDATE);
         request.statusUpdate = update;
-        request.picturePath = picturePath;
+        if (picturePath!=null)
+            request.picturePath = picturePath;
+        Toast.makeText(this,R.string.trying_to_send,Toast.LENGTH_SHORT).show();
         new UpdateStatusTask(this,pg, account).execute(request);
 	}
 
@@ -315,6 +320,10 @@ public class NewTweetActivity extends Activity implements LocationListener {
         UpdateRequest request = new UpdateRequest(UpdateType.DIRECT);
         request.message = msg;
         request.id = toUser.getId();
+        if (picturePath!=null)
+            request.picturePath = picturePath;
+        Toast.makeText(this,R.string.trying_to_send,Toast.LENGTH_SHORT).show();
+
         new UpdateStatusTask(this,pg, account).execute(request);
     }
 
@@ -408,6 +417,9 @@ public class NewTweetActivity extends Activity implements LocationListener {
     public void onActivityResult(int requestCode, int resultCode,Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String provider = preferences.getString("pictureService","yfrog");
+
         // code 1 = take picture
         if(requestCode==1  && resultCode==RESULT_OK) {
             Bitmap bitmap = (Bitmap) data.getExtras().get("data");
@@ -415,11 +427,16 @@ public class NewTweetActivity extends Activity implements LocationListener {
             picturePath = picHelper.storeBitmap(bitmap, "tmp-pic", Bitmap.CompressFormat.JPEG, 100); // TODO adjust quality per network
             Log.d("NewTweetActivity.onActivityResult","path: " + picturePath);
 
-            UpdateRequest req = new UpdateRequest(UpdateType.UPLOAD_PIC);
-            req.picturePath = picturePath;
-            req.view = edittext;
+//            UpdateRequest req = new UpdateRequest(UpdateType.UPLOAD_PIC);
+//            req.picturePath = picturePath;
+//            req.view = edittext;
+//
+//            new UpdateStatusTask(this,pg, account).execute(req);
 
-            new UpdateStatusTask(this,pg, account).execute(req);
+            if (provider.equals("twitter"))
+                Toast.makeText(this,R.string.picture_attached,Toast.LENGTH_SHORT).show();
+            else
+                edittext.setText(edittext.getText().toString() + "@@@@_image__url_@@@@");
         } else if (requestCode==2 && resultCode==RESULT_OK) {
             String item = (String) data.getExtras().get("data");
             if (item.contains(", ")) {
@@ -430,20 +447,23 @@ public class NewTweetActivity extends Activity implements LocationListener {
             // large size image
             File file = getTempFile(this);
 
-            UpdateRequest req = new UpdateRequest(UpdateType.UPLOAD_PIC);
-            req.picturePath = file.getAbsolutePath();
-            req.view = edittext;
-            new UpdateStatusTask(this,pg, account).execute(req);
+//            UpdateRequest req = new UpdateRequest(UpdateType.UPLOAD_PIC);
+            Toast.makeText(this,R.string.picture_attached,Toast.LENGTH_SHORT).show();
+
+            picturePath = file.getAbsolutePath();
+//            req.view = edittext;
+//            new UpdateStatusTask(this,pg, account).execute(req);
 
         } else if (requestCode==4 && resultCode==RESULT_OK) {
             // image from gallery
             Uri selectedImageUri = data.getData();
             picturePath = getPath(selectedImageUri);
+            Toast.makeText(this,R.string.picture_attached,Toast.LENGTH_SHORT).show();
 
-            UpdateRequest req = new UpdateRequest(UpdateType.UPLOAD_PIC);
-            req.picturePath = picturePath;
-            req.view = edittext;
-            new UpdateStatusTask(this,pg, account).execute(req);
+//            UpdateRequest req = new UpdateRequest(UpdateType.UPLOAD_PIC);
+//            req.picturePath = picturePath;
+//            req.view = edittext;
+//            new UpdateStatusTask(this,pg, account).execute(req);
 
         }
     }

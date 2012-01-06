@@ -322,7 +322,7 @@ builder                                .append(ue.getExpandedURL());
         } else {
             theUser = status.getRetweetedStatus().getUser();
         }
-        i.putExtra("userName", theUser.getName());
+        i.putExtra("userName", theUser.getScreenName());
         i.putExtra("userId",theUser.getId());
         startActivity(i);
     }
@@ -758,6 +758,9 @@ builder                                .append(ue.getExpandedURL());
             case R.id.ril:
                 readItLater(null);
                 break;
+            case R.id.report_as_spam:
+                report_spam(null);
+                break;
 
             default:
                 Log.e(getClass().getName(),"Unknown menu item: " + item.toString());
@@ -767,6 +770,13 @@ builder                                .append(ue.getExpandedURL());
 
     }
 
+    public void report_spam(View v) {
+        UpdateRequest request = new UpdateRequest(UpdateType.REPORT_AS_SPAMMER);
+        request.id = status.getUser().getId();
+
+        new UpdateStatusTask(this,pg, account).execute(request);
+
+    }
 
     /**
      * Load thumbnails of linked images for the passed listOfUrlPairs
