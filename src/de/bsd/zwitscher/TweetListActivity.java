@@ -329,11 +329,11 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 post(null);
                 break;
             default:
-                Log.e(getClass().getName(),"Unknown item " + item);
+                Log.i(getClass().getName(),"Unknown item " + item);
 
         }
 
-        return super.onOptionsItemSelected(item);    // TODO: Customise this generated block
+        return super.onOptionsItemSelected(item);
     }
 
     /**
