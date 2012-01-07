@@ -1,5 +1,6 @@
 package de.bsd.zwitscher;
 
+import java.io.File;
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import android.os.Environment;
 import android.util.Log;
 import android.util.Pair;
 import de.bsd.zwitscher.account.Account;
@@ -40,9 +42,14 @@ public class TweetDB {
     static final String ACCOUNT_ID_IS = ACCOUNT_ID + "=?";
     private TweetDBOpenHelper tdHelper;
     private final String account;
+    static final String APP_BASE_DIR = "/Android/data/de.bsd.zwitscher/";
 
 	public TweetDB(Context context, int accountId) {
-		tdHelper = new TweetDBOpenHelper(context, "TWEET_DB", null, 7);
+
+        File storage = Environment.getExternalStorageDirectory();
+        File dbFile = new File(storage,APP_BASE_DIR);
+
+		tdHelper = new TweetDBOpenHelper(context, dbFile.getAbsolutePath() + File.separator + "TWEET_DB", null, 7);
         account = String.valueOf(accountId);
 
 	}
