@@ -44,6 +44,13 @@
             android:autoLink="none"
             android:layout_below="@id/ListUserView"
             android:focusable="false"
+            android:ellipsize="none"
+            android:layout_weight="1"
+            android:editable="false"
+            android:scrollHorizontally="false"
+            android:singleLine="false"
+
+
          />
         <TextView
             android:id="@+id/ListTimeView"
