@@ -151,13 +151,15 @@
     <string name="take_image_large">Von der Kamera (groß)</string>
     <string name="from_gallery">Aus dem Album</string>
     <string name="ShortenUrls">URLS kürzen</string>
-    <string name="report_as_spammer">Spammer melden</string>
+    <string name="report_as_spammer">Spammer melden...</string>
     <string name="failed_to_load_user_info">Konnte die Benutzerdetails nicht laden</string>
     <string name="url_shortening_failed">Kürzen der URL fehlgeschlagen: [%s]</string>
     <string name="trying_to_send">Versuche zu senden ...</string>
     <string name="picture_attached">Bild hinzugefügt</string>
-    <string name="give_feedback">Feedback geben</string>
-    <string name="give_feedback_short">Feedback</string>
+    <string name="give_feedback">Feedback geben...</string>
+    <string name="give_feedback_short">Feedback...</string>
+    <string name="report_as_spammer_really">Wollen Sie wirklich [%s] als Spammer melden?</string>
+
 
 
 

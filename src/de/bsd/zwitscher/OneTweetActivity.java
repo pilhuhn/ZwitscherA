@@ -771,10 +771,30 @@ builder                                .append(ue.getExpandedURL());
     }
 
     public void report_spam(View v) {
-        UpdateRequest request = new UpdateRequest(UpdateType.REPORT_AS_SPAMMER);
-        request.id = status.getUser().getId();
 
-        new UpdateStatusTask(this,pg, account).execute(request);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(R.string.report_as_spammer);
+        builder.setCancelable(false);
+        String msg = getString(R.string.report_as_spammer_really,status.getUser().getScreenName());
+        builder.setMessage(msg);
+
+        builder.setPositiveButton(R.string.yes,new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                UpdateRequest request = new UpdateRequest(UpdateType.REPORT_AS_SPAMMER);
+                request.id = status.getUser().getId();
+
+                new UpdateStatusTask(OneTweetActivity.this,pg, account).execute(request);
+            }
+        });
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+        builder.create().show();
 
     }
 
