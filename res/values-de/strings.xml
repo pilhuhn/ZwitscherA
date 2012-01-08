@@ -156,6 +156,8 @@
     <string name="url_shortening_failed">Kürzen der URL fehlgeschlagen: [%s]</string>
     <string name="trying_to_send">Versuche zu senden ...</string>
     <string name="picture_attached">Bild hinzugefügt</string>
+    <string name="give_feedback">Feedback geben</string>
+    <string name="give_feedback_short">Feedback</string>
 
 
 

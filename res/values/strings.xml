@@ -159,4 +159,6 @@
     <string name="url_shortening_failed">URL shortening failed: [%s]</string>
     <string name="trying_to_send">Trying to send ...</string>
     <string name="picture_attached">Image attached</string>
+    <string name="give_feedback">Give feedback</string>
+    <string name="give_feedback_short">Feedback</string>
 </resources>

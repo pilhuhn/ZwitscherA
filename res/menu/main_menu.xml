@@ -31,4 +31,8 @@
                   />
         </menu>
     </item>
+    <item android:id="@+id/menu_feedback"
+          android:title="@string/give_feedback"
+          android:titleCondensed="@string/give_feedback_short"
+          />
 </menu>

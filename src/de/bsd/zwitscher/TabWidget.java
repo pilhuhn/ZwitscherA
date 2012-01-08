@@ -9,6 +9,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.text.AndroidCharacter;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Window;
@@ -238,12 +239,26 @@ public class TabWidget extends TabActivity {
         case R.id.to_top:
             if (listActivity!=null)
                 listActivity.scrollToTop(null);
+        case R.id.menu_feedback:
+            send_feedback();
+            break;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
 	    return true;
 	}
 
+    private void send_feedback() {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("text/plain");
+        String text = "Device: " + Build.MODEL + "\n" + "OS-Version: " + Build.VERSION.RELEASE + "\n\n";
+        i.putExtra(Intent.EXTRA_TEXT,text);
+        i.putExtra(Intent.EXTRA_SUBJECT, "Zwitscher Feedback");
+        i.putExtra(Intent.EXTRA_EMAIL,new String[] {"hwr@pilhuhn.de"});
+
+        startActivity(i);
+
+    }
 
     private class SyncSLTask extends AsyncTask<Void,Void,Void> {
 
