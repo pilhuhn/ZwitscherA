@@ -18,7 +18,7 @@
           android:showAsAction="always"
           />
     <item android:id="@+id/retweet"
-          android:icon="@drawable/rt_button"
+          android:icon="@drawable/rt_button_cl"
           android:showAsAction="always|withText"
           android:title="@string/retweet"
           />

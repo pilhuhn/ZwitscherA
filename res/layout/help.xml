@@ -115,7 +115,7 @@
             </TableRow>
             <TableRow>
                 <ImageView
-                        android:src="@drawable/rt_button"
+                        android:src="@drawable/rt_button_cl"
                         style="@style/helpIcon"
                         />
                 <TextView
@@ -125,7 +125,7 @@
             </TableRow>
             <TableRow>
                 <ImageView
-                        android:src="@drawable/rt_button_cl"
+                        android:src="@drawable/rt_button"
                         style="@style/helpIcon"
                         />
                 <TextView
