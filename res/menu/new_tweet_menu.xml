@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- Items listed here show up left to right in the action bar -->
+    <item android:id="@+id/shortenUrls"
+          android:title="@string/ShortenUrls"
+          android:icon="@drawable/shorten_url"
+            />
+
+
+    <item android:id="@+id/pickUser"
+          android:title="@string/pickUser"
+          />
+
+</menu>

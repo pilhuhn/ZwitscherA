@@ -50,7 +50,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import twitter4j.User;
-import twitter4j.media.MediaProvider;
 
 /**
  * This activity is called when the user wants to write a new tweet/dent.
@@ -488,16 +487,17 @@ public class NewTweetActivity extends Activity implements LocationListener {
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
         if (android.os.Build.VERSION.SDK_INT>=11) {
-            MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.new_tweet_menu_honey,menu);
 
             ActionBar actionBar = this.getActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
-
-            return true;
         }
-        return false;
+        else {
+            inflater.inflate(R.menu.new_tweet_menu,menu);
+        }
+        return true;
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
