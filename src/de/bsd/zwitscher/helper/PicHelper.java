@@ -157,20 +157,16 @@ public class PicHelper {
 
     /**
      * Store the passed bitmap on the file system
+     *
      * @param bitmap Bitmap to store
-     * @param fileName Name to store under
+     * @param file File to store in
      * @param compressFormat File kind (PNG / JPEG)
      * @param quality compression factor (for jpeg)
      * @return Path where the file was stored or null on error
      */
-    public String storeBitmap(Bitmap bitmap, String fileName, Bitmap.CompressFormat compressFormat, int quality) {
+    public String storeBitmap(Bitmap bitmap, File file, Bitmap.CompressFormat compressFormat, int quality) {
 
         try {
-            File baseDir = Environment.getExternalStorageDirectory();
-            File tmpDir = new File(baseDir, APP_BASE_DIR + "pictures");
-            if (!tmpDir.exists())
-                tmpDir.mkdirs();
-            File file = new File(tmpDir,fileName);
             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
             bitmap.compress(compressFormat, quality, out);
             out.flush();

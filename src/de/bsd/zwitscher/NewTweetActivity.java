@@ -2,6 +2,7 @@ package de.bsd.zwitscher;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -274,7 +275,9 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
 	/** Extract the @users from the passed oText and put them into sb
 	 * TODO optimize
-	 */
+     * @param sb Builder to populate
+     * @param oText Input text to analyze
+     */
 	private void findUsers(StringBuilder sb, String oText) {
 		if (!oText.contains("@"))
 			return;
@@ -330,7 +333,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
     /**
      * Trigger a list of usernames to pick one from and to insert
      * into the tweet
-     * @param v
+     * @param v Button that was touched
      */
     @SuppressWarnings("unused")
     public void selectUser(View v) {
@@ -355,7 +358,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
     /**
      * Called from the Back button to finish (abort) the activity
-     * @param v
+     * @param v Button that was touched
      */
     @SuppressWarnings("unused")
     public void done(View v) {
@@ -366,7 +369,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
      * Trigger taking a picture, called from the camera button.
      * Actually we present a menu from which the user will be able to take a picture
      * or select one from the gallery of pictures taken
-     * @param v
+     * @param v button that was pressed
      */
     @SuppressWarnings("unused")
     public void takePicture(View v) {
@@ -380,19 +383,20 @@ public class NewTweetActivity extends Activity implements LocationListener {
                     Intent intent;
                     switch (i) {
                     case 0:
-
+                        // small image
                         intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                         startActivityForResult(intent, 1);
                         break;
                     case 1:
-
-                        Uri tmpUri = Uri.fromFile(getTempFile(getApplicationContext()));
+                        // large image
+                        Uri tmpUri = Uri.fromFile(getFixedTempFile(NewTweetActivity.this));
                         intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                         intent.putExtra(MediaStore.EXTRA_OUTPUT,tmpUri);
                         startActivityForResult(intent, 3);
 
                         break;
                     case 2:
+                        // from gallery
                         intent =  new Intent(Intent.ACTION_PICK);
                         intent.setType("image/*");
                         startActivityForResult(intent, 4);
@@ -424,7 +428,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
         if(requestCode==1  && resultCode==RESULT_OK) {
             Bitmap bitmap = (Bitmap) data.getExtras().get("data");
             PicHelper picHelper = new PicHelper();
-            picturePath = picHelper.storeBitmap(bitmap, "tmp-pic", Bitmap.CompressFormat.JPEG, 100); // TODO adjust quality per network
+            picturePath = picHelper.storeBitmap(bitmap, getTempFile(this), Bitmap.CompressFormat.JPEG, 100); // TODO adjust quality per network
             Log.d("NewTweetActivity.onActivityResult","path: " + picturePath);
 
             if (provider.equals("twitter"))
@@ -439,11 +443,15 @@ public class NewTweetActivity extends Activity implements LocationListener {
             }
         } else if (requestCode==3 && resultCode==RESULT_OK) {
             // large size image
-            File file = getTempFile(this);
+            File file = getFixedTempFile(this);
+            File newPath = getTempFile(this);
+            boolean success = file.renameTo(newPath);
+            if (success)
+                picturePath = newPath.getAbsolutePath();
+            else
+                picturePath = file.getAbsolutePath();
 
             Toast.makeText(this,R.string.picture_attached,Toast.LENGTH_SHORT).show();
-
-            picturePath = file.getAbsolutePath();
 
             if(!provider.equals("twitter"))
                 picUrlCount=21;
@@ -530,13 +538,43 @@ public class NewTweetActivity extends Activity implements LocationListener {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Get a temporary file with a fixed (=known in advance) file name
+     * @param context activity context
+     * @return a temp file in the external storage in a package-specific directory
+     */
+    private File getFixedTempFile(Context context) {
+        File path = new File( Environment.getExternalStorageDirectory(), context.getPackageName() );
+
+        if(!path.exists())
+            path.mkdir();
+
+        File tempFile;
+        tempFile = new File(path,"image.tmp");
+        return tempFile;
+
+    }
+
+    /**
+     * Get a temporary file with a unique file name
+     * @param context activity context
+     * @return a temp file in the external storage in a package-specific directory
+     */
     private File getTempFile(Context context){
         File path = new File( Environment.getExternalStorageDirectory(), context.getPackageName() );
 
         if(!path.exists())
             path.mkdir();
 
-        return new File(path, "image.tmp");
+        File tempFile;
+        try {
+            tempFile = File.createTempFile("img_", ".jpg", path);
+        } catch (IOException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+            tempFile = new File(path,"image.tmp");
+        }
+        Log.d("NewTweetActivity.getTempFile",tempFile.getAbsolutePath());
+        return tempFile;
     }
 
     // Taken from http://stackoverflow.com/questions/2169649/open-an-image-in-androids-built-in-gallery-app-programmatically/2636538#2636538

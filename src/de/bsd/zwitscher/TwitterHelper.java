@@ -402,6 +402,7 @@ public class TwitterHelper {
 
 	public UpdateResponse updateStatus(UpdateRequest request) {
         UpdateResponse updateResponse = new UpdateResponse(request.updateType,request.statusUpdate);
+        updateResponse.setPicturePath(request.picturePath);
 		Log.i("TwitterHelper", "Sending update: " + request.statusUpdate);
 		try {
 			twitter.updateStatus(request.statusUpdate);

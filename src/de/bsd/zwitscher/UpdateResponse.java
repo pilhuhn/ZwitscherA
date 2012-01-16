@@ -22,6 +22,7 @@ public class UpdateResponse {
     View view;
     String origMessage;
     int statusCode;
+    private String picturePath;
 
     public UpdateResponse(UpdateType updateType, boolean success, String message) {
         this.message = message;
@@ -123,5 +124,13 @@ public class UpdateResponse {
                 ", origMessage='" + origMessage + '\'' +
                 ", statusCode=" + statusCode +
                 '}';
+    }
+
+    public void setPicturePath(String picturePath) {
+        this.picturePath = picturePath;
+    }
+
+    public String getPicturePath() {
+        return picturePath;
     }
 }

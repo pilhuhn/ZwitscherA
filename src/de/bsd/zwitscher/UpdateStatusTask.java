@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.ImageView;
 import de.bsd.zwitscher.account.Account;
@@ -56,15 +54,20 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
         UpdateRequest request = requests[0];
         UpdateResponse ret=null;
 
+        MediaProvider mediaProvider = th.getMediaProvider();
+        if (request.updateType==UpdateType.UPDATE && request.picturePath!=null) {
+            if (mediaProvider.equals(MediaProvider.TWITTER)) {
+                request.statusUpdate.setMedia(new File(request.picturePath));
+            }
+        }
+
         NetworkHelper nh = new NetworkHelper(context);
         if (!nh.isOnline()) {
 
             // We are not online, queue the request
-
-            return queueUpUpdate(request, "Offline - Queued for later sending");
+           return queueUpUpdate(request, "Offline - Queued for later sending");
         }
 
-        MediaProvider mediaProvider = th.getMediaProvider();
 
         switch (request.updateType) {
             case UPDATE:
@@ -174,6 +177,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
         if (result==null) {
             Toast.makeText(context,"No result - should not happen",Toast.LENGTH_SHORT).show();
+            return;
         }
 
         if (result.getUpdateType()==UpdateType.UPLOAD_PIC) {
@@ -199,6 +203,13 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                 }
             catch (Exception e) {
                 Log.i("UpdateStatusTask", "Favorite button seems to be gone");
+            }
+        } else if (result.getUpdateType()==UpdateType.UPDATE) {
+            if (result.isSuccess() && result.getPicturePath()!=null) {
+                File file = new File(result.getPicturePath());
+                if (file.exists()) {
+                    file.delete();
+                }
             }
         }
 
