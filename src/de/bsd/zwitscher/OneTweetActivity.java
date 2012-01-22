@@ -632,7 +632,8 @@ builder                                .append(ue.getExpandedURL());
         if (ures!=null) {
             for (URLEntity ue : ures) {
                 URL url = ue.getExpandedURL();
-                urls.add(url.toString());
+                if (url!=null)
+                    urls.add(url.toString());
             }
         }
 
