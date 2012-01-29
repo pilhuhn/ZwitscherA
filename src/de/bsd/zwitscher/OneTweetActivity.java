@@ -42,6 +42,7 @@ import android.util.Log;
 import android.view.View;
 import twitter4j.URLEntity;
 import twitter4j.User;
+import twitter4j.UserMentionEntity;
 
 import java.io.BufferedInputStream;
 import java.net.URL;
@@ -245,27 +246,41 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             }
         }
 
+        WorkingSpinner spinner = (WorkingSpinner) findViewById(R.id.ot_spinner);
+        if (spinner!=null) {
+            final UserMentionEntity[] userMentionEntities = status.getUserMentionEntities();
+            if (userMentionEntities !=null && userMentionEntities.length>0) {
+                spinner.setVisibility(View.VISIBLE);
+                String[] users = new String[userMentionEntities.length];
+                for (int i = 0, userMentionEntitiesLength = userMentionEntities.length;
+                     i < userMentionEntitiesLength; i++) {
+                    UserMentionEntity ume = userMentionEntities[i];
+                    users[i] = "@" + ume.getScreenName() + " (" + ume.getName() + ")";
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
+                        users);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(adapter);
+                spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        Intent intent = new Intent(OneTweetActivity.this, UserDetailActivity.class);
+                        intent.putExtra("userName", userMentionEntities[i].getScreenName());
+                        startActivity(intent);
+                    }
+                });
+            }
+            else {
+                spinner.setVisibility(View.INVISIBLE);
+            }
+        }
+
 	}
 
     private void setTweetText(TextView tweetView) {
         String[] tokens = status.getText().split(" ");
         StringBuilder builder = new StringBuilder();
-        TweetDB tweetDB = new TweetDB(this,account.getId());
         List<String> urlsToGo = new ArrayList<String>();
-/*
-        for (String token : tokens) {
-            if (token.startsWith("http://t.co")) {
-                String target = tweetDB.getTargetUrl(token); //  if that fails, retry in background and then re-display text
-                builder.append(target);
-                if (target.startsWith("http://t.co"))
-                    urlsToGo.add(target);
-            }
-            else {
-                builder.append(token);
-            }
-            builder.append(" ");
-        }
-*/
         for (String token: tokens) {
             if (token.startsWith("http")) {
                 boolean found=false;
@@ -282,10 +297,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 if (!found && status.getURLEntities()!=null) {
                     for (URLEntity ue : status.getURLEntities()) {
                         if (ue.getURL().toString().equals(token)) {
-//                            builder.append("<a href=\"")
 builder                                .append(ue.getExpandedURL());
-//                                .append("\">")
-//                                    .append(ue.getDisplayURL()).append("</a>");
                             found=true;
                             break;
                         }
@@ -323,7 +335,7 @@ builder                                .append(ue.getExpandedURL());
             theUser = status.getRetweetedStatus().getUser();
         }
         i.putExtra("userName", theUser.getScreenName());
-        i.putExtra("userId",theUser.getId());
+        i.putExtra("userId", theUser.getId());
         startActivity(i);
     }
 

@@ -154,10 +154,17 @@
                      android:onClick="done"
                      android:src="@drawable/back_button"
                      android:text="Done!"/>
+        <de.bsd.zwitscher.WorkingSpinner android:id="@+id/ot_spinner"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_below="@id/DoneButton"
+                 android:prompt="@string/pickUser"
+                 />
+
         <Gallery xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/gallery"
                  android:layout_width="fill_parent"
                  android:layout_height="wrap_content"
-                 android:layout_below="@id/DoneButton"
+                 android:layout_below="@id/ot_spinner"
                 />
     </RelativeLayout>
 </ScrollView>
