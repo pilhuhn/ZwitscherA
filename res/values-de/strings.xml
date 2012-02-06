@@ -159,8 +159,9 @@
     <string name="give_feedback">Feedback geben...</string>
     <string name="give_feedback_short">Feedback...</string>
     <string name="report_as_spammer_really">Wollen Sie wirklich [%s] als Spammer melden?</string>
-
-
-
+    <string name="goto_user">Gehe zu Benutzer</string>
+    <string name="goto_user_short">Zum Benutzer</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="ok">Ok</string>
 
 </resources>

@@ -48,6 +48,10 @@
                   />
         </menu>
     </item>
+    <item android:id="@+id/menu_goto_user"
+          android:title="@string/goto_user"
+          android:titleCondensed="@string/goto_user_short"
+            />
     <item android:id="@+id/menu_feedback"
           android:title="@string/give_feedback"
           android:titleCondensed="@string/give_feedback_short"

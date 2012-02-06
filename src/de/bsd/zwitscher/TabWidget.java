@@ -5,14 +5,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.text.AndroidCharacter;
 import android.util.Log;
 import android.util.Pair;
+import android.view.View;
 import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
@@ -242,11 +248,41 @@ public class TabWidget extends TabActivity {
         case R.id.menu_feedback:
             send_feedback();
             break;
+        case R.id.menu_goto_user:
+            displayUserInfo();
+            break;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
 	    return true;
 	}
+
+    private void displayUserInfo() {
+        final Dialog dialog = new Dialog(this);
+        dialog.setTitle(R.string.goto_user);
+        dialog.setContentView(R.layout.edit_text_dialog);
+        final EditText text = (EditText) dialog.findViewById(R.id.dialog_edit_text);
+        Button okButton = (Button) dialog.findViewById(R.id.ok_button);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String user = text.getText().toString();
+                Intent i = new Intent(TabWidget.this, UserDetailActivity.class);
+                i.putExtra("userName", user);
+                startActivity(i);
+                dialog.dismiss();
+            }
+        });
+        Button cancelButton = (Button) dialog.findViewById(R.id.cancel_button);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+
+    }
 
     private void send_feedback() {
         Intent i = new Intent(Intent.ACTION_SEND);

@@ -6,8 +6,10 @@
           android:icon="@drawable/wrench"
 		  android:enabled="true"
 		  android:visible="true"/>
-    <item android:enabled="true" android:id="@+id/reloadLists"
-      android:titleCondensed="Sync L and S" android:title="Synchronize Lists and Searches..."/>
+    <item android:id="@+id/menu_goto_user"
+          android:title="@string/goto_user"
+          android:titleCondensed="@string/goto_user_short"
+            />
     <item android:enabled="true" android:id="@+id/menu_cleanTweets"
           android:title="@string/menu_clean_statuses"
           />
@@ -31,6 +33,11 @@
                   />
         </menu>
     </item>
+    <item android:enabled="true"
+          android:id="@+id/reloadLists"
+          android:titleCondensed="Sync L and S"
+          android:title="Synchronize Lists and Searches..."/>
+
     <item android:id="@+id/menu_feedback"
           android:title="@string/give_feedback"
           android:titleCondensed="@string/give_feedback_short"
