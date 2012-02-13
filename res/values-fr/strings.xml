@@ -7,7 +7,7 @@
 <string name="dent_sent">Envoyé Dent</string>
 <string name="direct_message_sent">Courier privée a été envoyé</string>
 <string name="hello">Ecrivez votre Tweet au-dessus:</string>
-<string name="loading">Obtenir de messages...</string>
+<string name="loading">Obtenir de messages…</string>
 <string name="no_connect">Connexion impossible à Twitter</string>
 <string name="TweetButton">Envoyer!</string>
 <string name="ClearButton">Effacer</string>
@@ -35,8 +35,8 @@
 <string name="unfollow_user">Arrêter de suivre l\'utilisateur</string>
 <string name="add">Ajouter</string>
 <string name="from">de</string>
-<string name="get_user_detail">Obtenir les informations sur l\'utilisateur ...</string>
-<string name="get_preview">"Chargement des prévisus..."</string>
+<string name="get_user_detail">Obtenir les informations sur l\'utilisateur…</string>
+<string name="get_preview">"Chargement des prévisus…"</string>
 <string name="From">De</string>
 <string name="to">à</string>
 <string name="please_sync_lists">Merci de synchronizer les listes</string>
@@ -49,7 +49,7 @@
 <string name="please_log_in">Connectez-vous au service s.v.p.</string>
 <string name="username">Utilisateur</string>
 <string name="password">Mot de passe</string>
-<string name="login">Connecter...</string>
+<string name="login">Connecter…</string>
 <string name="service">Service</string>
 <string name="new_mentions">nouvelles mentions</string>
 <string name="new_directs">nouveau message direct</string>
@@ -100,4 +100,5 @@
 <string name="click_here">&lt;--- cliquez ici</string>
 <string name="wantToRemove">Vraiment effacer [%s] ?</string>
 <string name="addFilterExpression">Ajouter filtre</string>
+<string name="Reply_all">Répondre à tous</string>
 </resources>

@@ -6,7 +6,7 @@
     <string name="direct_message_sent">Private Nachricht gesendet</string>
     <string name="hello">Geben Sie den Text ein:</string>
     <string name="app_name">Zwitscher</string>
-    <string name="loading">Lade Tweets ...</string>
+    <string name="loading">Lade Tweets…</string>
     <string name="no_connect">Kann Twitter nicht erreichen</string>
     <string name="TweetButton">Absenden</string>
     <string name="ClearButton">Löschen</string>
@@ -30,8 +30,8 @@
     <string name="unfollow_user">Benutzer nicht folgen</string>
     <string name="add">Hinzufügen</string>
     <string name="from">von</string>
-    <string name="get_user_detail">Lade Benutzerdaten ...</string>
-    <string name="get_preview">"Lade Bildvorschau..."</string>
+    <string name="get_user_detail">Lade Benutzerdaten…</string>
+    <string name="get_preview">"Lade Bildvorschau…"</string>
     <string name="From">Von</string>
     <string name="to">an</string>
     <string name="please_sync_lists">Bitte synchronisieren Sie die Listen</string>
@@ -54,7 +54,7 @@
     <string name="please_log_in">Bitte einloggen</string>
     <string name="username">Benutzername</string>
     <string name="password">Passwort</string>
-    <string name="login">Einloggen...</string>
+    <string name="login">Einloggen…</string>
     <string name="service">Dienst</string>
     <string name="new_mentions">Neue Erwähnung(en)</string>
     <string name="new_directs">Neue direkt(e) Nachricht(en)</string>
@@ -115,7 +115,7 @@
     <string name="new_account_switch">Zum neuen Account wechseln</string>
     <string name="new_account_create">Anlegen!</string>
     <string name="menu_switch_account">Accounts</string>
-    <string name="select_account_delete">Account löschen...</string>
+    <string name="select_account_delete">Account löschen…</string>
     <string name="really_delete">Wirklich löschen:</string>
     <string name="menu_clean_statuses">Status aufräumen</string>
     <string name="search_hint">Nachrichten suchen</string>
@@ -140,8 +140,8 @@
     <string name="forward">Weiterleiten</string>
     <string name="speak">Vorlesen</string>
     <string name="favorite">Favorisieren</string>
-    <string name="translating">Übersetze ...</string>
-    <string name="logging_in">Einloggen ...</string>
+    <string name="translating">Übersetze …</string>
+    <string name="logging_in">Einloggen …</string>
     <string name="new_message">Neue Nachr.</string>
     <string name="reply">Antwort</string>
     <string name="replyall">Allen antworten</string>
@@ -151,17 +151,18 @@
     <string name="take_image_large">Von der Kamera (groß)</string>
     <string name="from_gallery">Aus dem Album</string>
     <string name="ShortenUrls">URLS kürzen</string>
-    <string name="report_as_spammer">Spammer melden...</string>
+    <string name="report_as_spammer">Spammer melden…</string>
     <string name="failed_to_load_user_info">Konnte die Benutzerdetails nicht laden</string>
     <string name="url_shortening_failed">Kürzen der URL fehlgeschlagen: [%s]</string>
-    <string name="trying_to_send">Versuche zu senden ...</string>
+    <string name="trying_to_send">Versuche zu senden …</string>
     <string name="picture_attached">Bild hinzugefügt</string>
-    <string name="give_feedback">Feedback geben...</string>
-    <string name="give_feedback_short">Feedback...</string>
+    <string name="give_feedback">Feedback geben…</string>
+    <string name="give_feedback_short">Feedback…</string>
     <string name="report_as_spammer_really">Wollen Sie wirklich [%s] als Spammer melden?</string>
     <string name="goto_user">Gehe zu Benutzer</string>
     <string name="goto_user_short">Zum Benutzer</string>
     <string name="cancel">Abbrechen</string>
     <string name="ok">Ok</string>
-
+    <string name="Reply">Antworten</string>
+    <string name="Reply_all">Allen antworten</string>
 </resources>

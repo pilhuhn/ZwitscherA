@@ -6,8 +6,8 @@
     <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-        <ImageButton android:layout_width="80px"
-                     android:layout_height="80px"
+        <ImageButton android:layout_width="64dp"
+                     android:layout_height="64dp"
                      android:src="@drawable/user_unknown"
                      android:scaleType="fitXY"
                      android:padding="4px"
@@ -24,8 +24,8 @@
                   android:id="@+id/TextView01"
                   android:layout_width="wrap_content"
                   android:minLines="2"
-                  android:paddingLeft="5px"
-                  android:paddingRight="5px"
+                  android:paddingLeft="5dp"
+                  android:paddingRight="5dp"
                   android:layout_toRightOf="@id/UserPictureImageView"
                   android:layout_below="@id/HintView"
                   android:layout_height="wrap_content"/>
@@ -40,7 +40,6 @@
                   android:textSize="16sp"
                   android:singleLine="false"
                   android:ellipsize="none"
-                  android:layout_weight="1"
                   android:editable="false"
                   android:scrollHorizontally="false"
                   android:text="@+id/TweetTextView"/>
@@ -64,7 +63,7 @@
                      android:layout_height="wrap_content"
                      android:onClick="reply"
                      android:src="@drawable/reply_button"
-                     android:text="Reply"/>
+                     android:text="@string/Reply"/>
         <ImageButton android:id="@+id/ReplyAllButton"
                      android:layout_below="@id/TimeTextView"
                      android:layout_width="wrap_content"
@@ -72,7 +71,7 @@
                      android:layout_toRightOf="@id/ReplyButton"
                      android:onClick="replyAll"
                      android:src="@drawable/reply_all_button"
-                     android:text="Reply All"/>
+                     android:text="@string/Reply_all"/>
 
         <ImageButton android:id="@+id/RetweetButton"
                      android:layout_below="@id/TimeTextView"

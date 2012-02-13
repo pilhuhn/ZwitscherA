@@ -60,7 +60,7 @@
                      android:layout_height="wrap_content"
                      android:onClick="reply"
                      android:src="@drawable/reply_button"
-                     android:text="Reply"/>
+                     android:text="@string/Reply"/>
         <ImageButton android:id="@+id/ReplyAllButton"
                      android:layout_below="@id/TimeTextView"
                      android:layout_width="wrap_content"
@@ -68,7 +68,7 @@
                      android:layout_toRightOf="@id/ReplyButton"
                      android:onClick="replyAll"
                      android:src="@drawable/reply_all_button"
-                     android:text="Reply All"/>
+                     android:text="@string/Reply_all"/>
 
         <ImageButton android:id="@+id/RetweetButton"
                      android:layout_below="@id/TimeTextView"

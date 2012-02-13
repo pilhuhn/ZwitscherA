@@ -19,16 +19,16 @@
 
     <!-- left column -->
     <ImageView android:id="@+id/ListImageView"
-               android:layout_width="80px"
-			android:layout_height="80px"
+               android:layout_width="64dp"
+			android:layout_height="64dp"
 			android:src="@drawable/user_unknown"
 			android:scaleType="fitXY"
-			android:padding="2px"
+			android:padding="2dp"
             android:layout_gravity="center_vertical"
             android:layout_centerVertical="true"
             android:layout_below="@id/ListUserView"
             android:focusable="false"
-            />
+            android:contentDescription="@string/user_image"/>
 
     <!-- right column -->
         <TextView
@@ -45,7 +45,6 @@
             android:layout_below="@id/ListUserView"
             android:focusable="false"
             android:ellipsize="none"
-            android:layout_weight="1"
             android:editable="false"
             android:scrollHorizontally="false"
             android:singleLine="false"
