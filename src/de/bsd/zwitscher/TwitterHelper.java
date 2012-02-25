@@ -605,6 +605,23 @@ Log.d("FillUp","Return: " + i);
         return status;
     }
 
+    public List<Status> getThreadForStatus(long startid) {
+        List<String> jsons = tweetDB.getThreadForStatus(startid);
+        List<Status> ret = new ArrayList<Status>(jsons.size());
+        for (String json : jsons) {
+            Status status = materializeStatus(json);
+            ret.add(status);
+        }
+
+        Collections.sort(ret,new Comparator<Status>() {
+            @Override
+            public int compare(Status status1, Status status2) {
+                return status2.getCreatedAt().compareTo(status1.getCreatedAt());
+            }
+        });
+        return ret;
+    }
+
     public List<Status> getRepliesToStatus(long statusId) {
         List<Status> ret = new ArrayList<Status>();
         List<String> replies = tweetDB.getReplies(statusId);

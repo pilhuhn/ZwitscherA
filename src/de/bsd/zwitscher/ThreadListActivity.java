@@ -20,7 +20,6 @@ import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
 import twitter4j.Status;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -94,7 +93,7 @@ public class ThreadListActivity extends ListActivity {
 
         }
 
-        return super.onOptionsItemSelected(item);    // TODO: Customise this generated block
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -107,26 +106,10 @@ public class ThreadListActivity extends ListActivity {
      */
     List<Status> getConversation(long statusId) {
 
-        List<Status> result = new ArrayList<Status>();
+        List<Status> result ;
 
         TwitterHelper th = new TwitterHelper(this, account);
-
-        Status status = th.getStatusById(statusId,null, false, true) ;
-        while (status!=null) {
-            List<Status> replies = th.getRepliesToStatus(status.getId());
-            for (Status reply : replies) {
-                if (!result.contains(reply))
-                    result.add(reply);
-            }
-            result.add(status);
-
-            long inReplyToStatusId = status.getInReplyToStatusId();
-            if (inReplyToStatusId!=-1)
-                status = th.getStatusById(inReplyToStatusId,null, false, true);
-            else
-                status=null;
-        }
-
+        result = th.getThreadForStatus(statusId);
         return result;
     }
 

@@ -4,8 +4,11 @@ import java.io.File;
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -416,7 +419,7 @@ public class TweetDB {
         List<String> ret = new ArrayList<String>();
 
         Cursor c ;
-        c = db.query(TABLE_STATUSES,new String[]{STATUS}, "i_rep_to = ? & " + ACCOUNT_ID_IS
+        c = db.query(TABLE_STATUSES,new String[]{STATUS}, "i_rep_to = ? AND " + ACCOUNT_ID_IS
                 ,new String[]{String.valueOf(inRepyId),account},null,null,"ID DESC");
         if (c.getCount()>0) {
             c.moveToFirst();
@@ -427,6 +430,66 @@ public class TweetDB {
         }
         c.close();
         db.close();
+
+        return ret;
+    }
+
+    public List<String> getThreadForStatus(long startid) {
+        SQLiteDatabase db = tdHelper.getReadableDatabase();
+        List<String> ret = new ArrayList<String>();
+        Set<Long> processed = new HashSet<Long>();
+        Stack<Long> todo = new Stack<Long>();
+        todo.push(startid);
+        processed.add(startid);
+
+        Cursor c;
+        int count = 0;
+        while (!todo.isEmpty()) {
+            long x = todo.pop();
+
+            count++;
+            c = db.query(TABLE_STATUSES,new String[]{"i_rep_to",STATUS}, "(id = ? ) AND " + ACCOUNT_ID_IS
+                    ,new String[]{String.valueOf(x),account},null,null,null);
+            if (c.getCount()>0) {
+                c.moveToFirst();
+                do {
+                    String json = c.getString(1);
+                    ret.add(json);
+                    long irt = c.getLong(0);
+                    if (irt!=-1 ) {
+                        todo.push(irt);
+                    }
+                } while (c.moveToNext());
+            }
+            c.close();
+        }
+
+        Log.i("getThreadForStatus","Num queries: " + count + ", num results: " + ret.size());
+
+        // also include later replies to thread
+        todo.push(startid);
+        while (!todo.isEmpty()) {
+            long x = todo.pop();
+
+            count++;
+            c = db.query(TABLE_STATUSES,new String[]{"id",STATUS}, "(i_rep_to = ? ) AND " + ACCOUNT_ID_IS
+                    ,new String[]{String.valueOf(x),account},null,null,null);
+            if (c.getCount()>0) {
+                c.moveToFirst();
+                do {
+                    String json = c.getString(1);
+                    ret.add(json);
+                    long id = c.getLong(0);
+                    if (id!=-1 ) {
+                        todo.push(id);
+                    }
+                } while (c.moveToNext());
+            }
+            c.close();
+        }
+
+        db.close();
+        Log.i("getThreadForStatus","Num queries: " + count + ", num results: " + ret.size());
 
         return ret;
     }
