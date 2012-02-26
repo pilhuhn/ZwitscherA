@@ -201,12 +201,15 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
      * The filter if not null is a regular expression, that if matches filters the
      * tweet.
      *
+     *
      * @param fromDbOnly If true only statuses already in the DB are returned
      * @param listId Id of the list / timeline to fetch (see above)
      * @param filter Filter expression to filter out tweets. If null no filtering happens.
+     * @param updateStatusList Should the currently displayed list be updated?
      * @return List of status items along with some counts
      */
-	private MetaList<Status> getTimlinesFromTwitter(boolean fromDbOnly, int listId, String filter) {
+	private MetaList<Status> getTimlinesFromTwitter(boolean fromDbOnly, int listId, String filter,
+                                                    boolean updateStatusList) {
 		Paging paging = new Paging();
 
 		MetaList<Status> myStatuses;
@@ -248,21 +251,27 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     		tdb.updateOrInsertLastRead(account.getId(), listId, last);
     	}
 
-    	statuses = new ArrayList<Status>();
-		List<Status> data = new ArrayList<Status>(myStatuses.getList().size());
-		for (Status status : myStatuses.getList()) {
-			if ((filter==null) || (!status.getText().matches(filter))) {
-				data.add(status);
-				statuses.add(status);
-			} else {
-				Log.i("TweetListActivity::filter",status.getUser().getScreenName() + " - " + status.getText());
+        MetaList<Status> metaList;
+        if (updateStatusList) {
+            statuses = new ArrayList<Status>();
+            List<Status> data = new ArrayList<Status>(myStatuses.getList().size());
+            for (Status status : myStatuses.getList()) {
+                if ((filter==null) || (!status.getText().matches(filter))) {
+                    data.add(status);
+                    statuses.add(status);
+                } else {
+                    Log.i("TweetListActivity::filter",status.getUser().getScreenName() + " - " + status.getText());
 
-			}
-		}
+                }
+            }
+            metaList = new MetaList<Status>(data,myStatuses.getNumOriginal(),myStatuses.getNumAdded());
+        }
+        else {
+            metaList = new MetaList<Status>(new ArrayList<Status>(),0,0);
+        }
 
-        MetaList<Status> metaList = new MetaList<Status>(data,myStatuses.getNumOriginal(),myStatuses.getNumAdded());
 
-		return metaList;
+        return metaList;
 	}
 
     private MetaList<DirectMessage> getDirectsFromTwitter(boolean fromDbOnly) {
@@ -478,7 +487,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     }
                     publishProgress(updating);
                     String filter = getFilter();
-                    data = getTimlinesFromTwitter(fromDbOnly, listId, filter);
+                    data = getTimlinesFromTwitter(fromDbOnly, listId, filter, updateListAdapter);
                 }
                 else if (listId ==-2) {
                     publishProgress(directsString);
@@ -501,10 +510,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     setListAdapter(new TweetAdapter(context, account, R.layout.tweet_list_item, result.getList()));
                 else
                     setListAdapter(new StatusAdapter(context, account, R.layout.tweet_list_item, result.getList()));
-            }
 
-            if (result.getList().size()==0) {
-                Toast.makeText(context, "Got no result from the server", Toast.LENGTH_LONG).show();
+                if (result.getList().size()==0) {
+                    Toast.makeText(context, "Got no result from the server", Toast.LENGTH_LONG).show();
+                }
             }
 
             if (titleTextBox!=null)
