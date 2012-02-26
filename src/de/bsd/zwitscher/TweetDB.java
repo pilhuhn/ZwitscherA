@@ -56,8 +56,6 @@ public class TweetDB {
         File dbFile = new File(storage,APP_BASE_DIR);
 
 		tdHelper = new TweetDBOpenHelper(context, dbFile.getAbsolutePath() + File.separator + "TWEET_DB", null, 7);
-//        account = String.valueOf(accountId);
-
 	}
 
     public static TweetDB getInstance(Context context) {
@@ -244,14 +242,13 @@ public class TweetDB {
      * Return the id of the status that was last read
      *
      *
-     * @param account
+     * @param account Id of the account to use
      * @param list_id id of the list
      * @return id of the status that was last read
      */
 	long getLastRead(int account, int list_id) {
         Long ret=-1L;
         try {
-//            SQLiteDatabase db = tdHelper.getReadableDatabase();
             Cursor c = db.query(TABLE_LAST_READ, new String[] {"last_read_id"}, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id), String.valueOf(
 account)}, null, null, null);
             if (c.getCount()==0)
@@ -261,7 +258,6 @@ account)}, null, null, null);
                 ret = c.getLong(0);
             }
             c.close();
-//            db.close();
         } catch (Throwable e) {
             e.printStackTrace();  // TODO: Customise this generated block
         }
@@ -270,7 +266,7 @@ account)}, null, null, null);
 
     /**
      * Update (or initially store) the last read information of the passed list
-     * @param account
+     * @param account Id of the account to use
      * @param list_id List to mark as read
      * @param last_read_id Id of the last read status
      */
@@ -281,7 +277,6 @@ account)}, null, null, null);
         cv.put(ACCOUNT_ID,account);
 
         try {
-//            SQLiteDatabase db;
             db= tdHelper.getWritableDatabase();
             int updated = db.update(TABLE_LAST_READ, cv, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id), String.valueOf(
                     account)});
@@ -289,7 +284,6 @@ account)}, null, null, null);
                 // row not yet present
                 db.insert(TABLE_LAST_READ, null, cv);
             }
-//            db.close();
         } catch (Exception e) {
             // Situation is not too bad, as it just means more network traffic next time // TODO find better solution
             e.printStackTrace();
@@ -300,10 +294,9 @@ account)}, null, null, null);
     /**
      * Return Infos about all lists in the DB
      * @return Map with List Id and Pair (listname,list owner )
-     * @param account
+     * @param account Id of the account to use
      */
 	Map<Integer, Pair<String, String>> getLists(int account) {
-//		SQLiteDatabase db = tdHelper.getReadableDatabase();
 		Map<Integer, Pair<String, String>> ret = new HashMap<Integer, Pair<String, String>>();
 		Cursor c = db.query(TABLE_LISTS, new String[] {"name","owner_name","id"}, ACCOUNT_ID_IS, new String[]{String.valueOf(
                 account)}, null, null, "name");
@@ -318,13 +311,12 @@ account)}, null, null, null);
 			} while (c.moveToNext());
 		}
 		c.close();
-//		db.close();
 		return ret;
 	}
 
     /**
      * Add a new list to the database
-     * @param account
+     * @param account Id of the account to use
      * @param name Name of the lise
      * @param id Id of the list
      * @param owner_name screen name of the list owner
@@ -336,29 +328,24 @@ account)}, null, null, null);
         cv.put(ACCOUNT_ID,account);
         cv.put("owner_name", owner_name);
 
-//		SQLiteDatabase db = tdHelper.getWritableDatabase();
 		db.insert(TABLE_LISTS, null, cv);
-//		db.close();
-
 	}
 
     /**
      * Delete the list with the passed ID in the DB
      * @param id Id of the list to delete
      * TODO Also remove statuses for the passed list
-     * @param account
+     * @param account Id of the account to use
      */
 	public void removeList(Integer id, int account) {
-//		SQLiteDatabase db = tdHelper.getWritableDatabase();
 		db.delete(TABLE_LISTS, "id = ? AND " + ACCOUNT_ID_IS, new String[]{id.toString(), String.valueOf(account)});
-//		db.close();
 	}
 
 
     /**
      * Update the stored TwitterResponse object. This may be necessary when e.g. the
      * favorite status has been changed on it.
-     * @param account
+     * @param account Id of the account to use
      * @param id Id of the object
      * @param status_json Json representation of it.
      */
@@ -366,9 +353,7 @@ account)}, null, null, null);
         ContentValues cv = new ContentValues(2);
         cv.put(STATUS, status_json);
         cv.put(ACCOUNT_ID,account);
-//        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.update(TABLE_STATUSES, cv, "id = ?", new String[]{String.valueOf(id)});
-//        db.close();
     }
 
     /**
@@ -377,14 +362,13 @@ account)}, null, null, null);
      * listIds.
      *
      *
-     * @param account
+     * @param account Id of the account to use
      * @param statusId The id of the status
      * @param listId The id of the list this status appears
      * @return The json_string if the status exists in the DB or null otherwise
      */
     public String getStatusObjectById(int account, long statusId, Long listId) {
 
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
         String ret = null;
         Cursor c;
         String statusIdS = String.valueOf(statusId);
@@ -414,13 +398,11 @@ account)}, null, null, null);
             ret = c.getString(0);
         }
         c.close();
-//        db.close();
 
         return ret;
     }
 
     public List<String> searchStatuses(int account, String query) {
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
         List<String> ret = new ArrayList<String>();
 
         Cursor c ;
@@ -434,7 +416,6 @@ account)}, null, null, null);
             } while (c.moveToNext());
         }
         c.close();
-//        db.close();
 
         return ret;
 
@@ -444,12 +425,11 @@ account)}, null, null, null);
     /**
      * Get all statuses that are marked as a reply to the passed one.
      *
-     * @param account
+     * @param account Id of the account to use
      * @param inRepyId Id of the original status
      * @return  List of Json_objects that represent the replies
      */
     public List<String> getReplies(int account, long inRepyId) {
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
         List<String> ret = new ArrayList<String>();
 
         Cursor c ;
@@ -463,13 +443,17 @@ account)}, null, null, null);
             } while (c.moveToNext());
         }
         c.close();
-//        db.close();
 
         return ret;
     }
 
+    /**
+     * Return the whole conversation starting at the status with id startid
+     * @param account Id of the account to use
+     * @param startid Status to start the search with
+     * @return List of json objects representing the conversation
+     */
     public List<String> getThreadForStatus(int account, long startid) {
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
         List<String> ret = new ArrayList<String>();
         Stack<Long> todo = new Stack<Long>();
         todo.push(startid);
@@ -522,7 +506,6 @@ account)}, null, null, null);
             c.close();
         }
 
-//        db.close();
         Log.i("getThreadForStatus","Num queries: " + count + ", num results: " + ret.size());
 
         return ret;
@@ -532,7 +515,7 @@ account)}, null, null, null);
     /**
      * Return a list of Responses along for the passed list id.
      *
-     * @param account
+     * @param account Id of the account to use
      * @param sinceId What is the oldest status to look after
      * @param howMany How many entries shall be returned
      * @param list_id From which list?
@@ -540,7 +523,6 @@ account)}, null, null, null);
      */
     public List<String> getStatusesObjsOlderThan(int account, long sinceId, int howMany, long list_id) {
         List<String> ret = new ArrayList<String>();
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         String listIdS = String.valueOf(list_id);
         if (sinceId>-1)
@@ -572,13 +554,11 @@ account)}, null, null, null);
             } while (c.moveToNext());
         }
         c.close();
-//        db.close();
         return ret;
     }
 
     public List<String> getDirectsOlderThan(int account, long sinceId, int howMany) {
         List<String> ret = new ArrayList<String>();
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         if (sinceId>-1)
             c = db.query(TABLE_DIRECTS,new String[]{"MESSAGE_JSON"},"id < ? AND " +ACCOUNT_ID_IS,new String[]{String.valueOf(sinceId), String.valueOf(
@@ -595,7 +575,6 @@ account)}, null, null, null);
             } while (c.moveToNext());
         }
         c.close();
-//        db.close();
         return ret;
 
     }
@@ -605,44 +584,36 @@ account)}, null, null, null);
      * Purge the last read table.
      */
     public void resetLastRead() {
-//        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_LAST_READ);
-//        db.close();
     }
 
     /**
      * Purge the statuses table.
      */
     public void cleanTweetDB() {
-//        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_STATUSES);
         db.execSQL("DELETE FROM " + TABLE_DIRECTS);
         db.execSQL("DELETE FROM " + TABLE_USERS);
         db.execSQL("DELETE FROM " + TABLE_LAST_READ);
         db.execSQL("DELETE FROM " + TABLE_URLS);
-//        db.close();
     }
 
     public void cleanStatusesAndUsers(long cutOff) {
-//        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_STATUSES + " WHERE ctime < " + cutOff);
         db.execSQL("DELETE FROM " + TABLE_USERS + " WHERE last_modified < " + cutOff);
         db.execSQL("DELETE FROM " + TABLE_URLS + " WHERE last_modified < " + cutOff);
-//        db.close();
-
     }
 
     /**
      * Returns a user by its ID from the database if it exists or null.
      *
      *
-     * @param account
+     * @param account Id of the account to use
      * @param userId Id of the user
      * @return Basic JSON string of the user info or null.
      */
     public String getUserById(int account, long userId) {
 
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
         String ret = null;
 
         Cursor c;
@@ -653,7 +624,6 @@ account)}, null, null, null);
             ret = c.getString(0);
         }
         c.close();
-//        db.close();
         return ret;
     }
 
@@ -661,12 +631,11 @@ account)}, null, null, null);
      * Returns a user by its screenname from the database if it exists or null.
      *
      *
-     * @param account
+     * @param account Id of the account to use
      * @param screenName screenname of the user
      * @return Basic JSON string of the user info or null.
      */
     public String getUserByName(int account, String screenName) {
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
         String ret = null;
 
         Cursor c;
@@ -677,7 +646,6 @@ account)}, null, null, null);
             ret = c.getString(0);
         }
         c.close();
-//        db.close();
         return ret;
     }
 
@@ -685,10 +653,9 @@ account)}, null, null, null);
     /**
      * Return a list of all users stored
      * @return list fo json objects in string representation
-     * @param account
+     * @param account Id of the account to use
      */
     public List<String> getUsers(int account) {
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
         List<String> ret = new ArrayList<String>();
 
         Cursor c;
@@ -701,7 +668,6 @@ account)}, null, null, null);
             } while (c.moveToNext());
         }
         c.close();
-//        db.close();
 
         return ret;
     }
@@ -709,7 +675,7 @@ account)}, null, null, null);
 
     /**
      * Insert a user into the database.
-     * @param account
+     * @param account Id of the account to use
      * @param userId The Id of the user to insert
      * @param json JSON representation of the User object
      * @param screenName screenname of that user
@@ -721,14 +687,12 @@ account)}, null, null, null);
         cv.put("user_json",json);
         cv.put("screenname",screenName);
 
-//        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.insertWithOnConflict(TABLE_USERS, null, cv,SQLiteDatabase.CONFLICT_REPLACE);
-//        db.close();
     }
 
     /**
      * Update an existing user in the database.
-     * @param account
+     * @param account Id of the account to use
      * @param userId Id of the user to update
      * @param json Json version of the User object
      */
@@ -736,38 +700,11 @@ account)}, null, null, null);
         ContentValues cv = new ContentValues(1);
         cv.put("user_json",json);
 
-//        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.update(TABLE_USERS, cv, "userId = ? AND " + ACCOUNT_ID + " = ?",
                 new String[]{String.valueOf(userId), String.valueOf(account)});
-//        db.close();
-    }
-
-    public Account getAccount(String name,String type) {
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
-        Cursor c;
-        Account account=null;
-        c = db.query(TABLE_ACCOUNTS,null,"name = ? AND serverType = ?", new String[]{name,type},null,null,null);
-        if (c.getCount()>0) {
-            c.moveToFirst();
-            boolean isDefault = c.getInt(6) == 1;
-            account = new Account(
-                    c.getInt(0), // id
-                    name, // name
-                    c.getString(2), // token key
-                    c.getString(3), // token secret
-                    c.getString(4), // url
-                    type, // type /5)
-                    isDefault // 6
-            );
-            account.setPassword(c.getString(7));
-        }
-        c.close();
-//        db.close();
-        return account;
     }
 
     public Account getDefaultAccount(){
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         Account account=null;
         c = db.query(TABLE_ACCOUNTS,null,"isDefault=1", null,null,null,null);
@@ -786,7 +723,6 @@ account)}, null, null, null);
             account.setPassword(c.getString(7));
         }
         c.close();
-//        db.close();
         return account;
 
     }
@@ -802,7 +738,6 @@ account)}, null, null, null);
             throw new IllegalStateException("Account id must not be -1");
 
         Log.i("TweetDB", "Setting default account to id " + id);
-//        SQLiteDatabase db = tdHelper.getWritableDatabase();
         // First see if the id exists
         Cursor c;
         c= db.query(TABLE_ACCOUNTS,new String[]{"id"},"id = " +id , null, null,null,null);
@@ -812,12 +747,10 @@ account)}, null, null, null);
         c.close();
         db.execSQL("UPDATE " + TABLE_ACCOUNTS + " SET isDefault = 0 WHERE isDefault = 1");
         db.execSQL("UPDATE " + TABLE_ACCOUNTS + " SET isDefault = 1 WHERE id = " + id);
-//        db.close();
     }
 
 
     public List<Account> getAccountsForSelection() {
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         List<Account> accounts = new ArrayList<Account>();
         c = db.query(TABLE_ACCOUNTS,null, null,null,null,null,null);
@@ -839,7 +772,6 @@ account)}, null, null, null);
             } while (c.moveToNext());
         }
         c.close();
-//        db.close();
 
         return accounts;
     }
@@ -856,7 +788,6 @@ account)}, null, null, null);
 
 
     public int getNewAccountId() {
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         int ret = 1;
         c = db.query(TABLE_ACCOUNTS,new String[]{"id"},null, null,null,null,"id desc","1");
@@ -866,19 +797,16 @@ account)}, null, null, null);
             ret++;
         }
         c.close();
-//        db.close();
         return ret;
     }
 
     public void deleteAccount(Account account) {
-//        SQLiteDatabase db = tdHelper.getWritableDatabase();
         String accountString = "" + account.getId();
         String[] accounts = new String[]{accountString};
         for (String table: DATA_TABLES) {
             db.delete(table,ACCOUNT_ID_IS,accounts);
         }
         db.delete(TABLE_ACCOUNTS,"id = ?", accounts);
-//        db.close();
     }
 
     public void insertOrUpdateAccount(Account account) {
@@ -892,9 +820,7 @@ account)}, null, null, null);
         cv.put("isDefault",account.isDefaultAccount() ? 1 : 0);
         cv.put("password",account.getPassword());
 
-//        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.insertWithOnConflict(TABLE_ACCOUNTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
-//        db.close();
 
     }
 
@@ -908,7 +834,6 @@ account)}, null, null, null);
      * @param values ContentValues that describe the content
      */
     public void storeValues(String table, List<ContentValues> values) {
-//        SQLiteDatabase db = tdHelper.getWritableDatabase();
         try {
             db.beginTransaction();
             for (ContentValues val : values) {
@@ -919,7 +844,6 @@ account)}, null, null, null);
         finally {
             db.endTransaction();
         }
-//        db.close();
     }
 
 
@@ -931,14 +855,10 @@ account)}, null, null, null);
         cv.put("query",query);
         cv.put("json",json);
 
-//        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.insert(TABLE_SEARCHES,null,cv);
-//        db.close();
-
     }
 
     public List<String> getSavedSearches(int account) {
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
         List<String > ret = new ArrayList<String>();
 
         Cursor c;
@@ -951,31 +871,25 @@ account)}, null, null, null);
             } while ((c.moveToNext()));
         }
         c.close();
-//        db.close();
 
         return ret;
     }
 
     public void deleteSearch(int account, int id) {
-//        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.delete(TABLE_SEARCHES,ACCOUNT_ID_IS + " AND id = ?",new String[]{String.valueOf(account),String.valueOf(id)});
-//        db.close();
     }
 
 
     public void persistUpdate(int account, byte[] request) {
-//        SQLiteDatabase db = tdHelper.getWritableDatabase();
         ContentValues cv = new ContentValues(3);
 
         cv.put("id", (Integer) null);
         cv.put(ACCOUNT_ID,account);
         cv.put("content",request);
         db.insert(TABLE_UPDATES,null,cv);
-//        db.close();
     }
 
     public List<Pair<Integer,byte[]>> getUpdatesForAccount(int account) {
-//        SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c = db.query(TABLE_UPDATES,new String[]{"id","content"},ACCOUNT_ID_IS,new String[]{String.valueOf(
                 account)},null,null,null);
         List<Pair<Integer,byte[]>> ret = new ArrayList<Pair<Integer, byte[]>>();
@@ -990,14 +904,11 @@ account)}, null, null, null);
             while( c.moveToNext());
         }
         c.close();
-//        db.close();
 
         return ret;
     }
 
     public void removeUpdate(int id) {
-//        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_UPDATES + " WHERE id = " + id);
-//        db.close();
     }
 }
