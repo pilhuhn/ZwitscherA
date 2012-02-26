@@ -60,7 +60,7 @@
                      android:layout_height="wrap_content"
                      android:layout_toRightOf="@id/ThreadButton"
                      android:src="@drawable/favorite_off"
-                     android:text="Favorite"/>
+                     android:text="@string/favorite"/>
 
 
 

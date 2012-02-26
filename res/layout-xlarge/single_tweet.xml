@@ -77,7 +77,7 @@
                      android:layout_height="wrap_content"
                      android:onClick="retweet"
                      android:src="@drawable/rt_button"
-                     android:text="Retweet"/>
+                     android:text="@string/retweet"/>
         <ImageButton android:id="@+id/ClassicRetweetButton"
                      android:layout_below="@id/TimeTextView"
                      android:layout_toRightOf="@id/RetweetButton"
@@ -94,14 +94,14 @@
                      android:layout_height="wrap_content"
                      android:onClick="threadView"
                      android:src="@drawable/threads"
-                     android:text="Thread"/>
+                     android:text="@string/thread"/>
         <Button android:id="@+id/DirectButton"
                      android:layout_below="@id/TimeTextView"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:layout_toRightOf="@id/ThreadButton"
                      android:onClick="directMessage"
-                     android:text="Direct"/>
+                     android:text="@string/direct"/>
         <ImageButton android:id="@+id/FavoriteButton"
                      android:layout_below="@id/TimeTextView"
                      android:layout_width="wrap_content"
@@ -109,7 +109,7 @@
                      android:layout_toRightOf="@id/DirectButton"
                      android:onClick="favorite"
                      android:src="@drawable/favorite_off"
-                     android:text="Favorite"/>
+                     android:text="@string/favorite"/>
 
         <ImageButton android:id="@+id/SpeakButton"
                      android:layout_below="@id/TimeTextView"
@@ -118,7 +118,7 @@
                      android:layout_height="wrap_content"
                      android:onClick="speak"
                      android:src="@drawable/speaker"
-                     android:text="Speak"/>
+                     android:text="@string/speak"/>
         <ImageButton android:id="@+id/TranslateButton"
                      android:layout_below="@id/TimeTextView"
                      android:layout_toRightOf="@id/SpeakButton"
@@ -126,19 +126,19 @@
                      android:layout_height="wrap_content"
                      android:onClick="translate"
                      android:src="@drawable/translate"
-                     android:text="Translate"/>
+                     android:text="@string/Translate"/>
         <ImageButton android:layout_below="@id/TimeTextView"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:layout_toRightOf="@id/TranslateButton"
-                     android:text="Send"
+                     android:text="@string/send"
                      android:onClick="send"
                      android:src="@drawable/direct_button"
                      android:id="@+id/SendButton"
                 />
 
         <Button android:id="@+id/ril_button"
-                android:text="RIL"
+                android:text="@string/ril_button"
                 android:layout_below="@id/TimeTextView"
                 android:layout_toRightOf="@id/SendButton"
                 android:layout_height="wrap_content"
@@ -153,7 +153,7 @@
                      android:layout_height="wrap_content"
                      android:onClick="done"
                      android:src="@drawable/back_button"
-                     android:text="Done!"/>
+                     android:text="@string/Done"/>
         <de.bsd.zwitscher.WorkingSpinner android:id="@+id/ot_spinner"
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content"

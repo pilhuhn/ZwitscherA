@@ -121,12 +121,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                 ReadItLaterStore store = new ReadItLaterStore(request.extUser,request.extPassword);
                 String result = store.store(request.status,!account.isStatusNet(),request.url);
                 boolean success;
-                if (result.startsWith("200")) {
-                    success = true;
-                }
-                else {
-                    success = false;
-                }
+                success = result.startsWith("200");
 
                 ret = new UpdateResponse(request.updateType,success,result);
                 break;

@@ -10,7 +10,7 @@ import android.text.SpannableString;
 import android.text.style.StyleSpan;
 
 /**
- * Helper to create a Spannable strings.
+ * Helper to create a Spannable string.
  * Those are strings that get 'markup' on portions of them
  * like different styles.
  *
@@ -24,6 +24,7 @@ import android.text.style.StyleSpan;
  *
  * @author Heiko W. Rupp
  */
+@SuppressWarnings("unused")
 public class SpannableBuilder {
 
     private int position = 0;

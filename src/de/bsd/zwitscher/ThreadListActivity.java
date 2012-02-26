@@ -41,22 +41,25 @@ public class ThreadListActivity extends ListActivity {
 
         thisActivity = this;
 
-        if (android.os.Build.VERSION.SDK_INT<11)
+        if (android.os.Build.VERSION.SDK_INT<11) {
             requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-        // Set the layout of the list activity
-        setContentView(R.layout.tweet_list_layout);
-
-        if (android.os.Build.VERSION.SDK_INT<11)
+            // Set the layout of the list activity
+            setContentView(R.layout.tweet_list_layout);
             getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
-        pg = (ProgressBar) findViewById(R.id.title_progress_bar);
-        titleTextBox = (TextView) findViewById(R.id.title_msg_box);
+            pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+            titleTextBox = (TextView) findViewById(R.id.title_msg_box);
 
 
-        ImageButton backButton = (ImageButton) findViewById(R.id.back_button);
-        backButton.setVisibility(View.VISIBLE);
-        // Disable the reload button
-        ImageButton reloadButton = (ImageButton) findViewById(R.id.tweet_list_reload_button);
-        reloadButton.setVisibility(View.GONE);
+            ImageButton backButton = (ImageButton) findViewById(R.id.back_button);
+            backButton.setVisibility(View.VISIBLE);
+            // Disable the reload button
+            ImageButton reloadButton = (ImageButton) findViewById(R.id.tweet_list_reload_button);
+            reloadButton.setVisibility(View.GONE);
+        }
+        else {
+            setContentView(R.layout.tweet_list_layout_honeycomb);
+        }
+
 
         account = AccountHolder.getInstance().getAccount();
         // Pull the start id ( = id of the calling s
@@ -96,29 +99,12 @@ public class ThreadListActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
-    /**
-     * Do the magic of getting the coversation starting with the status with
-     * id <i>statusId</i>.
-     * @param statusId Id of the status to start with
-     * @return List of Status that are involved in the conversation (may not be complete).
-     */
-    List<Status> getConversation(long statusId) {
-
-        List<Status> result ;
-
-        TwitterHelper th = new TwitterHelper(this, account);
-        result = th.getThreadForStatus(statusId);
-        return result;
-    }
-
     /**
      * Handle click on a list item which triggers the detail view of that item
      * @param l Parent view
      * @param v Clicked view
      * @param position Position in the list that was clicked
-     * @param id
+     * @param id Id of the item clicked
      */
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
@@ -133,7 +119,7 @@ public class ThreadListActivity extends ListActivity {
 
     /**
      * Called from the Back button
-     * @param v
+     * @param v Button that was clicked
      */
     @SuppressWarnings("unused")
     public void done(View v) {
@@ -142,7 +128,7 @@ public class ThreadListActivity extends ListActivity {
 
     /**
      * Scrolls to top, called from the ToTop button
-     * @param v
+     * @param v Button that was clicked
      */
     @SuppressWarnings("unused")
     public void scrollToTop(View v) {
@@ -151,7 +137,7 @@ public class ThreadListActivity extends ListActivity {
 
     /**
      * Called from the post button
-     * @param v
+     * @param v Button that was clicked
      */
     @SuppressWarnings("unused")
     public void post(View v) {
@@ -167,7 +153,12 @@ public class ThreadListActivity extends ListActivity {
         @Override
         protected List<twitter4j.Status> doInBackground(Long... params) {
             Long i = params[0];
-            return getConversation(i);
+
+            List<twitter4j.Status> result ;
+
+            TwitterHelper th = new TwitterHelper(ThreadListActivity.this, account);
+            result = th.getThreadForStatus(i);
+            return result;
         }
 
         @Override

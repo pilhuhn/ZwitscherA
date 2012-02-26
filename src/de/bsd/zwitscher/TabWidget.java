@@ -5,14 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.text.AndroidCharacter;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;

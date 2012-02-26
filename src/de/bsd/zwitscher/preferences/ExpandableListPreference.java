@@ -47,11 +47,11 @@ public class ExpandableListPreference extends DialogPreference implements TextVi
     public ExpandableListPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        String separ = attrs.getAttributeValue(null,"separator");
-        if (separ==null)
+        String separatorAttribute = attrs.getAttributeValue(null,"separator");
+        if (separatorAttribute==null)
             separator = DEFAULT_SEPARATOR;
         else
-            separator = separ;
+            separator = separatorAttribute;
 
         askBeforeDelete = attrs.getAttributeBooleanValue(null,"askBeforeDelete",true);
 
@@ -120,9 +120,9 @@ public class ExpandableListPreference extends DialogPreference implements TextVi
 
     /**
      * Called when the dialog is about to be displayed
-     * @param v The
+     * @param v The view this is invoked on
      * @param actionId The action that happened
-     * @param event
+     * @param event Even that has happened
      * @return true if we consumed the event. False otherwise.
      */
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -141,10 +141,10 @@ public class ExpandableListPreference extends DialogPreference implements TextVi
     /**
      * Called on a long click on an item. Meant to delete the selected item.
      * If the global option askBeforeDelete is set, a Dialog will be shown.
-     * @param parent
-     * @param view
+     * @param parent AdapterView
+     * @param view Clicked view
      * @param position Position of the selected item
-     * @param id
+     * @param id id of the item
      * @return true if the event has been consumed.
      */
     public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {

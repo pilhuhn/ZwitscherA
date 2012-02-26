@@ -169,4 +169,10 @@
     <string name="Reply">Reply</string>
     <string name="user_image">User image</string>
     <string name="Reply_all">Reply All</string>
+    <string name="thread">Thread</string>
+    <string name="send">Send</string>
+    <string name="Done">Done!</string>
+    <string name="ril_button">RIL</string>
+    <string name="bio">Bio:</string>
+    <string name="Translate">Translate</string>
 </resources>

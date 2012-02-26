@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+ - Layout for the individual tabs that hosts any lists
+ - with the list on top and the quick navigation at the
+ - bottom.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="horizontal"
+	android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+	android:paddingLeft="8dip"
+	android:paddingRight="8dip">
+
+	<ListView android:id="@android:id/list"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:layout_weight="1"
+        android:focusable="true"
+	    android:drawSelectorOnTop="false"/>
+
+<!--
+    <LinearLayout android:layout_height="fill_parent"
+                  android:layout_width="wrap_content"
+                  android:orientation="vertical">
+        <ImageButton
+            android:id="@+id/tweet_list_reload_button"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:onClick="reload"
+            android:src="@drawable/reload_button"
+            android:layout_gravity="right"
+                />
+        <ImageButton
+            android:id="@+id/post_button"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:onClick="post"
+            android:enabled="true"
+            android:src="@drawable/post_button"
+            android:layout_gravity="right"
+                />
+        <ImageButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="left"
+            android:onClick="scrollToTop"
+            android:src="@drawable/to_top_button"
+                />
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="left"
+            android:onClick="done"
+            android:src="@drawable/back_button"
+            android:visibility="gone"
+                />
+    </LinearLayout>
+-->
+
+</LinearLayout>

@@ -53,7 +53,7 @@ public abstract class AbstractListActivity extends ListActivity {
 
     /**
      * Scrolls to top, called from the ToTop button
-     * @param v
+     * @param v Button that was pressed
      */
     @SuppressWarnings("unused")
     public void scrollToTop(View v) {
@@ -62,7 +62,7 @@ public abstract class AbstractListActivity extends ListActivity {
 
     /**
      * Called from the post button
-     * @param v
+     * @param v Button that was pressed
      */
     @SuppressWarnings("unused")
     public void post(View v) {
@@ -72,6 +72,11 @@ public abstract class AbstractListActivity extends ListActivity {
 
     abstract public void reload(View v);
 
+    /**
+     * Finish the activity. Called from the done button
+     * @param v Button that was invoked
+     */
+    @SuppressWarnings("unused")
     public void done(View v) {
         finish();
     }

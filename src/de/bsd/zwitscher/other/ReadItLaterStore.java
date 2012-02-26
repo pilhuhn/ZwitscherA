@@ -118,12 +118,7 @@ public class ReadItLaterStore {
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.connect();
             int code = conn.getResponseCode();
-            if (code==200)
-                return true;
-
-            return false;
-
-
+            return code == 200;
 
         } catch (IOException e) {
             e.printStackTrace();  // TODO: Customise this generated block

@@ -80,7 +80,7 @@
                      android:layout_height="wrap_content"
                      android:onClick="retweet"
                      android:src="@drawable/rt_button_cl"
-                     android:text="Retweet"/>
+                     android:text="@string/retweet"/>
 
         <ImageButton android:id="@+id/ThreadButton"
                      android:layout_below="@id/ReplyButton"
@@ -88,7 +88,7 @@
                      android:layout_height="wrap_content"
                      android:onClick="threadView"
                      android:src="@drawable/threads"
-                     android:text="Thread"/>
+                     android:text="@string/thread"/>
         <ImageButton android:id="@+id/FavoriteButton"
                      android:layout_below="@id/ReplyButton"
                      android:layout_width="wrap_content"
@@ -96,7 +96,7 @@
                      android:layout_toRightOf="@id/ThreadButton"
                      android:onClick="favorite"
                      android:src="@drawable/favorite_off"
-                     android:text="Favorite"/>
+                     android:text="@string/favorite"/>
         <ImageButton android:id="@+id/TranslateButton"
                      android:layout_below="@id/ReplyButton"
                      android:layout_toRightOf="@id/FavoriteButton"
@@ -104,7 +104,7 @@
                      android:layout_height="wrap_content"
                      android:onClick="translate"
                      android:src="@drawable/translate"
-                     android:text="Translate"/>
+                     android:text="@string/Translate"/>
 
         <ImageButton android:id="@+id/DoneButton"
                      android:layout_below="@id/ThreadButton"
@@ -112,7 +112,7 @@
                      android:layout_height="wrap_content"
                      android:onClick="done"
                      android:src="@drawable/back_button"
-                     android:text="Done!"/>
+                     android:text="@string/Done"/>
         <de.bsd.zwitscher.WorkingSpinner android:id="@+id/ot_spinner"
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content"

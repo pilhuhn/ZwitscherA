@@ -42,7 +42,7 @@ public class ErrorDisplayActivity extends Activity {
         bodyView.setText(Html.fromHtml(body));
 
         TextView messageView = (TextView) findViewById(R.id.error_message);
-        if (message!=null && !message.equals("")) {
+        if (!message.equals("")) {
             messageView.setText(Html.fromHtml(message));
         } else {
             messageView.setEnabled(false);

@@ -46,7 +46,7 @@
                     />
         </TableRow>
         <TableRow>
-            <TextView android:text="Bio:"
+            <TextView android:text="@string/bio"
                       android:layout_gravity="left"
                     />
             <TextView android:id="@+id/userDetail_bio"

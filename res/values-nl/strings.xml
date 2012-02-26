@@ -14,7 +14,7 @@
     <string name="direct_message_sent">Direct bericht verzonden</string>
     <string name="hello">Tweet hieronder invoeren:</string>
     <string name="app_name">Zwitscher</string>
-    <string name="loading">Tweets worden geladen...</string>
+    <string name="loading">Tweets worden geladen…</string>
     <string name="no_connect">Geen verbinding met Twitter</string>
     <string name="TweetButton">Tweet dit!</string>
     <string name="ClearButton">Clear!</string>
@@ -42,7 +42,7 @@
     <string name="add">Toevoegen</string>
     <string name="from">van</string>
     <string name="get_user_detail">User details ophalen..</string>
-    <string name="get_preview">"Previews laden..."</string>
+    <string name="get_preview">"Previews laden…"</string>
     <string name="From">Van</string>
     <string name="to">aan</string>
     <string name="please_sync_lists">Synchroniseer lijsten</string>
@@ -57,7 +57,7 @@
     <string name="please_log_in">log in alsjeblieft</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
-    <string name="login">Log in...</string>
+    <string name="login">Log in…</string>
     <string name="service">Service</string>
     <string name="new_mentions">nieuw mentions</string>
     <string name="new_directs">nieuw direct messages</string>

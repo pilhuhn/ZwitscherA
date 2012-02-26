@@ -4,10 +4,8 @@ import java.io.File;
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 
 import android.content.ContentValues;
@@ -317,7 +315,7 @@ public class TweetDB {
     /**
      * Delete the list with the passed ID in the DB
      * @param id Id of the list to delete
-     * @todo Also remove statuses for the passed list
+     * TODO Also remove statuses for the passed list
      */
 	public void removeList(Integer id) {
 		SQLiteDatabase db = tdHelper.getWritableDatabase();
@@ -437,19 +435,18 @@ public class TweetDB {
     public List<String> getThreadForStatus(long startid) {
         SQLiteDatabase db = tdHelper.getReadableDatabase();
         List<String> ret = new ArrayList<String>();
-        Set<Long> processed = new HashSet<Long>();
         Stack<Long> todo = new Stack<Long>();
         todo.push(startid);
-        processed.add(startid);
 
         Cursor c;
         int count = 0;
+        String selection = "id = ? AND ACCOUNT_ID = ?";
         while (!todo.isEmpty()) {
             long x = todo.pop();
 
             count++;
-            c = db.query(TABLE_STATUSES,new String[]{"i_rep_to",STATUS}, "(id = ? ) AND " + ACCOUNT_ID_IS
-                    ,new String[]{String.valueOf(x),account},null,null,null);
+            c = db.query(TABLE_STATUSES,new String[]{"i_rep_to",STATUS}, selection
+                    , new String[]{String.valueOf(x), account},null,null,null);
             if (c.getCount()>0) {
                 c.moveToFirst();
                 do {
@@ -468,11 +465,12 @@ public class TweetDB {
 
         // also include later replies to thread
         todo.push(startid);
+        String selection1 = "i_rep_to = ?  AND ACCOUNT_ID = ?";
         while (!todo.isEmpty()) {
             long x = todo.pop();
 
             count++;
-            c = db.query(TABLE_STATUSES,new String[]{"id",STATUS}, "(i_rep_to = ? ) AND " + ACCOUNT_ID_IS
+            c = db.query(TABLE_STATUSES,new String[]{"id",STATUS}, selection1
                     ,new String[]{String.valueOf(x),account},null,null,null);
             if (c.getCount()>0) {
                 c.moveToFirst();
@@ -682,9 +680,9 @@ public class TweetDB {
 
     /**
      * Update an existing user in the database.
-     * @param userId
-     * @param json
-     * @todo Still needed with conflict resolution on insert?
+     * @param userId Id of the user to update
+     * @param json Json version of the User object
+     * TODO Still needed with conflict resolution on insert?
      */
     public void updateUser(long userId, String json) {
         ContentValues cv = new ContentValues(1);
@@ -917,23 +915,6 @@ public class TweetDB {
     }
 
 
-    public String getTargetUrl(String input) {
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
-        Cursor c = db.query(TABLE_URLS,new String[]{"target"},"src = ?",new String[]{input},null,null,null);
-        String ret;
-        if (c.getCount()>0) {
-            c.moveToFirst();
-            ret = c.getString(0);
-        }
-        else {
-            ret = input;
-        }
-        c.close();
-        db.close();
-
-        return ret;
-    }
-
     public void persistUpdate(byte[] request) {
         SQLiteDatabase db = tdHelper.getWritableDatabase();
         ContentValues cv = new ContentValues(3);
@@ -954,7 +935,7 @@ public class TweetDB {
             do {
                 int id = c.getInt(0);
                 byte[] content = c.getBlob(1);
-                Pair p = new Pair(id,content);
+                Pair<Integer,byte[]> p = new Pair<Integer,byte[]>(id,content);
                 ret.add(p);
             }
             while( c.moveToNext());

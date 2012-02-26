@@ -32,11 +32,6 @@ public class FlushQueueTask extends AsyncTask<Void,Integer,Pair<Integer,Integer>
     }
 
     @Override
-    protected void onPreExecute() {
-        super.onPreExecute();    // TODO: Customise this generated block
-    }
-
-    @Override
     protected Pair<Integer,Integer> doInBackground(Void... voids) {
 
         NetworkHelper nh = new NetworkHelper(context);
