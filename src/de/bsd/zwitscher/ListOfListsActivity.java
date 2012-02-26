@@ -65,7 +65,7 @@ public class ListOfListsActivity extends AbstractListActivity {
 
         if (mode==0) {
             // Display users lists
-            userListsEntries = tdb.getLists().entrySet();
+            userListsEntries = tdb.getLists(account.getId()).entrySet();
             for (Map.Entry<Integer, Pair<String, String>> userList : userListsEntries) {
                 Pair<String, String> nameOwnerPair = userList.getValue();
                 String listname;
@@ -198,14 +198,14 @@ public class ListOfListsActivity extends AbstractListActivity {
 
                 int listId = entry.getKey();
                 String screenName = nameOwnerPair.second;
-                long lastFetched = tdb.getLastRead(listId);
+                long lastFetched = tdb.getLastRead(account.getId(), listId);
                 if (lastFetched>0)
                     paging.setSinceId(lastFetched);
                 MetaList<twitter4j.Status> list = th.getUserList(paging, listId, screenName, false);
                 long newOnes = list.getNumOriginal();
                 if (newOnes>0) {
                     long maxId = list.getList().get(0).getId();
-                    tdb.updateOrInsertLastRead(listId,maxId);
+                    tdb.updateOrInsertLastRead(account.getId(), listId,maxId);
 
                     publishProgress(nameOwnerPair.first,newOnes);
 

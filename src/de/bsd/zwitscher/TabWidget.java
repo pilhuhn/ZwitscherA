@@ -70,7 +70,7 @@ public class TabWidget extends TabActivity {
          * so we need to re-create the account.
          */
         if (account==null) {
-            TweetDB tdb = new TweetDB(this,-1);
+            TweetDB tdb = TweetDB.getInstance(getApplicationContext());
             account = tdb.getDefaultAccount();
             AccountHolder.getInstance().setAccount(account);
         }
@@ -82,7 +82,7 @@ public class TabWidget extends TabActivity {
 
 		tabHost.setCurrentTab(0); // Home tab, tabs start at 0
 
-        new InitialSyncTask(this).execute(accountId);
+        new InitialSyncTask(getApplicationContext()).execute(accountId);
 	}
 
     protected void onResume() {
@@ -224,7 +224,7 @@ public class TabWidget extends TabActivity {
             new CleanupTask(this).execute();
             break;
         case R.id.DevelDumpAccounts:
-            TweetDB tmpDb = new TweetDB(this,-1);
+            TweetDB tmpDb = TweetDB.getInstance(getApplicationContext());
             List<Account> allAccounts = tmpDb.getAccountsForSelection();
             for (Account a : allAccounts)
                 System.out.println(a);
@@ -329,17 +329,17 @@ public class TabWidget extends TabActivity {
 	 */
 	private void syncLists() {
 		TwitterHelper th = new TwitterHelper(this, account);
-        TweetDB tdb = new TweetDB(this,accountId);
+        TweetDB tdb = TweetDB.getInstance(getApplicationContext());
         if (account.getServerType().equalsIgnoreCase("twitter")) {
             List<UserList> userLists = th.getUserLists();
-            Map<Integer, Pair<String, String>> storedLists = tdb.getLists();
+            Map<Integer, Pair<String, String>> storedLists = tdb.getLists(accountId);
             List<Integer> storedListIds = new ArrayList<Integer>(storedLists.size());
             storedListIds.addAll(storedLists.keySet());
 
             // Check for lists to add
             for (UserList userList : userLists) {
                 if (!storedListIds.contains(userList.getId())) {
-                    tdb.addList(userList.getName(),userList.getId(), userList.getUser().getScreenName());
+                    tdb.addList(accountId, userList.getName(),userList.getId(), userList.getUser().getScreenName());
                 }
             }
             // check for outdated lists and remove them
@@ -353,7 +353,7 @@ public class TabWidget extends TabActivity {
                     }
                 }
                 if (!found) {
-                    tdb.removeList(id);
+                    tdb.removeList(id, account.getId());
                 }
             }
             syncSearches(th,tdb);
@@ -373,7 +373,7 @@ public class TabWidget extends TabActivity {
 
         for (SavedSearch search : storedSearches) {
             if (!searches.contains(search)) {
-                tdb.deleteSearch(search.getId());
+                tdb.deleteSearch(account.getId(), search.getId());
             }
         }
 
@@ -382,12 +382,12 @@ public class TabWidget extends TabActivity {
 
 
     private void resetLastRead() {
-        TweetDB tb = new TweetDB(this,accountId);
+        TweetDB tb = TweetDB.getInstance(getApplicationContext());
         tb.resetLastRead();
     }
 
     private void cleanTweetDB() {
-        TweetDB tb = new TweetDB(this,accountId);
+        TweetDB tb = TweetDB.getInstance(getApplicationContext());
         tb.cleanTweetDB();
     }
 
@@ -413,8 +413,8 @@ public class TabWidget extends TabActivity {
         protected Void doInBackground(Integer... params) {
             int accountId = params[0];
 
-            TweetDB tdb = new TweetDB(context,accountId);
-            if (tdb.getLists().size()==0 && tdb.getSavedSearches().size()==0)
+            TweetDB tdb = TweetDB.getInstance(context);
+            if (tdb.getLists(accountId).size()==0 && tdb.getSavedSearches(account.getId()).size()==0)
                 syncLists();
 
             return null;

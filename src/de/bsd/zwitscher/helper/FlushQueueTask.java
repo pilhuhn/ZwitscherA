@@ -14,7 +14,6 @@ import de.bsd.zwitscher.TweetDB;
 import de.bsd.zwitscher.TwitterHelper;
 import de.bsd.zwitscher.UpdateRequest;
 import de.bsd.zwitscher.UpdateResponse;
-import de.bsd.zwitscher.UpdateType;
 import de.bsd.zwitscher.account.Account;
 
 /**
@@ -38,9 +37,9 @@ public class FlushQueueTask extends AsyncTask<Void,Integer,Pair<Integer,Integer>
         if (!nh.isOnline())
             return new Pair<Integer, Integer>(0,0);
 
-        TweetDB tdb = new TweetDB(context,account.getId());
+        TweetDB tdb = TweetDB.getInstance(context);
         TwitterHelper th = new TwitterHelper(context,account);
-        List<Pair<Integer,byte[]>> list = tdb.getUpdatesForAccount();
+        List<Pair<Integer,byte[]>> list = tdb.getUpdatesForAccount(account.getId());
         Integer count = list.size();
         int good=0;
         for (Pair pair : list) {

@@ -38,7 +38,7 @@ public class CleanupTask extends AsyncTask<Void,Void,Void> {
         // Clean tweets that are a older than a week
         long tOld = System.currentTimeMillis() - WEEK;
 
-        TweetDB tdb = new TweetDB(context,-1); // account id does not matter
+        TweetDB tdb = TweetDB.getInstance(context.getApplicationContext()); // account id does not matter
         tdb.cleanStatusesAndUsers(tOld);
         PicHelper ph = new PicHelper();
         ph.cleanup(tOld);

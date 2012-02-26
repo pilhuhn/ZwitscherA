@@ -46,6 +46,7 @@ import twitter4j.Tweet;
  * <li>0 : home/friends timeline</li>
  * <li>-1 : mentions </li>
  * <li>-2 : direct </li>
+ * <li>&gt;0 : saved search</li>
  * </ul>
  * @author Heiko W. Rupp
  */
@@ -118,7 +119,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             }
         }
 
-        boolean fromDbOnly = tdb.getLastRead(list_id) != -1;
+        boolean fromDbOnly = tdb.getLastRead(account.getId(), list_id) != -1;
         fillListViewFromTimeline(fromDbOnly); // Only get tweets from db to speed things up at start
     }
 
@@ -189,7 +190,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
 
     /**
-     * Retrieve a list of statuses. Depending on list_id, this is taken from
+     * Retrieve a list of statuses. Depending on listId, this is taken from
      * different sources:
      * <ul>
      * <li>0 : home timeline</li>
@@ -200,74 +201,84 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
      * The filter if not null is a regular expression, that if matches filters the
      * tweet.
      *
+     *
      * @param fromDbOnly If true only statuses already in the DB are returned
+     * @param listId Id of the list / timeline to fetch (see above)
      * @param filter Filter expression to filter out tweets. If null no filtering happens.
+     * @param updateStatusList Should the currently displayed list be updated?
      * @return List of status items along with some counts
      */
-	private MetaList<Status> getTimlinesFromTwitter(boolean fromDbOnly, String filter) {
+	private MetaList<Status> getTimlinesFromTwitter(boolean fromDbOnly, int listId, String filter,
+                                                    boolean updateStatusList) {
 		Paging paging = new Paging();
 
 		MetaList<Status> myStatuses;
 
 
-    	long last = tdb.getLastRead(list_id);
+    	long last = tdb.getLastRead(account.getId(), listId);
     	if (last>0 )//&& !Debug.isDebuggerConnected())
     		paging.sinceId(last).setCount(200);
         else
             paging.setCount(50); // 50 Tweets if we don't have the timeline yet
 
-        switch (list_id) {
+        switch (listId) {
         case 0:
             // Home time line
-        	myStatuses = th.getTimeline(paging,list_id, fromDbOnly);
+        	myStatuses = th.getTimeline(paging,listId, fromDbOnly);
 
         	break;
         case -1:
-        	myStatuses = th.getTimeline(paging, list_id, fromDbOnly);
+        	myStatuses = th.getTimeline(paging, listId, fromDbOnly);
         	break;
         case -2:
             // see below at getDirectsFromTwitter
             myStatuses = new MetaList<Status>();
             break;
         case -3:
-            myStatuses = th.getTimeline(paging,list_id,fromDbOnly);
+            myStatuses = th.getTimeline(paging,listId,fromDbOnly);
             break;
         case -4:
-            myStatuses = th.getTimeline(paging,list_id,fromDbOnly);
+            myStatuses = th.getTimeline(paging,listId,fromDbOnly);
             break;
         default:
-        	myStatuses = th.getUserList(paging,list_id, userListOwner, fromDbOnly);
+        	myStatuses = th.getUserList(paging,listId, userListOwner, fromDbOnly);
         	break;
         }
 
         // Update the 'since' id in the database
     	if (myStatuses.getList().size()>0) {
     		last = myStatuses.getList().get(0).getId(); // assumption is that twitter sends the newest (=highest id) first
-    		tdb.updateOrInsertLastRead(list_id, last);
+    		tdb.updateOrInsertLastRead(account.getId(), listId, last);
     	}
 
-    	statuses = new ArrayList<Status>();
-		List<Status> data = new ArrayList<Status>(myStatuses.getList().size());
-		for (Status status : myStatuses.getList()) {
-			if ((filter==null) || (!status.getText().matches(filter))) {
-				data.add(status);
-				statuses.add(status);
-			} else {
-				Log.i("TweetListActivity::filter",status.getUser().getScreenName() + " - " + status.getText());
+        MetaList<Status> metaList;
+        if (updateStatusList) {
+            statuses = new ArrayList<Status>();
+            List<Status> data = new ArrayList<Status>(myStatuses.getList().size());
+            for (Status status : myStatuses.getList()) {
+                if ((filter==null) || (!status.getText().matches(filter))) {
+                    data.add(status);
+                    statuses.add(status);
+                } else {
+                    Log.i("TweetListActivity::filter",status.getUser().getScreenName() + " - " + status.getText());
 
-			}
-		}
+                }
+            }
+            metaList = new MetaList<Status>(data,myStatuses.getNumOriginal(),myStatuses.getNumAdded());
+        }
+        else {
+            metaList = new MetaList<Status>(new ArrayList<Status>(),0,0);
+        }
 
-        MetaList<Status> metaList = new MetaList<Status>(data,myStatuses.getNumOriginal(),myStatuses.getNumAdded());
 
-		return metaList;
+        return metaList;
 	}
 
     private MetaList<DirectMessage> getDirectsFromTwitter(boolean fromDbOnly) {
         MetaList<DirectMessage> messages;
 
 
-        long last = tdb.getLastRead(-2);
+        long last = tdb.getLastRead(account.getId(), -2);
         Paging paging = new Paging();
         if (last>-1)
             paging.setSinceId(last);
@@ -346,11 +357,16 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         // Now check and process items that were created while we were offline
         new FlushQueueTask(this, account).execute();
 
+        NetworkHelper networkHelper = new NetworkHelper(this);
+        if (list_id == 0 &&  networkHelper.mayReloadAdditional()) {
+            new GetTimeLineTask(this,-1,false).execute(false);
+            new GetTimeLineTask(this,-2,false).execute(false);
+        }
     }
 
 
     private void fillListViewFromTimeline(boolean fromDbOnly) {
-    	new GetTimeLineTask(this).execute(fromDbOnly);
+    	new GetTimeLineTask(this,list_id,true).execute(fromDbOnly);
     }
 
     public void onScrollStateChanged(AbsListView absListView, int i) {
@@ -406,10 +422,14 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         boolean fromDbOnly = false;
         String updating;
         Context context;
+        private int listId;
         Dialog dialog = null;
+        private boolean updateListAdapter;
 
-        private GetTimeLineTask(Context context) {
+        private GetTimeLineTask(Context context,int listId,boolean updateListAdapter) {
             this.context = context;
+            this.listId = listId;
+            this.updateListAdapter = updateListAdapter;
         }
 
         @Override
@@ -418,13 +438,15 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             updating = context.getString(R.string.updating);
             String s = getString(R.string.getting_tweets)+ "...";
 
-            if (pg!=null)
-                pg.setVisibility(ProgressBar.VISIBLE);
-            else {
-                dialog = new Dialog(context);
-                dialog.setTitle(s);
-                dialog.setCancelable(false);
-                dialog.show();
+            if (updateListAdapter) {
+                if (pg!=null)
+                    pg.setVisibility(ProgressBar.VISIBLE);
+                else {
+                    dialog = new Dialog(context);
+                    dialog.setTitle(s);
+                    dialog.setCancelable(false);
+                    dialog.show();
+                }
             }
             if(titleTextBox!=null) {
                 titleTextBox.setText(s);
@@ -450,9 +472,9 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             }
             else {
                 String directsString = context.getString(R.string.direct);
-                if (list_id>-5 && list_id!=-2) {
+                if (this.listId >-5 && this.listId !=-2) {
                     String updating;
-                    switch (list_id) {
+                    switch (listId) {
                         case 0: updating = context.getString(R.string.home_timeline);
                             break;
                         case -1: updating = context.getString(R.string.mentions);
@@ -465,49 +487,16 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     }
                     publishProgress(updating);
                     String filter = getFilter();
-                    data = getTimlinesFromTwitter(fromDbOnly, filter);
-                    // Also check for mentions + directs (if allowed in prefs)
-                    NetworkHelper networkHelper = new NetworkHelper(context);
-
-                    if (list_id<=0 && !fromDbOnly && networkHelper.mayReloadAdditional()) { // TODO make this block nicer
-                        publishProgress(context.getString(R.string.mentions));
-                        long mentionLast = tdb.getLastRead(-1);
-                        Paging paging;
-                        paging = new Paging();
-
-                        if (mentionLast>0) {
-                            paging.setCount(200);
-                            paging.setSinceId(mentionLast);
-                        }
-                        else
-                            paging.setCount(50);
-                        MetaList<twitter4j.Status> mentions = th.getTimeline(paging,-1,false);
-                        newMentions = mentions.getNumOriginal();
-                        if (mentions.getList().size()>0) {
-                            long id = mentions.getList().get(0).getId();
-                            tdb.updateOrInsertLastRead(-1,id);
-                        }
-
-                        if (list_id==0) { // Fetch directs only if original list was homes
-                            publishProgress(directsString);
-                            MetaList<DirectMessage> directs = getDirectsFromTwitter(false);
-                            newDirects = directs.getNumOriginal();
-                            if (directs.getList().size()>0) {
-                                long id = mentions.getList().get(0).getId();
-                                tdb.updateOrInsertLastRead(-2,id);
-                            }
-                        }
-
-                    }
+                    data = getTimlinesFromTwitter(fromDbOnly, listId, filter, updateListAdapter);
                 }
-                else if (list_id==-2) {
+                else if (listId ==-2) {
                     publishProgress(directsString);
                     data = getDirectsFromTwitter(fromDbOnly);
                 }
                 else { // list id < -4 ==> saved search
                     String s = context.getString(R.string.searches);
                     publishProgress(s);
-                    data = getSavedSearchFromTwitter(-list_id,fromDbOnly);
+                    data = getSavedSearchFromTwitter(-listId,fromDbOnly);
                 }
             }
 	        return data;
@@ -516,13 +505,15 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         @SuppressWarnings("unchecked")
 		@Override
 		protected void onPostExecute(MetaList result) {
-            if (list_id<-4)
-	            setListAdapter(new TweetAdapter(context, account, R.layout.tweet_list_item, result.getList()));
-            else
-	            setListAdapter(new StatusAdapter(context, account, R.layout.tweet_list_item, result.getList()));
+            if (updateListAdapter) {
+                if (listId <-4)
+                    setListAdapter(new TweetAdapter(context, account, R.layout.tweet_list_item, result.getList()));
+                else
+                    setListAdapter(new StatusAdapter(context, account, R.layout.tweet_list_item, result.getList()));
 
-            if (result.getList().size()==0) {
-                Toast.makeText(context, "Got no result from the server", Toast.LENGTH_LONG).show();
+                if (result.getList().size()==0) {
+                    Toast.makeText(context, "Got no result from the server", Toast.LENGTH_LONG).show();
+                }
             }
 
             if (titleTextBox!=null)
@@ -531,7 +522,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 ActionBar ab = getActionBar();
                 if (ab!=null) {
                     String s = account.getAccountIdentifier();
-                    Map<Integer,Pair<String,String>> userLists = tdb.getLists();
+                    Map<Integer,Pair<String,String>> userLists = tdb.getLists(account.getId());
                     if (userListId !=-1) {
                         Pair<String,String> nameOwnerPair = userLists.get(userListId);
                         if (nameOwnerPair!=null) {
@@ -546,7 +537,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     ab.setSubtitle(s);
                 }
             }
-	        getListView().requestLayout();
+            if (updateListAdapter)
+	            getListView().requestLayout();
             if (newMentions>0) {
                 String s = getString(R.string.new_mentions);
                 Toast.makeText(context,newMentions + " " + s,Toast.LENGTH_LONG).show();
@@ -560,7 +552,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
 
             // Only do the next if we actually did an update from twitter
-            if (!fromDbOnly) {
+            if (!fromDbOnly && updateListAdapter) {
                 Log.i("GTLTask", " scroll to " + result.getNumOriginal());
                 getListView().setSelection(result.getNumOriginal() - 1);
             }

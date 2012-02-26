@@ -27,8 +27,7 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		tweetDB = new TweetDB(this, -1); // -1 is no valid account. But does not
-											// matter for the moment.
+		tweetDB = TweetDB.getInstance(getApplicationContext());
 	}
 
 	/**

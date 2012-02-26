@@ -50,7 +50,7 @@ public class TwitterHelper {
             accountId = account.getId();
         else
             accountId = -1; // default if no account selected.
-        tweetDB = new TweetDB(context,accountId);
+        tweetDB = TweetDB.getInstance(context.getApplicationContext());
         twitter = getTwitter();
 	}
 
@@ -169,7 +169,7 @@ public class TwitterHelper {
           });
 
 
-          tweetDB.updateOrInsertLastRead(-2,max);
+          tweetDB.updateOrInsertLastRead(accountId, -2,max);
        }
        int numDirects = ret2.size();
        int filled = fillUpDirectsFromDb(ret2);
@@ -188,7 +188,7 @@ public class TwitterHelper {
      */
     public List<Status> getStatuesFromDb(long sinceId, int howMany, long list_id) {
         List<Status> ret = new ArrayList<Status>();
-        List<String> responseList = tweetDB.getStatusesObjsOlderThan(sinceId,howMany,list_id);
+        List<String> responseList = tweetDB.getStatusesObjsOlderThan(account.getId(), sinceId,howMany,list_id);
         for (String json : responseList) {
             Status status = materializeStatus(json);
             ret.add(status);
@@ -198,7 +198,7 @@ public class TwitterHelper {
 
     public List<DirectMessage> getDirectsFromDb(long sinceId, int num) {
         List<DirectMessage> ret = new ArrayList<DirectMessage>();
-        List<String> responses = tweetDB.getDirectsOlderThan(sinceId,num);
+        List<String> responses = tweetDB.getDirectsOlderThan(account.getId(), sinceId,num);
         for (String json : responses) {
             DirectMessage msg = materializeDirect(json);
             ret.add(msg);
@@ -578,7 +578,7 @@ Log.d("FillUp","Return: " + i);
         Status status = null;
 
         if (!directOnly) {
-            String obj  = tweetDB.getStatusObjectById(statusId, list_id);
+            String obj  = tweetDB.getStatusObjectById(account.getId(), statusId, list_id);
             if (obj!=null) {
                 status = materializeStatus(obj);
                 if (status!=null)
@@ -606,7 +606,7 @@ Log.d("FillUp","Return: " + i);
     }
 
     public List<Status> getThreadForStatus(long startid) {
-        List<String> jsons = tweetDB.getThreadForStatus(startid);
+        List<String> jsons = tweetDB.getThreadForStatus(account.getId(), startid);
         List<Status> ret = new ArrayList<Status>(jsons.size());
         for (String json : jsons) {
             Status status = materializeStatus(json);
@@ -624,7 +624,7 @@ Log.d("FillUp","Return: " + i);
 
     public List<Status> getRepliesToStatus(long statusId) {
         List<Status> ret = new ArrayList<Status>();
-        List<String> replies = tweetDB.getReplies(statusId);
+        List<String> replies = tweetDB.getReplies(account.getId(), statusId);
         for (String reply : replies) {
             Status status = materializeStatus(reply);
             ret.add(status);
@@ -649,7 +649,7 @@ Log.d("FillUp","Return: " + i);
             query = query.substring(pos +1);
         }
 
-        List<String> jsons = tweetDB.searchStatuses(query);
+        List<String> jsons = tweetDB.searchStatuses(account.getId(), query);
         List<Status> ret = new ArrayList<Status>(jsons.size());
         String qtl = query.toLowerCase();
         for (String s : jsons ) {
@@ -682,7 +682,7 @@ Log.d("FillUp","Return: " + i);
         boolean existing = false;
 
         try {
-            String userJson = tweetDB.getUserById(userId);
+            String userJson = tweetDB.getUserById(account.getId(), userId);
             if (userJson!=null) {
                 existing = true;
                 user = DataObjectFactory.createUser(userJson);
@@ -695,9 +695,9 @@ Log.d("FillUp","Return: " + i);
             user = twitter.showUser(userId);
             userJson = DataObjectFactory.getRawJSON(user);
             if (!existing)
-                tweetDB.insertUser(userId,userJson, user.getScreenName());
+                tweetDB.insertUser(account.getId(), userId,userJson, user.getScreenName());
             else
-                tweetDB.updateUser(userId,userJson);
+                tweetDB.updateUser(account.getId(), userId,userJson);
 
         } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
@@ -716,7 +716,7 @@ Log.d("FillUp","Return: " + i);
         boolean existing = false;
 
         try {
-            String userJson = tweetDB.getUserByName(screenName);
+            String userJson = tweetDB.getUserByName(account.getId(), screenName);
             if (userJson!=null) {
                 existing=true;
                 user = DataObjectFactory.createUser(userJson);
@@ -728,9 +728,9 @@ Log.d("FillUp","Return: " + i);
             user = twitter.showUser(screenName);
             userJson = DataObjectFactory.getRawJSON(user);
             if (!existing)
-                tweetDB.insertUser(user.getId(),userJson, user.getScreenName());
+                tweetDB.insertUser(account.getId(), user.getId(),userJson, user.getScreenName());
             else
-                tweetDB.updateUser(user.getId(),userJson);
+                tweetDB.updateUser(account.getId(), user.getId(),userJson);
 
         } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
@@ -860,7 +860,7 @@ Log.d("FillUp","Return: " + i);
 
         // Serialize and then store in DB
         String json = DataObjectFactory.getRawJSON(status);
-        tweetDB.updateStatus(status.getId(), json);
+        tweetDB.updateStatus(accountId, status.getId(), json);
     }
 
 
@@ -1021,7 +1021,7 @@ Log.d("FillUp","Return: " + i);
     }
 
     public List<SavedSearch> getSavedSearchesFromDb() {
-        List<String> jsons = tweetDB.getSavedSearches();
+        List<String> jsons = tweetDB.getSavedSearches(account.getId());
         List<SavedSearch> searches = new ArrayList<SavedSearch>(jsons.size());
 
         for (String json : jsons) {
@@ -1036,7 +1036,7 @@ Log.d("FillUp","Return: " + i);
     }
 
     public List<User> getUsersFromDb() {
-        List<String> jsons = tweetDB.getUsers();
+        List<String> jsons = tweetDB.getUsers(account.getId());
         List<User> users = new ArrayList<User>(jsons.size());
         for (String json : jsons) {
             try {
@@ -1075,6 +1075,6 @@ Log.d("FillUp","Return: " + i);
     public void persistSavedSearch(SavedSearch search) {
         String json = DataObjectFactory.getRawJSON(search);
 
-        tweetDB.storeSavedSearch(search.getName(),search.getQuery(),search.getId(),json);
+        tweetDB.storeSavedSearch(account.getId(), search.getName(),search.getQuery(),search.getId(),json);
     }
 }

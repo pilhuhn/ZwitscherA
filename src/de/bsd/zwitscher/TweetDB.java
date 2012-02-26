@@ -41,19 +41,34 @@ public class TweetDB {
     static final String STATUS = "STATUS";
     static final String ACCOUNT_ID = "ACCOUNT_ID";
     static final String ACCOUNT_ID_IS = ACCOUNT_ID + "=?";
-    private TweetDBOpenHelper tdHelper;
-    private final String account;
+    private static TweetDBOpenHelper tdHelper;
     static final String APP_BASE_DIR = "/Android/data/de.bsd.zwitscher/";
 
-	public TweetDB(Context context, int accountId) {
+    private static TweetDB instance;
+
+    private static SQLiteDatabase db=null;
+
+
+
+	private TweetDB(Context context) {
 
         File storage = Environment.getExternalStorageDirectory();
         File dbFile = new File(storage,APP_BASE_DIR);
 
 		tdHelper = new TweetDBOpenHelper(context, dbFile.getAbsolutePath() + File.separator + "TWEET_DB", null, 7);
-        account = String.valueOf(accountId);
-
 	}
+
+    public static TweetDB getInstance(Context context) {
+
+        if (instance == null) {
+            instance = new TweetDB(context);
+
+        }
+        if (db==null) {
+            db= tdHelper.getWritableDatabase();
+        }
+        return instance;
+    }
 
 
     private static class TweetDBOpenHelper extends SQLiteOpenHelper {
@@ -225,44 +240,50 @@ public class TweetDB {
 
     /**
      * Return the id of the status that was last read
+     *
+     *
+     * @param account Id of the account to use
      * @param list_id id of the list
      * @return id of the status that was last read
      */
-	long getLastRead(int list_id) {
-		SQLiteDatabase db = tdHelper.getReadableDatabase();
-		Cursor c = db.query(TABLE_LAST_READ, new String[] {"last_read_id"}, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id),account}, null, null, null);
-		Long ret;
-		if (c.getCount()==0)
-			ret = -1L;
-		else {
-			c.moveToFirst();
-			ret = c.getLong(0);
-		}
-		c.close();
-		db.close();
-		return ret;
+	long getLastRead(int account, int list_id) {
+        Long ret=-1L;
+        try {
+            Cursor c = db.query(TABLE_LAST_READ, new String[] {"last_read_id"}, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id), String.valueOf(
+account)}, null, null, null);
+            if (c.getCount()==0)
+                ret = -1L;
+            else {
+                c.moveToFirst();
+                ret = c.getLong(0);
+            }
+            c.close();
+        } catch (Throwable e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+        return ret;
 	}
 
     /**
      * Update (or initially store) the last read information of the passed list
+     * @param account Id of the account to use
      * @param list_id List to mark as read
      * @param last_read_id Id of the last read status
      */
-	void updateOrInsertLastRead(int list_id, long last_read_id) {
+	void updateOrInsertLastRead(int account, int list_id, long last_read_id) {
 		ContentValues cv = new ContentValues();
 		cv.put("list_id", list_id);
 		cv.put("last_read_id", last_read_id);
         cv.put(ACCOUNT_ID,account);
 
         try {
-            SQLiteDatabase db;
             db= tdHelper.getWritableDatabase();
-            int updated = db.update(TABLE_LAST_READ, cv, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id),account});
+            int updated = db.update(TABLE_LAST_READ, cv, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id), String.valueOf(
+                    account)});
             if (updated==0) {
                 // row not yet present
                 db.insert(TABLE_LAST_READ, null, cv);
             }
-            db.close();
         } catch (Exception e) {
             // Situation is not too bad, as it just means more network traffic next time // TODO find better solution
             e.printStackTrace();
@@ -273,11 +294,12 @@ public class TweetDB {
     /**
      * Return Infos about all lists in the DB
      * @return Map with List Id and Pair (listname,list owner )
+     * @param account Id of the account to use
      */
-	Map<Integer, Pair<String, String>> getLists() {
-		SQLiteDatabase db = tdHelper.getReadableDatabase();
+	Map<Integer, Pair<String, String>> getLists(int account) {
 		Map<Integer, Pair<String, String>> ret = new HashMap<Integer, Pair<String, String>>();
-		Cursor c = db.query(TABLE_LISTS, new String[] {"name","owner_name","id"}, ACCOUNT_ID_IS, new String[]{account}, null, null, "name");
+		Cursor c = db.query(TABLE_LISTS, new String[] {"name","owner_name","id"}, ACCOUNT_ID_IS, new String[]{String.valueOf(
+                account)}, null, null, "name");
 		if (c.getCount()>0){
 			c.moveToFirst();
 			do {
@@ -289,54 +311,49 @@ public class TweetDB {
 			} while (c.moveToNext());
 		}
 		c.close();
-		db.close();
 		return ret;
 	}
 
     /**
      * Add a new list to the database
+     * @param account Id of the account to use
      * @param name Name of the lise
      * @param id Id of the list
      * @param owner_name screen name of the list owner
      */
-	public void addList(String name, int id, String owner_name) {
+	public void addList(int account, String name, int id, String owner_name) {
 		ContentValues cv = new ContentValues();
 		cv.put("name", name);
 		cv.put("id",id);
         cv.put(ACCOUNT_ID,account);
         cv.put("owner_name", owner_name);
 
-		SQLiteDatabase db = tdHelper.getWritableDatabase();
 		db.insert(TABLE_LISTS, null, cv);
-		db.close();
-
 	}
 
     /**
      * Delete the list with the passed ID in the DB
      * @param id Id of the list to delete
      * TODO Also remove statuses for the passed list
+     * @param account Id of the account to use
      */
-	public void removeList(Integer id) {
-		SQLiteDatabase db = tdHelper.getWritableDatabase();
-		db.delete(TABLE_LISTS, "id = ? AND " + ACCOUNT_ID_IS, new String[]{id.toString(), account});
-		db.close();
+	public void removeList(Integer id, int account) {
+		db.delete(TABLE_LISTS, "id = ? AND " + ACCOUNT_ID_IS, new String[]{id.toString(), String.valueOf(account)});
 	}
 
 
     /**
      * Update the stored TwitterResponse object. This may be necessary when e.g. the
      * favorite status has been changed on it.
+     * @param account Id of the account to use
      * @param id Id of the object
      * @param status_json Json representation of it.
      */
-    public void updateStatus(long id, String status_json) {
+    public void updateStatus(int account, long id, String status_json) {
         ContentValues cv = new ContentValues(2);
         cv.put(STATUS, status_json);
         cv.put(ACCOUNT_ID,account);
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.update(TABLE_STATUSES, cv, "id = ?", new String[]{String.valueOf(id)});
-        db.close();
     }
 
     /**
@@ -344,13 +361,14 @@ public class TweetDB {
      * A status with the same id can occur multiple times with various
      * listIds.
      *
+     *
+     * @param account Id of the account to use
      * @param statusId The id of the status
      * @param listId The id of the list this status appears
      * @return The json_string if the status exists in the DB or null otherwise
      */
-    public String getStatusObjectById(long statusId, Long listId) {
+    public String getStatusObjectById(int account, long statusId, Long listId) {
 
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
         String ret = null;
         Cursor c;
         String statusIdS = String.valueOf(statusId);
@@ -358,7 +376,7 @@ public class TweetDB {
             c= db.query(TABLE_STATUSES, // Table
                     new String[]{STATUS}, // returned column
                     "id = ? AND list_id = ? AND " + ACCOUNT_ID_IS, // selection
-                    new String[]{statusIdS,String.valueOf(listId),account}, // selection param
+                    new String[]{statusIdS,String.valueOf(listId), String.valueOf(account)}, // selection param
                     null, // groupBy
                     null, // having
                     null // order by
@@ -368,7 +386,7 @@ public class TweetDB {
             c= db.query(TABLE_STATUSES, // Table
                     new String[]{STATUS}, // returned column
                     "id = ? AND " + ACCOUNT_ID_IS, // selection
-                    new String[]{statusIdS,account}, // selection param
+                    new String[]{statusIdS, String.valueOf(account)}, // selection param
                     null, // groupBy
                     null, // having
                     null // order by
@@ -380,18 +398,16 @@ public class TweetDB {
             ret = c.getString(0);
         }
         c.close();
-        db.close();
 
         return ret;
     }
 
-    public List<String> searchStatuses(String query) {
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
+    public List<String> searchStatuses(int account, String query) {
         List<String> ret = new ArrayList<String>();
 
         Cursor c ;
         c = db.query(TABLE_STATUSES,new String[]{STATUS}, "status LIKE '%" + query + "%' AND " + ACCOUNT_ID_IS
-                ,new String[]{account},null,null,"ID DESC","100"); // only 100 results -> may get filtered down later
+                ,new String[]{String.valueOf(account)},null,null,"ID DESC","100"); // only 100 results -> may get filtered down later
         if (c.getCount()>0) {
             c.moveToFirst();
             do {
@@ -400,7 +416,6 @@ public class TweetDB {
             } while (c.moveToNext());
         }
         c.close();
-        db.close();
 
         return ret;
 
@@ -409,16 +424,17 @@ public class TweetDB {
 
     /**
      * Get all statuses that are marked as a reply to the passed one.
+     *
+     * @param account Id of the account to use
      * @param inRepyId Id of the original status
      * @return  List of Json_objects that represent the replies
      */
-    public List<String> getReplies(long inRepyId) {
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
+    public List<String> getReplies(int account, long inRepyId) {
         List<String> ret = new ArrayList<String>();
 
         Cursor c ;
         c = db.query(TABLE_STATUSES,new String[]{STATUS}, "i_rep_to = ? AND " + ACCOUNT_ID_IS
-                ,new String[]{String.valueOf(inRepyId),account},null,null,"ID DESC");
+                ,new String[]{String.valueOf(inRepyId), String.valueOf(account)},null,null,"ID DESC");
         if (c.getCount()>0) {
             c.moveToFirst();
             do {
@@ -427,13 +443,17 @@ public class TweetDB {
             } while (c.moveToNext());
         }
         c.close();
-        db.close();
 
         return ret;
     }
 
-    public List<String> getThreadForStatus(long startid) {
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
+    /**
+     * Return the whole conversation starting at the status with id startid
+     * @param account Id of the account to use
+     * @param startid Status to start the search with
+     * @return List of json objects representing the conversation
+     */
+    public List<String> getThreadForStatus(int account, long startid) {
         List<String> ret = new ArrayList<String>();
         Stack<Long> todo = new Stack<Long>();
         todo.push(startid);
@@ -446,7 +466,7 @@ public class TweetDB {
 
             count++;
             c = db.query(TABLE_STATUSES,new String[]{"i_rep_to",STATUS}, selection
-                    , new String[]{String.valueOf(x), account},null,null,null);
+                    , new String[]{String.valueOf(x), String.valueOf(account)},null,null,null);
             if (c.getCount()>0) {
                 c.moveToFirst();
                 do {
@@ -471,7 +491,7 @@ public class TweetDB {
 
             count++;
             c = db.query(TABLE_STATUSES,new String[]{"id",STATUS}, selection1
-                    ,new String[]{String.valueOf(x),account},null,null,null);
+                    ,new String[]{String.valueOf(x), String.valueOf(account)},null,null,null);
             if (c.getCount()>0) {
                 c.moveToFirst();
                 do {
@@ -486,7 +506,6 @@ public class TweetDB {
             c.close();
         }
 
-        db.close();
         Log.i("getThreadForStatus","Num queries: " + count + ", num results: " + ret.size());
 
         return ret;
@@ -495,21 +514,22 @@ public class TweetDB {
 
     /**
      * Return a list of Responses along for the passed list id.
+     *
+     * @param account Id of the account to use
      * @param sinceId What is the oldest status to look after
      * @param howMany How many entries shall be returned
      * @param list_id From which list?
      * @return List of JResponse objects
      */
-    public List<String> getStatusesObjsOlderThan(long sinceId, int howMany, long list_id) {
+    public List<String> getStatusesObjsOlderThan(int account, long sinceId, int howMany, long list_id) {
         List<String> ret = new ArrayList<String>();
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         String listIdS = String.valueOf(list_id);
         if (sinceId>-1)
             c = db.query(TABLE_STATUSES, // Table
                     new String[]{STATUS}, // Columns returned
                     "id < ? AND list_id = ? AND " +ACCOUNT_ID_IS, // selection
-                    new String[]{String.valueOf(sinceId), listIdS,account}, // selection values
+                    new String[]{String.valueOf(sinceId), listIdS, String.valueOf(account)}, // selection values
                     null, // group by
                     null, // having
                     "ID DESC", // order by
@@ -519,7 +539,7 @@ public class TweetDB {
             c = db.query(TABLE_STATUSES, // Table
                     new String[]{STATUS}, // Columns returned
                     "list_id = ? AND " + ACCOUNT_ID_IS, // selection
-                    new String[]{listIdS,account},  // selection values
+                    new String[]{listIdS, String.valueOf(account)},  // selection values
                     null, // group by
                     null, // having
                     "ID DESC", // order by
@@ -534,18 +554,18 @@ public class TweetDB {
             } while (c.moveToNext());
         }
         c.close();
-        db.close();
         return ret;
     }
 
-    public List<String> getDirectsOlderThan(long sinceId, int howMany) {
+    public List<String> getDirectsOlderThan(int account, long sinceId, int howMany) {
         List<String> ret = new ArrayList<String>();
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         if (sinceId>-1)
-            c = db.query(TABLE_DIRECTS,new String[]{"MESSAGE_JSON"},"id < ? AND " +ACCOUNT_ID_IS,new String[]{String.valueOf(sinceId),account},null,null,"CREATED_AT DESC",String.valueOf(howMany));
+            c = db.query(TABLE_DIRECTS,new String[]{"MESSAGE_JSON"},"id < ? AND " +ACCOUNT_ID_IS,new String[]{String.valueOf(sinceId), String.valueOf(
+                    account)},null,null,"CREATED_AT DESC",String.valueOf(howMany));
         else
-            c = db.query(TABLE_DIRECTS,new String[]{"MESSAGE_JSON"},  ACCOUNT_ID_IS,new String[]{account},null,null,"CREATED_AT DESC",String.valueOf(howMany));
+            c = db.query(TABLE_DIRECTS,new String[]{"MESSAGE_JSON"},  ACCOUNT_ID_IS,new String[]{String.valueOf(
+                    account)},null,null,"CREATED_AT DESC",String.valueOf(howMany));
 
         if (c.getCount()>0){
             c.moveToFirst();
@@ -555,7 +575,6 @@ public class TweetDB {
             } while (c.moveToNext());
         }
         c.close();
-        db.close();
         return ret;
 
     }
@@ -565,73 +584,68 @@ public class TweetDB {
      * Purge the last read table.
      */
     public void resetLastRead() {
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_LAST_READ);
-        db.close();
     }
 
     /**
      * Purge the statuses table.
      */
     public void cleanTweetDB() {
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_STATUSES);
         db.execSQL("DELETE FROM " + TABLE_DIRECTS);
         db.execSQL("DELETE FROM " + TABLE_USERS);
         db.execSQL("DELETE FROM " + TABLE_LAST_READ);
         db.execSQL("DELETE FROM " + TABLE_URLS);
-        db.close();
     }
 
     public void cleanStatusesAndUsers(long cutOff) {
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_STATUSES + " WHERE ctime < " + cutOff);
         db.execSQL("DELETE FROM " + TABLE_USERS + " WHERE last_modified < " + cutOff);
         db.execSQL("DELETE FROM " + TABLE_URLS + " WHERE last_modified < " + cutOff);
-        db.close();
-
     }
 
     /**
      * Returns a user by its ID from the database if it exists or null.
      *
+     *
+     * @param account Id of the account to use
      * @param userId Id of the user
      * @return Basic JSON string of the user info or null.
      */
-    public String getUserById(long userId) {
+    public String getUserById(int account, long userId) {
 
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
         String ret = null;
 
         Cursor c;
-        c = db.query(TABLE_USERS,new String[]{"user_json"},"userId = ? AND  " + ACCOUNT_ID_IS,new String[] { String.valueOf(userId), account},null, null, null);
+        c = db.query(TABLE_USERS,new String[]{"user_json"},"userId = ? AND  " + ACCOUNT_ID_IS,new String[] { String.valueOf(userId), String.valueOf(
+                account)},null, null, null);
         if (c.getCount()>0) {
             c.moveToFirst();
             ret = c.getString(0);
         }
         c.close();
-        db.close();
         return ret;
     }
 
     /**
      * Returns a user by its screenname from the database if it exists or null.
      *
+     *
+     * @param account Id of the account to use
      * @param screenName screenname of the user
      * @return Basic JSON string of the user info or null.
      */
-    public String getUserByName(String screenName) {
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
+    public String getUserByName(int account, String screenName) {
         String ret = null;
 
         Cursor c;
-        c = db.query(TABLE_USERS,new String[]{"user_json"},"screenname = ? AND  " + ACCOUNT_ID_IS ,new String[] { screenName, account},null, null, null);
+        c = db.query(TABLE_USERS,new String[]{"user_json"},"screenname = ? AND  " + ACCOUNT_ID_IS ,new String[] { screenName, String.valueOf(
+                account)},null, null, null);
         if (c.getCount()>0) {
             c.moveToFirst();
             ret = c.getString(0);
         }
         c.close();
-        db.close();
         return ret;
     }
 
@@ -639,9 +653,9 @@ public class TweetDB {
     /**
      * Return a list of all users stored
      * @return list fo json objects in string representation
+     * @param account Id of the account to use
      */
-    public List<String> getUsers() {
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
+    public List<String> getUsers(int account) {
         List<String> ret = new ArrayList<String>();
 
         Cursor c;
@@ -654,7 +668,6 @@ public class TweetDB {
             } while (c.moveToNext());
         }
         c.close();
-        db.close();
 
         return ret;
     }
@@ -662,64 +675,36 @@ public class TweetDB {
 
     /**
      * Insert a user into the database.
+     * @param account Id of the account to use
      * @param userId The Id of the user to insert
      * @param json JSON representation of the User object
      * @param screenName screenname of that user
      */
-    public void insertUser(long userId, String json, String screenName) {
+    public void insertUser(int account, long userId, String json, String screenName) {
         ContentValues cv = new ContentValues(4);
         cv.put("userId",userId);
         cv.put(ACCOUNT_ID,account);
         cv.put("user_json",json);
         cv.put("screenname",screenName);
 
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.insertWithOnConflict(TABLE_USERS, null, cv,SQLiteDatabase.CONFLICT_REPLACE);
-        db.close();
     }
 
     /**
      * Update an existing user in the database.
+     * @param account Id of the account to use
      * @param userId Id of the user to update
      * @param json Json version of the User object
-     * TODO Still needed with conflict resolution on insert?
      */
-    public void updateUser(long userId, String json) {
+    public void updateUser(int account, long userId, String json) {
         ContentValues cv = new ContentValues(1);
         cv.put("user_json",json);
 
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.update(TABLE_USERS, cv, "userId = ? AND " + ACCOUNT_ID + " = ?",
-                new String[]{String.valueOf(userId), account});
-        db.close();
-    }
-
-    public Account getAccount(String name,String type) {
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
-        Cursor c;
-        Account account=null;
-        c = db.query(TABLE_ACCOUNTS,null,"name = ? AND serverType = ?", new String[]{name,type},null,null,null);
-        if (c.getCount()>0) {
-            c.moveToFirst();
-            boolean isDefault = c.getInt(6) == 1;
-            account = new Account(
-                    c.getInt(0), // id
-                    name, // name
-                    c.getString(2), // token key
-                    c.getString(3), // token secret
-                    c.getString(4), // url
-                    type, // type /5)
-                    isDefault // 6
-            );
-            account.setPassword(c.getString(7));
-        }
-        c.close();
-        db.close();
-        return account;
+                new String[]{String.valueOf(userId), String.valueOf(account)});
     }
 
     public Account getDefaultAccount(){
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         Account account=null;
         c = db.query(TABLE_ACCOUNTS,null,"isDefault=1", null,null,null,null);
@@ -738,7 +723,6 @@ public class TweetDB {
             account.setPassword(c.getString(7));
         }
         c.close();
-        db.close();
         return account;
 
     }
@@ -754,7 +738,6 @@ public class TweetDB {
             throw new IllegalStateException("Account id must not be -1");
 
         Log.i("TweetDB", "Setting default account to id " + id);
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
         // First see if the id exists
         Cursor c;
         c= db.query(TABLE_ACCOUNTS,new String[]{"id"},"id = " +id , null, null,null,null);
@@ -764,12 +747,10 @@ public class TweetDB {
         c.close();
         db.execSQL("UPDATE " + TABLE_ACCOUNTS + " SET isDefault = 0 WHERE isDefault = 1");
         db.execSQL("UPDATE " + TABLE_ACCOUNTS + " SET isDefault = 1 WHERE id = " + id);
-        db.close();
     }
 
 
     public List<Account> getAccountsForSelection() {
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         List<Account> accounts = new ArrayList<Account>();
         c = db.query(TABLE_ACCOUNTS,null, null,null,null,null,null);
@@ -791,7 +772,6 @@ public class TweetDB {
             } while (c.moveToNext());
         }
         c.close();
-        db.close();
 
         return accounts;
     }
@@ -808,7 +788,6 @@ public class TweetDB {
 
 
     public int getNewAccountId() {
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
         Cursor c;
         int ret = 1;
         c = db.query(TABLE_ACCOUNTS,new String[]{"id"},null, null,null,null,"id desc","1");
@@ -818,19 +797,16 @@ public class TweetDB {
             ret++;
         }
         c.close();
-        db.close();
         return ret;
     }
 
     public void deleteAccount(Account account) {
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
         String accountString = "" + account.getId();
         String[] accounts = new String[]{accountString};
         for (String table: DATA_TABLES) {
             db.delete(table,ACCOUNT_ID_IS,accounts);
         }
         db.delete(TABLE_ACCOUNTS,"id = ?", accounts);
-        db.close();
     }
 
     public void insertOrUpdateAccount(Account account) {
@@ -844,9 +820,7 @@ public class TweetDB {
         cv.put("isDefault",account.isDefaultAccount() ? 1 : 0);
         cv.put("password",account.getPassword());
 
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.insertWithOnConflict(TABLE_ACCOUNTS, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
-        db.close();
 
     }
 
@@ -860,7 +834,6 @@ public class TweetDB {
      * @param values ContentValues that describe the content
      */
     public void storeValues(String table, List<ContentValues> values) {
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
         try {
             db.beginTransaction();
             for (ContentValues val : values) {
@@ -871,11 +844,10 @@ public class TweetDB {
         finally {
             db.endTransaction();
         }
-        db.close();
     }
 
 
-    public void storeSavedSearch(String name, String query, int id, String json) {
+    public void storeSavedSearch(int account, String name, String query, int id, String json) {
         ContentValues cv = new ContentValues(5);
         cv.put("id",id);
         cv.put("name", name);
@@ -883,18 +855,14 @@ public class TweetDB {
         cv.put("query",query);
         cv.put("json",json);
 
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.insert(TABLE_SEARCHES,null,cv);
-        db.close();
-
     }
 
-    public List<String> getSavedSearches() {
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
+    public List<String> getSavedSearches(int account) {
         List<String > ret = new ArrayList<String>();
 
         Cursor c;
-        c = db.query(TABLE_SEARCHES,new String[]{"json"},ACCOUNT_ID_IS,new String[] { account},null, null, "ID DESC");
+        c = db.query(TABLE_SEARCHES,new String[]{"json"},ACCOUNT_ID_IS,new String[] {String.valueOf(account)},null, null, "ID DESC");
         if (c.getCount()>0) {
             c.moveToFirst();
             do {
@@ -903,32 +871,27 @@ public class TweetDB {
             } while ((c.moveToNext()));
         }
         c.close();
-        db.close();
 
         return ret;
     }
 
-    public void deleteSearch(int id) {
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
-        db.delete(TABLE_SEARCHES,ACCOUNT_ID_IS + " AND id = ?",new String[]{account,String.valueOf(id)});
-        db.close();
+    public void deleteSearch(int account, int id) {
+        db.delete(TABLE_SEARCHES,ACCOUNT_ID_IS + " AND id = ?",new String[]{String.valueOf(account),String.valueOf(id)});
     }
 
 
-    public void persistUpdate(byte[] request) {
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
+    public void persistUpdate(int account, byte[] request) {
         ContentValues cv = new ContentValues(3);
 
         cv.put("id", (Integer) null);
         cv.put(ACCOUNT_ID,account);
         cv.put("content",request);
         db.insert(TABLE_UPDATES,null,cv);
-        db.close();
     }
 
-    public List<Pair<Integer,byte[]>> getUpdatesForAccount() {
-        SQLiteDatabase db = tdHelper.getReadableDatabase();
-        Cursor c = db.query(TABLE_UPDATES,new String[]{"id","content"},ACCOUNT_ID_IS,new String[]{account},null,null,null);
+    public List<Pair<Integer,byte[]>> getUpdatesForAccount(int account) {
+        Cursor c = db.query(TABLE_UPDATES,new String[]{"id","content"},ACCOUNT_ID_IS,new String[]{String.valueOf(
+                account)},null,null,null);
         List<Pair<Integer,byte[]>> ret = new ArrayList<Pair<Integer, byte[]>>();
         if (c.getCount()>0) {
             c.moveToFirst();
@@ -941,14 +904,11 @@ public class TweetDB {
             while( c.moveToNext());
         }
         c.close();
-        db.close();
 
         return ret;
     }
 
     public void removeUpdate(int id) {
-        SQLiteDatabase db = tdHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_UPDATES + " WHERE id = " + id);
-        db.close();
     }
 }

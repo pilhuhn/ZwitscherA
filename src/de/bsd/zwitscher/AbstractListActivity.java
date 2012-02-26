@@ -35,11 +35,11 @@ public abstract class AbstractListActivity extends ListActivity {
         account = AccountHolder.getInstance().getAccount();
 
         if (account==null) {
-            TweetDB tmp = new TweetDB(this,-1);
+            TweetDB tmp = TweetDB.getInstance(getApplicationContext());
             account = tmp.getDefaultAccount();
         }
         th = new TwitterHelper(this, account);
-        tdb = new TweetDB(this,account.getId());
+        tdb = TweetDB.getInstance(getApplicationContext());
 
     }
 

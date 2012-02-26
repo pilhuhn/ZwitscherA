@@ -22,7 +22,7 @@ public class ExpandUrlRunner implements Runnable {
     public ExpandUrlRunner(Context context, List<String> urls) {
         this.urls = urls;
         this.context = context;
-        tweetDB = new TweetDB(context,-1); // Dummy account, does not matter
+        tweetDB = TweetDB.getInstance(context);
     }
 
     @Override
