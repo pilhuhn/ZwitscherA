@@ -245,6 +245,7 @@ public class TabWidget extends TabActivity {
         case R.id.to_top:
             if (listActivity!=null)
                 listActivity.scrollToTop(null);
+            break;
         case R.id.menu_feedback:
             send_feedback();
             break;
