@@ -147,7 +147,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
      * @see de.bsd.zwitscher.helper.FlushQueueTask
      */
     private UpdateResponse queueUpUpdate(UpdateRequest request, String message) {
-        TweetDB tdb = new TweetDB(context,account.getId());
+        TweetDB tdb = TweetDB.getInstance(context.getApplicationContext());
 
         UpdateResponse response = null;
         try {
@@ -156,7 +156,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
             out.writeObject(request);
             out.close();
 
-            tdb.persistUpdate(bos.toByteArray());
+            tdb.persistUpdate(account.getId(), bos.toByteArray());
 
             response = new UpdateResponse(UpdateType.QUEUED,true,message);
         } catch (IOException e) {

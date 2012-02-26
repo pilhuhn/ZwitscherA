@@ -54,7 +54,7 @@ public class AccountStuffActivity extends Activity {
     public void switchAccount(View view) {
 
         Account account = getSelectedAccountFromSpinner();
-        TweetDB tdb = new TweetDB(this,-1);
+        TweetDB tdb = TweetDB.getInstance(getApplicationContext());
         tdb.setDefaultAccount(account.getId());
         switchToSelectedAccount(account);
 
@@ -97,7 +97,7 @@ public class AccountStuffActivity extends Activity {
 
     private Account removeAccountFromDb(Account account) {
 
-        TweetDB tdb = new TweetDB(this,-1); // Account does not matter
+        TweetDB tdb = TweetDB.getInstance(getApplicationContext());
         tdb.deleteAccount(account);
 
         // Just select the first available account to switch to
@@ -131,7 +131,7 @@ public class AccountStuffActivity extends Activity {
     }
 
     private void getAccounts() {
-        TweetDB tdb = new TweetDB(this,-1); // Account id not needed
+        TweetDB tdb = TweetDB.getInstance(getApplicationContext());
         accounts = tdb.getAccountsForSelection();
     }
 

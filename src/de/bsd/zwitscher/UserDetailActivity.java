@@ -296,12 +296,12 @@ public class UserDetailActivity extends Activity  {
     @SuppressWarnings("unused")
     public void addToList(View v) {
 
-        TweetDB tdb = new TweetDB(this,account.getId());
+        TweetDB tdb = TweetDB.getInstance(getApplicationContext());
 
         List<String> data = new ArrayList<String>();
         Set<Map.Entry<Integer,Pair<String,String>>> userListsEntries;
 
-        userListsEntries = tdb.getLists().entrySet();
+        userListsEntries = tdb.getLists(account.getId()).entrySet();
         for (Map.Entry<Integer, Pair<String, String>> userList : userListsEntries) {
             if (userList.getValue().second.equals(account.getName()))
                 data.add(userList.getValue().first);
@@ -327,11 +327,11 @@ public class UserDetailActivity extends Activity  {
         if (requestCode==1 && resultCode==RESULT_OK) {
             String o = (String) data.getExtras().get("data");
 
-            TweetDB tdb = new TweetDB(this,account.getId());
+            TweetDB tdb = TweetDB.getInstance(getApplicationContext());
             Set<Map.Entry<Integer,Pair<String,String>>> userListsEntries;
 
             int listId;
-            userListsEntries = tdb.getLists().entrySet();
+            userListsEntries = tdb.getLists(account.getId()).entrySet();
             for (Map.Entry<Integer, Pair<String, String>> userList : userListsEntries) {
                 Pair<String,String> nameOwnerPair = userList.getValue();
                 if (o.equals(nameOwnerPair.first) && nameOwnerPair.second.equals(account.getName())) {
