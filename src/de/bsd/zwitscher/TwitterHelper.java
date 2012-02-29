@@ -610,7 +610,8 @@ Log.d("FillUp","Return: " + i);
         List<Status> ret = new ArrayList<Status>(jsons.size());
         for (String json : jsons) {
             Status status = materializeStatus(json);
-            ret.add(status);
+            if (!ret.contains(status)) // Filter duplicates, as we search over all timelines
+                ret.add(status);
         }
 
         Collections.sort(ret,new Comparator<Status>() {

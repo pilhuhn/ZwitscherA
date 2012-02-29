@@ -481,7 +481,7 @@ account)}, null, null, null);
             c.close();
         }
 
-        Log.i("getThreadForStatus","Num queries: " + count + ", num results: " + ret.size());
+//        Log.i("getThreadForStatus","Num queries: " + count + ", num results: " + ret.size());
 
         // also include later replies to thread
         todo.push(startid);
@@ -506,7 +506,7 @@ account)}, null, null, null);
             c.close();
         }
 
-        Log.i("getThreadForStatus","Num queries: " + count + ", num results: " + ret.size());
+//        Log.i("getThreadForStatus","Num queries: " + count + ", num results: " + ret.size());
 
         return ret;
     }
