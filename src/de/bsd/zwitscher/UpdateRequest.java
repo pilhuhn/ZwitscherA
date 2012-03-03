@@ -21,7 +21,7 @@ public class UpdateRequest implements Serializable {
     StatusUpdate statusUpdate;
     Status status;
     String picturePath;
-    View view;
+    transient View view; // Don't serialize
     String url;         // for external apps
     String extUser;     // for external apps
     String extPassword; // for external apps
