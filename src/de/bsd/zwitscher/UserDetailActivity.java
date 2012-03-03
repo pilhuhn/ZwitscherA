@@ -211,7 +211,7 @@ public class UserDetailActivity extends Activity  {
 
     /**
      * Set the appropriate text on the follow button
-     * @param weAreFollowing Are we folloing that user (show 'unfollow' message in this case).
+     * @param weAreFollowing Are we following that user (show 'unfollow' message in this case).
      */
     private void setFollowingButton(boolean weAreFollowing) {
         if (weAreFollowing)

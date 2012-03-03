@@ -175,4 +175,6 @@
     <string name="ril_button">RIL</string>
     <string name="bio">Bio:</string>
     <string name="Translate">Translate</string>
+    <string name="Direct">Direct</string>
+    <string name="screen_name">screen name</string>
 </resources>

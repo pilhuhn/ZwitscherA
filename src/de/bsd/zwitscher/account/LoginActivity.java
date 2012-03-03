@@ -22,7 +22,7 @@ import de.bsd.zwitscher.helper.NetworkHelper;
 
 public class LoginActivity extends Activity {
 
-	TweetDB tweetDB;
+	private TweetDB tweetDB;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

@@ -13,7 +13,7 @@ import de.bsd.zwitscher.helper.PicHelper;
  * Common base for the Adapters
  * @author Heiko W. Rupp
  */
-public class AbstractAdapter<T> extends ArrayAdapter<T> {
+class AbstractAdapter<T> extends ArrayAdapter<T> {
 
     List<T> items;
     PicHelper ph;
@@ -21,7 +21,7 @@ public class AbstractAdapter<T> extends ArrayAdapter<T> {
     LayoutInflater inflater;
 
 
-    public AbstractAdapter(Context context, int textViewResourceId, List<T> objects) {
+    AbstractAdapter(Context context, int textViewResourceId, List<T> objects) {
         super(context, textViewResourceId, objects);
 
         extContext = context;

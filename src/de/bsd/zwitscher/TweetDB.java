@@ -426,15 +426,15 @@ account)}, null, null, null);
      * Get all statuses that are marked as a reply to the passed one.
      *
      * @param account Id of the account to use
-     * @param inRepyId Id of the original status
+     * @param inReplyId Id of the original status
      * @return  List of Json_objects that represent the replies
      */
-    public List<String> getReplies(int account, long inRepyId) {
+    public List<String> getReplies(int account, long inReplyId) {
         List<String> ret = new ArrayList<String>();
 
         Cursor c ;
         c = db.query(TABLE_STATUSES,new String[]{STATUS}, "i_rep_to = ? AND " + ACCOUNT_ID_IS
-                ,new String[]{String.valueOf(inRepyId), String.valueOf(account)},null,null,"ID DESC");
+                ,new String[]{String.valueOf(inReplyId), String.valueOf(account)},null,null,"ID DESC");
         if (c.getCount()>0) {
             c.moveToFirst();
             do {

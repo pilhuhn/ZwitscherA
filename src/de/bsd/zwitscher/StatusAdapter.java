@@ -30,8 +30,8 @@ import java.util.List;
  */
 class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
-    TwitterHelper th;
-    boolean downloadImages;
+    private TwitterHelper th;
+    private boolean downloadImages;
 
 
     public StatusAdapter(Context context, Account account, int textViewResourceId, List<T> objects) {

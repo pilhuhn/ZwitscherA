@@ -13,10 +13,10 @@ import de.bsd.zwitscher.TwitterHelper;
  * Create an account
  * @author Heiko W. Rupp
  */
-public class CreateAccountTask extends AsyncTask<Void,Void,String> {
+class CreateAccountTask extends AsyncTask<Void,Void,String> {
 
-    ProgressDialog dialog;
-    Activity context;
+    private ProgressDialog dialog;
+    private Activity context;
     private String username;
     private String password;
     private String service;

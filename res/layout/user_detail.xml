@@ -123,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:onClick="directMessage"
                 android:src="@drawable/direct_button"
-                android:text="Direct"/>
+                android:text="@string/Direct"/>
     </LinearLayout>
     <LinearLayout
         android:layout_height="wrap_content"

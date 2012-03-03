@@ -59,13 +59,13 @@ import twitter4j.User;
  */
 public class NewTweetActivity extends Activity implements LocationListener {
 
-	EditText edittext;
-	Status origStatus;
-    ProgressBar pg;
-    User toUser = null;
-    TextView charCountView;
-    String picturePath = null;
-    LocationManager locationManager;
+	private EditText edittext;
+	private Status origStatus;
+    private ProgressBar pg;
+    private User toUser = null;
+    private TextView charCountView;
+    private String picturePath = null;
+    private LocationManager locationManager;
     private Account account;
     private int picUrlCount;
 
@@ -305,7 +305,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
      * Trigger an update (new tweet, reply )
      * @param update Update to send
      */
-	public void tweet(StatusUpdate update) {
+    void tweet(StatusUpdate update) {
         UpdateRequest request = new UpdateRequest(UpdateType.UPDATE);
         request.statusUpdate = update;
         if (picturePath!=null)
@@ -578,7 +578,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
     }
 
     // Taken from http://stackoverflow.com/questions/2169649/open-an-image-in-androids-built-in-gallery-app-programmatically/2636538#2636538
-    public String getPath(Uri uri) {
+    String getPath(Uri uri) {
         String[] projection = { MediaStore.Images.Media.DATA };
         Cursor cursor = managedQuery(uri, projection, null, null, null);
         int column_index = cursor

@@ -12,11 +12,11 @@ import de.bsd.zwitscher.TweetDB;
  */
 public class CleanupTask extends AsyncTask<Void,Void,Void> {
 
-    private Context context;
-    long MILLIS = 1000;
-    long DAY = 86400L * MILLIS;
-    long WEEK = 7* DAY;
-    ProgressDialog pd ;
+    private final Context context;
+    private static final long MILLIS = 1000;
+    private static final long DAY = 86400L * MILLIS;
+    private final static long WEEK = 7* DAY;
+    private ProgressDialog pd ;
 
     public CleanupTask(Context context) {
         this.context = context;

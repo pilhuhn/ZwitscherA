@@ -29,10 +29,10 @@ import java.util.List;
  */
 public class ThreadListActivity extends ListActivity {
 
-    ProgressBar pg;
-    TextView titleTextBox;
-    Context thisActivity;
-    List<Status> statuses;
+    private ProgressBar pg;
+    private TextView titleTextBox;
+    private Context thisActivity;
+    private List<Status> statuses;
     private Account account;
 
     @Override

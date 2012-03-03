@@ -13,11 +13,11 @@ import java.util.List;
 public class MetaList<T> {
 
     /** The actual list */
-    List<T> list = new ArrayList<T>();
+    private List<T> list = new ArrayList<T>();
     /** Number of original (= received from server) items */
-    int numOriginal;
+    private int numOriginal;
     /** Number of items filled up */
-    int numAdded;
+    private int numAdded;
 
     /**
      * Create a new empty MetaList with the list initialized

@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import android.widget.Spinner;
 
 /**
- * A spinner, that does not have the flaw that for programmatical invocations it will directly
+ * A spinner, that does not have the flaw that for programmatic invocations it will directly
  * call the onSelectedListener. Instead it defines a onClick listener that is then called when
  * the user selects an item. This even works when the user re-selects that item again.
  *

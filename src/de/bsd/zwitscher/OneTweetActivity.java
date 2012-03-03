@@ -56,12 +56,12 @@ import java.util.*;
  */
 public class OneTweetActivity extends Activity implements OnInitListener, OnUtteranceCompletedListener {
 
-	Status status ;
-    ImageView userPictureView;
-    ProgressBar pg;
-    boolean downloadPictures=false;
-    TextToSpeech tts;
-    TextView titleTextView;
+	private Status status ;
+    private ImageView userPictureView;
+    private ProgressBar pg;
+    private boolean downloadPictures=false;
+    private TextToSpeech tts;
+    private TextView titleTextView;
     private Account account;
 
     @Override
@@ -316,7 +316,7 @@ builder                                .append(ue.getExpandedURL());
             // we have unresolved links - try to fetch them now
             // TODO figure out how to best do it, as
             // we need not only to fetch the urls in background, but
-            // also do the image previw magic again
+            // also do the image preview magic again
         }
     }
 
@@ -445,7 +445,7 @@ builder                                .append(ue.getExpandedURL());
         String password = prefs.getString("ril_password","");
 
         if (user.equals("") || password.equals("")) {
-            Toast.makeText(this,"No user/passwrod for ReadItLater given",Toast.LENGTH_LONG).show();
+            Toast.makeText(this,"No user/password for ReadItLater given",Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -482,7 +482,7 @@ builder                                .append(ue.getExpandedURL());
      * If directly called from within speak() it will not work
      * because the onInit() listener is no ready early enough
      */
-	public void setupspeak() {
+    void setupspeak() {
 
 		tts = new TextToSpeech(this,this);
         tts.setLanguage(Locale.US);
@@ -668,7 +668,7 @@ builder                                .append(ue.getExpandedURL());
         // We have urls, so check for picture services
         for (String url :  urls) {
             Log.d("One tweet","Url = " + url);
-//            url = UrlHelper.expandUrl(url); // expand link shorteners TODO that ultimatively needs to go into the main parsing for all kinds of links
+//            url = UrlHelper.expandUrl(url); // expand link shorteners TODO that ultimately needs to go into the main parsing for all kinds of links
             String finalUrlString="";
             if (url.contains("yfrog.com")) {
                 finalUrlString = url + ".th.jpg";
@@ -772,7 +772,7 @@ builder                                .append(ue.getExpandedURL());
                 readItLater(null);
                 break;
             case R.id.report_as_spam:
-                report_spam(null);
+                report_spam();
                 break;
 
             default:
@@ -783,7 +783,7 @@ builder                                .append(ue.getExpandedURL());
 
     }
 
-    public void report_spam(View v) {
+    void report_spam() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);
@@ -821,7 +821,7 @@ builder                                .append(ue.getExpandedURL());
         List<BitmapWithUrl> bitmaps = new ArrayList<BitmapWithUrl>(listOfUrlPairs.size());
 
         for (UrlPair urlPair : listOfUrlPairs) {
-            Log.i("loadThumbail", "URL to load is " + urlPair.getTarget());
+            Log.i("loadThumbnail", "URL to load is " + urlPair.getTarget());
 
             try {
                 URL picUrl = new URL(urlPair.getTarget());

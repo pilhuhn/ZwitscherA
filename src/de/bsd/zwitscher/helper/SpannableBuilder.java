@@ -28,7 +28,7 @@ import android.text.style.StyleSpan;
 public class SpannableBuilder {
 
     private int position = 0;
-    List<Holder> holderList;
+    private List<Holder> holderList;
     private Context context;
 
 
@@ -53,10 +53,10 @@ public class SpannableBuilder {
     }
 
     /**
-     * Create a SpannableBuilder from a string resource and stype
+     * Create a SpannableBuilder from a string resource and style
      * @param context Context of caller
      * @param resourceId Id of a string resource in res/strings.xml
-     * @param typeface Style to use - typicalla a {@link android.graphics.Typeface} constant
+     * @param typeface Style to use - typically a {@link android.graphics.Typeface} constant
      */
     public SpannableBuilder(Context context, int resourceId, int typeface) {
         this(context);

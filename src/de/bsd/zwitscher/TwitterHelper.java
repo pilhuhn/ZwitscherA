@@ -36,11 +36,11 @@ import twitter4j.media.MediaProvider;
 public class TwitterHelper {
 
     private static final String HTTP_IDENTI_CA_API = "http://identi.ca/api/";
-    Context context;
-    TweetDB tweetDB;
-    Twitter twitter;
-    int accountId;
-    Account account;
+    private Context context;
+    private TweetDB tweetDB;
+    private Twitter twitter;
+    private int accountId;
+    private Account account;
 
 
     public TwitterHelper(Context context, Account account) {
@@ -343,7 +343,7 @@ public class TwitterHelper {
      * @param username Username to get the token for
      * @param password password of that user and service
      * @param service service to use. Currently supported are twitter and identi.ca
-     * @param makeDefault  @throws Exception If the server can not be reached or the credentials are not vaild
+     * @param makeDefault  @throws Exception If the server can not be reached or the credentials are not valid
      * @return id of the account
      * @throws Exception when anything goes wrong (e.g wrong username/password etc.)
      */
@@ -637,7 +637,7 @@ Log.d("FillUp","Return: " + i);
      * Search the status table for statuses of the current user
      * that match the passed query entry. If the query starts with
      * 'from:', statuses from the passed user are looked up
-     * @param query Query [from:user |ÊsearchTerm ]
+     * @param query Query [from:user |ï¿½searchTerm ]
      * @return Statuses found or an empty list.
      */
     public List<Status> searchStatues(String query) {

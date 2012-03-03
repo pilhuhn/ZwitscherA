@@ -9,14 +9,14 @@ import android.os.Parcelable;
  * @author Heiko W. Rupp
  */
 public class Account implements Parcelable {
-    int id;
-    String name;
-    String accessTokenKey;
-    String accessTokenSecret;
-    String serverType;
-    String serverUrl;
-    boolean defaultAccount;
-    String password;
+    private int id;
+    private String name;
+    private String accessTokenKey;
+    private String accessTokenSecret;
+    private String serverType;
+    private String serverUrl;
+    private boolean defaultAccount;
+    private String password;
 
     public Account(int id, String name, String accessTokenKey, String accessTokenSecret, String serverUrl, String serverType,boolean defaultAccount) {
         this.id = id;

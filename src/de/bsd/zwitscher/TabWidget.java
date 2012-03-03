@@ -42,13 +42,12 @@ import android.widget.TabHost;
 public class TabWidget extends TabActivity {
 
     static final String LIST_ID = "list_id";
-    static final long SEVEN_DAYS = 7 * 86400 * 1000L;
-    TabHost tabHost;
-	TabHost.TabSpec homeSpec;
+    private static final long SEVEN_DAYS = 7 * 86400 * 1000L;
+    private TabHost tabHost;
     ProgressBar pg;
     TextView titleTextBox;
-    int accountId;
-    Account account;
+    private int accountId;
+    private Account account;
     private AbstractListActivity listActivity;
 
     @Override
@@ -110,9 +109,9 @@ public class TabWidget extends TabActivity {
         homeIntent.putExtra(LIST_ID, 0);
 
         String tmp = getString(R.string.home_timeline);
-        homeSpec = tabHost.newTabSpec("tmp")
-				.setIndicator(tmp,res.getDrawable(R.drawable.ic_tab_home))
-				.setContent(homeIntent);
+        TabHost.TabSpec homeSpec = tabHost.newTabSpec("tmp")
+                .setIndicator(tmp, res.getDrawable(R.drawable.ic_tab_home))
+                .setContent(homeIntent);
         tabHost.addTab(homeSpec);
 
         Intent mentionsIntent = new Intent().setClass(this,TweetListActivity.class);

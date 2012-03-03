@@ -21,7 +21,7 @@ import de.bsd.zwitscher.TweetDB;
 public class AccountStuffActivity extends Activity {
 
     private List<Account> accounts;
-    Spinner spinner;
+    private Spinner spinner;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {

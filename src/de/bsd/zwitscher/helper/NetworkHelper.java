@@ -16,8 +16,8 @@ import android.util.Log;
  */
 public class NetworkHelper {
 
-    ConnectivityManager cManager;
-    SharedPreferences preferences;
+    private ConnectivityManager cManager;
+    private SharedPreferences preferences;
 
     public NetworkHelper(Context context) {
         cManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -55,9 +55,11 @@ public class NetworkHelper {
         Hsdpa = 8
         */
 
+/*
         Log.i("NetworkHelper","Current network is " + info.getTypeName() + ":" + info.getSubtypeName());
         Log.i("NetworkHelper","Current network is " + type + ":" + info.getSubtype());
         Log.i("NetworkHelper","Desired config is  " + networkConfig);
+*/
 
         int configType = 0;
         try {

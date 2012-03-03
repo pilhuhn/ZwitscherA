@@ -19,8 +19,8 @@ import android.util.Log;
  */
 public class PicHelper {
 
-    static final String APP_BASE_DIR = "/Android/data/de.bsd.zwitscher/";
-    String externalStorageState;
+    private static final String APP_BASE_DIR = "/Android/data/de.bsd.zwitscher/";
+    private String externalStorageState;
 
     public PicHelper() {
         externalStorageState = Environment.getExternalStorageState();
