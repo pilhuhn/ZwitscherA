@@ -265,6 +265,59 @@ account)}, null, null, null);
 	}
 
     /**
+     * Return the id of the status that was last read
+     *
+     *
+     * @param account Id of the account to use
+     * @param list_id id of the list
+     * @return id of the status that was last fetched
+     */
+	long getLastFetched(int account, int list_id) {
+        Long ret=-1L;
+        try {
+            Cursor c = db.query(TABLE_LAST_READ, new String[] {"last_fetched_id"}, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id), String.valueOf(
+account)}, null, null, null);
+            if (c.getCount()==0)
+                ret = -1L;
+            else {
+                c.moveToFirst();
+                ret = c.getLong(0);
+            }
+            c.close();
+        } catch (Throwable e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+        return ret;
+	}
+
+    public void markAllRead(int listId, int accountId) {
+        db.execSQL("UPDATE " + TABLE_LAST_READ + " SET last_read_id = last_fetched_id WHERE list_id = " + listId + " AND ACCOUNT_ID = " +accountId);
+    }
+
+    public int getUnreadCount(int accountId, int listId) {
+        int ret =0;
+        Cursor c = db.query(TABLE_LAST_READ,new String[]{"last_read_id","last_fetched_id"},"list_id =? AND " + ACCOUNT_ID_IS,
+                new String[]{String.valueOf(listId),String.valueOf(accountId)},null,null,null);
+        if (c.getCount()>0) {
+            c.moveToFirst();
+            long lastRead = c.getLong(0);
+            long lastFetched = c.getLong(1);
+            Log.i("getUnreadCount","lr= " + lastRead + ", lf="+lastFetched);
+            c.close();
+
+            c = db.rawQuery("SELECT COUNT(id) FROM " + TABLE_STATUSES + " WHERE list_id=? AND ACCOUNT_ID=? AND id > ?",
+                    new String[]{String.valueOf(listId),String.valueOf(accountId),String.valueOf(lastRead)});
+            if (c.getCount()>0) {
+                c.moveToFirst();
+                ret = c.getInt(0);
+            }
+            c.close();
+        }
+        return ret;
+    }
+
+
+    /**
      * Update (or initially store) the last read information of the passed list
      * @param account Id of the account to use
      * @param list_id List to mark as read
@@ -277,7 +330,31 @@ account)}, null, null, null);
         cv.put(ACCOUNT_ID,account);
 
         try {
-            db= tdHelper.getWritableDatabase();
+            int updated = db.update(TABLE_LAST_READ, cv, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id), String.valueOf(
+                    account)});
+            if (updated==0) {
+                // row not yet present
+                db.insert(TABLE_LAST_READ, null, cv);
+            }
+        } catch (Exception e) {
+            // Situation is not too bad, as it just means more network traffic next time // TODO find better solution
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Update (or initially store) the last read information of the passed list
+     * @param account Id of the account to use
+     * @param list_id List to mark as read
+     * @param last_fetched_id Id of the last fetched status
+     */
+	void updateOrInsertLastFetched(int account, int list_id, long last_fetched_id) {
+		ContentValues cv = new ContentValues();
+		cv.put("list_id", list_id);
+		cv.put("last_fetched_id", last_fetched_id);
+        cv.put(ACCOUNT_ID,account);
+
+        try {
             int updated = db.update(TABLE_LAST_READ, cv, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id), String.valueOf(
                     account)});
             if (updated==0) {

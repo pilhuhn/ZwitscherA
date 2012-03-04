@@ -5,22 +5,18 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-import de.bsd.zwitscher.helper.CaseInsensitiveStringComparator;
+import de.bsd.zwitscher.helper.CaseInsensitivePairComparator;
 import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.Paging;
 import twitter4j.SavedSearch;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Display the list of user lists
@@ -31,7 +27,7 @@ public class ListOfListsActivity extends AbstractListActivity {
 
     Set<Map.Entry<Integer,Pair<String,String>>> userListsEntries;
     int mode;
-    ArrayAdapter<String> adapter;
+    ListOfListLineItemAdapter adapter;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,8 +56,14 @@ public class ListOfListsActivity extends AbstractListActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.i("LioLiActivity","onResume");
 
-        List<String> result = new ArrayList<String>();
+        setupAdapter();
+
+    }
+
+    private void setupAdapter() {
+        List<Pair<String,Integer>> result = new ArrayList<Pair<String, Integer>>();
 
         if (mode==0) {
             // Display users lists
@@ -73,31 +75,38 @@ public class ListOfListsActivity extends AbstractListActivity {
                     listname = nameOwnerPair.first;
                 else
                     listname = "@" + nameOwnerPair.second + "/" + nameOwnerPair.first;
-                result.add(listname);
+
+                int count=tdb.getUnreadCount(account.getId(),userList.getKey());
+
+                Pair<String,Integer> pair = new Pair<String,Integer>(listname,count);
+                result.add(pair);
             }
             if (result.isEmpty()) {
                 String s = getString(R.string.please_sync_lists);
-                result.add(s);
+                Pair<String,Integer> pair = new Pair<String, Integer>(s,0);
+                result.add(pair);
             }
         }
         else if (mode==1) {
             List<SavedSearch> searches = th.getSavedSearchesFromDb();
             for (SavedSearch search : searches) {
-                result.add(search.getName());
+                Pair<String,Integer> pair = new Pair<String, Integer>(search.getName(),0);
+                result.add(pair);
             }
 
             if (result.isEmpty()) {
                 String s = getString(R.string.no_searches_found);
-                result.add(s);
+                Pair<String,Integer> pair = new Pair<String, Integer>(s,0);
+                result.add(pair);
             }
         }
         else
             throw new IllegalArgumentException("Unknown mode " + mode);
 
-        Collections.sort(result, new CaseInsensitiveStringComparator());
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, result);
+        Collections.sort(result, new CaseInsensitivePairComparator());
+        adapter = new ListOfListLineItemAdapter(this, R.layout.list_of_list_line_item, result);
         setListAdapter(adapter);
-
+        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -114,7 +123,7 @@ public class ListOfListsActivity extends AbstractListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
 
-        String text = (String) getListView().getItemAtPosition(position);
+        String text = ((Pair<String,Integer>) getListView().getItemAtPosition(position)).first;
 
         if (mode==0) { // User list
             int listId = -1 ;
@@ -132,6 +141,12 @@ public class ListOfListsActivity extends AbstractListActivity {
             }
 
             if (listId!=-1) {
+
+                tdb.markAllRead(listId, account.getId());
+                adapter.setCountForItem(position,0);
+                adapter.notifyDataSetChanged();
+                getListView().requestLayout();
+
                 Intent intent = new Intent().setClass(this,TweetListActivity.class);
                 intent.putExtra(TabWidget.LIST_ID, listId);
                 intent.putExtra("userListid",listId);
@@ -197,18 +212,16 @@ public class ListOfListsActivity extends AbstractListActivity {
                 paging.setCount(100);
 
                 int listId = entry.getKey();
-                String screenName = nameOwnerPair.second;
-                long lastFetched = tdb.getLastRead(account.getId(), listId);
+                long lastFetched = tdb.getLastFetched(account.getId(), listId);
                 if (lastFetched>0)
                     paging.setSinceId(lastFetched);
-                MetaList<twitter4j.Status> list = th.getUserList(paging, listId, screenName, false);
+                MetaList<twitter4j.Status> list = th.getUserList(paging, listId, false);
                 long newOnes = list.getNumOriginal();
                 if (newOnes>0) {
                     long maxId = list.getList().get(0).getId();
-                    tdb.updateOrInsertLastRead(account.getId(), listId,maxId);
+                    tdb.updateOrInsertLastFetched(account.getId(), listId, maxId);
 
                     publishProgress(nameOwnerPair.first,newOnes);
-
                 }
             }
 
@@ -219,6 +232,8 @@ public class ListOfListsActivity extends AbstractListActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
+            setupAdapter();
 
             setProgressBarVisibility(false);
             if (pg!=null)
@@ -231,36 +246,15 @@ public class ListOfListsActivity extends AbstractListActivity {
         protected void onProgressUpdate(Object... values) {
             super.onProgressUpdate(values);
 
-
             String list = (String) values[0];
 
             if (values.length==2) {
                 Long num = (Long) values[1];
                 Toast.makeText(context, list + ": " + num + " new", Toast.LENGTH_SHORT).show();
             } else { // len =1
-
                 if (titleTextBox!=null)
                     titleTextBox.setText(updating + " " + list + "...");
             }
-            // Support Progress bar with a determinate value
-//            int i = values[0];
-//            int val = (i * 10000) / userListsEntries.size();
-//            Log.d("SyAlLiTa","progress: " + val);
-//            setProgress(val);
-//            pg.setProgress(val);
-
-            // Update the list entries somehow with a marker that they have new tweets
-//                ListView listView = getListView();
-//                for (int i = 0; i < listView.getCount(); i++) {
-//                    String itemAtI = (String) listView.getItemAtPosition(i);
-//                    if (itemAtI.equals(userList.getKey())) {
-//                        adapter.remove(itemAtI);
-//                        itemAtI = itemAtI + "(" + newOnes + ")";
-//                        adapter.insert(itemAtI,i);
-//                    }
-//                }
-
-
         }
     }
 }

@@ -241,7 +241,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             myStatuses = th.getTimeline(paging,listId,fromDbOnly);
             break;
         default:
-        	myStatuses = th.getUserList(paging,listId, userListOwner, fromDbOnly);
+        	myStatuses = th.getUserList(paging,listId, fromDbOnly);
         	break;
         }
 

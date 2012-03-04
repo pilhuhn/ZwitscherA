@@ -480,16 +480,17 @@ public class TwitterHelper {
         return updateResponse;
     }
 
-	public MetaList<Status> getUserList(Paging paging, int listId, String screenName, boolean fromDbOnly) {
+	public MetaList<Status> getUserList(Paging paging, int listId, boolean fromDbOnly) {
 
         List<Status> statuses;
         if (!fromDbOnly) {
             try {
-                statuses = twitter.getUserListStatuses(screenName, listId, paging);
+                statuses = twitter.getUserListStatuses( listId, paging);
                 int size = statuses.size();
                 Log.i("getUserList","Got " + size + " statuses from Twitter");
 
                 persistStatus(statuses,listId);
+
             } catch (Exception e) {
                 statuses = new ArrayList<Status>();
 
