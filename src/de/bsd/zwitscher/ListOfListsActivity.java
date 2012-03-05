@@ -220,8 +220,6 @@ public class ListOfListsActivity extends AbstractListActivity {
                 if (newOnes>0) {
                     long maxId = list.getList().get(0).getId();
                     tdb.updateOrInsertLastFetched(account.getId(), listId, maxId);
-
-                    publishProgress(nameOwnerPair.first,newOnes);
                 }
             }
 
@@ -248,13 +246,8 @@ public class ListOfListsActivity extends AbstractListActivity {
 
             String list = (String) values[0];
 
-            if (values.length==2) {
-                Long num = (Long) values[1];
-                Toast.makeText(context, list + ": " + num + " new", Toast.LENGTH_SHORT).show();
-            } else { // len =1
-                if (titleTextBox!=null)
-                    titleTextBox.setText(updating + " " + list + "...");
-            }
+            if (titleTextBox!=null)
+                titleTextBox.setText(updating + " " + list + "...");
         }
     }
 }
