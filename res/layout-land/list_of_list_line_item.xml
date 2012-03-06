@@ -13,7 +13,7 @@
               android:autoLink="none"
               android:gravity="left"
               android:singleLine="false"
-              android:layout_weight="4"
+              android:layout_weight="7"
               android:textSize="28dp"
               />
     <TextView android:id="@+id/count"
