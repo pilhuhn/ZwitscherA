@@ -684,7 +684,10 @@ builder                                .append(ue.getExpandedURL());
             else if (url.contains("twimg")) {
                 finalUrlString = url;
             }
-
+            else if (url.contains("i.imgur.com")) {
+                String tmp = url.substring(0,url.lastIndexOf('.'));
+                finalUrlString = tmp + "s" + url.substring(url.lastIndexOf('.'));
+            }
             else {
                 String screenName;
                 long statusId;
