@@ -1,4 +1,5 @@
-Welcome to Zwitscher, a microblogging client for Android.
+Welcome to Zwitscher, a microblogging client for Android, that is licensed
+under the ASL V2 license (as is Twitter4j) -- see LICENSE.txt
 I know that this is not the first one and far from working good.
 It is first a "real" project for me to get into Android programming.
 
