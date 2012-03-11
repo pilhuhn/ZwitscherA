@@ -1,11 +1,11 @@
 package de.bsd.zwitscher;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.widget.ListView;
@@ -43,9 +43,9 @@ public class ListOfListsActivity extends AbstractListActivity {
                 reloadButton.setEnabled(false);  // disabled for stored searches (for now), as the tweets are not persisted
 
         }
-        else {
+        else { // >= 11 -> honeycomb and later
             setContentView(R.layout.tweet_list_layout_honeycomb);
-// TODO enable/disable reload button
+            // TODO enable/disable reload button
         }
 
 
@@ -55,7 +55,6 @@ public class ListOfListsActivity extends AbstractListActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i("LioLiActivity","onResume");
 
         setupAdapter();
 
@@ -237,6 +236,15 @@ public class ListOfListsActivity extends AbstractListActivity {
                 pg.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)
                 titleTextBox.setText("");
+
+            if (Build.VERSION.SDK_INT>=11) {
+                ActionBar ab = getActionBar();
+                if (ab==null && parent!=null)
+                    ab=parent.getActionBar();
+                if (ab!=null)
+                    ab.setSubtitle(account.getAccountIdentifier());
+            }
+
         }
 
         @Override
@@ -245,8 +253,18 @@ public class ListOfListsActivity extends AbstractListActivity {
 
             String list = (String) values[0];
 
-            if (titleTextBox!=null)
-                titleTextBox.setText(updating + " " + list + "...");
+            String text = updating + " " + list + "...";
+            if (titleTextBox!=null) {
+                titleTextBox.setText(text);
+            }
+
+            if (Build.VERSION.SDK_INT>=11) {
+                ActionBar ab = getActionBar();
+                if (ab==null && parent!=null)
+                    ab=parent.getActionBar();
+                if (ab!=null)
+                    ab.setSubtitle(text);
+            }
         }
     }
 }

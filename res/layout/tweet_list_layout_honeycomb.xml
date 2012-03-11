@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
- - Layout for the individual tabs that hosts any lists
- - with the list on top and the quick navigation at the
- - bottom.
+ - Layout for the tabs that hosts the list of lists
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

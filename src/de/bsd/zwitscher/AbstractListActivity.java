@@ -21,13 +21,14 @@ public abstract class AbstractListActivity extends ListActivity {
     TwitterHelper th;
     TweetDB tdb;
     Account account;
+    TabWidget parent;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Activity theParent = getParent();
         if (theParent instanceof TabWidget) {
-            TabWidget parent = (TabWidget) theParent;
+            parent = (TabWidget) theParent;
             pg = parent.pg;
             titleTextBox = parent.titleTextBox;
         }
