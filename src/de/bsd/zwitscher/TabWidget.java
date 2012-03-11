@@ -21,6 +21,7 @@ import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.account.AccountStuffActivity;
+import de.bsd.zwitscher.account.LoginActivity;
 import de.bsd.zwitscher.helper.CleanupTask;
 import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.SavedSearch;
@@ -72,6 +73,14 @@ public class TabWidget extends TabActivity {
             TweetDB tdb = TweetDB.getInstance(getApplicationContext());
             account = tdb.getDefaultAccount();
             AccountHolder.getInstance().setAccount(account);
+        }
+
+        if (account==null) {
+            // Still null -> initial login failed
+            Intent i = new Intent().setClass(this, LoginActivity.class);
+            startActivity(i);
+            finish();
+            return;
         }
 
         accountId = account.getId();
