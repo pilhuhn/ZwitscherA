@@ -47,8 +47,6 @@ public class TwitterLoginActivity extends Activity {
             RequestToken rt = new GetRequestTokenTask().execute().get();
             String token = rt.getToken();
 
-            System.out.println("Token is " + token);
-
             myWebView.loadUrl("https://api.twitter.com/oauth/authorize?force_login=true&oauth_token="+token);
         } catch (InterruptedException e) {
             e.printStackTrace();  // TODO: Customise this generated block
@@ -122,26 +120,22 @@ public class TwitterLoginActivity extends Activity {
          */
         @SuppressWarnings("unused")
         public void obtain(String html) {
-            System.out.println("html is " + html);
             int i = html.indexOf("<code>");
             if (i!=-1) {
                 html = html.substring(i+6);
                 i = html.indexOf("</code>");
                 html = html.substring(0,i);
 
-
-
-            System.out.println("html is now");
-            try {
-                Account acct = new GenerateAccountWithOauthTask().execute(html).get();
+                try {
+                    Account acct = new GenerateAccountWithOauthTask().execute(html).get();
                     Intent intent = new Intent().setClass(TwitterLoginActivity.this, TabWidget.class);
                     startActivity(intent);
                     finish();
-            } catch (Exception e) {
-                Toast.makeText(getApplicationContext(),
-                        "Error: " + e.getMessage(), 15000).show();
-                e.printStackTrace();
-            }
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(),
+                            "Error: " + e.getMessage(), 15000).show();
+                    e.printStackTrace();
+                }
             }
         }
     }

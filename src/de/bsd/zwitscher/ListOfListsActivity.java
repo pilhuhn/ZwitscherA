@@ -10,7 +10,6 @@ import android.util.Pair;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 import de.bsd.zwitscher.helper.CaseInsensitivePairComparator;
 import de.bsd.zwitscher.helper.MetaList;
 import twitter4j.Paging;

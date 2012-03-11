@@ -475,7 +475,6 @@ public class NewTweetActivity extends Activity implements LocationListener {
     }
 
     private void switchOffLocationUpdates() {
-        System.out.println("Switch off updates");
         if (locationManager!=null) {
             locationManager.removeUpdates(this);
         }

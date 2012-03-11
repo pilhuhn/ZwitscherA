@@ -468,8 +468,6 @@ builder                                .append(ue.getExpandedURL());
     //////////////// speak related stuff ////////////////////
 
     public void onInit(int status) {
-        String statusString = status == 0 ? "Success" : "Failure";
-        System.out.println("speak" + " onInit " + statusString);
     }
 
     public void onUtteranceCompleted(String utteranceId) {

@@ -447,7 +447,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             super.onPreExecute();
             updating = context.getString(R.string.updating);
             String s = getString(R.string.getting_tweets)+ "...";
-            System.out.println("s: " + s + " , pg: " + pg + ", ttB: " + titleTextBox);
             if (updateListAdapter) {
                 if (pg!=null)
                     pg.setVisibility(ProgressBar.VISIBLE);
