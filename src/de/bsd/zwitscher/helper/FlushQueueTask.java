@@ -10,11 +10,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
-import de.bsd.zwitscher.TweetDB;
-import de.bsd.zwitscher.TwitterHelper;
-import de.bsd.zwitscher.UpdateRequest;
-import de.bsd.zwitscher.UpdateResponse;
+import de.bsd.zwitscher.*;
 import de.bsd.zwitscher.account.Account;
+import de.bsd.zwitscher.other.ReadItLaterStore;
 
 /**
  * A task that sends stuff that got queued while being offline.
@@ -68,7 +66,23 @@ public class FlushQueueTask extends AsyncTask<Void,Integer,Pair<Integer,Integer>
                      ret = th.retweet(usr);
                      good++;
                      break;
+                 case REPORT_AS_SPAMMER:
+                     int code = th.reportAsSpammer(usr.id); // TODO correct status ?
+                     ret = new UpdateResponse(UpdateType.REPORT_AS_SPAMMER,usr.id);
+                     ret.setStatusCode(code);
+                     break;
+                 case LATER_READING:
+                     ReadItLaterStore store = new ReadItLaterStore(usr.extUser,usr.extPassword);
+                     String result = store.store(usr.status,!account.isStatusNet(),usr.url);
+                     boolean success;
+                     success = result.startsWith("200");
 
+                     ret = new UpdateResponse(usr.getUpdateType(),success,result);
+
+                     if (success)
+                         good++;
+
+                     break;
                  default:
                      Log.e("FlushQueueTask","Update type " + usr.getUpdateType() + " not yet supported");
                  }

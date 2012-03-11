@@ -17,14 +17,14 @@ public class UpdateRequest implements Serializable {
 
     UpdateType updateType;
     String message;
-    long id;
-    StatusUpdate statusUpdate;
-    Status status;
+    public long id;
+    public StatusUpdate statusUpdate;
+    public Status status;
     String picturePath;
     transient View view; // Don't serialize
-    String url;         // for external apps
-    String extUser;     // for external apps
-    String extPassword; // for external apps
+    public String url;         // for external apps
+    public String extUser;     // for external apps
+    public String extPassword; // for external apps
 
     public UpdateRequest(UpdateType updateType) {
         this.updateType = updateType;

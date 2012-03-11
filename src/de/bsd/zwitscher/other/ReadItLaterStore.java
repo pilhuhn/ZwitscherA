@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import android.os.AsyncTask;
 import de.bsd.zwitscher.Tokens;
 import twitter4j.Status;
 
@@ -45,7 +46,7 @@ public class ReadItLaterStore {
 
         StringBuilder json = new StringBuilder();
         json.append("new={");
-        json.append("  \"0\":{ ");
+        json.append("  \"0\":{ \n");
         json.append("      \"url\":\"").append(articleUrl).append("\",\n");
         json.append("      \"title\":\"").append(tweet.getText()).append("\"");
         if (isTwitter) {
@@ -54,12 +55,12 @@ public class ReadItLaterStore {
         }
         json.append("} } ");
 
+        System.out.println(json.toString());
         int code;
         String result="-no result-";
 
         try {
             URL url = new URL(targetUrl);
-            System.out.println("Writing to " + targetUrl);
 
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.setDoOutput(true);
@@ -87,6 +88,7 @@ public class ReadItLaterStore {
                 }
                 br.close();
                 result = builder.toString();
+                System.out.println(result);
             }
 
         } catch (IOException e) {
@@ -110,20 +112,33 @@ public class ReadItLaterStore {
         sb.append("apikey=").append(Tokens.readItLaterToken);
         String targetUrl = sb.toString();
 
-
         try {
-            URL url = new URL(targetUrl);
-            System.out.println("Writing to " + targetUrl);
-
-            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-            conn.connect();
-            int code = conn.getResponseCode();
-            return code == 200;
-
-        } catch (IOException e) {
-            e.printStackTrace();  // TODO: Customise this generated block
+            boolean result = new CheckRilAccountTask().execute(targetUrl).get();
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             return false;
         }
     }
 
+
+    class CheckRilAccountTask extends AsyncTask<String,Void,Boolean> {
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            String targetUrl = strings[0];
+            try {
+                URL url = new URL(targetUrl);
+                System.out.println("Writing to " + targetUrl);
+
+                HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+                conn.connect();
+                int code = conn.getResponseCode();
+                return code == 200;
+
+            } catch (IOException e) {
+                e.printStackTrace();  // TODO: Customise this generated block
+                return false;
+            }
+        }
+    }
 }

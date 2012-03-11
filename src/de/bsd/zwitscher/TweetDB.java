@@ -302,7 +302,8 @@ account)}, null, null, null);
             c.moveToFirst();
             long lastRead = c.getLong(0);
             long lastFetched = c.getLong(1);
-            Log.i("getUnreadCount","lr= " + lastRead + ", lf="+lastFetched);
+
+//            Log.i("getUnreadCount","lr= " + lastRead + ", lf="+lastFetched);
             c.close();
 
             c = db.rawQuery("SELECT COUNT(id) FROM " + TABLE_STATUSES + " WHERE list_id=? AND ACCOUNT_ID=? AND id > ?",

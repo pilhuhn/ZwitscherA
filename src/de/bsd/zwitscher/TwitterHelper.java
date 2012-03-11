@@ -1001,11 +1001,13 @@ Log.d("FillUp","Return: " + i);
      * Reports the passed user as spammer
      * @param userId id of the user
      */
-    public void reportAsSpammer(long userId) {
+    public int reportAsSpammer(long userId) {
         try {
             twitter.reportSpam(userId);
+            return 200;
         } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
+            return 500;
         }
     }
 
