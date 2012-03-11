@@ -359,14 +359,14 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
         NetworkHelper networkHelper = new NetworkHelper(this);
         if (list_id == 0 &&  networkHelper.mayReloadAdditional()) {
-            new GetTimeLineTask(this,-1,false).execute(false);
-            new GetTimeLineTask(this,-2,false).execute(false);
+            new GetTimeLineTask(this,-1,false, 1).execute(false);
+            new GetTimeLineTask(this,-2,false, 2).execute(false);
         }
     }
 
 
     private void fillListViewFromTimeline(boolean fromDbOnly) {
-    	new GetTimeLineTask(this,list_id,true).execute(fromDbOnly);
+    	new GetTimeLineTask(this,list_id,true, 0).execute(fromDbOnly);
     }
 
     public void onScrollStateChanged(AbsListView absListView, int i) {
@@ -425,11 +425,21 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         private int listId;
         Dialog dialog = null;
         private boolean updateListAdapter;
+        private int startDelaySecs;
 
-        private GetTimeLineTask(Context context,int listId,boolean updateListAdapter) {
+        /**
+         * Fetch a timeline from db and/or remote. Allow to delay this a bit so that the
+         * progress bar etc. from earlier fetch tasks can be displayed.
+         * @param context Calling activity
+         * @param listId  What timeline to fetch
+         * @param updateListAdapter Should the adapter be updated - true for current tab, false for others
+         * @param startDelaySecs How long to delay before the network fetch is performed.
+         */
+        private GetTimeLineTask(Context context, int listId, boolean updateListAdapter, int startDelaySecs) {
             this.context = context;
             this.listId = listId;
             this.updateListAdapter = updateListAdapter;
+            this.startDelaySecs = startDelaySecs;
         }
 
         @Override
@@ -437,7 +447,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             super.onPreExecute();
             updating = context.getString(R.string.updating);
             String s = getString(R.string.getting_tweets)+ "...";
-
+            System.out.println("s: " + s + " , pg: " + pg + ", ttB: " + titleTextBox);
             if (updateListAdapter) {
                 if (pg!=null)
                     pg.setVisibility(ProgressBar.VISIBLE);
@@ -462,6 +472,14 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 		@Override
         @SuppressWarnings("unchecked")
 		protected MetaList doInBackground(Boolean... params) {
+            if (startDelaySecs>0) {
+                try {
+                    Thread.sleep(1000L*startDelaySecs);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+
             fromDbOnly = params[0];
 	        MetaList data;
             if (userId!=null) {
