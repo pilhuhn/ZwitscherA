@@ -78,7 +78,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         else
             setContentView(R.layout.single_tweet_honeycomb);
 
-        setupspeak();
 
         userPictureView = (ImageView) findViewById(R.id.UserPictureImageView);
 
@@ -276,6 +275,23 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         }
 
 	}
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        setupspeak();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (tts!=null) {
+            tts.shutdown();
+            tts=null;
+        }
+    }
 
     private void setTweetText(TextView tweetView) {
         String[] tokens = status.getText().split(" ");
