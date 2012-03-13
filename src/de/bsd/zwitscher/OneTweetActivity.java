@@ -916,7 +916,11 @@ builder                                .append(ue.getExpandedURL());
 
         @Override
         protected List<BitmapWithUrl> doInBackground(Void... params) {
-            List<UrlPair> pictureUrls = parseForPictureUrls(status);
+            List<UrlPair> pictureUrls;
+            if (status.isRetweet())
+                pictureUrls = parseForPictureUrls(status.getRetweetedStatus());
+            else
+                pictureUrls = parseForPictureUrls(status);
             List<BitmapWithUrl> bitmapList=null;
             if (downloadPictures)
                 bitmapList = loadThumbnails(pictureUrls);
