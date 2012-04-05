@@ -1,10 +1,12 @@
 package de.bsd.zwitscher;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -32,12 +34,16 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
     private TwitterHelper th;
     private boolean downloadImages;
+    private UserDisplay userDisplay;
 
 
     public StatusAdapter(Context context, Account account, int textViewResourceId, List<T> objects) {
         super(context, textViewResourceId, objects);
         th = new TwitterHelper(context, account);
         downloadImages = new NetworkHelper(context).mayDownloadImages();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String tmp = preferences.getString("screen_name_overview","USER");
+        userDisplay = UserDisplay.valueOf(tmp);
     }
 
     @Override
@@ -78,21 +84,21 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
             Status status = (Status)response;
             if (status.getRetweetedStatus()==null) {
                 userOnPicture =status.getUser();
-                builder.append(status.getUser().getName(), Typeface.BOLD);
+                appendUserInfo(userOnPicture,builder);
+
                 if (status.getInReplyToScreenName()!=null) {
                     builder.appendSpace();
-                    builder.append(R.string.in_reply_to,Typeface.NORMAL)
-                        .appendSpace()
-                        .append(status.getInReplyToScreenName(), Typeface.BOLD);
+                    builder.append(R.string.in_reply_to,Typeface.NORMAL).appendSpace();
+                    builder.append(status.getInReplyToScreenName(), Typeface.BOLD); // we only have the screen name here
                 }
             }
             else {
                 userOnPicture = status.getRetweetedStatus().getUser();
-                builder.append(status.getRetweetedStatus().getUser().getName(),Typeface.BOLD)
-                    .appendSpace()
+                appendUserInfo(userOnPicture,builder);
+                builder.appendSpace()
                     .append(R.string.resent_by, Typeface.NORMAL)
-                    .appendSpace()
-                    .append(status.getUser().getName(), Typeface.BOLD);
+                    .appendSpace();
+                appendUserInfo(status.getUser(),builder);
             }
             statusText = textWithReplaceTokens(status);
 
@@ -135,6 +141,22 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 //Debug.stopMethodTracing();
         return convertView;
     }
+
+
+    private void appendUserInfo(User user,SpannableBuilder builder) {
+        switch (userDisplay) {
+            case USER:
+                builder.append(user.getName(), Typeface.BOLD);
+                break;
+            case SCREENNAME:
+               builder.append(user.getScreenName());
+                break;
+            case BOTH:
+                builder.append(user.getName(),Typeface.BOLD)
+                .append(" (").append(user.getScreenName()).append(")");
+        }
+    }
+
 
     private String textWithReplaceTokens(Status status) {
 

@@ -78,6 +78,19 @@ public class SpannableBuilder {
     }
 
     /**
+     * Append text to the existing one with default NORMAL typeface
+     * @param text New text to append
+     * @return this SpannableBuilder
+     */
+    public SpannableBuilder append(String text) {
+
+        Holder h = new Holder(text,Typeface.NORMAL);
+        holderList.add(h);
+
+        return this;
+    }
+
+    /**
      * Append text to the existing one
      * @param resourceId Id of a string resource
      * @param typeface Style to use - typically a {@link  android.graphics.Typeface} constant

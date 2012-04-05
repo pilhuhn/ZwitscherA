@@ -25,4 +25,10 @@
         <item>4</item>
         <item>5</item>
     </string-array>
+    <string-array name="prefs_screen_name">
+        <item>Benutzer</item>
+        <item>\@-Name</item>
+        <item>Benutzer und @-Name</item>
+    </string-array>
+
 </resources>

@@ -39,6 +39,16 @@
         <item>Twitter</item>
         <item>Identi.ca</item>
     </string-array>
+    <string-array name="prefs_screen_name">
+        <item>User</item>
+        <item>\@-name</item>
+        <item>User + @-name</item>
+    </string-array>
+    <string-array name="prefs_screen_name_vals">
+        <item>USER</item>
+        <item>SCREENNAME</item>
+        <item>BOTH</item>
+    </string-array>
     <array name="take_picture_items">
         <item>@string/take_image_small</item>
         <item>@string/take_image_large</item>

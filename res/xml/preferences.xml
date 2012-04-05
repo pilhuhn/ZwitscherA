@@ -54,6 +54,13 @@
                         android:summary="@string/prefs_extra_roaming_descr"
                         android:defaultValue="false"/>
 
+    <ListPreference android:title="@string/screen_name_overview"
+                        android:key="screen_name_overview"
+                        android:summary="@string/prefs_screen_name_overview"
+                        android:entries="@array/prefs_screen_name"
+                        android:entryValues="@array/prefs_screen_name_vals"
+                        android:defaultValue="USER"/>
+
     <ListPreference android:title="@string/prefs_pictureService"
                     android:summary="@string/prefs_pictureService_descr"
                     android:key="pictureService"
