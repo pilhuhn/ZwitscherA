@@ -73,14 +73,11 @@ public class UserImageView extends ImageView {
 
         if (isFavorite) {
             paint.setColor(Color.GREEN);
-            canvas.drawCircle(5f,5f,10, paint);
+            canvas.drawCircle(0f,0f,10, paint);
         }
 
         if (isRetweet) {
             if (rtBitmap != null) {
-                paint.setColor(Color.MAGENTA);
-                canvas.drawRect(38f,38f,80f,80f, paint);
-
                 canvas.drawBitmap(rtBitmap, null, RT_RECT, paint);
             } else {
                 paint.setColor(Color.MAGENTA);

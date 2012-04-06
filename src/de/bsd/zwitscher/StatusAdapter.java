@@ -121,9 +121,6 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
         bi = ph.getBitMapForUserFromFile(userOnPicture);
         if (bi!=null) {
-            // TODO find an alternative for decoration of images, as this is expensive
-//            bi = ph.decorate(bi,extContext,status.isFavorited(),status.getRetweetedStatus()!=null);
-//            viewHolder.iv.setImageBitmap(bi);
             viewHolder.iv.setImageBitmap(bi);
             if (response instanceof Status) {
                 Status status = (Status) response;
