@@ -5,9 +5,9 @@ import java.util.List;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 import de.bsd.zwitscher.helper.PicHelper;
+import de.bsd.zwitscher.helper.UserImageView;
 
 /**
  * Common base for the Adapters
@@ -32,7 +32,7 @@ class AbstractAdapter<T> extends ArrayAdapter<T> {
     }
 
     static class ViewHolder {
-        ImageView iv;
+        UserImageView iv;
         TextView statusText;
         TextView userInfo;
         TextView timeClientInfo;

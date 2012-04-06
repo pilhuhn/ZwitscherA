@@ -260,7 +260,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     data.add(status);
                     statuses.add(status);
                 } else {
-                    Log.i("TweetListActivity::filter",status.getUser().getScreenName() + " - " + status.getText());
+                    Log.d("TweetListActivity::filter",status.getUser().getScreenName() + " - " + status.getText());
 
                 }
             }
@@ -556,6 +556,9 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             }
             if (updateListAdapter)
 	            getListView().requestLayout();
+            if (result.getNumOriginal()>0) {
+                Toast.makeText(context,result.getNumOriginal() + " new items",Toast.LENGTH_SHORT).show();
+            }
             if (newMentions>0) {
                 String s = getString(R.string.new_mentions);
                 Toast.makeText(context,newMentions + " " + s,Toast.LENGTH_LONG).show();

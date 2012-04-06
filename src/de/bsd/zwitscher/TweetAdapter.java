@@ -7,15 +7,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
-import de.bsd.zwitscher.helper.PicHelper;
 import de.bsd.zwitscher.helper.SpannableBuilder;
+import de.bsd.zwitscher.helper.UserImageView;
 import twitter4j.Tweet;
 
 /**
@@ -43,7 +40,7 @@ class TweetAdapter<T extends Tweet> extends AbstractAdapter<T> {
             convertView = inflater.inflate(R.layout.tweet_list_item,null);
 
             viewHolder = new ViewHolder();
-            viewHolder.iv = (ImageView) convertView.findViewById(R.id.ListImageView);
+            viewHolder.iv = (UserImageView) convertView.findViewById(R.id.ListImageView);
             viewHolder.statusText = (TextView) convertView.findViewById(R.id.ListTextView);
             viewHolder.userInfo = (TextView) convertView.findViewById(R.id.ListUserView);
             viewHolder.timeClientInfo = (TextView) convertView.findViewById(R.id.ListTimeView);

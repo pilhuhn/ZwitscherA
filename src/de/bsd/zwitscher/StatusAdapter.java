@@ -9,12 +9,12 @@ import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.SpannableBuilder;
 import de.bsd.zwitscher.helper.TriggerPictureDownloadTask;
+import de.bsd.zwitscher.helper.UserImageView;
 import twitter4j.DirectMessage;
 import twitter4j.MediaEntity;
 import twitter4j.Status;
@@ -34,7 +34,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
     private TwitterHelper th;
     private boolean downloadImages;
-    private UserDisplay userDisplay;
+    private UserDisplayMode userDisplay;
 
 
     public StatusAdapter(Context context, Account account, int textViewResourceId, List<T> objects) {
@@ -43,7 +43,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
         downloadImages = new NetworkHelper(context).mayDownloadImages();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String tmp = preferences.getString("screen_name_overview","USER");
-        userDisplay = UserDisplay.valueOf(tmp);
+        userDisplay = UserDisplayMode.valueOf(tmp);
     }
 
     @Override
@@ -57,7 +57,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
             convertView = inflater.inflate(R.layout.tweet_list_item,parent,false);
 
             viewHolder = new ViewHolder();
-            viewHolder.iv = (ImageView) convertView.findViewById(R.id.ListImageView);
+            viewHolder.iv = (UserImageView) convertView.findViewById(R.id.ListImageView);
             viewHolder.statusText = (TextView) convertView.findViewById(R.id.ListTextView);
             viewHolder.userInfo = (TextView) convertView.findViewById(R.id.ListUserView);
             viewHolder.timeClientInfo = (TextView) convertView.findViewById(R.id.ListTimeView);
@@ -88,7 +88,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
                 if (status.getInReplyToScreenName()!=null) {
                     builder.appendSpace();
-                    builder.append(R.string.in_reply_to,Typeface.NORMAL).appendSpace();
+                    builder.append(R.string.in_reply_to, Typeface.NORMAL).appendSpace();
                     builder.append(status.getInReplyToScreenName(), Typeface.BOLD); // we only have the screen name here
                 }
             }
@@ -98,7 +98,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
                 builder.appendSpace()
                     .append(R.string.resent_by, Typeface.NORMAL)
                     .appendSpace();
-                appendUserInfo(status.getUser(),builder);
+                appendUserInfo(status.getUser(), builder);
             }
             statusText = textWithReplaceTokens(status);
 
@@ -123,7 +123,17 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
         if (bi!=null) {
             // TODO find an alternative for decoration of images, as this is expensive
 //            bi = ph.decorate(bi,extContext,status.isFavorited(),status.getRetweetedStatus()!=null);
+//            viewHolder.iv.setImageBitmap(bi);
             viewHolder.iv.setImageBitmap(bi);
+            if (response instanceof Status) {
+                Status status = (Status) response;
+                viewHolder.iv.markFavorite(status.isFavorited());
+                viewHolder.iv.markRetweet(status.isRetweet());
+                if (status.isRetweet()) {
+                    Bitmap rtbm = ph.getBitMapForUserFromFile(status.getUser());
+                    viewHolder.iv.setRtImage(rtbm);
+                }
+            }
         }
         else {
             // underlying convertView seems to be reused, so default image is not loaded when bi==null

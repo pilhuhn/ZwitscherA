@@ -18,7 +18,7 @@
      />
 
     <!-- left column -->
-    <ImageView android:id="@+id/ListImageView"
+    <de.bsd.zwitscher.helper.UserImageView android:id="@+id/ListImageView"
                android:layout_width="64dp"
 			android:layout_height="64dp"
 			android:src="@drawable/user_unknown"

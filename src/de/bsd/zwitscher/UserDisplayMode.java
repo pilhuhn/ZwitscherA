@@ -5,7 +5,7 @@ package de.bsd.zwitscher;
  *
  * @author Heiko W. Rupp
  */
-public enum UserDisplay {
+public enum UserDisplayMode {
     USER,
     SCREENNAME,
     BOTH
