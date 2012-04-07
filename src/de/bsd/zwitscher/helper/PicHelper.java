@@ -33,9 +33,8 @@ public class PicHelper {
      * Load the user picture for the passed user.
      * If this is on file system, it is checked if it has changed on the server.
      * If it is not yet on filesystem, it is fetched from remote and stored locally.
-     * After fetching the corners are bitten off
      * @param user User for which to obtain the picture
-     * @return Bitmap of the picture of null if loading failed.
+     * @return Bitmap of the picture or null if loading failed.
      */
 	public Bitmap fetchUserPic(User user) {
 
@@ -45,7 +44,7 @@ public class PicHelper {
 		URL imageUrl = user.getProfileImageURL();
 
 		String username = user.getScreenName();
-        Log.i("fetchUserPic","Looking for pic of user '" + username + "' from '" + imageUrl.toString() + "'");
+//        Log.i("fetchUserPic","Looking for pic of user '" + username + "' from '" + imageUrl.toString() + "'");
 		boolean found = false;
 		// TODO use v8 methods when we require v8 in the manifest. Is probably too early yet.
 		try {
@@ -54,20 +53,26 @@ public class PicHelper {
 				if (iconFile!=null && iconFile.exists() && iconFile.lastModified() > System.currentTimeMillis() - ONE_DAY)
 					found = true;
 			}
-			if (found)
-				Log.i("fetchUserPic","Picture was on file system");
+			if (found) {
+//				Log.i("fetchUserPic","Picture was on file system, returning it");
+                return getBitMapForScreenNameFromFile(username);
+            }
 		}
 		catch (Exception ioe) {
-			Log.i("PicHelper", ioe.getMessage());
+			Log.w("PicHelper", ioe.getMessage());
 		}
 
-		if (!found) {
-			try {
-                Log.i("fetchUserPic","Downloading image and persisting it locally");
-                BufferedInputStream in = new BufferedInputStream(imageUrl.openStream());
-                Bitmap bitmap = BitmapFactory.decodeStream(in);
+//        Log.i("fetchUserPic","found=" + found);
 
-    			if (bitmap!=null && externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
+        // Not found - fetch from remote and store it locally
+		if (!found) {
+            Bitmap bitmap=null;
+            try {
+//                Log.i("fetchUserPic","Downloading image for "+ username +" and persisting it locally");
+                BufferedInputStream in = new BufferedInputStream(imageUrl.openStream());
+                bitmap = BitmapFactory.decodeStream(in);
+
+                if (bitmap!=null && externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
     				File iconFile = getPictureFileForUser(username);
     				BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(iconFile));
                     bitmap.compress(Bitmap.CompressFormat.PNG, 0, out);
@@ -75,15 +80,17 @@ public class PicHelper {
                     out.close();
     			}
             in.close();
-            if (bitmap!=null)
-               bitmap.recycle();
+//            if (bitmap!=null)
+//               bitmap.recycle();
 			}
 			catch (IOException ioe) {
 				ioe.printStackTrace();
 			}
+//            Log.i("fetchUP","loaded? bm=" + bitmap);
+            return bitmap;
 		}
-        return getBitMapForUserFromFile(user);
-	}
+        return null;
+    }
 
 
     /**

@@ -3,7 +3,6 @@ package de.bsd.zwitscher;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
@@ -119,27 +118,13 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
             throw new IllegalArgumentException("Unknown type " + response);
 
 
-        bi = ph.getBitMapForUserFromFile(userOnPicture);
-        if (bi!=null) {
-            viewHolder.iv.setImageBitmap(bi);
-            if (response instanceof Status) {
-                Status status = (Status) response;
-                viewHolder.iv.markFavorite(status.isFavorited());
-                viewHolder.iv.markRetweet(status.isRetweet());
-                if (status.isRetweet()) {
-                    Bitmap rtbm = ph.getBitMapForUserFromFile(status.getUser());
-                    viewHolder.iv.setRtImage(rtbm);
-                }
-            }
-        }
-        else {
-            // underlying convertView seems to be reused, so default image is not loaded when bi==null
-            viewHolder.iv.setImageBitmap(BitmapFactory.decodeResource(extContext.getResources(), R.drawable.user_unknown));
-            // Trigger fetching of user pic in background
-            if (downloadImages) {
-                new TriggerPictureDownloadTask().execute(userOnPicture);
-            }
-        }
+        // User images will all be loaded asynchronously
+        // It this is a status, then pass it along as well.
+        Status status=null;
+        if (response instanceof Status)
+            status = (Status) response;
+
+        new TriggerPictureDownloadTask(viewHolder.iv, userOnPicture, downloadImages, status).execute();
 
         viewHolder.userInfo.setText(builder.toSpannableString());
         viewHolder.statusText.setText(statusText);
