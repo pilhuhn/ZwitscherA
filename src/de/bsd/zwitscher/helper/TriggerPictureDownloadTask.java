@@ -59,7 +59,7 @@ public class TriggerPictureDownloadTask extends AsyncTask<Void,Void,Bitmap> {
                 imageBitmap = picHelper.fetchUserPic(user);
         }
 
-        if (status.isRetweet() && !rtUserLoaded) {
+        if (status.isRetweet() && !rtUserLoaded && downloadImages) {
             picHelper.fetchUserPic(status.getUser());
         }
 

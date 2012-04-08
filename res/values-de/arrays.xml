@@ -12,18 +12,12 @@
         <item>20</item>
     </string-array>
     <string-array name="network_config">
-        <item>Immer (WiFi)</item>
+        <item>Immer</item>
+        <item>WiFi</item>
         <item>3G (UMTS)</item>
         <item>Edge</item>
         <item>Gprs</item>
         <item>Nie</item>
-    </string-array>
-    <string-array name="network_config_vals">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
     </string-array>
     <string-array name="prefs_screen_name">
         <item>Benutzer</item>

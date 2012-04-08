@@ -48,27 +48,15 @@ public class NetworkHelper {
         }
         int type = info.getType();
         int subType = info.getSubtype();
-        /*
-        11-05 21:26:00.359: INFO/NetworkHelper(329): Current network is MOBILE:UMTS
-        11-05 21:26:00.359: INFO/NetworkHelper(329): Current network is 0:3
-        Edge = 2
-        Hsdpa = 8
-        */
 
-/*
-        Log.i("NetworkHelper","Current network is " + info.getTypeName() + ":" + info.getSubtypeName());
-        Log.i("NetworkHelper","Current network is " + type + ":" + info.getSubtype());
-        Log.i("NetworkHelper","Desired config is  " + networkConfig);
-*/
-
-        int configType = 0;
+        int configType;
         try {
             configType = Integer.parseInt(networkConfig);
         } catch (NumberFormatException e) {
             Log.w("NetworkHelper",e.getMessage());
-            configType = 5;
+            configType = 6;
         }
-        if (configType==5) // Never
+        if (configType==6) // Never
             return false;
         if (configType==1)
             return true; // Always
@@ -80,19 +68,18 @@ public class NetworkHelper {
             }
 
             switch (configType) {
-                case 1: return true;
-                case 2: return subType > TelephonyManager.NETWORK_TYPE_UMTS;
-                case 3: return subType >= TelephonyManager.NETWORK_TYPE_EDGE;
-                case 4: return subType >= TelephonyManager.NETWORK_TYPE_GPRS;
-                case 5: return false; // Never
+                case 1: return true;  // Always
+                case 2: return false; // WiFi necessary - but this is a mobile network
+                case 3: return subType > TelephonyManager.NETWORK_TYPE_UMTS;
+                case 4: return subType >= TelephonyManager.NETWORK_TYPE_EDGE;
+                case 5: return subType >= TelephonyManager.NETWORK_TYPE_GPRS;
+                case 6: return false; // Never
                 default:
                     Log.w("NetworkHelper","Unknown config type: " + configType);
                     return false;
             }
 
-
-
-        } else if (type==ConnectivityManager.TYPE_WIFI) {
+        } else if (type==ConnectivityManager.TYPE_WIFI && configType==2) {
             return true; // Wifi is 'better' than mobile and 'Never' was caught earlier
         } else {
             Log.i("NetworkHelper","Unknown connectivity type: " + info.getTypeName());
