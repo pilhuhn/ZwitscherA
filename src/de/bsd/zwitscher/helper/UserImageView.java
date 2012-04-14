@@ -4,7 +4,6 @@ package de.bsd.zwitscher.helper;
 import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import de.bsd.zwitscher.R;
@@ -25,18 +24,15 @@ public class UserImageView extends ImageView {
     private static final Rect RECT64 = new Rect(0, 0, SIXTYFOUR, SIXTYFOUR);
     private static final Rect RECT72 = new Rect(0, 0, SEVENTY_TWO, SEVENTY_TWO);
     private static final Rect RECT80 = new Rect(0, 0, EIGHTY, EIGHTY);
+    private static final Rect RT_UNKNOWN_RECT = new Rect(70,70,80,80);
     private Bitmap baseBitmap;
     private boolean isFavorite;
     private boolean isRetweet;
     private static Xfermode SRC_OVER = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
     private Bitmap rtBitmap;
-    private Paint paint = new Paint(); // TODO move to constructor?
+    private Paint paint = new Paint();
     private Bitmap unknownUserBitmap;
 
-
-//    public UserImageView(Context context) {
-//        super(context);
-//    }
 
     public UserImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -45,19 +41,36 @@ public class UserImageView extends ImageView {
         unknownUserBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.user_unknown);
     }
 
+    /**
+     * Set the bitmap for the user of the tweet
+     * @param baseBitmap Bitmap to display. Null is allowed
+     */
     public void setImageBitmap(Bitmap baseBitmap) {
+        super.setImageBitmap(baseBitmap);
         this.baseBitmap = baseBitmap;
     }
 
+    /**
+     * Set the bitmap of the retweeting user
+     * @param bitmap Bitmap to display (in small). Null is allowed
+     */
     public void setRtImage(Bitmap bitmap) {
         rtBitmap = bitmap;
     }
 
+    /**
+     * If the argument is true, the View will get a tiny favorite marker
+     * @param favorited Is the matching tweet a Favorite?
+     */
     public void markFavorite(boolean favorited) {
         isFavorite = favorited;
 
     }
 
+    /**
+     * If the argument is true, show the rtBitmap (or a marker if not rtBitmap is set).
+     * @param isRetweet Is the matching tweet a Retweet?
+     */
     public void markRetweet(boolean isRetweet) {
         this.isRetweet =isRetweet;
     }
@@ -67,19 +80,22 @@ public class UserImageView extends ImageView {
 
         float factor = getHeight() / 64.0f;
 
-     //   p.setFilterBitmap(false);
+
         if (baseBitmap==null)
             baseBitmap= unknownUserBitmap;
+        Rect SRC = new Rect(0,0,baseBitmap.getHeight(),baseBitmap.getWidth());
 
+        // First draw the tweet's user bitmap
         if (isRetweet) {
             if (rtBitmap!=null)
-                canvas.drawBitmap(baseBitmap,null, scale(RECT64,factor), paint); // TODO precompute rect once
+                canvas.drawBitmap(baseBitmap,SRC, scale(RECT64,factor), paint);
             else
-                canvas.drawBitmap(baseBitmap,null,scale(RECT72,factor), paint);
+                canvas.drawBitmap(baseBitmap,SRC,scale(RECT72,factor), paint);
         }
         else
-            canvas.drawBitmap(baseBitmap,null,scale(RECT80,factor), paint);
+            canvas.drawBitmap(baseBitmap,SRC,scale(RECT80,factor), paint);
 
+        // And then overlay with markers
         paint.setXfermode(SRC_OVER);
 
         if (isFavorite) {
@@ -89,10 +105,10 @@ public class UserImageView extends ImageView {
 
         if (isRetweet) {
             if (rtBitmap != null) {
-                canvas.drawBitmap(rtBitmap, null, scale(RT_RECT,factor), paint);
+                canvas.drawBitmap(rtBitmap, SRC, scale(RT_RECT,factor), paint);
             } else {
                 paint.setColor(Color.MAGENTA);
-                canvas.drawRect(70f, 70f, 80f,80f, paint);
+                canvas.drawRect(scale(RT_UNKNOWN_RECT,factor), paint);
             }
         }
     }

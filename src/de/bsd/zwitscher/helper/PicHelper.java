@@ -73,7 +73,8 @@ public class PicHelper {
                 bitmap = BitmapFactory.decodeStream(in);
 
                 if (bitmap!=null && externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
-    				File iconFile = getPictureFileForUser(username);
+                    File iconFile = getPictureFileForUser(username);
+//                    Log.i("fetchUserPic","Storing picture for " + username +" at " + iconFile.getAbsolutePath());
     				BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(iconFile));
                     bitmap.compress(Bitmap.CompressFormat.PNG, 0, out);
                     out.flush();
@@ -112,6 +113,11 @@ public class PicHelper {
                 File iconFile = getPictureFileForUser(username);
                 if (iconFile==null)
                     return null;
+                if (!iconFile.exists()) {
+//                    Log.w("PicHelper","getPictureFileForUser("+username+"): file does not exist");
+                    return null;
+                }
+
                 FileInputStream fis = new FileInputStream(iconFile);
                 Bitmap bi = BitmapFactory.decodeStream(fis);
                 fis.close();
@@ -125,7 +131,7 @@ public class PicHelper {
     }
 
     /**
-     * Locate the file for the passed screen name
+     * Locate the file object for the passed screen name
      * @param username Screen name to lookup
      * @return File object of the matching file
      */
@@ -163,7 +169,7 @@ public class PicHelper {
 
 
     /**
-     * Store the passed bitmap on the file system
+     * Store the passed bitmap on the file system (recorded camera images)
      *
      * @param bitmap Bitmap to store
      * @param file File to store in

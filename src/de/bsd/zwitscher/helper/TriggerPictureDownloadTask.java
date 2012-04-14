@@ -49,6 +49,9 @@ public class TriggerPictureDownloadTask extends AsyncTask<Void,Void,Bitmap> {
                 }
                 userImageView.setRtImage(rtbm);
             }
+            else {
+                userImageView.setRtImage(null);
+            }
         }
     }
 
