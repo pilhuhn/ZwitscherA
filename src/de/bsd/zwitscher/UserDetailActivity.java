@@ -442,7 +442,7 @@ public class UserDetailActivity extends Activity  {
             Drawable background = null;
             if (downloadImages) {
                 String profileBackgroundImageUrl = user.getProfileBackgroundImageUrl();
-                if (!profileBackgroundImageUrl.equals("")) {
+                if (!"".equals(profileBackgroundImageUrl)) {
                     try {
                         URL url = new URL(profileBackgroundImageUrl);
                         InputStream is = url.openStream();
