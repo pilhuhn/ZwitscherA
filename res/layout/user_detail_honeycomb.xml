@@ -12,8 +12,8 @@
               android:textSize="16dp"
               />
 
-    <ImageView android:layout_width="80px"
-                android:layout_height="80px"
+    <ImageView android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:src="@drawable/user_unknown"
                 android:scaleType="fitXY"
                 android:padding="4px"

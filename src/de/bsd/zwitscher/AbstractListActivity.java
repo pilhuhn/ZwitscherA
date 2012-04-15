@@ -16,7 +16,7 @@ import de.bsd.zwitscher.account.AccountHolder;
  */
 public abstract class AbstractListActivity extends ListActivity {
 
-    ProgressBar pg;
+    ProgressBar progressBar;
     TextView titleTextBox;
     TwitterHelper th;
     TweetDB tdb;
@@ -29,7 +29,7 @@ public abstract class AbstractListActivity extends ListActivity {
         Activity theParent = getParent();
         if (theParent instanceof TabWidget) {
             parent = (TabWidget) theParent;
-            pg = parent.pg;
+            progressBar = parent.pg;
             titleTextBox = parent.titleTextBox;
         }
 

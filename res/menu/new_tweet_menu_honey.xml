@@ -5,10 +5,9 @@
     <item android:id="@+id/shortenUrls"
           android:title="@string/ShortenUrls"
           android:icon="@drawable/shorten_url"
-          android:showAsAction="ifRoom"/>
+    />
 
     <item android:id="@+id/camera"
-          android:showAsAction="ifRoom"
           android:icon="@drawable/camera"
       />
 

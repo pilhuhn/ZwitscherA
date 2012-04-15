@@ -24,6 +24,8 @@
 
     <style name="ZwitscherStyle" parent="android:style/Theme.Holo">
         <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="android:actionBarSplitStyle">@style/MyActionBar</item>
+        <item name="android:actionBarTabBarStyle">@style/MyActionBar</item>
     </style>
 
 </resources>

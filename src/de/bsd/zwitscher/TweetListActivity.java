@@ -63,7 +63,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     private int newDirects=0;
     Long userId=null;
     int userListId = -1;
-    private String userListOwner;
 
     /**
      * Called when the activity is first created.
@@ -89,7 +88,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         if ((!(theParent instanceof TabWidget)) && (android.os.Build.VERSION.SDK_INT<11)) {
             // We have no enclosing TabWidget, so we need our window here
             getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.window_title);
-            pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+            progressBar = (ProgressBar) findViewById(R.id.title_progress_bar);
             titleTextBox = (TextView) findViewById(R.id.title_msg_box);
 
 
@@ -107,7 +106,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             list_id = 0;
         } else {
             userListId = intentInfo.getInt("userListid");
-            userListOwner = intentInfo.getString("userListOwner");
             list_id = intentInfo.getInt(TabWidget.LIST_ID);
             if (intentInfo.containsKey("userId")) {
                 // Display tweets of a single user
@@ -313,8 +311,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             ActionBar actionBar = this.getActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
 
-            pg = (ProgressBar) menu.findItem(R.id.ProgressBar).getActionView();
-
             return true;
         }
         else if (theParent instanceof TabWidget) {
@@ -448,8 +444,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             updating = context.getString(R.string.updating);
             String s = getString(R.string.getting_tweets)+ "...";
             if (updateListAdapter) {
-                if (pg!=null)
-                    pg.setVisibility(ProgressBar.VISIBLE);
+                if (progressBar!=null)
+                    progressBar.setVisibility(ProgressBar.VISIBLE);
                 else {
                     dialog = new Dialog(context);
                     dialog.setTitle(s);
@@ -538,7 +534,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             if (Build.VERSION.SDK_INT>=11) {
                 ActionBar ab = getActionBar();
                 if (ab!=null) {
-                    String s = account.getAccountIdentifier();
+                    String s=null;
                     Map<Integer,Pair<String,String>> userLists = tdb.getLists(account.getId());
                     if (userListId !=-1) {
                         Pair<String,String> nameOwnerPair = userLists.get(userListId);
@@ -548,9 +544,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                                 tmp = nameOwnerPair.first;
                             else
                                 tmp = "@" +nameOwnerPair.second + "/" + nameOwnerPair.first;
-                            s+= ": " + tmp;
+                            s =tmp;
                         }
                     }
+                    ab.setTitle(account.getAccountIdentifier());
                     ab.setSubtitle(s);
                 }
             }
@@ -576,8 +573,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 Log.i("GTLTask", " scroll to " + result.getNumOriginal());
                 getListView().setSelection(result.getNumOriginal() - 1);
             }
-            if (pg!=null)
-                pg.setVisibility(ProgressBar.INVISIBLE);
+            if (progressBar !=null)
+                progressBar.setVisibility(ProgressBar.INVISIBLE);
             if (dialog!=null)
                 dialog.cancel();
 

@@ -6,13 +6,14 @@
     <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-        <ImageButton android:layout_width="80px"
-                     android:layout_height="80px"
+        <ImageButton android:layout_width="64dp"
+                     android:layout_height="64dp"
                      android:src="@drawable/user_unknown"
                      android:scaleType="fitXY"
                      android:padding="4px"
                      android:onClick="displayUserDetail"
-                     android:id="@+id/UserPictureImageView"/>
+                     android:id="@+id/UserPictureImageView"
+                     android:contentDescription="Picture of the user"/>
         <TextView android:id="@+id/HintView"
                   android:layout_height="wrap_content"
                   android:layout_width="wrap_content"
@@ -24,8 +25,8 @@
                   android:id="@+id/TextView01"
                   android:layout_width="wrap_content"
                   android:minLines="2"
-                  android:paddingLeft="5px"
-                  android:paddingRight="5px"
+                  android:paddingLeft="5dp"
+                  android:paddingRight="5dp"
                   android:layout_toRightOf="@id/UserPictureImageView"
                   android:layout_below="@id/HintView"
                   android:layout_height="wrap_content"/>
@@ -62,12 +63,18 @@
                      android:src="@drawable/favorite_off"
                      android:text="@string/favorite"/>
 
+        <de.bsd.zwitscher.WorkingSpinner android:id="@+id/ot_spinner"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_below="@id/FavoriteButton"
+                 android:prompt="@string/pickUser"
+                 />
 
 
         <Gallery xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/gallery"
                  android:layout_width="fill_parent"
                  android:layout_height="wrap_content"
-                 android:layout_below="@id/FavoriteButton"
+                 android:layout_below="@id/ot_spinner"
                 />
     </RelativeLayout>
 </ScrollView>

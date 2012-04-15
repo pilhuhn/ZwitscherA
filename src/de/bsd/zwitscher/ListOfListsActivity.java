@@ -192,8 +192,8 @@ public class ListOfListsActivity extends AbstractListActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             setProgressBarVisibility(true);
-            if (pg!=null)
-                pg.setVisibility(ProgressBar.VISIBLE);
+            if (progressBar !=null)
+                progressBar.setVisibility(ProgressBar.VISIBLE);
 
         }
 
@@ -232,8 +232,8 @@ public class ListOfListsActivity extends AbstractListActivity {
             setupAdapter();
 
             setProgressBarVisibility(false);
-            if (pg!=null)
-                pg.setVisibility(ProgressBar.INVISIBLE);
+            if (progressBar !=null)
+                progressBar.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)
                 titleTextBox.setText("");
 
@@ -241,8 +241,10 @@ public class ListOfListsActivity extends AbstractListActivity {
                 ActionBar ab = getActionBar();
                 if (ab==null && parent!=null)
                     ab=parent.getActionBar();
-                if (ab!=null)
-                    ab.setSubtitle(account.getAccountIdentifier());
+                if (ab!=null) {
+                    ab.setTitle(account.getAccountIdentifier());
+                    ab.setSubtitle(null);
+                }
             }
 
         }

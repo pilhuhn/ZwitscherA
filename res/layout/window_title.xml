@@ -18,8 +18,8 @@
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_toRightOf="@android:id/title"
-        android:paddingLeft="5px"
-        android:paddingRight="2px"
+        android:paddingLeft="5dp"
+        android:paddingRight="2dp"
         />
 	<ProgressBar
 		android:id="@+id/title_progress_bar"

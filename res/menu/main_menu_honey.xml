@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/ProgressBar"
         android:actionLayout="@layout/progress"
-        android:visible="true"
+        android:visible="false"
         android:showAsAction="always"
     />
     <item android:id="@+id/to_top"
@@ -19,7 +19,7 @@
 	<item android:alphabeticShortcut="P"
 		  android:id="@+id/preferences"
 		  android:titleCondensed="Prefs"
-		  android:title="Preferences"
+		  android:title="@string/Preferences"
           android:icon="@drawable/wrench"
 		  android:enabled="true"
 		  android:visible="true"/>

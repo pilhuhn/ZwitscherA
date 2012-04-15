@@ -59,10 +59,11 @@ public class TabWidget extends TabActivity {
         if (android.os.Build.VERSION.SDK_INT<11)
             requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
 		setContentView(R.layout.tabs);
-        if (android.os.Build.VERSION.SDK_INT<11)
+        if (android.os.Build.VERSION.SDK_INT<11) {
             getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
-        pg = (ProgressBar) findViewById(R.id.title_progress_bar);
-        titleTextBox = (TextView) findViewById(R.id.title_msg_box);
+            pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+            titleTextBox = (TextView) findViewById(R.id.title_msg_box);
+        }
 
         account = AccountHolder.getInstance().getAccount();
         /*
@@ -108,7 +109,7 @@ public class TabWidget extends TabActivity {
         if (titleTextBox!=null)
             titleTextBox.setText(account.getAccountIdentifier());
         if (Build.VERSION.SDK_INT>=11)
-            getActionBar().setSubtitle(account.getAccountIdentifier());
+            getActionBar().setTitle(account.getAccountIdentifier());
     }
 
     private void setupTabs() {
@@ -187,7 +188,8 @@ public class TabWidget extends TabActivity {
 		    inflater.inflate(R.menu.main_menu, menu);
         else {
             inflater.inflate(R.menu.main_menu_honey,menu);
-            pg = (ProgressBar) menu.findItem(R.id.ProgressBar).getActionView();
+            MenuItem item = menu.findItem(R.id.ProgressBar);
+            pg = (ProgressBar) item.getActionView();
             pg.setVisibility(ProgressBar.INVISIBLE);
         }
         return true;

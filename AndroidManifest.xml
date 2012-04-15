@@ -18,8 +18,9 @@
     <application android:icon="@drawable/icon" android:label="@string/app_name"
     			android:debuggable="false"  android:allowBackup="true"
                 android:theme="@style/ZwitscherStyle"
-
         >
+                <!--android:uiOptions="splitActionBarWhenNarrow"-->
+
         <!-- indicates that we want to invoke search from all views -->
         <meta-data android:name="android.app.default_searchable"
                    android:value=".MySearchActivity" />
@@ -35,6 +36,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="http" android:host="twitter.com"/> <!-- TODO: android:pathPattern="#!/.*/status/.*"/> -->
+                <data android:scheme="https" android:host="twitter.com"/> <!-- TODO: android:pathPattern="#!/.*/status/.*"/> -->
             </intent-filter>
         </activity>
 
