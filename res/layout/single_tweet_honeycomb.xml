@@ -63,7 +63,7 @@
                      android:src="@drawable/favorite_off"
                      android:text="@string/favorite"/>
 
-        <de.bsd.zwitscher.WorkingSpinner android:id="@+id/ot_spinner"
+        <Spinner android:id="@+id/ot_spinner"
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content"
                  android:layout_below="@id/FavoriteButton"

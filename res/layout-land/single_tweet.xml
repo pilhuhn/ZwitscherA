@@ -109,7 +109,7 @@
                      android:src="@drawable/back_button"
                      android:text="@string/Done"/>
 
-        <de.bsd.zwitscher.WorkingSpinner android:id="@+id/ot_spinner"
+        <Spinner android:id="@+id/ot_spinner"
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content"
                  android:layout_below="@id/DoneButton"

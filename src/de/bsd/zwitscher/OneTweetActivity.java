@@ -8,6 +8,7 @@ import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -245,27 +246,51 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             }
         }
 
-        WorkingSpinner spinner = (WorkingSpinner) findViewById(R.id.ot_spinner);
+        final Spinner spinner = (Spinner) findViewById(R.id.ot_spinner);
         if (spinner!=null) {
+
             final UserMentionEntity[] userMentionEntities = status.getUserMentionEntities();
             if (userMentionEntities !=null && userMentionEntities.length>0) {
                 spinner.setVisibility(View.VISIBLE);
-                String[] users = new String[userMentionEntities.length];
+                List<String> users = new ArrayList<String>(userMentionEntities.length+1);
+                // Add an item 0 as dummy, as the spinner auto-selects it
+                users.add("Pick a user");
                 for (int i = 0, userMentionEntitiesLength = userMentionEntities.length;
                      i < userMentionEntitiesLength; i++) {
                     UserMentionEntity ume = userMentionEntities[i];
-                    users[i] = "@" + ume.getScreenName() + " (" + ume.getName() + ")";
+                    users.add ("@" + ume.getScreenName() + " (" + ume.getName() + ")");
                 }
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
                         users);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
+/*
                 spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        if (i>0) {
                         Intent intent = new Intent(OneTweetActivity.this, UserDetailActivity.class);
-                        intent.putExtra("userName", userMentionEntities[i].getScreenName());
+                        intent.putExtra("userName", userMentionEntities[i-1].getScreenName());
                         startActivity(intent);
+                        }
+                    }
+                });
+*/
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        // Our dummy is at position 0
+                        if (position>0) {
+                            Intent intent = new Intent(OneTweetActivity.this, UserDetailActivity.class);
+                            intent.putExtra("userName", userMentionEntities[position-1].getScreenName());
+                            startActivity(intent);
+                        }
+                        // reset to item 0, so that repeated selection of the same item works.
+                        spinner.setSelection(0);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
                     }
                 });
             }
