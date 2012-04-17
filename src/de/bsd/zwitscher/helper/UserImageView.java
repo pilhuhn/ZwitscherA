@@ -21,6 +21,7 @@ public class UserImageView extends ImageView {
     private static final Rect RT_RECT = new Rect(FOO, FOO, EIGHTY, EIGHTY);
     private static final int SIXTYFOUR = 51;
     private static final int SEVENTY_TWO = 58;
+    private static final Rect RECT20 = new Rect(0, 0, 20, 20);
     private static final Rect RECT64 = new Rect(0, 0, SIXTYFOUR, SIXTYFOUR);
     private static final Rect RECT72 = new Rect(0, 0, SEVENTY_TWO, SEVENTY_TWO);
     private static final Rect RECT80 = new Rect(0, 0, EIGHTY, EIGHTY);
@@ -32,6 +33,8 @@ public class UserImageView extends ImageView {
     private Bitmap rtBitmap;
     private Paint paint = new Paint();
     private Bitmap unknownUserBitmap;
+    private Bitmap favBitmap;
+    private Rect favRect ;
 
 
     public UserImageView(Context context, AttributeSet attrs) {
@@ -39,6 +42,8 @@ public class UserImageView extends ImageView {
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(context,attrs);
         setLayoutParams(params);
         unknownUserBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.user_unknown);
+        favBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.favorite_on);
+        favRect = new Rect(0,0,favBitmap.getWidth(),favBitmap.getHeight());
     }
 
     /**
@@ -83,7 +88,7 @@ public class UserImageView extends ImageView {
 
         if (baseBitmap==null)
             baseBitmap= unknownUserBitmap;
-        Rect SRC = new Rect(0,0,baseBitmap.getHeight(),baseBitmap.getWidth());
+        Rect SRC = new Rect(0,0,baseBitmap.getWidth(),baseBitmap.getHeight());
 
         // First draw the tweet's user bitmap
         if (isRetweet) {
@@ -99,13 +104,15 @@ public class UserImageView extends ImageView {
         paint.setXfermode(SRC_OVER);
 
         if (isFavorite) {
-            paint.setColor(Color.GREEN);
-            canvas.drawCircle(0f,0f,10, paint);
+//            paint.setColor(Color.GREEN);
+//            canvas.drawCircle(0f,0f,10, paint);
+            canvas.drawBitmap(favBitmap,favRect,RECT20,paint);
         }
 
         if (isRetweet) {
             if (rtBitmap != null) {
-                canvas.drawBitmap(rtBitmap, SRC, scale(RT_RECT,factor), paint);
+                Rect RT_SRC = new Rect(0,0,rtBitmap.getWidth(),rtBitmap.getHeight());
+                canvas.drawBitmap(rtBitmap, RT_SRC, scale(RT_RECT,factor), paint);
             } else {
                 paint.setColor(Color.MAGENTA);
                 canvas.drawRect(scale(RT_UNKNOWN_RECT,factor), paint);
