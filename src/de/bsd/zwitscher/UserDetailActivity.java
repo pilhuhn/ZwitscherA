@@ -336,7 +336,10 @@ public class UserDetailActivity extends Activity  {
                 Pair<String,String> nameOwnerPair = userList.getValue();
                 if (o.equals(nameOwnerPair.first) && nameOwnerPair.second.equals(account.getName())) {
                     listId = userList.getKey();
-                    thTwitterHelper.addUserToLists(theUser.getId(),listId); // TODO make async
+                    UpdateRequest request = new UpdateRequest(UpdateType.ADD_TO_LIST);
+                    request.id=listId;
+                    request.userId=theUser.getId();
+                    new UpdateStatusTask(this,pg,account).execute(request);
                 }
             }
         }

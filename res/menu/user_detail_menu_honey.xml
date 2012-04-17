@@ -9,7 +9,7 @@
           />
     <item android:id="@+id/addToList"
           android:icon="@drawable/add_list"
-          android:title="@string/add"
+          android:title="@string/add_to_list"
           />
     <item android:id="@+id/direct"
           android:icon="@drawable/direct_button"

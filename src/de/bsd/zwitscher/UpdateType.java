@@ -14,5 +14,6 @@ public enum UpdateType {
     UPLOAD_PIC,
     LATER_READING,
     QUEUED,
-    REPORT_AS_SPAMMER
+    REPORT_AS_SPAMMER,
+    ADD_TO_LIST
 }

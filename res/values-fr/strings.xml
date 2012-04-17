@@ -101,4 +101,5 @@
 <string name="wantToRemove">Vraiment effacer [%s] ?</string>
 <string name="addFilterExpression">Ajouter filtre</string>
 <string name="Reply_all">Répondre à tous</string>
+<string name="add_to_list">Ajouter à liste…</string>
 </resources>

@@ -129,6 +129,10 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                 th.reportAsSpammer(request.id);
                 ret = new UpdateResponse(request.updateType,true,"OK");
                 break;
+            case ADD_TO_LIST:
+                success = th.addUserToLists(request.userId,(int)request.id);
+                ret = new UpdateResponse(request.updateType,success,"Added");
+                break;
             default:
                 throw new IllegalArgumentException("Update type not supported yet : " + request.updateType);
         }

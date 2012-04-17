@@ -25,6 +25,7 @@ public class UpdateRequest implements Serializable {
     public String url;         // for external apps
     public String extUser;     // for external apps
     public String extPassword; // for external apps
+    public long userId;
 
     public UpdateRequest(UpdateType updateType) {
         this.updateType = updateType;
