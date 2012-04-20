@@ -34,12 +34,13 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
     private TwitterHelper th;
     private boolean downloadImages;
     private UserDisplayMode userDisplay;
+    private final NetworkHelper networkHelper;
 
 
     public StatusAdapter(Context context, Account account, int textViewResourceId, List<T> objects) {
         super(context, textViewResourceId, objects);
         th = new TwitterHelper(context, account);
-        downloadImages = new NetworkHelper(context).mayDownloadImages();
+        networkHelper = new NetworkHelper(context);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String tmp = preferences.getString("screen_name_overview","USER");
         userDisplay = UserDisplayMode.valueOf(tmp);
@@ -124,6 +125,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
         if (response instanceof Status)
             status = (Status) response;
 
+        downloadImages = networkHelper.mayDownloadImages();
         new TriggerPictureDownloadTask(viewHolder.iv, userOnPicture, downloadImages, status).execute();
 
         viewHolder.userInfo.setText(builder.toSpannableString());
