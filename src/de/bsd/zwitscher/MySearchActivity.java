@@ -2,6 +2,7 @@ package de.bsd.zwitscher;
 
 import java.util.List;
 
+import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Build;
@@ -42,10 +43,13 @@ public class MySearchActivity extends AbstractListActivity {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             if (Build.VERSION.SDK_INT>=11) {
-                getActionBar().setTitle(account.getAccountIdentifier());
+                ActionBar actionBar = getActionBar();
+                actionBar.setTitle(account.getAccountIdentifier());
                 String queryIs = getString(R.string.query_is);
-                getActionBar().setSubtitle(queryIs + ": " + query);
-                getActionBar().setHomeButtonEnabled(true);
+                actionBar.setSubtitle(queryIs + ": " + query);
+                actionBar.setHomeButtonEnabled(true);
+                actionBar.setDisplayHomeAsUpEnabled(true);
+
             }
             List<Status> statusList = th.searchStatues(query);
             StatusAdapter<Status> adapter = new StatusAdapter<Status>(this,account,R.layout.tweet_list_item,statusList);
