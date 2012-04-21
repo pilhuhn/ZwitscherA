@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
@@ -60,6 +61,7 @@ public class UserDetailActivity extends Activity  {
     Button followButton ;
     private long userId;
     private Account account;
+    private MenuItem weAreFollowingMenuItem;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,7 +103,6 @@ public class UserDetailActivity extends Activity  {
             theUser = thTwitterHelper.getUserById(userId,true);
             fillDetails(theUser,false);
         }
-
         if (userId!=0)
             new UserDetailDownloadTask(this).execute(userId);
         else
@@ -349,6 +350,12 @@ public class UserDetailActivity extends Activity  {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.user_detail_menu_honey,menu);
 
+            weAreFollowingMenuItem = menu.findItem(R.id.follow);
+            if (weAreFollowing)
+                weAreFollowingMenuItem.setTitle(R.string.unfollow_user);
+            else
+                weAreFollowingMenuItem.setTitle(R.string.follow_user);
+
             ActionBar actionBar = this.getActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -488,6 +495,15 @@ public class UserDetailActivity extends Activity  {
             View followButton = findViewById(R.id.userDetail_follow_button);
             if (followButton!=null)
                 followButton.setEnabled(true);
+            if (Build.VERSION.SDK_INT>=11) {
+                if (weAreFollowingMenuItem!=null) {
+                    if (isFriend)
+                        weAreFollowingMenuItem.setTitle(R.string.unfollow_user);
+                    else
+                        weAreFollowingMenuItem.setTitle(R.string.follow_user);
+                }
+            }
+
             if (pg!=null)
                 pg.setVisibility(ProgressBar.INVISIBLE);
             if (titleTextBox!=null)
