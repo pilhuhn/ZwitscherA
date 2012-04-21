@@ -133,6 +133,10 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                 success = th.addUserToLists(request.userId,(int)request.id);
                 ret = new UpdateResponse(request.updateType,success,"Added");
                 break;
+            case FOLLOW_UNFOLLOW:
+                success = th.followUnfollowUser(request.userId,request.someBool);
+                ret = new UpdateResponse(request.updateType,success,"Follow/Unfollow set");
+                break;
             default:
                 throw new IllegalArgumentException("Update type not supported yet : " + request.updateType);
         }

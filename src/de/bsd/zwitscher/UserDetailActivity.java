@@ -250,11 +250,10 @@ public class UserDetailActivity extends Activity  {
     @SuppressWarnings("unused")
     public void followUser(View v) {
 
-        boolean success = thTwitterHelper.followUnfollowUser(theUser.getId(),!weAreFollowing);
-        if (success) {
-            weAreFollowing = !weAreFollowing;
-            setFollowingButton(weAreFollowing);
-        }
+        UpdateRequest request = new UpdateRequest(UpdateType.FOLLOW_UNFOLLOW);
+        request.userId = theUser.getId();
+        request.someBool = !weAreFollowing;
+        new UpdateStatusTask(this,pg,account).execute(request);
     }
 
 
