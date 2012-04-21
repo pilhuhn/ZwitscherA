@@ -180,4 +180,6 @@
     <string name="prefs_screen_name_overview">How to display names in the timeline (a change will only be active after a timeline reload)</string>
     <string name="Preferences">Preferences</string>
     <string name="add_to_list">Add to list…</string>
+    <string name="query_is">Query is</string>
+    <string name="no_items_found">No items found</string>
 </resources>

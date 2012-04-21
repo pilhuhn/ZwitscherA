@@ -658,13 +658,13 @@ Log.d("FillUp","Return: " + i);
             Status st = materializeStatus(s);
             if (what!=null) {
                 if ("from".equalsIgnoreCase(what)) {  // Todo limit options
-                    if (st.getUser().getName().contains(qtl))
+                    if (st.getUser().getName().contains(qtl) && !ret.contains(st))
                         ret.add(st);
-                    if (st.getUser().getScreenName().contains(qtl))
+                    if (st.getUser().getScreenName().contains(qtl) && !ret.contains(st))
                         ret.add(st);
                 }
             } else {
-                if (st.getText().toLowerCase().contains(qtl))
+                if (st.getText().toLowerCase().contains(qtl) && !ret.contains(st))
                    ret.add(st);
             }
         }

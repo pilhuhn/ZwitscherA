@@ -102,4 +102,6 @@
 <string name="addFilterExpression">Ajouter filtre</string>
 <string name="Reply_all">Répondre à tous</string>
 <string name="add_to_list">Ajouter à liste…</string>
+    <string name="no_items_found">Rien trouvé</string>
+
 </resources>

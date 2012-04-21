@@ -168,6 +168,8 @@
     <string name="prefs_screen_name_overview">Wie sollen die Namen in der Timeline dargestellt werden (eine Änderung wird erst nach einem Reload der Timeline aktiv)</string>
     <string name="Preferences">Einstellungen</string>
     <string name="add_to_list">Zu Liste hinzufügen…</string>
+    <string name="query_is">Suche nach</string>
+    <string name="no_items_found">Keine Einträge gefunden</string>
 
 
 </resources>

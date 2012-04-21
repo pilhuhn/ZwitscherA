@@ -16,22 +16,40 @@
           android:title="@string/new_message"
           android:icon="@drawable/post_button"
         />
-	<item android:alphabeticShortcut="P"
-		  android:id="@+id/preferences"
-		  android:titleCondensed="Prefs"
-		  android:title="@string/Preferences"
-          android:icon="@drawable/wrench"
-		  android:enabled="true"
-		  android:visible="true"/>
+    <item
+        android:id="@+id/menu_default_search"
+        android:icon="@drawable/ic_menu_search"
+        android:title="@string/searches"
+        android:showAsAction="ifRoom"
+        android:actionViewClass="android.widget.SearchView"
+    />
+    <item android:id="@+id/menu_goto_user"
+          android:title="@string/goto_user"
+          android:titleCondensed="@string/goto_user_short"
+            />
+    <item android:alphabeticShortcut="P"
+    		  android:id="@+id/preferences"
+    		  android:titleCondensed="Prefs"
+    		  android:title="@string/Preferences"
+              android:icon="@drawable/wrench"
+    		  android:enabled="true"
+    		  android:visible="true"/>
+    <item android:id="@+id/AccountStuff"
+          android:title="@string/menu_switch_account"/>
+
+    <item android:id="@+id/menu_feedback"
+          android:title="@string/give_feedback"
+          android:titleCondensed="@string/give_feedback_short"
+          android:showAsAction="never"
+            />
+    <item android:enabled="true" android:id="@+id/helpMenu"
+      android:titleCondensed="@string/help" android:title="@string/help"/>
+
     <item android:enabled="true" android:id="@+id/reloadLists"
       android:titleCondensed="Sync L and S" android:title="Synchronize Lists and Searches..."/>
     <item android:enabled="true" android:id="@+id/menu_cleanTweets"
           android:title="@string/menu_clean_statuses"
           />
-    <item android:enabled="true" android:id="@+id/helpMenu"
-      android:titleCondensed="@string/help" android:title="@string/help"/>
-    <item android:id="@+id/AccountStuff"
-          android:title="@string/menu_switch_account"/>
     <item android:id="@+id/DevelMenu"
           android:title="Devel..."
           android:enabled="true"  >
@@ -48,13 +66,4 @@
                   />
         </menu>
     </item>
-    <item android:id="@+id/menu_goto_user"
-          android:title="@string/goto_user"
-          android:titleCondensed="@string/goto_user_short"
-            />
-    <item android:id="@+id/menu_feedback"
-          android:title="@string/give_feedback"
-          android:titleCondensed="@string/give_feedback_short"
-          android:showAsAction="never"
-          />
 </menu>

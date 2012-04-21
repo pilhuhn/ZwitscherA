@@ -259,7 +259,11 @@ public class TabWidget extends TabActivity {
         case R.id.menu_goto_user:
             displayUserInfo();
             break;
+        case R.id.menu_default_search:
+            onSearchRequested();
+            break;
 	    default:
+            System.out.println("Unknown option " + item.toString());
 	        return super.onOptionsItemSelected(item);
 	    }
 	    return true;
