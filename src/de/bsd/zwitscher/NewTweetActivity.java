@@ -146,6 +146,13 @@ public class NewTweetActivity extends Activity implements LocationListener {
             else { // OP is null -> new tweet
                 if (bundleText!=null)
                     edittext.setText(bundleText);
+                else if (bundle.get(Intent.EXTRA_STREAM)!=null) {
+                    Uri externalUmageUri = (Uri) bundle.get(Intent.EXTRA_STREAM);
+                    // THis is a content:// uri.
+                    // decode the picture location
+                    picturePath = getPath(externalUmageUri);
+                    Toast.makeText(this,R.string.picture_attached,Toast.LENGTH_SHORT).show();
+                }
             }
         }
         edittext.setSelection(edittext.getText().length());
@@ -578,6 +585,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
     }
 
     // Taken from http://stackoverflow.com/questions/2169649/open-an-image-in-androids-built-in-gallery-app-programmatically/2636538#2636538
+    // In the future use something like InputStream is = getContentResolver().openInputStream(Uri.parse(YOUR_URI_STRING)));
     String getPath(Uri uri) {
         String[] projection = { MediaStore.Images.Media.DATA };
         Cursor cursor = managedQuery(uri, projection, null, null, null);
