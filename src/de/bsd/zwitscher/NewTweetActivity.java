@@ -148,6 +148,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
                     edittext.setText(bundleText);
             }
         }
+        edittext.setSelection(edittext.getText().length());
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         boolean locationEnabled = preferences.getBoolean("location",false);
         CheckBox box = (CheckBox) findViewById(R.id.GeoCheckBox);
