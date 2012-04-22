@@ -37,7 +37,7 @@ class CreateAccountTask extends AsyncTask<Void,Void,String> {
             AccountHolder.getInstance().setAccount(account);
             return "OK";
         } catch (Exception e) {
-            return "Login failed  " + e.getLocalizedMessage();
+            return context.getString(R.string.login_failed) + e.getLocalizedMessage();
         }
 
     }

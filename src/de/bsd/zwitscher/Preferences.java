@@ -46,7 +46,7 @@ public class Preferences extends PreferenceActivity implements SharedPreferences
             boolean success = store.verifyAccount();
 
             if (!success) {
-                Toast.makeText(this,"Account is not valid",Toast.LENGTH_LONG).show();
+                Toast.makeText(this,getString(R.string.account_not_valid),Toast.LENGTH_LONG).show();
                 p.setSummary(R.string.invalid);
             }
         }

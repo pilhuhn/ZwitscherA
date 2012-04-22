@@ -254,7 +254,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 spinner.setVisibility(View.VISIBLE);
                 List<String> users = new ArrayList<String>(userMentionEntities.length+1);
                 // Add an item 0 as dummy, as the spinner auto-selects it
-                users.add("Pick a user");
+                users.add(getString(R.string.pick_a_user));
                 for (int i = 0, userMentionEntitiesLength = userMentionEntities.length;
                      i < userMentionEntitiesLength; i++) {
                     UserMentionEntity ume = userMentionEntities[i];
@@ -486,7 +486,7 @@ builder                                .append(ue.getExpandedURL());
         String password = prefs.getString("ril_password","");
 
         if (user.equals("") || password.equals("")) {
-            Toast.makeText(this,"No user/password for ReadItLater given",Toast.LENGTH_LONG).show();
+            Toast.makeText(this,getString(R.string.no_ril_user),Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -628,7 +628,7 @@ builder                                .append(ue.getExpandedURL());
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setMessage(result);
-            builder.setTitle("Translation result");
+            builder.setTitle(context.getString(R.string.translation_result));
             builder.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();

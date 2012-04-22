@@ -122,10 +122,10 @@
     <string name="wrote">schrieb</string>
     <string name="message_from_zwitscher">Nachricht von Zwitscher</string>
     <string name="click_here">&lt;--- Hier berühren</string>
-    <string name="read_it_later_enable">ReadItLater nutzen</string>
+    <string name="read_it_later_enable">Pocket(ReadItLater) nutzen</string>
     <string name="read_it_later_username">Benutzername</string>
     <string name="read_it_later_password">Password</string>
-    <string name="read_it_later_support">Einstellungen für ReadItLater</string>
+    <string name="read_it_later_support">Einstellungen für Pocket(ReadItLater)</string>
     <string name="unset">Ungesetzt</string>
     <string name="set">Gesetzt</string>
     <string name="invalid">Ungültig</string>
@@ -172,6 +172,12 @@
     <string name="no_items_found">Keine Einträge gefunden</string>
     <string name="queueing">Server scheint down oder überladen. Für späteres Senden gespeichert. [%s]</string>
     <string name="update_not_yet_supported">Update type [%s] noch nicht unterstützt</string>
+    <string name="pick_a_user">Benutzer auswählen</string>
+    <string name="no_ril_user">Keinen Account für Pocket(ReadItLater) gegeben</string>
+    <string name="translation_result">Übersetzung:</string>
+    <string name="error_nothing_provided">-nichts angegeben-</string>
+    <string name="account_not_valid">Account ist ungültig</string>
+    <string name="login_failed">Login fehlgeschlagen</string>
 
 
 </resources>

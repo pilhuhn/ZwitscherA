@@ -29,11 +29,11 @@ public class ErrorDisplayActivity extends Activity {
         String message = bundle.getString("e_text");
 
         if (head==null)
-            head="-nothing provided-";
+            head=getString(R.string.error_nothing_provided);
         if (body==null)
-            body="-nothing provided-";
+            body=getString(R.string.error_nothing_provided);
         if (message==null)
-            message="-nothing provided-";
+            message=getString(R.string.error_nothing_provided);
 
         TextView headView = (TextView) findViewById(R.id.error_head);
         headView.setText(Html.fromHtml(head));
