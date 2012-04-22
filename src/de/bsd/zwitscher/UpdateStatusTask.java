@@ -138,11 +138,11 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                 ret = new UpdateResponse(request.updateType,success,"Follow/Unfollow set");
                 break;
             default:
-                throw new IllegalArgumentException("Update type not supported yet : " + request.updateType);
+                throw new IllegalArgumentException(context.getString(R.string.update_not_yet_supported, request.updateType));
         }
 
-        if (ret!=null && ret.getStatusCode()==502)
-            ret = queueUpUpdate(request,"Server seems down, queued for later sending. [" + ret.getMessage() + "]");
+        if (ret!=null && (ret.getStatusCode()==502||ret.getStatusCode()==503))
+            ret = queueUpUpdate(request,context.getString(R.string.queueing, ret.getMessage()));
 
         return ret;
     }

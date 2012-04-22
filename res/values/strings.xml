@@ -182,4 +182,6 @@
     <string name="add_to_list">Add to list…</string>
     <string name="query_is">Query is</string>
     <string name="no_items_found">No items found</string>
+    <string name="queueing">Server seems down or overloaded, queued for later sending. [%s]</string>
+    <string name="update_not_yet_supported">Update type %s not supported yet</string>
 </resources>
