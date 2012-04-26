@@ -709,7 +709,10 @@ builder                                .append(ue.getExpandedURL());
             Log.d("One tweet","Url = " + url);
 //            url = UrlHelper.expandUrl(url); // expand link shorteners TODO that ultimately needs to go into the main parsing for all kinds of links
             String finalUrlString="";
-            if (url.contains("yfrog.com")) {
+            if (url.endsWith(".jpg") || url.endsWith(".png") || url.endsWith(".jpeg")) {
+                finalUrlString = url;
+            }
+            else if (url.contains("yfrog.com")) {
                 finalUrlString = url + ".th.jpg";
             }
             else if (url.contains("twitpic.com")) {
