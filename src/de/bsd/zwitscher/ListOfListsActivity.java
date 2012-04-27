@@ -264,8 +264,10 @@ public class ListOfListsActivity extends AbstractListActivity {
                 ActionBar ab = getActionBar();
                 if (ab==null && parent!=null)
                     ab=parent.getActionBar();
-                if (ab!=null)
-                    ab.setSubtitle(text);
+                if (ab!=null) {
+                    ab.setTitle(R.string.updating);
+                    ab.setSubtitle(list);
+                }
             }
         }
     }
