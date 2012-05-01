@@ -23,6 +23,7 @@ public class UpdateResponse {
     String origMessage;
     int statusCode;
     private String picturePath;
+    boolean someBool;
 
     public UpdateResponse(UpdateType updateType, boolean success, String message) {
         this.message = message;

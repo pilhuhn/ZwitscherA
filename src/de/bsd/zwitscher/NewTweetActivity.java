@@ -65,6 +65,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
     private User toUser = null;
     private TextView charCountView;
     private String picturePath = null;
+    private boolean pictureRemovable = false;
     private LocationManager locationManager;
     private Account account;
     private int picUrlCount;
@@ -318,6 +319,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
         request.statusUpdate = update;
         if (picturePath!=null)
             request.picturePath = picturePath;
+        request.someBool = pictureRemovable;
         Toast.makeText(this,R.string.trying_to_send,Toast.LENGTH_SHORT).show();
         new UpdateStatusTask(this,pg, account).execute(request);
 	}
@@ -333,6 +335,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
         request.id = toUser.getId();
         if (picturePath!=null)
             request.picturePath = picturePath;
+        request.someBool = pictureRemovable;
         Toast.makeText(this,R.string.trying_to_send,Toast.LENGTH_SHORT).show();
 
         new UpdateStatusTask(this,pg, account).execute(request);
@@ -431,25 +434,27 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String provider = preferences.getString("pictureService","yfrog");
+        pictureRemovable = false;
 
-        // code 1 = take picture
+        // code 1 = take small picture
         if(requestCode==1  && resultCode==RESULT_OK) {
             Bitmap bitmap = (Bitmap) data.getExtras().get("data");
             PicHelper picHelper = new PicHelper();
             picturePath = picHelper.storeBitmap(bitmap, getTempFile(this), Bitmap.CompressFormat.JPEG, 100); // TODO adjust quality per network
             Log.d("NewTweetActivity.onActivityResult","path: " + picturePath);
+            pictureRemovable = true;
 
             if (provider.equals("twitter"))
                 Toast.makeText(this,R.string.picture_attached,Toast.LENGTH_SHORT).show();
             else
                 picUrlCount=21;
-        } else if (requestCode==2 && resultCode==RESULT_OK) {
+        } else if (requestCode==2 && resultCode==RESULT_OK) { // select user
             String item = (String) data.getExtras().get("data");
             if (item.contains(", ")) {
                 String user = item.substring(0,item.indexOf(", "));
                 edittext.append("@" + user + " ");
             }
-        } else if (requestCode==3 && resultCode==RESULT_OK) {
+        } else if (requestCode==3 && resultCode==RESULT_OK) { // take large picture
             // large size image
             File file = getFixedTempFile(this);
             File newPath = getTempFile(this);
@@ -458,13 +463,14 @@ public class NewTweetActivity extends Activity implements LocationListener {
                 picturePath = newPath.getAbsolutePath();
             else
                 picturePath = file.getAbsolutePath();
+            pictureRemovable = true;
 
             Toast.makeText(this,R.string.picture_attached,Toast.LENGTH_SHORT).show();
 
             if(!provider.equals("twitter"))
                 picUrlCount=21;
 
-        } else if (requestCode==4 && resultCode==RESULT_OK) {
+        } else if (requestCode==4 && resultCode==RESULT_OK) { // picture from gallery
             // image from gallery
             Uri selectedImageUri = data.getData();
             picturePath = getPath(selectedImageUri);

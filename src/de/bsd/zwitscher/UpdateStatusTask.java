@@ -92,6 +92,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                     }
                 }
                 ret = th.updateStatus(request);
+                ret.someBool = request.someBool;
                 break;
             case FAVORITE:
                 ret = th.favorite(request);
@@ -114,6 +115,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                         ret.setFailure();
                         ret.setMessage("Picture upload failed");
                     }
+                    ret.someBool = request.someBool;
                 }
                 break;
             case LATER_READING:
@@ -209,9 +211,11 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
             }
         } else if (result.getUpdateType()==UpdateType.UPDATE) {
             if (result.isSuccess() && result.getPicturePath()!=null) {
-                File file = new File(result.getPicturePath());
-                if (file.exists()) {
-                    file.delete();
+                if (result.someBool) { // only delete if some bool is set, which means that the we allow to remove the picture
+                    File file = new File(result.getPicturePath());
+                    if (file.exists()) {
+                        file.delete(); // TODO only for camera shots, not for Gallery images
+                    }
                 }
             }
         }
