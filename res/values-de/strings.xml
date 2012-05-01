@@ -178,6 +178,8 @@
     <string name="error_nothing_provided">-nichts angegeben-</string>
     <string name="account_not_valid">Account ist ungültig</string>
     <string name="login_failed">Login fehlgeschlagen</string>
+    <string name="invalid_filter">Der Filterausdruck ist ungültig - es wird nicht gefiltert (%s)</string>
+    <string name="invalid_list_item">Eintrag [%s] ist ungültig, wird nicht genutzt</string>
 
 
 </resources>

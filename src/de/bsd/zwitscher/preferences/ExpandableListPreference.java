@@ -11,14 +11,11 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 import de.bsd.zwitscher.R;
 
 /**
@@ -34,6 +31,7 @@ import de.bsd.zwitscher.R;
 public class ExpandableListPreference extends DialogPreference implements TextView.OnEditorActionListener,
         AdapterView.OnItemLongClickListener{
 
+    private static final String EXPANDABLE_LIST_PREFERENCE = "ExpandableListPreference";
     EditText inputField;
     List<String> items = new ArrayList<String>();
     ListView listView;
@@ -43,6 +41,7 @@ public class ExpandableListPreference extends DialogPreference implements TextVi
     boolean askBeforeDelete = true;
     private static final String DEFAULT_SEPARATOR = ",";
     String hint;
+    private VerifyCallback verifierCallback;
 
     public ExpandableListPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -64,8 +63,10 @@ public class ExpandableListPreference extends DialogPreference implements TextVi
 
         key = getKey();
 
-
+        String verifierCallbackName = attrs.getAttributeValue(null, "verifierCallback");
+        verifierCallback = loadCallbackClass(verifierCallbackName);
     }
+
 
     @Override
     protected void onBindDialogView(View view) {
@@ -96,8 +97,20 @@ public class ExpandableListPreference extends DialogPreference implements TextVi
         // User has clicked ok, but not return - take the contents of the input
         // field.
         String s = inputField.getText().toString();
-        if (!items.contains(s) && !s.equals("") && !s.equals("\n")) // For whatever reason we are called twice.
+        if (!items.contains(s) && !s.equals("") && !s.equals("\n")) {// For whatever reason we are called twice.
+            boolean valid = true;
+            // If a verifier is defined, invoke it
+            if (verifierCallback!=null) {
+                valid = verifierCallback.verify(s);
+            }
+            if (valid) {
                 items.add(s);
+            }
+            else {
+                String tmp = getContext().getString(R.string.invalid_list_item,s);
+                Toast.makeText(getContext(),tmp,Toast.LENGTH_LONG).show();
+            }
+        }
 
         if (items.size()>0) {
             SharedPreferences sp = getPreferenceManager().getSharedPreferences();
@@ -179,4 +192,38 @@ public class ExpandableListPreference extends DialogPreference implements TextVi
         return true;
 
     }
+
+    private VerifyCallback loadCallbackClass(String verifierCallbackName) {
+
+        try {
+            Class clazz = Class.forName(verifierCallbackName);
+            if (clazz==null) {
+                Log.e(EXPANDABLE_LIST_PREFERENCE,"Class " + verifierCallbackName + " not found");
+                return null;
+            }
+
+            Class[] ifs = clazz.getInterfaces();
+            if (ifs==null) {
+                Log.e(EXPANDABLE_LIST_PREFERENCE,"Class " + verifierCallbackName + " implements no interfaces");
+                return null;
+            }
+            boolean found = false;
+            for (Class c : ifs) {
+                if (c.getName().equals("de.bsd.zwitscher.preferences.VerifyCallback"))
+                    found = true;
+            }
+            if (!found) {
+                Log.e(EXPANDABLE_LIST_PREFERENCE,"Class " + verifierCallbackName + " does not implement de.bsd.zwitscher.preferences.VerifyCallback");
+                return null;
+            }
+
+            VerifyCallback callback = (VerifyCallback) clazz.newInstance();
+            return callback;
+        } catch (Exception e) {
+            Log.e(EXPANDABLE_LIST_PREFERENCE,"Loading of " + verifierCallbackName + " failed: " + e.getLocalizedMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

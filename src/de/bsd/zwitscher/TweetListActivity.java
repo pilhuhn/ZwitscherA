@@ -1,8 +1,12 @@
 package de.bsd.zwitscher;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -34,10 +38,7 @@ import android.widget.Toast;
 import de.bsd.zwitscher.helper.FlushQueueTask;
 import de.bsd.zwitscher.helper.MetaList;
 import de.bsd.zwitscher.helper.NetworkHelper;
-import twitter4j.DirectMessage;
-import twitter4j.Paging;
-import twitter4j.Status;
-import twitter4j.Tweet;
+import twitter4j.*;
 
 /**
  * Show the list of tweets.
@@ -56,13 +57,13 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     List<Status> statuses;
     List<DirectMessage> directs;
     List<Tweet> tweets;
-    Bundle intentInfo;
     int list_id;
     ListView lv;
     int newMentions=0;
     private int newDirects=0;
     Long userId=null;
     int userListId = -1;
+    private Pattern filterPattern;
 
     /**
      * Called when the activity is first created.
@@ -100,8 +101,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 		lv.setOnItemClickListener(this);
 		lv.setOnItemLongClickListener(this); // Directly got to reply
 
-
-        intentInfo = getIntent().getExtras();
+        Bundle intentInfo = getIntent().getExtras();
         if (intentInfo==null) {
             list_id = 0;
         } else {
@@ -130,6 +130,9 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 		lv.setOnItemClickListener(this);
 		lv.setOnItemLongClickListener(this); // Directly got to reply
 
+        String msg = setupFilter();
+        if (msg!=null)
+            Toast.makeText(this,msg,Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -200,13 +203,13 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
      * tweet.
      *
      *
+     *
      * @param fromDbOnly If true only statuses already in the DB are returned
      * @param listId Id of the list / timeline to fetch (see above)
-     * @param filter Filter expression to filter out tweets. If null no filtering happens.
      * @param updateStatusList Should the currently displayed list be updated?
      * @return List of status items along with some counts
      */
-	private MetaList<Status> getTimlinesFromTwitter(boolean fromDbOnly, int listId, String filter,
+	private MetaList<Status> getTimlinesFromTwitter(boolean fromDbOnly, int listId,
                                                     boolean updateStatusList) {
 		Paging paging = new Paging();
 
@@ -253,13 +256,16 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         if (updateStatusList) {
             statuses = new ArrayList<Status>();
             List<Status> data = new ArrayList<Status>(myStatuses.getList().size());
+            if (filterPattern==null) {
+                setupFilter(); // TODO report errors?
+            }
             for (Status status : myStatuses.getList()) {
-                if ((filter==null) || (!status.getText().matches(filter))) {
+                boolean shouldFilter = matchesFilter(status);
+                if (shouldFilter) {
+                    Log.i("TweetListActivity::filter, filtered ",status.getUser().getScreenName() + " - " + status.getText());
+                } else {
                     data.add(status);
                     statuses.add(status);
-                } else {
-                    Log.d("TweetListActivity::filter",status.getUser().getScreenName() + " - " + status.getText());
-
                 }
             }
             metaList = new MetaList<Status>(data,myStatuses.getNumOriginal(),myStatuses.getNumAdded());
@@ -271,6 +277,33 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
         return metaList;
 	}
+
+    /**
+     * Does the passed status match the filter pattern?
+     * This method checks the status text and the expanded url entities
+     * @param status Status to check
+     * @return True if the filter expression matches, false otherwise
+     */
+    private boolean matchesFilter(Status status) {
+        boolean shouldFilter = false;
+        if (filterPattern != null) {
+            Matcher m = filterPattern.matcher(status.getText());
+            if (m.matches())
+                shouldFilter = true;
+
+            if (status.getURLEntities() != null) {
+                for (URLEntity ue : status.getURLEntities()) {
+                    URL expUrl = ue.getExpandedURL();
+                    if (expUrl !=null && expUrl.toString()!=null ) {
+                        m = filterPattern.matcher(expUrl.toString());
+                        if (m.matches())
+                            shouldFilter = true;
+                    }
+                }
+            }
+        }
+        return shouldFilter;
+    }
 
     private MetaList<DirectMessage> getDirectsFromTwitter(boolean fromDbOnly) {
         MetaList<DirectMessage> messages;
@@ -401,9 +434,11 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
                         List<Status> newStatuses = th.getStatuesFromDb(last.getId(),7,list_id);
                         for (Status status : newStatuses ) {
-                            sta.insert(status, totalCount + i);
-                            statuses.add(status);
-                            i++;
+                            if (!matchesFilter(status)) {
+                                sta.insert(status, totalCount + i);
+                                statuses.add(status);
+                                i++;
+                            }
                         }
                     }
                     sta.notifyDataSetChanged();
@@ -499,8 +534,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                         default: updating = "";
                     }
                     publishProgress(updating);
-                    String filter = getFilter();
-                    data = getTimlinesFromTwitter(fromDbOnly, listId, filter, updateListAdapter);
+                    data = getTimlinesFromTwitter(fromDbOnly, listId, updateListAdapter);
                 }
                 else if (listId ==-2) {
                     publishProgress(directsString);
@@ -595,16 +629,29 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     }
 
 
-    // ".*(http://4sq.com/|http://shz.am/).*"
-    private String getFilter() {
+    /**
+     * Set up a filter for tweets. The entries from the filter list are joined together to e.g.
+     *  ".*(http://4sq.com/|http://shz.am/).*"
+     * @return Error message on issue with pattern, null otherwise
+     */
+    private String setupFilter() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String exp = prefs.getString("filter",null);
-        if (exp==null)
+        if (exp==null) {
+            filterPattern = null;
             return null;
+        }
         String ret=".*(" + exp.replaceAll(",","|") + ").*";
 
         Log.i("TweetListActivity::getFilter()","Filter is " + ret);
-        return ret;
+        try {
+            filterPattern = Pattern.compile(ret);
+        } catch (PatternSyntaxException e) {
+            String tmp = getString(R.string.invalid_filter,e.getLocalizedMessage());
+            Log.e("setupFilter",tmp);
+            return tmp;
+        }
+        return null;
     }
 
 }

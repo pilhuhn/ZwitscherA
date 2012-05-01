@@ -190,4 +190,6 @@
     <string name="error_nothing_provided">-nothing provided-</string>
     <string name="account_not_valid">Account is not valid</string>
     <string name="login_failed">Login failed</string>
+    <string name="invalid_filter">Filter expression is invalid - not filtering (%s)</string>
+    <string name="invalid_list_item">Entry [%s] is invalid, rejecting</string>
 </resources>
