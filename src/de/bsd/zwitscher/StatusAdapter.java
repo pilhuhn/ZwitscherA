@@ -2,7 +2,6 @@ package de.bsd.zwitscher;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
@@ -21,6 +20,7 @@ import twitter4j.TwitterResponse;
 import twitter4j.URLEntity;
 import twitter4j.User;
 
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -32,7 +32,6 @@ import java.util.List;
 class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
     private TwitterHelper th;
-    private boolean downloadImages;
     private UserDisplayMode userDisplay;
     private final NetworkHelper networkHelper;
 
@@ -74,7 +73,6 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
 
         T response = items.get(position);
-        Bitmap bi;
 
         SpannableBuilder builder = new SpannableBuilder(extContext);
         User userOnPicture;
@@ -125,7 +123,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
         if (response instanceof Status)
             status = (Status) response;
 
-        downloadImages = networkHelper.mayDownloadImages();
+        boolean downloadImages = networkHelper.mayDownloadImages();
         new TriggerPictureDownloadTask(viewHolder.iv, userOnPicture, downloadImages, status).execute();
 
         viewHolder.userInfo.setText(builder.toSpannableString());
@@ -154,13 +152,17 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
     private String textWithReplaceTokens(Status status) {
 
+        if (status.getText()==null)
+            return "";
+
         String[] tokens = status.getText().split(" ");
         StringBuilder builder = new StringBuilder();
         for (String token : tokens) {
             boolean found=false;
             if (status.getMediaEntities()!=null) {
                 for (MediaEntity me : status.getMediaEntities()) {
-                    if (me.getURL().toString().equals(token)) {
+                    URL meURL = me.getURL();
+                    if (meURL !=null && meURL.toString()!=null && meURL.toString().equals(token) && me.getDisplayURL()!=null) {
                         builder.append(me.getDisplayURL());
                         found=true;
                         break;
@@ -169,7 +171,8 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
             }
             if (!found && status.getURLEntities()!=null) {
                 for (URLEntity ue : status.getURLEntities()) {
-                    if (ue.getURL()!=null && ue.getURL().toString().equals(token)) {
+                    URL ueURL = ue.getURL();
+                    if (ueURL !=null && ueURL.toString().equals(token) && ue.getDisplayURL()!=null) {
                         builder.append(ue.getDisplayURL());
                         found=true;
                         break;

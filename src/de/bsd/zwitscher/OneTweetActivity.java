@@ -8,7 +8,6 @@ import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -321,7 +320,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     private void setTweetText(TextView tweetView) {
         String[] tokens = status.getText().split(" ");
         StringBuilder builder = new StringBuilder();
-        List<String> urlsToGo = new ArrayList<String>();
         for (String token: tokens) {
             if (token.startsWith("http")) {
                 boolean found=false;
@@ -337,10 +335,12 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
                 if (!found && status.getURLEntities()!=null) {
                     for (URLEntity ue : status.getURLEntities()) {
-                        if (ue.getURL().toString().equals(token)) {
-builder                                .append(ue.getExpandedURL());
-                            found=true;
-                            break;
+                        if (ue.getURL()!=null && ue.getURL().toString().equals(token)) {
+                            if (ue.getExpandedURL() != null) {
+                                builder.append(ue.getExpandedURL());
+                                found = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -353,12 +353,6 @@ builder                                .append(ue.getExpandedURL());
             builder.append(" ");
         }
         tweetView.setText(builder.toString());
-        if (urlsToGo.size()>0) {
-            // we have unresolved links - try to fetch them now
-            // TODO figure out how to best do it, as
-            // we need not only to fetch the urls in background, but
-            // also do the image preview magic again
-        }
     }
 
     /**
@@ -723,7 +717,7 @@ builder                                .append(ue.getExpandedURL());
             else if (url.contains("plixi.com")) {
                 finalUrlString = "http://api.plixi.com/api/tpapi.svc/imagefromurl?size=thumbnail&url=" +  url;
             }
-            else if (url.contains("twimg")) {
+            else if (url.contains("twimg")) { // This is the normal twitter picture entity
                 finalUrlString = url;
             }
             else if (url.contains("i.imgur.com")) {
