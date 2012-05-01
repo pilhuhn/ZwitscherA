@@ -115,99 +115,98 @@ public class UserDetailActivity extends Activity  {
      * @param weAreFollowing True if we are following that user
      */
     private void fillDetails(User user, boolean weAreFollowing) {
-        if (user!=null) {
-            TextView userNameView = (TextView) findViewById(R.id.UserName);
-            String uName = "<b>" + user.getName() + "</b>" + " (" + user.getScreenName() + ")";
-            userNameView.setText(Html.fromHtml(uName));
-            userId = user.getId();
-            View usersTweetsButton = findViewById(R.id.view_users_tweets_button);
-            if (usersTweetsButton!=null)
-                usersTweetsButton.setEnabled(true);
-            View viewOnWebButton = findViewById(R.id.view_user_on_web_button);
-            if (viewOnWebButton!=null)
-                viewOnWebButton.setEnabled(true);
-
-            String colorString = user.getProfileBackgroundColor();
-            if (colorString.equals("")) {
-                colorString = "#EFEFEF";
-            }
-            if (!colorString.startsWith("#"))  // identi.ca sends the # , but twitter does not
-                colorString = "#" + colorString;
-            getWindow().setTitleColor(Color.parseColor(colorString));
-            boolean downloadImages = new NetworkHelper(this).mayDownloadImages();
-            String textColorString = user.getProfileTextColor();
-            if (textColorString.equals(""))
-                textColorString = colorString;
-
-            if (!textColorString.startsWith("#"))
-                textColorString = "#" + textColorString;
-            int textColor = Color.parseColor(textColorString);
-
-            userNameView.setTextColor(textColor);
-
-
-            TableLayout tl = (TableLayout) findViewById(R.id.user_table_layout);
-            for (int i = 0 ; i < tl.getChildCount(); i++) {
-                TableRow row = (TableRow) tl.getChildAt(i);
-                for (int j = 0 ; j < row.getChildCount(); j++) {
-                    TextView tv = (TextView) row.getChildAt(j);
-                    tv.setTextColor(textColor);
-                }
-            }
-            String backgroundColorString = user.getProfileSidebarFillColor();
-            if (!backgroundColorString.equals("")) {
-                if (!backgroundColorString.startsWith("#"))
-                    backgroundColorString = "#" + backgroundColorString;
-                int backgroundColor = Color.parseColor(backgroundColorString);
-                tl.setBackgroundColor(backgroundColor);
-                userNameView.setBackgroundColor(backgroundColor);
-            }
-
-            PicHelper picHelper = new PicHelper();
-            Bitmap bitmap;
-                bitmap = picHelper.getBitMapForUserFromFile(user);
-            if (bitmap!=null) {
-                ImageView iv = (ImageView) findViewById(R.id.UserPictureImageView);
-                iv.setImageBitmap(bitmap);
-            }
-            TextView locationView = (TextView) findViewById(R.id.userDetail_location);
-            locationView.setText(user.getLocation());
-
-            TextView bioView = (TextView) findViewById(R.id.userDetail_bio);
-            bioView.setText(user.getDescription());
-
-            TextView webView = (TextView) findViewById(R.id.userDetail_web);
-            if (user.getURL()!=null) {
-                webView.setText(user.getURL().toString());
-                String plc = user.getProfileBackgroundColor();
-                if (!plc.equals("")) {
-                    if (!plc.startsWith("#"))
-                        plc = "#" + plc;
-                    webView.setTextColor(Color.parseColor(plc));
-                }
-            }
-
-            TextView tweetView = (TextView) findViewById(R.id.userDetail_tweetCount);
-            tweetView.setText("" + user.getStatusesCount());
-
-            TextView followersView = (TextView) findViewById(R.id.userDetail_followerCount);
-            followersView.setText("" + user.getFollowersCount());
-
-            TextView followingView = (TextView) findViewById(R.id.userDetail_followingCount);
-            followingView.setText("" + user.getFriendsCount());
-
-            TextView listedView = (TextView) findViewById(R.id.userDetail_listedCount);
-            listedView.setText("" + user.getListedCount());
-
-
-            if (followButton!=null) {
-                followButton.setEnabled(true);
-                setFollowingButton(weAreFollowing);
-            }
-            ImageButton addToListButton = (ImageButton) findViewById(R.id.userDetail_addListButton);
-            if (addToListButton!=null)
-                addToListButton.setEnabled(true);
+        if (user == null) {
+            return;
         }
+        TextView userNameView = (TextView) findViewById(R.id.UserName);
+        String uName = "<b>" + user.getName() + "</b>" + " (" + user.getScreenName() + ")";
+        userNameView.setText(Html.fromHtml(uName));
+        userId = user.getId();
+        View usersTweetsButton = findViewById(R.id.view_users_tweets_button);
+        if (usersTweetsButton!=null)
+            usersTweetsButton.setEnabled(true);
+        View viewOnWebButton = findViewById(R.id.view_user_on_web_button);
+        if (viewOnWebButton!=null)
+            viewOnWebButton.setEnabled(true);
+
+        String colorString = user.getProfileBackgroundColor();
+        if (colorString.equals("")) {
+            colorString = "#EFEFEF";
+        }
+        if (!colorString.startsWith("#"))  // identi.ca sends the # , but twitter does not
+            colorString = "#" + colorString;
+        getWindow().setTitleColor(Color.parseColor(colorString));
+        String textColorString = user.getProfileTextColor();
+        if (textColorString.equals(""))
+            textColorString = colorString;
+
+        if (!textColorString.startsWith("#"))
+            textColorString = "#" + textColorString;
+        int textColor = Color.parseColor(textColorString);
+
+        userNameView.setTextColor(textColor);
+
+        TableLayout tl = (TableLayout) findViewById(R.id.user_table_layout);
+        for (int i = 0 ; i < tl.getChildCount(); i++) {
+            TableRow row = (TableRow) tl.getChildAt(i);
+            for (int j = 0 ; j < row.getChildCount(); j++) {
+                TextView tv = (TextView) row.getChildAt(j);
+                tv.setTextColor(textColor);
+            }
+        }
+        String backgroundColorString = user.getProfileSidebarFillColor();
+        if (!backgroundColorString.equals("")) {
+            if (!backgroundColorString.startsWith("#"))
+                backgroundColorString = "#" + backgroundColorString;
+            int backgroundColor = Color.parseColor(backgroundColorString);
+            tl.setBackgroundColor(backgroundColor);
+            userNameView.setBackgroundColor(backgroundColor);
+        }
+
+        PicHelper picHelper = new PicHelper();
+        Bitmap bitmap;
+        bitmap = picHelper.getBitMapForUserFromFile(user);
+        if (bitmap!=null) {
+            ImageView iv = (ImageView) findViewById(R.id.UserPictureImageView);
+            iv.setImageBitmap(bitmap);
+        }
+        TextView locationView = (TextView) findViewById(R.id.userDetail_location);
+        locationView.setText(user.getLocation());
+
+        TextView bioView = (TextView) findViewById(R.id.userDetail_bio);
+        bioView.setText(user.getDescription());
+
+        TextView webView = (TextView) findViewById(R.id.userDetail_web);
+        if (user.getURL()!=null) {
+            webView.setText(user.getURL().toString());
+            String plc = user.getProfileBackgroundColor();
+            if (!plc.equals("")) {
+                if (!plc.startsWith("#"))
+                    plc = "#" + plc;
+                webView.setTextColor(Color.parseColor(plc));
+            }
+        }
+
+        TextView tweetView = (TextView) findViewById(R.id.userDetail_tweetCount);
+        tweetView.setText("" + user.getStatusesCount());
+
+        TextView followersView = (TextView) findViewById(R.id.userDetail_followerCount);
+        followersView.setText("" + user.getFollowersCount());
+
+        TextView followingView = (TextView) findViewById(R.id.userDetail_followingCount);
+        followingView.setText("" + user.getFriendsCount());
+
+        TextView listedView = (TextView) findViewById(R.id.userDetail_listedCount);
+        listedView.setText("" + user.getListedCount());
+
+
+        if (followButton!=null) {
+            followButton.setEnabled(true);
+            setFollowingButton(weAreFollowing);
+        }
+        ImageButton addToListButton = (ImageButton) findViewById(R.id.userDetail_addListButton);
+        if (addToListButton!=null)
+            addToListButton.setEnabled(true);
     }
 
     /**
