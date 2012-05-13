@@ -152,7 +152,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
     private String textWithReplaceTokens(Status status) {
 
-        if (status.getText()==null)
+        if (status==null || status.getText()==null)
             return "";
 
         String[] tokens = status.getText().split(" ");
