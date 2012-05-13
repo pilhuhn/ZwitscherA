@@ -2,7 +2,6 @@ package de.bsd.zwitscher;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -62,6 +61,7 @@ public class UserDetailActivity extends Activity  {
     private long userId;
     private Account account;
     private MenuItem weAreFollowingMenuItem;
+    private String userName;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,42 +71,55 @@ public class UserDetailActivity extends Activity  {
             setContentView(R.layout.user_detail);
             getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         }
-        else
+        else {
             setContentView(R.layout.user_detail_honeycomb);
-        pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+            pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+        }
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
         followButton = (Button) findViewById(R.id.userDetail_follow_button);
         if (followButton!=null)
             followButton.setEnabled(false);
 
+        account = AccountHolder.getInstance().getAccount();
+        thTwitterHelper = new TwitterHelper(this, account);
 
         bundle = getIntent().getExtras();
         if (bundle!=null) {
-            String userName = bundle.getString("userName");
+            userName = bundle.getString("userName");
+            userId = bundle.getLong("userId");
             TextView userNameView = (TextView) findViewById(R.id.UserName);
             userNameView.setText(userName);
         }
+                    // If the user is in the DB, show the saved state while reloading its data
+        if (userId!=0) {
+            theUser = thTwitterHelper.getUserById(userId,true);
+            if (theUser!=null)
+                fillDetails(theUser,false);
+            else
+                reload();
+        }
+        else {
+            reload();
+        }
 
+        // We don't need to show the "<-- touch" comment any more
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().putBoolean("newUser",false).commit();
     }
 
     public void onResume() {
         super.onResume();
-        account = AccountHolder.getInstance().getAccount();
-        thTwitterHelper = new TwitterHelper(this, account);
-        userId = bundle.getLong("userId");
-        String userName = bundle.getString("userName");
 
-        // If the user is in the DB, show the saved state while reloading its data
-        if (userId!=0) {
-            theUser = thTwitterHelper.getUserById(userId,true);
-            fillDetails(theUser,false);
-        }
+        userName = bundle.getString("userName");
+
+    }
+
+    private void reload() {
         if (userId!=0)
             new UserDetailDownloadTask(this).execute(userId);
-        else
-            new UserDetailDownloadTask(this).execute(userName);
+        else {
+            new UserDetailDownloadTask(this).execute(this.userName);
+        }
     }
 
     /**
@@ -358,6 +371,9 @@ public class UserDetailActivity extends Activity  {
             ActionBar actionBar = this.getActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
 
+            MenuItem pgItem  = menu.findItem(R.id.ProgressBar);
+            pg = (ProgressBar) pgItem.getActionView();
+            pg.setVisibility(ProgressBar.INVISIBLE);
             return true;
         }
         return false;
@@ -384,6 +400,9 @@ public class UserDetailActivity extends Activity  {
             case R.id.usersTweets:
                 showUserTweets(null);
                 break;
+            case R.id.refresh:
+                reload();
+                break;
 
             default:
                 Log.e(getClass().getName(), "Unknown menu item: " + item.toString());
@@ -400,7 +419,6 @@ public class UserDetailActivity extends Activity  {
     private class UserDetailDownloadTask extends AsyncTask<Object,Void, Object[]> {
 
         private Context context;
-        Dialog dialog;
 
         private UserDetailDownloadTask(Context context) {
             this.context = context;
@@ -409,16 +427,14 @@ public class UserDetailActivity extends Activity  {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if (pg!=null)
+            if (pg!=null) {
                 pg.setVisibility(ProgressBar.VISIBLE);
-            else {
-                dialog = new Dialog(context);
-                dialog.setTitle(R.string.get_user_detail);
-                dialog.setCancelable(false);
-                dialog.show();
 
             }
-            if (titleTextBox!=null) {
+            if (Build.VERSION.SDK_INT>=11) {
+                getActionBar().setTitle(R.string.get_user_detail);
+            }
+            else if (titleTextBox!=null) {
                 String s = getString(R.string.get_user_detail);
                 titleTextBox.setText(s);
             }
@@ -505,10 +521,11 @@ public class UserDetailActivity extends Activity  {
 
             if (pg!=null)
                 pg.setVisibility(ProgressBar.INVISIBLE);
-            if (titleTextBox!=null)
+            if (Build.VERSION.SDK_INT>=11) {
+                getActionBar().setTitle(R.string.app_name);
+            }
+            else if (titleTextBox!=null)
                 titleTextBox.setText("");
-            if (dialog!=null)
-                dialog.cancel();
 
             Drawable background = (Drawable) params[2];
             if (background!=null)
