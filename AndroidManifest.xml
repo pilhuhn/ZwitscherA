@@ -25,10 +25,10 @@
         <meta-data android:name="android.app.default_searchable"
                    android:value=".MySearchActivity" />
 
-        <activity android:name=".TweetListActivity" android:hardwareAccelerated="true">
+        <activity android:name=".TweetListActivity" android:hardwareAccelerated="true" android:configChanges="orientation">
         </activity>
 
-		<activity android:name=".TabWidget"/>
+		<activity android:name=".TabWidget" android:configChanges="orientation"/>
 
 		<activity android:name=".OneTweetActivity">
             <intent-filter>
