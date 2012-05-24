@@ -52,7 +52,7 @@ public class MySearchActivity extends AbstractListActivity {
 
             }
             List<Status> statusList = th.searchStatues(query);
-            StatusAdapter<Status> adapter = new StatusAdapter<Status>(this,account,R.layout.tweet_list_item,statusList);
+            StatusAdapter<Status> adapter = new StatusAdapter<Status>(this,account,R.layout.tweet_list_item,statusList, 0);
             getListView().setAdapter(adapter);
         }
     }

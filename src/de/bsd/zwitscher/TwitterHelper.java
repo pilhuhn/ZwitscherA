@@ -101,7 +101,7 @@ public class TwitterHelper {
 
         }
         int numStatuses = statuses.size();
-        int filled = fillUpStatusesFromDB(list_id,statuses);
+        int filled = fillUpStatusesFromDB(list_id,statuses, -1);
         Log.i("getTimeline","Now we have " + statuses.size());
 
         MetaList<Status> metaList = new MetaList<Status>(statuses,numStatuses,filled);
@@ -480,7 +480,7 @@ public class TwitterHelper {
         return updateResponse;
     }
 
-	public MetaList<Status> getUserList(Paging paging, int listId, boolean fromDbOnly) {
+	public MetaList<Status> getUserList(Paging paging, int listId, boolean fromDbOnly, int unreadCount) {
 
         List<Status> statuses;
         if (!fromDbOnly) {
@@ -502,7 +502,7 @@ public class TwitterHelper {
             statuses = new ArrayList<Status>();
 
         int numOriginal = statuses.size();
-        int filled = fillUpStatusesFromDB(listId, statuses);
+        int filled = fillUpStatusesFromDB(listId, statuses, unreadCount);
         Log.i("getUserList","Now we have " + statuses.size());
 
         MetaList<Status> metaList = new MetaList<Status>(statuses,numOriginal,filled);
@@ -521,16 +521,19 @@ public class TwitterHelper {
      * <li>If no incoming tweets, show maxOld</li>
      * </ul>
      * See also preferences.xml
+     *
      * @param listId The list for which tweets are fetched
      * @param statuses The list of incoming statuses to fill up
+     * @param unreadCount Number of unread messages the use has in the list. Provides a minimum to fetch. Set to -1 to ignore.
      * @return number of added statuses
      */
-    private int fillUpStatusesFromDB(int listId, List<Status> statuses) {
+    private int fillUpStatusesFromDB(int listId, List<Status> statuses, int unreadCount) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         int minOld = Integer.valueOf(preferences.getString("minOldTweets","5"));
         int maxOld = Integer.valueOf(preferences.getString("maxOldTweets","10"));
+        if (unreadCount>-1 && unreadCount > maxOld)
+            maxOld=unreadCount+3; // Fetch some 'context' too. Also prevents ArrayIndexOOB exceptions later
 
-Log.d("FillUp","Incoming: " + statuses.size());
         int size = statuses.size();
         if (size==0)
             statuses.addAll(getStatuesFromDb(-1,maxOld,listId));
@@ -539,10 +542,8 @@ Log.d("FillUp","Incoming: " + statuses.size());
             statuses.addAll(getStatuesFromDb(statuses.get(size-1).getId(),num,listId));
         }
         int size2 = statuses.size();
-Log.d("FillUp","Now: " + size2);
 
         int i = size2 - size;
-Log.d("FillUp","Return: " + i);
         return i;
     }
 

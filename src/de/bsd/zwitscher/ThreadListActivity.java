@@ -181,7 +181,7 @@ public class ThreadListActivity extends ListActivity {
             if (titleTextBox!=null)
                 titleTextBox.setText("");
 
-            setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, account, R.layout.tweet_list_item, statusList));
+            setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, account, R.layout.tweet_list_item, statusList, 0));
             statuses = statusList;
 
             ListView lv = getListView();

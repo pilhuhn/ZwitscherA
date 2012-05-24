@@ -64,6 +64,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     Long userId=null;
     int userListId = -1;
     private Pattern filterPattern;
+    int unreadCount = -1;
 
     /**
      * Called when the activity is first created.
@@ -114,6 +115,9 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 ImageButton tweet_list_reload_button = (ImageButton) findViewById(R.id.tweet_list_reload_button);
                 if (tweet_list_reload_button!=null)
                     tweet_list_reload_button.setVisibility(View.INVISIBLE);
+            }
+            if (intentInfo.containsKey("unreadCount")) {
+                unreadCount = intentInfo.getInt("unreadCount");
             }
         }
 
@@ -242,14 +246,19 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             myStatuses = th.getTimeline(paging,listId,fromDbOnly);
             break;
         default:
-        	myStatuses = th.getUserList(paging,listId, fromDbOnly);
+        	myStatuses = th.getUserList(paging,listId, fromDbOnly, unreadCount);
+            if (unreadCount>-1) {
+                List<Status> list = myStatuses.getList();
+                    last = list.get(unreadCount).getId();
+            }
+
         	break;
         }
 
         // Update the 'since' id in the database
     	if (myStatuses.getList().size()>0) {
-    		last = myStatuses.getList().get(0).getId(); // assumption is that twitter sends the newest (=highest id) first
-    		tdb.updateOrInsertLastRead(account.getId(), listId, last);
+    		long newLast = myStatuses.getList().get(0).getId(); // assumption is that twitter sends the newest (=highest id) first
+    		tdb.updateOrInsertLastRead(account.getId(), listId, newLast);
     	}
 
         MetaList<Status> metaList;
@@ -274,6 +283,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             metaList = new MetaList<Status>(new ArrayList<Status>(),0,0);
         }
 
+        metaList.oldLast = last;
 
         return metaList;
 	}
@@ -556,7 +566,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 if (listId <-4)
                     setListAdapter(new TweetAdapter(context, account, R.layout.tweet_list_item, result.getList()));
                 else
-                    setListAdapter(new StatusAdapter(context, account, R.layout.tweet_list_item, result.getList()));
+                    setListAdapter(new StatusAdapter(context, account, R.layout.tweet_list_item, result.getList(), result.oldLast));
 
                 if (result.getList().size()==0) {
                     Toast.makeText(context, "Got no result from the server", Toast.LENGTH_LONG).show();

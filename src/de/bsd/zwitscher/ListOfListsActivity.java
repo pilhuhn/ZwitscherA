@@ -140,7 +140,8 @@ public class ListOfListsActivity extends AbstractListActivity {
 
             if (listId!=-1) {
 
-                tdb.markAllRead(listId, account.getId());
+                int count = adapter.getUnreadCountForPosition(position);
+                tdb.markAllRead(listId, account.getId()); // TODO Too early ? How to pass the number of unreads to the inner list?
                 adapter.setCountForItem(position,0);
                 adapter.notifyDataSetChanged();
                 getListView().requestLayout();
@@ -149,6 +150,7 @@ public class ListOfListsActivity extends AbstractListActivity {
                 intent.putExtra(TabWidget.LIST_ID, listId);
                 intent.putExtra("userListid",listId);
                 intent.putExtra("userListOwner",ownerName);
+                intent.putExtra("unreadCount",count);
 
                 startActivity(intent);
             }
@@ -213,7 +215,7 @@ public class ListOfListsActivity extends AbstractListActivity {
                 long lastFetched = tdb.getLastFetched(account.getId(), listId);
                 if (lastFetched>0)
                     paging.setSinceId(lastFetched);
-                MetaList<twitter4j.Status> list = th.getUserList(paging, listId, false);
+                MetaList<twitter4j.Status> list = th.getUserList(paging, listId, false, -1);
                 long newOnes = list.getNumOriginal();
                 if (newOnes>0) {
                     long maxId = list.getList().get(0).getId();

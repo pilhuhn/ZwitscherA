@@ -77,6 +77,11 @@ class ListOfListLineItemAdapter extends ArrayAdapter<Pair<String,Integer>> {
 
     }
 
+    public int getUnreadCountForPosition(int position) {
+        Pair<String,Integer> item = items.get(position);
+        return item.second;
+    }
+
     static class ViewHolder {
         TextView nameView;
         TextView countView;

@@ -19,6 +19,9 @@ public class MetaList<T> {
     /** Number of items filled up */
     private int numAdded;
 
+    /** the last id the user has probably seen before */
+    public long oldLast;
+
     /**
      * Create a new empty MetaList with the list initialized
      */

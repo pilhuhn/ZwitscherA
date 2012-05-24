@@ -34,10 +34,12 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
     private TwitterHelper th;
     private UserDisplayMode userDisplay;
     private final NetworkHelper networkHelper;
+    private long oldLast;
 
 
-    public StatusAdapter(Context context, Account account, int textViewResourceId, List<T> objects) {
+    public StatusAdapter(Context context, Account account, int textViewResourceId, List<T> objects, long oldLast) {
         super(context, textViewResourceId, objects);
+        this.oldLast = oldLast;
         th = new TwitterHelper(context, account);
         networkHelper = new NetworkHelper(context);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -66,13 +68,29 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        if (position %2 == 0)
-            convertView.setBackgroundColor(Color.BLACK);
-        else
-            convertView.setBackgroundColor(Color.DKGRAY);
-
-
         T response = items.get(position);
+        boolean isOld = false;
+
+        if (response instanceof Status) {
+
+            Status status = (Status) response;
+            long oid;
+            oid = status.getId();
+
+            if (oid <= oldLast) {
+                convertView.setBackgroundColor(Color.BLACK);
+                isOld = true;
+            }
+        }
+
+        if (!isOld) {
+
+            if (position % 2 == 0)
+                convertView.setBackgroundColor(Color.rgb(15,40,20));
+            else
+                convertView.setBackgroundColor(Color.DKGRAY);
+        }
+
 
         SpannableBuilder builder = new SpannableBuilder(extContext);
         User userOnPicture;
@@ -130,6 +148,15 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
         viewHolder.statusText.setText(statusText);
         String text = th.getStatusDate(response) ;
         viewHolder.timeClientInfo.setText((text));
+        if (!isOld) {
+                viewHolder.userInfo.setTextColor(Color.LTGRAY);
+                viewHolder.statusText.setTextColor(Color.LTGRAY);
+                viewHolder.timeClientInfo.setTextColor(Color.LTGRAY);
+        } else {
+            viewHolder.userInfo.setTextColor(Color.GRAY);
+            viewHolder.statusText.setTextColor(Color.GRAY);
+            viewHolder.timeClientInfo.setTextColor(Color.GRAY);
+        }
 //Debug.stopMethodTracing();
         return convertView;
     }
