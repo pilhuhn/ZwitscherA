@@ -249,6 +249,9 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         	myStatuses = th.getUserList(paging,listId, fromDbOnly, unreadCount);
             if (unreadCount>-1) {
                 List<Status> list = myStatuses.getList();
+                if (list.size()<=unreadCount)
+                    unreadCount = list.size()-1;
+                if (unreadCount > -1)
                     last = list.get(unreadCount).getId();
             }
 
