@@ -724,6 +724,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 String tmp = url.substring(0,url.lastIndexOf('.'));
                 finalUrlString = tmp + "s" + url.substring(url.lastIndexOf('.'));
             }
+            else if (url.contains("://instagr.am/p/")) {
+                finalUrlString = url + "media";  //   /?size= { t, m ,l } default is m
+            }
             else {
                 String screenName;
                 long statusId;
