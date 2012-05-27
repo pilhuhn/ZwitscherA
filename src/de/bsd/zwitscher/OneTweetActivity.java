@@ -727,6 +727,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             else if (url.contains("://instagr.am/p/")) {
                 finalUrlString = url + "media";  //   /?size= { t, m ,l } default is m
             }
+            else if (url.contains("://picplz.com")) {
+                finalUrlString = url + "/thumb/600"; // last parameter gives max size of longest side-- TODO depend on device display size
+            }
             else {
                 String screenName;
                 long statusId;
