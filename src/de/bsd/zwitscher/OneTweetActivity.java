@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -63,6 +64,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     private TextToSpeech tts;
     private TextView titleTextView;
     private Account account;
+    int screenWidth;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +80,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         else
             setContentView(R.layout.single_tweet_honeycomb);
 
+
+        screenWidth = getWindowManager().getDefaultDisplay().getWidth();
 
         userPictureView = (ImageView) findViewById(R.id.UserPictureImageView);
 
@@ -714,8 +718,22 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 tmp = tmp.substring(tmp.lastIndexOf("/")+1);
                 finalUrlString = "http://twitpic.com/show/thumb/" + tmp;
             }
-            else if (url.contains("plixi.com")) {
-                finalUrlString = "http://api.plixi.com/api/tpapi.svc/imagefromurl?size=thumbnail&url=" +  url;
+            else if (url.contains("plixi.com") || url.contains("lockerz.com")) {
+                String tmp;
+//                big - original
+//                medium - 600px scaled
+//                mobile - 320px scaled
+//                small - 150px cropped
+//                thumbnail - 79px cropped
+                if (screenWidth>600)
+                    tmp = "modbile"; // big enough on a SGN in portrait mode
+                else if (screenWidth>320)
+                    tmp = "mobile";
+                else if (screenWidth>150)
+                    tmp = "small";
+                else
+                    tmp = "thumbnail";
+                finalUrlString = "http://api.plixi.com/api/tpapi.svc/imagefromurl?url=" +  url + "&size=" + tmp;
             }
             else if (url.contains("twimg")) { // This is the normal twitter picture entity
                 finalUrlString = url;
@@ -728,11 +746,21 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 finalUrlString = url + "media";  //   /?size= { t, m ,l } default is m
             }
             else if (url.contains("://picplz.com")) {
-                finalUrlString = url + "/thumb/600"; // last parameter gives max size of longest side-- TODO depend on device display size
+                int size = screenWidth-20;
+                finalUrlString = url + "/thumb/" + size; // last parameter gives max size of longest side--
             }
             else if (url.contains("://img.ly")) {
                 String tmp =  url.substring(url.lastIndexOf("/")+1);
                 finalUrlString = "http://img.ly/show/medium/" + tmp; // mini/thumb/medium/large/full
+            }
+            else if (url.contains("://campl.us")) {
+                String tmp;
+                if (screenWidth > 480)
+                    tmp = ":480px";
+                else
+                    tmp = ":120px";
+
+                finalUrlString = url + tmp; // 120px , 480px or 800px
             }
             else {
                 String screenName;
