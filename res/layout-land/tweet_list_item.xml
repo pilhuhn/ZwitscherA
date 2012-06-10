@@ -56,5 +56,8 @@
             android:autoLink="none"
             android:layout_below="@id/ListUserView"
             android:focusable="false"
+            android:scrollHorizontally="false"
+            android:inputType="textMultiLine"
+
          />
 </RelativeLayout>
