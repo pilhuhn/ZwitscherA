@@ -157,7 +157,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
         // Check if the tweet contains urls to picture services and load thumbnails
         // if needed
-        new DownloadImagePreviewsTask(this, status).execute();
+        new DownloadImagePreviewsTask(status).execute();
 
         TextView tv01 = (TextView) findViewById(R.id.TextView01);
         StringBuilder sb = new StringBuilder("<b>");
@@ -701,10 +701,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             Log.d("One tweet","Url = " + url);
 //            url = UrlHelper.expandUrl(url); // expand link shorteners TODO that ultimately needs to go into the main parsing for all kinds of links
             String finalUrlString="";
-            if (url.endsWith(".jpg") || url.endsWith(".png") || url.endsWith(".jpeg")) {
-                finalUrlString = url;
-            }
-            else if (url.contains("yfrog.com")) {
+            if (url.contains("yfrog.com")) {
                 finalUrlString = url + ".th.jpg";
             }
             else if (url.contains("twitpic.com")) {
@@ -733,11 +730,16 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 finalUrlString = url;
             }
             else if (url.contains("i.imgur.com")) {
-                String tmp = url.substring(0,url.lastIndexOf('.'));
-                finalUrlString = tmp + "s" + url.substring(url.lastIndexOf('.'));
+                finalUrlString = url.substring(0,url.lastIndexOf('.'));
+                finalUrlString += (screenWidth>320)? "l" : "s";
+                finalUrlString += url.substring(url.lastIndexOf('.')); // 's'mall or 'l'arge
             }
             else if (url.contains("://instagr.am/p/")) {
-                finalUrlString = url + "media";  //   /?size= { t, m ,l } default is m
+
+                finalUrlString = url;
+                if (!url.endsWith("/"))
+                    finalUrlString +="/";
+                finalUrlString += "media";  //   /?size= { t, m ,l } default is m
             }
             else if (url.contains("://picplz.com")) {
                 int size = screenWidth-20;
@@ -755,6 +757,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                     tmp = ":120px";
 
                 finalUrlString = url + tmp; // 120px , 480px or 800px
+            }
+            else if (url.endsWith(".jpg") || url.endsWith(".png") || url.endsWith(".jpeg")) {
+                finalUrlString = url;
             }
             else {
                 String screenName;
@@ -949,11 +954,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     private class DownloadImagePreviewsTask extends AsyncTask<Void,Void,List<BitmapWithUrl>> {
 
-        private Context context;
         private twitter4j.Status status;
 
-        private DownloadImagePreviewsTask(Context context, twitter4j.Status status) {
-            this.context = context;
+        private DownloadImagePreviewsTask(twitter4j.Status status) {
             this.status = status;
         }
 
@@ -986,7 +989,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             super.onPostExecute(bitmaps);
             if (bitmaps!=null) {
                 Gallery g = (Gallery) findViewById(R.id.gallery);
-                ImageAdapter adapter = new ImageAdapter(context);
+                ImageAdapter adapter = new ImageAdapter();
 
                 adapter.addImages(bitmaps);
                 g.setAdapter(adapter);
@@ -1021,8 +1024,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
         int mGalleryItemBackground;
 
-        public ImageAdapter(Context c) {
-            mContext = c;
+        public ImageAdapter() {
             // See res/values/style.xml for the <declare-styleable> that defines
             // Gallery1.
             TypedArray a = obtainStyledAttributes(R.styleable.Gallery1);
@@ -1044,7 +1046,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         }
 
         public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView i = new ImageView(mContext);
+            ImageView i = new ImageView(getApplicationContext());
 
             Bitmap bitmap = mImages.get(position).bitmap;
             if (bitmap!=null) {
@@ -1079,8 +1081,6 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
             return i;
         }
-
-        private Context mContext;
     }
 
     /**
