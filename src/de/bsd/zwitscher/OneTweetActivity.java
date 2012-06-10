@@ -6,17 +6,12 @@ import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.ViewGroup;
-import android.view.Window;
+import android.view.*;
 import android.widget.*;
 import com.google.api.translate.Language;
 import com.google.api.translate.Translate;
@@ -40,7 +35,6 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.util.Log;
-import android.view.View;
 import twitter4j.URLEntity;
 import twitter4j.User;
 import twitter4j.UserMentionEntity;
@@ -1055,8 +1049,30 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             Bitmap bitmap = mImages.get(position).bitmap;
             if (bitmap!=null) {
                 i.setImageBitmap(bitmap);
-                i.setScaleType(ImageView.ScaleType.FIT_XY);
-                i.setLayoutParams(new Gallery.LayoutParams(bitmap.getWidth()*2, bitmap.getHeight()*2));
+                i.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                i.setAdjustViewBounds(true);
+
+                // Try to get the freaking scaling right
+                Display defaultDisplay = getWindow().getWindowManager().getDefaultDisplay();
+
+                int w = defaultDisplay.getWidth();
+                int h = defaultDisplay.getHeight();
+                int bw = bitmap.getWidth();
+                int bh = bitmap.getHeight();
+
+                double wf = (double)bw / (double)w;
+                double hf = (double)bw / (double)h;
+                double maf = Math.max(wf,hf);
+
+                if (maf < 0.3 )
+                    maf = 2 * maf; // twitpic thumbs are 150px only, scale up a bit
+
+                if (maf>0) {
+                    int fh = (int) (bh/maf);
+                    int fw = (int) (bw/maf);
+
+                    i.setLayoutParams(new Gallery.LayoutParams(fw,fh));
+                }
             }
             // The preferred Gallery item background
             i.setBackgroundResource(mGalleryItemBackground);
