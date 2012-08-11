@@ -84,6 +84,14 @@ public class NewTweetActivity extends Activity implements LocationListener {
             setContentView(R.layout.new_tweet_honeycomb);
         charCountView = (TextView) findViewById(R.id.CharCount);
         account = AccountHolder.getInstance().getAccount();
+        // If account is null, which can happen when called via intent from the
+        // outside world
+        if (account==null) {
+            TweetDB tdb = TweetDB.getInstance(getApplicationContext());
+            account = tdb.getDefaultAccount();
+            AccountHolder.getInstance().setAccount(account);
+        }
+
 
 
         final ImageButton tweetButton = (ImageButton) findViewById(R.id.TweetButton);
