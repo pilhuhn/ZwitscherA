@@ -482,11 +482,21 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             return;
         }
 
-        String url;
+        String url = null;
         if (account.isStatusNet())
             url = "https://identi.ca/notice/" + status.getId();
-        else
-            url = "https://twitter.com/#!/" + status.getUser().getScreenName() + "/status/" + status.getId();
+        else {
+            // do not link to the status here, but to the link(s) inside
+            if (status.getURLEntities()!=null && status.getURLEntities().length>0) {
+                URLEntity ue = status.getURLEntities()[0]; // TODO grab all urls
+                if (ue.getExpandedURL()!=null)
+                    url = ue.getExpandedURL().toString();
+                else if (ue.getURL()!=null)
+                    url = ue.getURL().toString();
+            }
+            if (url==null) // Fallback
+                url = "https://twitter.com/#!/" + status.getUser().getScreenName() + "/status/" + status.getId();
+        }
 
         UpdateRequest request = new UpdateRequest(UpdateType.LATER_READING);
         request.status = status;
@@ -818,6 +828,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 reply(null);
                 break;
             case R.id.retweet:
+                item.setEnabled(false); // TODO show busy spinner?
                 retweet(null);
                 break;
             case R.id.direct:
@@ -855,7 +866,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 Log.e(getClass().getName(),"Unknown menu item: " + item.toString());
         }
 
-        return super.onOptionsItemSelected(item);
+        return true;
+//        return super.onOptionsItemSelected(item);
 
     }
 
