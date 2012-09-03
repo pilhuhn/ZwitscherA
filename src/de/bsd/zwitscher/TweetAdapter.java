@@ -72,7 +72,6 @@ class TweetAdapter<T extends Tweet> extends AbstractAdapter<T> {
         statusText = tweet.getText();
 
 
-
         bi = ph.getBitMapForScreenNameFromFile(tweet.getFromUser());
         if (bi!=null) {
             viewHolder.iv.setImageBitmap(bi);

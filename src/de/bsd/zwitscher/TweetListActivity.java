@@ -38,6 +38,7 @@ import android.widget.Toast;
 import de.bsd.zwitscher.helper.FlushQueueTask;
 import de.bsd.zwitscher.helper.MetaList;
 import de.bsd.zwitscher.helper.NetworkHelper;
+import de.bsd.zwitscher.other.TweetMarkerSync;
 import twitter4j.*;
 
 /**
@@ -258,11 +259,30 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         	break;
         }
 
+        long newLast=-1;
         // Update the 'since' id in the database
     	if (myStatuses.getList().size()>0) {
-    		long newLast = myStatuses.getList().get(0).getId(); // assumption is that twitter sends the newest (=highest id) first
+    		newLast = myStatuses.getList().get(0).getId(); // assumption is that twitter sends the newest (=highest id) first
     		tdb.updateOrInsertLastRead(account.getId(), listId, newLast);
     	}
+
+        // Sync with TweetMarker
+        long newLast2=-1;
+        if (listId>=0 && !account.isStatusNet() && !fromDbOnly) {
+            if (listId==0)
+                newLast2 = TweetMarkerSync.syncFromTweetMarker("timeline", account.getName());
+            else
+                newLast2 = TweetMarkerSync.syncFromTweetMarker("lists."+listId, account.getName());
+
+            if (newLast2>newLast) {
+                tdb.updateOrInsertLastRead(account.getId(), listId, newLast2);
+            } else {
+                if (listId==0)
+                    TweetMarkerSync.syncToTweetMarker("timeline",newLast,account.getName(),th.getOAuth());
+                else
+                    TweetMarkerSync.syncToTweetMarker("lists."+listId,newLast,account.getName(),th.getOAuth());
+            }
+        }
 
         MetaList<Status> metaList;
         if (updateStatusList) {
@@ -286,7 +306,19 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             metaList = new MetaList<Status>(new ArrayList<Status>(),0,0);
         }
 
-        metaList.oldLast = last;
+        if (newLast2>last) {
+            metaList.oldLast=newLast2;
+            // the read status from remote is newer than the last read locally, so lets mark those in between as read
+            for (Status s : statuses) {
+                long id = s.getId();
+                if (id>last) {
+                    th.markStatusAsOld(id);
+                }
+            }
+        }
+        else {
+            metaList.oldLast = last;
+        }
 
         return metaList;
 	}
@@ -446,6 +478,9 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                             statuses = new ArrayList<Status>();
 
                         List<Status> newStatuses = th.getStatuesFromDb(last.getId(),7,list_id);
+                        // TODO add checking for old
+                        List<Long> readIds = obtainReadIds(newStatuses);
+                        sta.readIds.addAll(readIds);
                         for (Status status : newStatuses ) {
                             if (!matchesFilter(status)) {
                                 sta.insert(status, totalCount + i);
@@ -566,10 +601,19 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 		@Override
 		protected void onPostExecute(MetaList result) {
             if (updateListAdapter) {
-                if (listId <-4)
+                if (listId <-4) { // saved search
                     setListAdapter(new TweetAdapter(context, account, R.layout.tweet_list_item, result.getList()));
-                else
-                    setListAdapter(new StatusAdapter(context, account, R.layout.tweet_list_item, result.getList(), result.oldLast));
+                }
+                else if (listId == -2) { // direct messages
+                    setListAdapter(new StatusAdapter(context, account, R.layout.tweet_list_item,
+                                                result.getList(),0, new ArrayList<Long>()));
+                }
+                else { // all others
+                    List<twitter4j.Status> statusList = (List<twitter4j.Status>) result.getList();
+                    List<Long> reads = obtainReadIds(statusList);
+                    setListAdapter(new StatusAdapter(context, account, R.layout.tweet_list_item,
+                            result.getList(), result.oldLast, reads));
+                }
 
                 if (result.getList().size()==0) {
                     Toast.makeText(context, "Got no result from the server", Toast.LENGTH_LONG).show();
@@ -618,6 +662,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             // Only do the next if we actually did an update from twitter
             if (!fromDbOnly && updateListAdapter) {
                 Log.i("GTLTask", " scroll to " + result.getNumOriginal());
+                // TODO modify to scroll to last-read position
                 getListView().setSelection(result.getNumOriginal() - 1);
             }
             if (progressBar !=null)
@@ -639,6 +684,14 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             }
 
         }
+    }
+
+    private List<Long> obtainReadIds(List<Status> statusList) {
+        List<Long> idsToCheck = new ArrayList<Long>(statusList.size());
+        for ( Status status: statusList) {
+            idsToCheck.add(status.getId());
+        }
+        return th.getReadIds(idsToCheck);
     }
 
 

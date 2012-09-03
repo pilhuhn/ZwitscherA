@@ -34,11 +34,13 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
     private TwitterHelper th;
     private UserDisplayMode userDisplay;
     private final NetworkHelper networkHelper;
+    public List<Long> readIds;
     private long oldLast;
 
 
-    public StatusAdapter(Context context, Account account, int textViewResourceId, List<T> objects, long oldLast) {
+    public StatusAdapter(Context context, Account account, int textViewResourceId, List<T> objects, long oldLast, List<Long> readIds) {
         super(context, textViewResourceId, objects);
+        this.readIds = readIds;
         this.oldLast = oldLast;
         th = new TwitterHelper(context, account);
         networkHelper = new NetworkHelper(context);
@@ -77,10 +79,28 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
             long oid;
             oid = status.getId();
 
-            if (oid <= oldLast) {
+
+            if (oid <= oldLast ) {
                 convertView.setBackgroundColor(Color.BLACK);
                 isOld = true;
+            } else if (readIds.contains(oid)) {
+                convertView.setBackgroundColor(Color.rgb(0,0,40)); // todo debug color
+                isOld=true;
+            } else if (status.isRetweet() && readIds.contains(status.getRetweetedStatus().getId())) {
+                convertView.setBackgroundColor(Color.rgb(40,0,0));
+                isOld=true;
             }
+
+// TODO rethink - we only want to mark as old when?
+// As the status adapter gets called multiple times
+// make sure we don't re-color
+/*
+            if (status.isRetweet() && ! readIds.contains(status.getRetweetedStatus().getId())) {
+                th.markStatusAsOld(status.getRetweetedStatus().getId());
+                readIds.add(status.getRetweetedStatus().getId()); // If we have seen the retweet once it is enough
+            }
+*/
+            th.markStatusAsOld(status.getId());
         }
 
         if (!isOld) {
@@ -143,6 +163,24 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
         boolean downloadImages = networkHelper.mayDownloadImages();
         new TriggerPictureDownloadTask(viewHolder.iv, userOnPicture, downloadImages, status).execute();
+
+/*
+        // In case users devices have issues wrapping the text
+        int len = statusText.length();
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        while (i < len ) {
+            int r = len - i;
+            if (r>32)
+                r = 32;
+            String tmp = statusText.substring(i,i+r);
+            sb.append(tmp);
+            sb.append("<br/>");
+            i+=32;
+        }
+        Spanned sp  = Html.fromHtml(sb.toString());
+        viewHolder.statusText.setText(sp);
+*/
 
         viewHolder.userInfo.setText(builder.toSpannableString());
         viewHolder.statusText.setText(statusText);

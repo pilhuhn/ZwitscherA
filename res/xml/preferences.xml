@@ -55,6 +55,12 @@
                         android:summary="@string/prefs_extra_roaming_descr"
                         android:defaultValue="false"/>
 
+    <CheckBoxPreference android:title="@string/prefs_keep_images"
+                        android:key="keep_images"
+                        android:summary="@string/prefs_keep_images_long"
+                        android:defaultValue="false"
+                        />
+
     <ListPreference android:title="@string/screen_name_overview"
                         android:key="screen_name_overview"
                         android:summary="@string/prefs_screen_name_overview"
@@ -69,6 +75,13 @@
                     android:entries="@array/pictureService"
                     android:entryValues="@array/pictureServiceVals"
                     />
+
+    <CheckBoxPreference android:title="Sync with Tweet Marker"
+                        android:summary="Sync the read status with Tweet Marker (tweetmarker.net)"
+                        android:key="tweetmarker_sync"
+                        android:defaultValue="false"
+                        android:enabled="false"
+                        />
 
     <PreferenceScreen android:title="@string/read_it_later_support">
         <CheckBoxPreference android:title="@string/read_it_later_enable"

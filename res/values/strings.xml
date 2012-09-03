@@ -192,4 +192,7 @@
     <string name="login_failed">Login failed</string>
     <string name="invalid_filter">Filter expression is invalid - not filtering (%s)</string>
     <string name="invalid_list_item">Entry [%s] is invalid, rejecting</string>
+    <string name="prefs_keep_images">Keep images after post</string>
+    <string name="prefs_keep_images_long">Should images be kept on SD card after successful submit with a new status
+    </string>
 </resources>

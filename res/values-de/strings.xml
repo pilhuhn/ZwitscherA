@@ -180,6 +180,9 @@
     <string name="login_failed">Login fehlgeschlagen</string>
     <string name="invalid_filter">Der Filterausdruck ist ungültig - es wird nicht gefiltert (%s)</string>
     <string name="invalid_list_item">Eintrag [%s] ist ungültig, wird nicht genutzt</string>
+    <string name="prefs_keep_images">Bilder nach dem Senden behalten</string>
+    <string name="prefs_keep_images_long">Sollen Bilder nach dem efolgreichen Senden auf der SD-Karte behalten werden?
+    </string>
 
 
 </resources>

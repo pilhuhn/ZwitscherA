@@ -1,5 +1,6 @@
 package de.bsd.zwitscher;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ActionBar;
@@ -52,7 +53,7 @@ public class MySearchActivity extends AbstractListActivity {
 
             }
             List<Status> statusList = th.searchStatues(query);
-            StatusAdapter<Status> adapter = new StatusAdapter<Status>(this,account,R.layout.tweet_list_item,statusList, 0);
+            StatusAdapter<Status> adapter = new StatusAdapter<Status>(this,account,R.layout.tweet_list_item,statusList, 0,new ArrayList<Long>());
             getListView().setAdapter(adapter);
         }
     }

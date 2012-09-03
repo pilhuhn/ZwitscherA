@@ -62,6 +62,5 @@
             android:layout_below="@id/ListTextView"
             android:focusable="false"
             android:scrollHorizontally="false"
-            android:inputType="textMultiLine"
          />
 </RelativeLayout>

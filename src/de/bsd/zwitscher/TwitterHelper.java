@@ -109,6 +109,10 @@ public class TwitterHelper {
         return metaList ;
 	}
 
+    OAuthAuthorization getOAuth() {
+        return (OAuthAuthorization) twitter.getAuthorization();
+    }
+
 
     /**
      * Return direct messages.
@@ -1081,5 +1085,13 @@ public class TwitterHelper {
         String json = DataObjectFactory.getRawJSON(search);
 
         tweetDB.storeSavedSearch(account.getId(), search.getName(),search.getQuery(),search.getId(),json);
+    }
+
+    public void markStatusAsOld(long id) {
+        tweetDB.addRead(account.getId(),id);
+    }
+
+    public List<Long> getReadIds(List<Long> idsToCheck) {
+        return tweetDB.getReads(account.getId(),idsToCheck);
     }
 }

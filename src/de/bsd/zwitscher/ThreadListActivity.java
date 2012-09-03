@@ -20,6 +20,7 @@ import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
 import twitter4j.Status;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -181,11 +182,23 @@ public class ThreadListActivity extends ListActivity {
             if (titleTextBox!=null)
                 titleTextBox.setText("");
 
-            setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, account, R.layout.tweet_list_item, statusList, 0));
+            List<Long> readIds = obtainReadIds(statusList);
+            setListAdapter(new StatusAdapter<twitter4j.Status>(thisActivity, account, R.layout.tweet_list_item, statusList,0, readIds));
             statuses = statusList;
 
             ListView lv = getListView();
             lv.requestLayout();
         }
     }
+
+    // TODO move to common helper, as this is copied from TweetListActivity
+    private List<Long> obtainReadIds(List<Status> statusList) {
+        TwitterHelper th = new TwitterHelper(ThreadListActivity.this, account);
+        List<Long> idsToCheck = new ArrayList<Long>(statusList.size());
+        for ( Status status: statusList) {
+            idsToCheck.add(status.getId());
+        }
+        return th.getReadIds(idsToCheck);
+    }
+
 }

@@ -12,7 +12,7 @@
       />
 
     <item android:id="@+id/clear"
-          android:showAsAction="always"
+          android:showAsAction="ifRoom|withText"
           android:title="@string/ClearButton"
           android:icon="@drawable/clear"
           />
@@ -24,6 +24,7 @@
         />
 
     <item android:id="@+id/pickUser"
+          android:showAsAction="ifRoom|withText"
           android:title="@string/pickUser"
           />
 

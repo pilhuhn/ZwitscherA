@@ -2,11 +2,7 @@ package de.bsd.zwitscher;
 
 import java.io.File;
 import java.lang.String;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -36,6 +32,7 @@ public class TweetDB {
     public static final String TABLE_DIRECTS = "directs";
     public static final String TABLE_URLS = "urls";
     public static final String TABLE_UPDATES = "updates";
+    public static final String TABLE_READ_IDS = "read_ids";
     private static final String[] DATA_TABLES = {TABLE_STATUSES,
         TABLE_LAST_READ,TABLE_LISTS,TABLE_USERS,TABLE_SEARCHES,TABLE_DIRECTS};
     static final String STATUS = "STATUS";
@@ -55,7 +52,7 @@ public class TweetDB {
         File storage = Environment.getExternalStorageDirectory();
         File dbFile = new File(storage,APP_BASE_DIR);
 
-		tdHelper = new TweetDBOpenHelper(context, dbFile.getAbsolutePath() + File.separator + "TWEET_DB", null, 7);
+		tdHelper = new TweetDBOpenHelper(context, dbFile.getAbsolutePath() + File.separator + "TWEET_DB", null, 8);
 	}
 
     public static TweetDB getInstance(Context context) {
@@ -176,6 +173,14 @@ public class TweetDB {
                     "content BLOB " +
                     ")"
             );
+
+            db.execSQL(CREATE_TABLE + TABLE_READ_IDS + " (" +
+                    "id LONG PRIMARY KEY, " +
+                    ACCOUNT_ID + " LONG, " +
+                    "tstamp LONG "+
+                    ")"
+            );
+            db.execSQL("CREATE UNIQUE INDEX READ_ID_IDX ON " + TABLE_READ_IDS + "(id, " + ACCOUNT_ID +" )" );
 		}
 
 		@Override
@@ -234,9 +239,76 @@ public class TweetDB {
                 db.execSQL("DELETE FROM " + TABLE_LISTS);
                 db.execSQL("ALTER TABLE " + TABLE_LISTS + " RENAME COLUMN list_json TO owner_name");
             }
+            if (oldVersion<8) {
+                db.execSQL(CREATE_TABLE + TABLE_READ_IDS + " (" +
+                        "id LONG PRIMARY KEY, " +
+                        ACCOUNT_ID + " LONG, " +
+                        "tstamp LONG "+
+                        ")"
+                );
+                db.execSQL("CREATE UNIQUE INDEX READ_ID_IDX ON " + TABLE_READ_IDS + "(id, " + ACCOUNT_ID + ")");
+            }
 		}
 
 	}
+
+    void addRead(int account,long id) {
+        ContentValues cv = new ContentValues(3);
+        cv.put("id",id);
+        cv.put(ACCOUNT_ID,account);
+        cv.put("tstamp",System.currentTimeMillis());
+        db.insertWithOnConflict(TABLE_READ_IDS, null, cv,SQLiteDatabase.CONFLICT_IGNORE);
+    }
+
+    boolean isRead(int account, long id) {
+        boolean found = false;
+        try {
+            Cursor c = db.query(TABLE_READ_IDS,new String[] {"id"},"id = ? AND " + ACCOUNT_ID_IS,
+                    new String[] {String.valueOf(id),String.valueOf(account)},null,null,null);
+
+            if (c.getCount()>0)
+                found=true;
+            c.close();
+
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+        return found;
+    }
+
+    List<Long> getReads(int account, List<Long> idsToCheck) {
+
+        if (idsToCheck==null)
+            return Collections.emptyList();
+
+        StringBuilder sb = new StringBuilder("id IN (");
+        Iterator<Long> iter = idsToCheck.iterator();
+        while (iter.hasNext()) {
+            sb.append(iter.next());
+            if (iter.hasNext())
+                sb.append(",");
+        }
+        sb.append(") AND " + ACCOUNT_ID_IS);
+        List<Long> readIds;
+
+        Cursor c = db.query(TABLE_READ_IDS, new String[]{"id"}, sb.toString(), new String[]{String.valueOf(account)},
+                null,null,null);
+        if (c.getCount()==0)
+            readIds = Collections.emptyList();
+        else {
+            readIds = new ArrayList<Long>(c.getCount());
+
+            c.moveToFirst();
+            do {
+                long id = c.getLong(0);
+                readIds.add(id);
+            } while (c.moveToNext());
+        }
+        c.close();
+
+        Log.i("TDB:getReads","In: " + idsToCheck.size() + ", already read: " + readIds.size());
+        return readIds;
+    }
 
     /**
      * Return the id of the status that was last read
