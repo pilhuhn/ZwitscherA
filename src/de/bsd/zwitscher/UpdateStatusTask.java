@@ -5,9 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import android.util.Log;
-import android.widget.ImageView;
-import de.bsd.zwitscher.account.Account;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -15,9 +12,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.other.ReadItLaterStore;
 import twitter4j.StatusUpdate;
@@ -214,7 +214,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                 if (result.someBool) { // only delete if some bool is set, which means that the we allow to remove the picture
                     File file = new File(result.getPicturePath());
                     if (file.exists()) {
-                        file.delete(); // TODO only for camera shots, not for Gallery images
+                       // file.delete(); // TODO only for camera shots, not for Gallery images
                     }
                 }
             }
