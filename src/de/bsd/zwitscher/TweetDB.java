@@ -279,7 +279,7 @@ public class TweetDB {
     List<Long> getReads(int account, List<Long> idsToCheck) {
 
         if (idsToCheck==null)
-            return Collections.emptyList();
+            return new ArrayList<Long>(0);
 
         StringBuilder sb = new StringBuilder("id IN (");
         Iterator<Long> iter = idsToCheck.iterator();
@@ -294,7 +294,7 @@ public class TweetDB {
         Cursor c = db.query(TABLE_READ_IDS, new String[]{"id"}, sb.toString(), new String[]{String.valueOf(account)},
                 null,null,null);
         if (c.getCount()==0)
-            readIds = Collections.emptyList();
+            readIds = new ArrayList<Long>(0);
         else {
             readIds = new ArrayList<Long>(c.getCount());
 
