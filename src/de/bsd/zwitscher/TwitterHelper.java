@@ -454,7 +454,7 @@ public class TwitterHelper {
             }
 
             // reload tweet and update in DB - twitter4j should have some status.setFav()..
-            status = getStatusById(status.getId(),null, true, false); // no list id, don't persist
+            status = getStatusById(status.getId(),null, true, false, false); // no list id, don't persist
             updateStatus(status); // explicitly update in DB - we know it is there.
 			updateResponse.setSuccess();
             updateResponse.setMessage("(Un)favorite set");
@@ -574,13 +574,15 @@ public class TwitterHelper {
      * Get a single status. If directOnly is false, we first look in the local
      * db if it is already present. Otherwise we directly go to the server.
      *
+     *
      * @param statusId Id of the status to fetch
      * @param list_id id of the timeline
      * @param directOnly If true only call out to the server. Otherwise try to look up in local db.
      * @param alsoPersist Should the fetched status be persisted? Required directOnly = false and no db hit.
+     * @param fromDbOnly If true, do not call out to the server.
      * @return the obtained Status
      */
-    public Status getStatusById(long statusId, Long list_id, boolean directOnly, boolean alsoPersist) {
+    public Status getStatusById(long statusId, Long list_id, boolean directOnly, boolean alsoPersist, boolean fromDbOnly) {
         Status status = null;
 
         if (!directOnly) {
@@ -591,6 +593,9 @@ public class TwitterHelper {
                     return status;
             }
         }
+
+        if (fromDbOnly)
+            return null;
 
         try {
             status = twitter.showStatus(statusId);

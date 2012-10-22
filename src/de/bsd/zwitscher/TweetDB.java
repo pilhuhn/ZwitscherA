@@ -514,7 +514,7 @@ account)}, null, null, null);
      *
      * @param account Id of the account to use
      * @param statusId The id of the status
-     * @param listId The id of the list this status appears
+     * @param listId The id of the list this status appears. May be null if the list id does not matter.
      * @return The json_string if the status exists in the DB or null otherwise
      */
     public String getStatusObjectById(int account, long statusId, Long listId) {

@@ -80,26 +80,31 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
             oid = status.getId();
 
 
+            long rtStatusId = -1;
+            if (status.isRetweet()) {
+                rtStatusId = status.getRetweetedStatus().getId();
+            }
             if (oid <= oldLast ) {
                 convertView.setBackgroundColor(Color.BLACK);
                 isOld = true;
             } else if (readIds.contains(oid)) {
                 convertView.setBackgroundColor(Color.rgb(0,0,40)); // todo debug color
                 isOld=true;
-            } else if (status.isRetweet() && readIds.contains(status.getRetweetedStatus().getId())) {
+            } else if (status.isRetweet() && readIds.contains(rtStatusId)) {
                 convertView.setBackgroundColor(Color.rgb(40,0,0));
                 isOld=true;
             }
 
-// TODO rethink - we only want to mark as old when?
-// As the status adapter gets called multiple times
-// make sure we don't re-color
-/*
-            if (status.isRetweet() && ! readIds.contains(status.getRetweetedStatus().getId())) {
-                th.markStatusAsOld(status.getRetweetedStatus().getId());
-                readIds.add(status.getRetweetedStatus().getId()); // If we have seen the retweet once it is enough
+            // If the status is a RT and we also have the original one
+            // on file, then mark the original as seen too
+            if (status.isRetweet() && ! readIds.contains(rtStatusId)) {
+                // Only color when we have the original one too
+                Status rtStatus = th.getStatusById(rtStatusId,null,false,false,true);
+                if (rtStatus!=null) {
+                    th.markStatusAsOld(rtStatusId);
+                    readIds.add(rtStatusId); // If we have seen the retweet once it is enough
+                }
             }
-*/
             th.markStatusAsOld(status.getId());
         }
 

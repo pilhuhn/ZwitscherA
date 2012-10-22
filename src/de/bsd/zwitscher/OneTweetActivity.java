@@ -106,7 +106,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 String tids = dataString.substring(dataString.lastIndexOf("/")+1);
                 Long tid = Long.parseLong(tids);
                 TwitterHelper th = new TwitterHelper(this, account);
-                status = th.getStatusById(tid,0L,false,false);
+                status = th.getStatusById(tid,0L,false,false, false);
             } else if (dataString.matches("http://twitter.com/#!/.*$")) {
                 // A user - forward to UserDetailActivity TODO: remove once this is coded in AndroidManifest.xml
                 String userName = dataString.substring(dataString.lastIndexOf("/")+1);
