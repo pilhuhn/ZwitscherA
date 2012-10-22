@@ -2,7 +2,6 @@ package de.bsd.zwitscher;
 
 
 import android.app.ActionBar;
-import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
@@ -13,8 +12,6 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.*;
 import android.widget.*;
-import com.google.api.translate.Language;
-import com.google.api.translate.Translate;
 
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
@@ -26,7 +23,6 @@ import twitter4j.Place;
 import twitter4j.Status;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -40,7 +36,9 @@ import twitter4j.User;
 import twitter4j.UserMentionEntity;
 
 import java.io.BufferedInputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -584,62 +582,21 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
      */
     @SuppressWarnings("unused")
 	public void translate(View v) {
-		Translate.setHttpReferrer("http://bsd.de/zwitscher");
-//		try {
-//            targetLanguage = Language.fromString(locale);
-//			String result = Translate.execute(status.getText(), Language.AUTO_DETECT, targetLanguage);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			Toast.makeText(getApplicationContext(), e.getMessage(), 15000).show();
-//		}
         String locale = Locale.getDefault().getLanguage();
-        new TranslateTask(this).execute(status.getText(),locale);
+        String text = status.getText();
+        try {
+            text = URLEncoder.encode(text,"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+        String url = "http://translate.google.com/#auto/" + locale + "/" + text;
+
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
+
 	}
 
-    private static class TranslateTask extends AsyncTask<String,Void,String> {
-
-        private Context context;
-        ProgressDialog dialog;
-
-        private TranslateTask(Context context) {
-            this.context = context;
-        }
-
-        protected String doInBackground(String... strings) {
-            String text = strings[0];
-            String locale = strings[1];
-            Language targetLanguage = Language.fromString(locale);
-            try {
-                return Translate.execute(text, Language.AUTO_DETECT, targetLanguage);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return e.getLocalizedMessage();
-            }
-        }
-
-        protected void onPreExecute() {
-            dialog = new ProgressDialog(context);
-            dialog.setTitle(context.getString(R.string.translating));
-            dialog.setCancelable(false);
-            dialog.show();
-        }
-
-        protected void onPostExecute(String result) {
-            dialog.cancel();
-            dialog.hide();
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setMessage(result);
-            builder.setTitle(context.getString(R.string.translation_result));
-            builder.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            AlertDialog alert = builder.create();
-            alert.show();
-        }
-    }
 
     /**
      * Finishes this screen and returns to the list of statuses

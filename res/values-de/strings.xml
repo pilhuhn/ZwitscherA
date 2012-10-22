@@ -136,7 +136,7 @@
     <string name="usersTweets">Tweets des Benutzers</string>
     <string name="retweet">Retweet</string>
     <string name="show_thread">Thread</string>
-    <string name="translate">Übersetzen</string>
+    <string name="translate">Übersetzen…</string>
     <string name="forward">Weiterleiten</string>
     <string name="speak">Vorlesen</string>
     <string name="favorite">Favorisieren</string>
