@@ -218,11 +218,13 @@ public class NewTweetActivity extends Activity implements LocationListener {
         return tags;
     }
 
+    @SuppressWarnings("unused")
     public void clear(View v) {
         edittext.setText("");
 
     }
 
+    @SuppressWarnings("unused")
     public void shortenUrls(View v) {
         String text = edittext.getText().toString();
         Map<Integer,String> urls = new HashMap<Integer,String>();
@@ -254,6 +256,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
     }
 
+    @SuppressWarnings("unused")
     public void finallySend(View v) {
         StatusUpdate up  = new StatusUpdate(edittext.getText().toString());
         // add location  if enabled in preferences and checked on tweet
@@ -282,9 +285,8 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
     private Location getCurrentLocation() {
 		LocationManager locMngr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		Location currLoc = null;
-		currLoc = locMngr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		if (currLoc == null) {
+        Location currLoc = locMngr.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (currLoc == null) {
 			currLoc = locMngr.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		}
 		return currLoc;
