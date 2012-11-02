@@ -24,15 +24,20 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
+import android.view.textservice.SpellCheckerSession;
+import android.view.textservice.TextInfo;
+import android.view.textservice.TextServicesManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -42,6 +47,7 @@ import android.widget.Toast;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.helper.PicHelper;
+import de.bsd.zwitscher.helper.TextCompletionListener;
 import de.bsd.zwitscher.helper.UrlHelper;
 import twitter4j.GeoLocation;
 import twitter4j.Status;
@@ -69,6 +75,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
     private LocationManager locationManager;
     private Account account;
     private int picUrlCount;
+    private SpellCheckerSession spellCheckerSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,6 +200,17 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
                 int tlen = edittext.getText().length();
 
+                if (spellCheckerSession !=null) {
+                    String text = edittext.getText().toString();
+                    if (!text.isEmpty()) {
+                        spellCheckerSession.getSentenceSuggestions(new TextInfo[]{new TextInfo(text)}, 1);
+                    }
+                }
+                else {
+                    System.out.println("Did not get a spell checker session");
+                }
+
+
                 if (tweetButton!=null) {
                     if (tlen >0 ) {
                         tweetButton.setEnabled(true);
@@ -205,6 +223,15 @@ public class NewTweetActivity extends Activity implements LocationListener {
             }
         });
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            TextServicesManager svc = (TextServicesManager) getSystemService(TEXT_SERVICES_MANAGER_SERVICE);
+            SpellCheckerSession.SpellCheckerSessionListener completionListener = new TextCompletionListener();
+            spellCheckerSession = svc.newSpellCheckerSession(null, null, completionListener, true);
+            edittext.setInputType(InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE);
+            if (spellCheckerSession!=null) {
+                System.out.println("Session is not null, spelling is supported");
+            }
+        }
     }
 
     private Set<String> getHashTags(String text) {
@@ -370,7 +397,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
         Intent intent = new Intent(this,MultiSelectListActivity.class);
         intent.putStringArrayListExtra("data", (ArrayList<String>) data);
-        intent.putExtra("mode","single");
+        intent.putExtra("mode", "single");
 
         startActivityForResult(intent, 2);
 

@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <uses-sdk android:minSdkVersion="8"
-              android:targetSdkVersion="11"/>
+              android:targetSdkVersion="16"/>
 
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
 
@@ -80,7 +80,18 @@
                    android:resource="@xml/searchable"/>
         </activity>
         <activity android:name=".account.TwitterLoginActivity"/>
+      <activity android:name=".helper.TextCompleterPrefActivity" />
 
+      <service android:name=".helper.TextCompletionService"
+                 android:permission="android.permission.BIND_TEXT_SERVICE">
+            <intent-filter >
+                <action android:name="android.service.textservice.SpellCheckerService" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.view.textservice.scs"
+                android:resource="@xml/completer" />
+        </service>
     </application>
 
 </manifest>

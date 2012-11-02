@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<spell-checker xmlns:android="http://schemas.android.com/apk/res/android"
+  android:label="@string/app_name"
+  android:settingsActivity="de.bsd.zwitscher.helper.TextCompleterPrefActivity"
+  >
+  <subtype
+          android:label="%s"
+          android:subtypeLocale="en"
+  />
+
+
+</spell-checker>
