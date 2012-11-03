@@ -33,14 +33,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
+import de.bsd.zwitscher.helper.UserTagTokenizer;
 import de.bsd.zwitscher.helper.PicHelper;
 import de.bsd.zwitscher.helper.UrlHelper;
 import twitter4j.GeoLocation;
@@ -59,7 +55,7 @@ import twitter4j.User;
  */
 public class NewTweetActivity extends Activity implements LocationListener {
 
-	private EditText edittext;
+    private MultiAutoCompleteTextView edittext;
 	private Status origStatus;
     private ProgressBar pg;
     private User toUser = null;
@@ -95,7 +91,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
 
         final ImageButton tweetButton = (ImageButton) findViewById(R.id.TweetButton);
-        edittext = (EditText) findViewById(R.id.edittext);
+        edittext = (MultiAutoCompleteTextView) findViewById(R.id.edittext);
         edittext.setSelected(true);
         if (tweetButton!=null)
             tweetButton.setEnabled(false);
@@ -175,8 +171,6 @@ public class NewTweetActivity extends Activity implements LocationListener {
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,1,1,this);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1,1,this);
-
-
         }
 
         // Add a listener to count the text length.
@@ -204,6 +198,26 @@ public class NewTweetActivity extends Activity implements LocationListener {
                 charCountView.setText(String.valueOf(140-tlen- picUrlCount)); // TODO if url detected 4 twitter, decrease by 20 chars
             }
         });
+
+        // Now set the adapter and Tokenizer for auto-completion of @user and #hashtag
+        edittext.setThreshold(2); // default seems to be 2 as well -> @ + 1 char
+        Set<String> usernames = new HashSet<String>();
+        usernames.addAll(getUsernames(true));
+        usernames.add("#Zwitscher");
+        usernames.add("#Android");
+        usernames.add("#RHQ");
+        usernames.add("#JBoss");
+        usernames.add("#java");
+        usernames.add("@pilhuhn");
+        usernames.add("@RHQ_project");
+        System.out.println("hashes " + AccountHolder.getInstance().getHashTags().size());
+        System.out.println("users  " + AccountHolder.getInstance().getUserNames().size());
+        usernames.addAll(AccountHolder.getInstance().getHashTags());
+        usernames.addAll(AccountHolder.getInstance().getUserNames());
+        ArrayAdapter<String> acAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,
+                usernames.toArray(new String[usernames.size()]));
+        edittext.setAdapter(acAdapter);
+        edittext.setTokenizer(new UserTagTokenizer());
 
     }
 
@@ -359,14 +373,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
     @SuppressWarnings("unused")
     public void selectUser(View v) {
 
-        TwitterHelper th = new TwitterHelper(this, account);
-        List<User> users = th.getUsersFromDb();
-        List<String> data = new ArrayList<String>(users.size());
-
-        for (User user : users) {
-            String item = user.getScreenName() + ", " + user.getName();
-            data.add(item);
-        }
+        List<String> data = getUsernames(false);
 
         Intent intent = new Intent(this,MultiSelectListActivity.class);
         intent.putStringArrayListExtra("data", (ArrayList<String>) data);
@@ -374,6 +381,23 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
         startActivityForResult(intent, 2);
 
+    }
+
+    private List<String> getUsernames(boolean shortForm) {
+        TwitterHelper th = new TwitterHelper(this, account);
+        List<User> users = th.getUsersFromDb();
+        List<String> data = new ArrayList<String>(users.size());
+
+        for (User user : users) {
+            StringBuilder sb = new StringBuilder("@");
+            sb.append(user.getScreenName());
+            if (!shortForm) {
+                sb.append(", ");
+                sb.append(user.getName());
+            }
+            data.add(sb.toString());
+        }
+        return data;
     }
 
 
@@ -462,7 +486,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
             String item = (String) data.getExtras().get("data");
             if (item.contains(", ")) {
                 String user = item.substring(0,item.indexOf(", "));
-                edittext.append("@" + user + " ");
+                edittext.append( user + " ");
             }
         } else if (requestCode==3 && resultCode==RESULT_OK) { // take large picture
             // large size image

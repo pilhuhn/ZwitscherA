@@ -35,6 +35,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.helper.FlushQueueTask;
 import de.bsd.zwitscher.helper.MetaList;
 import de.bsd.zwitscher.helper.NetworkHelper;
@@ -318,6 +319,16 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         }
         else {
             metaList.oldLast = last;
+        }
+
+        for (Status status:metaList.getList()) {
+            AccountHolder accountHolder = AccountHolder.getInstance();
+            accountHolder.addUserName(status.getUser().getScreenName());
+            if (status.getHashtagEntities()!=null) {
+                for (HashtagEntity hte : status.getHashtagEntities()) {
+                    accountHolder.addHashTag(hte.getText());
+                }
+            }
         }
 
         return metaList;
