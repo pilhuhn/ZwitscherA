@@ -24,4 +24,8 @@
     <item android:id="@+id/report_as_spam"
           android:title="@string/report_as_spammer"
           />
+  <item android:id="@+id/show_on_web"
+    android:title="@string/show_on_web"
+    />
+
 </menu>

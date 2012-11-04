@@ -818,6 +818,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             case R.id.report_as_spam:
                 report_spam();
                 break;
+            case R.id.show_on_web:
+                show_on_web();
+                break;
 
             default:
                 Log.e(getClass().getName(),"Unknown menu item: " + item.toString());
@@ -825,6 +828,20 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
         return true;
 //        return super.onOptionsItemSelected(item);
+
+    }
+
+    private void show_on_web() {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        String u;
+        if (!account.isStatusNet()) {
+            u = "https://mobile.twitter.com/" + status.getUser().getScreenName() + "/status/" + status.getId();
+        }
+        else {
+            u = "http://identi.ca/notice/" + status.getId();
+        }
+        i.setData(Uri.parse(u));
+        startActivity(i);
 
     }
 
