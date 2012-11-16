@@ -22,7 +22,7 @@
         <item name="android:background">#446644</item>
     </style>
 
-    <style name="ZwitscherStyle" parent="android:Theme">
+    <style name="ZwitscherStyle" parent="android:style/Theme.Holo">
         <item name="android:actionBarStyle">@style/MyActionBar</item>
         <item name="android:actionBarSplitStyle">@style/MyActionBar</item>
         <item name="android:actionBarTabBarStyle">@style/MyActionBar</item>
