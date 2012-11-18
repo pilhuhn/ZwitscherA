@@ -107,45 +107,47 @@ public class NewTweetActivity extends Activity implements LocationListener {
             if (op!=null) {
                 origStatus = (Status) bundle.get("status");
 
-                if (op.equals(getString(R.string.reply))) {
-                    Set<String> hashTags = getHashTags(origStatus.getText());
-                    textOben.setText(origStatus.getText());
-                    StringBuilder builder = new StringBuilder();
-                    builder.append("@").append(origStatus.getUser().getScreenName()).append(" ");
-                    for (String hashTag : hashTags) {
-                        builder.append(hashTag).append(" ");
+                if (origStatus!=null) {
+                    if (op.equals(getString(R.string.reply))) {
+                        Set<String> hashTags = getHashTags(origStatus.getText());
+                        textOben.setText(origStatus.getText());
+                        StringBuilder builder = new StringBuilder();
+                        builder.append("@").append(origStatus.getUser().getScreenName()).append(" ");
+                        for (String hashTag : hashTags) {
+                            builder.append(hashTag).append(" ");
+                        }
+
+                        edittext.setText(builder.toString());
+                    } else if (op.equals(getString(R.string.replyall))) {
+                        textOben.setText(origStatus.getText());
+                        String oText = origStatus.getText();
+
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("@");
+                        sb.append(origStatus.getUser().getScreenName()).append(" ");
+
+                        findUsers (sb,oText);
+                        Set<String> hashTags = getHashTags(origStatus.getText());
+                        for (String hashTag : hashTags) {
+                            sb.append(hashTag).append(" ");
+                        }
+
+                        edittext.setText(sb.toString());
+                    } else if (op.equals(getString(R.string.classicretweet))) {
+                        textOben.setText(origStatus.getText());
+                        String msg = "RT @" + origStatus.getUser().getScreenName() + " ";
+                        msg = msg + origStatus.getText();
+                        edittext.setText(msg); // limit to 140 chars is done by the edittext via maxLength attribute
+                    } else if (op.equals(getString(R.string.direct))) {
+
+                        if (directUser!=null)
+                            toUser = directUser;
+                        else if (origStatus!=null) {
+                            toUser = origStatus.getUser();
+                        }
+                        String s = getString(R.string.send_direct_to);
+                        textOben.setText(s + " "+ toUser.getScreenName());
                     }
-
-                    edittext.setText(builder.toString());
-                } else if (op.equals(getString(R.string.replyall))) {
-                    textOben.setText(origStatus.getText());
-                    String oText = origStatus.getText();
-
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("@");
-                    sb.append(origStatus.getUser().getScreenName()).append(" ");
-
-                    findUsers (sb,oText);
-                    Set<String> hashTags = getHashTags(origStatus.getText());
-                    for (String hashTag : hashTags) {
-                        sb.append(hashTag).append(" ");
-                    }
-
-                    edittext.setText(sb.toString());
-                } else if (op.equals(getString(R.string.classicretweet))) {
-                    textOben.setText(origStatus.getText());
-                    String msg = "RT @" + origStatus.getUser().getScreenName() + " ";
-                    msg = msg + origStatus.getText();
-                    edittext.setText(msg); // limit to 140 chars is done by the edittext via maxLength attribute
-                } else if (op.equals(getString(R.string.direct))) {
-
-                    if (directUser!=null)
-                        toUser = directUser;
-                    else if (origStatus!=null) {
-                        toUser = origStatus.getUser();
-                    }
-                    String s = getString(R.string.send_direct_to);
-                    textOben.setText(s + " "+ toUser.getScreenName());
                 }
             }
             else { // OP is null -> new tweet
