@@ -670,7 +670,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 //            url = UrlHelper.expandUrl(url); // expand link shorteners TODO that ultimately needs to go into the main parsing for all kinds of links
             String finalUrlString="";
             if (url.contains("yfrog.com")) {
-                finalUrlString = url + ".th.jpg";
+                finalUrlString = url + ":iphone";
             }
             else if (url.contains("twitpic.com")) {
                 String tmp = url;
