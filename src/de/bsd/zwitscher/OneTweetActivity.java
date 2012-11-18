@@ -314,39 +314,40 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     }
 
     private void setTweetText(TextView tweetView) {
-        String[] tokens = status.getText().split(" ");
+        String[] tokens;
+        if (status.isRetweet()) {
+            tokens = status.getRetweetedStatus().getText().split(" ");
+        } else {
+            tokens = status.getText().split(" ");
+        }
         StringBuilder builder = new StringBuilder();
         for (String token: tokens) {
-            if (token.startsWith("http")) {
-                boolean found=false;
-                if (status.getMediaEntities()!=null) {
-                    for (MediaEntity me : status.getMediaEntities()) {
-                        if (me.getURL().toString().equals(token)) {
-                            builder.append(me.getDisplayURL());
-                            found=true;
-                            break;
-                        }
-                     }
-                }
+            boolean found=false;
+            if (status.getMediaEntities()!=null) {
+                for (MediaEntity me : status.getMediaEntities()) {
+                    if (me.getURL().toString().equals(token)) {
+                        builder.append(me.getDisplayURL());
+                        found=true;
+                        break;
+                    }
+                 }
+            }
 
-                if (!found && status.getURLEntities()!=null) {
-                    for (URLEntity ue : status.getURLEntities()) {
-                        if (ue.getURL()!=null && ue.getURL().toString().equals(token)) {
-                            if (ue.getExpandedURL() != null) {
-                                builder.append(ue.getExpandedURL());
-                                found = true;
-                                break;
-                            }
+            if (!found && status.getURLEntities()!=null) {
+                for (URLEntity ue : status.getURLEntities()) {
+                    if (ue.getURL()!=null && ue.getURL().toString().equals(token)) {
+                        if (ue.getExpandedURL() != null) {
+                            builder.append(ue.getExpandedURL());
+                            found = true;
+                            break;
                         }
                     }
                 }
-                if (!found)
-                    builder.append(token);
             }
-            else {
+            if (!found) {
                 builder.append(token);
             }
-            builder.append(" ");
+            builder.append(" "); // todo, not at the end
         }
         tweetView.setText(builder.toString());
     }

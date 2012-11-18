@@ -225,7 +225,12 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
         if (status==null || status.getText()==null)
             return "";
 
-        String[] tokens = status.getText().split(" ");
+        String[] tokens;
+        if (status.isRetweet()) {
+            tokens = status.getRetweetedStatus().getText().split(" ");
+        } else {
+            tokens = status.getText().split(" ");
+        }
         StringBuilder builder = new StringBuilder();
         for (String token : tokens) {
             boolean found=false;
