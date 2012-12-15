@@ -45,6 +45,10 @@ public class TwitterLoginActivity extends Activity {
 
         try {
             RequestToken rt = new GetRequestTokenTask().execute().get();
+            if (rt==null) {
+                Toast.makeText(this,"Failure to create token. Perhaps the server is down? Please retry later",Toast.LENGTH_LONG).show();
+                return;
+            }
             String token = rt.getToken();
 
             myWebView.loadUrl("https://api.twitter.com/oauth/authorize?force_login=true&oauth_token="+token);
