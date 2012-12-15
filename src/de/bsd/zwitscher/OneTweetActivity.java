@@ -665,12 +665,27 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
 
         // We have urls, so check for picture services
+        // TODO check http://stackoverflow.com/a/11014923/100957
         for (String url :  urls) {
             Log.d("One tweet","Url = " + url);
 //            url = UrlHelper.expandUrl(url); // expand link shorteners TODO that ultimately needs to go into the main parsing for all kinds of links
             String finalUrlString="";
             if (url.contains("yfrog.com")) {
+                // http://twitter.yfrog.com/page/api
                 finalUrlString = url + ":iphone";
+            } else if (url.contains("youtube.com") || url.contains("youtu.be")) {
+                // http://i.ytimg.com/vi/%s/  0.jpg => default 480x360
+                //                            default.png => 120x90
+                //                            1... jpg => other 120x90 thumbs
+                String videoId;
+                // TODO what if the url contains ?embedd etc ?
+                if (url.startsWith("http://youtu.be/")) {
+                    videoId = url.substring(16);
+                }
+                else { // TODO exact string ?
+                    videoId = url.substring(url.indexOf("v=")+2);
+                }
+                finalUrlString = "http://i.ytimg.com/vi/" + videoId + "/0.jpg";
             }
             else if (url.contains("twitpic.com")) {
                 String tmp = url;
@@ -678,6 +693,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 finalUrlString = "http://twitpic.com/show/thumb/" + tmp;
             }
             else if (url.contains("plixi.com") || url.contains("lockerz.com")) {
+                // http://support.lockerz.com/entries/350297-image-from-url
                 String tmp;
 //                big - original
 //                medium - 600px scaled
@@ -685,7 +701,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 //                small - 150px cropped
 //                thumbnail - 79px cropped
                 if (screenWidth>600)
-                    tmp = "modbile"; // big enough on a SGN in portrait mode
+                    tmp = "medium"; // big enough on a SGN in portrait mode
                 else if (screenWidth>320)
                     tmp = "mobile";
                 else if (screenWidth>150)

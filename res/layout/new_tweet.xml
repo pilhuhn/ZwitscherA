@@ -16,7 +16,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:lines="3"
-        android:inputType="textMultiLine"
+        android:inputType="textMultiLine|textAutoComplete|textAutoCorrect"
         android:layout_below="@id/textOben"
         android:gravity="top|left"
         android:autoText="true"

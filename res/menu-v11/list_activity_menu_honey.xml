@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/ProgressBar"
+          android:actionLayout="@layout/progress"
+          android:visible="false"
+          android:showAsAction="always"
+          />
+    <item android:id="@+id/to_top"
+        android:icon="@drawable/ic_menu_top"
+        android:showAsAction="always"/>
+  <item android:id="@+id/refresh"
+        android:icon="@drawable/ic_menu_refresh"
+        android:title="@string/refresh"
+        android:showAsAction="always|withText"/>
+    <item android:id="@+id/send"
+          android:showAsAction="always|withText"
+          android:title="@string/new_message"
+          android:icon="@drawable/ic_menu_start_conversation"
+        />
+</menu>

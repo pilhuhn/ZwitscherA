@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/ProgressBar"
+        android:actionLayout="@layout/progress"
+        android:visible="false"
+        android:showAsAction="always"
+    />
+
+
+    <item android:id="@+id/refresh"
+          android:title="@string/refresh"
+          android:icon="@drawable/ic_menu_refresh"
+          android:showAsAction="ifRoom"
+          />
+    <item android:id="@+id/follow"
+          android:title="@string/follow_user"
+          android:showAsAction="withText"
+          />
+    <item android:id="@+id/addToList"
+          android:icon="@drawable/add_list"
+          android:title="@string/add_to_list"
+          />
+    <item android:id="@+id/direct"
+          android:icon="@drawable/direct_button"
+          android:title="@string/direct"
+          />
+    <item android:id="@+id/viewOnWeb"
+          android:title="@string/viewOnWeb"
+          />
+    <item android:id="@+id/usersTweets"
+          android:title="@string/usersTweets"
+          />
+</menu>

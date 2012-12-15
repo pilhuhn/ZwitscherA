@@ -1,0 +1,71 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/ProgressBar"
+        android:actionLayout="@layout/progress"
+        android:visible="false"
+        android:showAsAction="always"
+    />
+    <item android:id="@+id/to_top"
+          android:icon="@drawable/ic_menu_top"
+          android:showAsAction="always"/>
+    <item android:id="@+id/refresh"
+          android:title="@string/refresh"
+          android:icon="@drawable/ic_menu_refresh"
+          android:showAsAction="always"/>
+    <item android:id="@+id/send"
+          android:showAsAction="always|withText"
+          android:title="@string/new_message"
+          android:icon="@drawable/ic_menu_start_conversation"
+        />
+    <item
+        android:id="@+id/menu_default_search"
+
+        android:title="@string/searches"
+        android:showAsAction="ifRoom"
+        android:actionViewClass="android.widget.SearchView"
+    />
+    <!--android:icon="@drawable/ic_menu_search"-->
+
+    <item android:id="@+id/menu_goto_user"
+          android:title="@string/goto_user"
+          android:titleCondensed="@string/goto_user_short"
+            />
+    <item android:alphabeticShortcut="P"
+    		  android:id="@+id/preferences"
+    		  android:titleCondensed="Prefs"
+    		  android:title="@string/Preferences"
+              android:icon="@drawable/wrench"
+    		  android:enabled="true"
+    		  android:visible="true"/>
+    <item android:id="@+id/AccountStuff"
+          android:title="@string/menu_switch_account"/>
+
+    <item android:id="@+id/menu_feedback"
+          android:title="@string/give_feedback"
+          android:titleCondensed="@string/give_feedback_short"
+          android:showAsAction="never"
+            />
+    <item android:enabled="true" android:id="@+id/helpMenu"
+      android:titleCondensed="@string/help" android:title="@string/help"/>
+
+    <item android:enabled="true" android:id="@+id/reloadLists"
+      android:titleCondensed="Sync L and S" android:title="Synchronize Lists and Searches..."/>
+    <item android:enabled="true" android:id="@+id/menu_cleanTweets"
+          android:title="@string/menu_clean_statuses"
+          />
+    <item android:id="@+id/DevelMenu"
+          android:title="Devel..."
+          android:enabled="true"  >
+        <menu>
+            <item android:id="@+id/DevelResetLastRead"
+                  android:title="Reset Last Read"/>
+            <item android:id="@+id/DevelCleanTweets"
+                  android:title="Clean TweetDB"/>
+            <item android:id="@+id/DevelCleanImages"
+                  android:title="Clean User Pics"
+                    />
+            <item android:id="@+id/DevelDumpAccounts"
+                  android:title="Dump accounts"
+                  />
+        </menu>
+    </item>
+</menu>
