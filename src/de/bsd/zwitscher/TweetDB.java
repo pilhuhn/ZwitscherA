@@ -306,7 +306,6 @@ public class TweetDB {
         }
         c.close();
 
-        Log.i("TDB:getReads","In: " + idsToCheck.size() + ", already read: " + readIds.size());
         return readIds;
     }
 

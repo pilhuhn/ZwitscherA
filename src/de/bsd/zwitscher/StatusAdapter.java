@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,9 +35,9 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
     private TwitterHelper th;
     private UserDisplayMode userDisplay;
-    private final NetworkHelper networkHelper;
     public List<Long> readIds;
     private long oldLast;
+    private final boolean downloadImages;
 
 
     public StatusAdapter(Context context, Account account, int textViewResourceId, List<T> objects, long oldLast, List<Long> readIds) {
@@ -43,10 +45,12 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
         this.readIds = readIds;
         this.oldLast = oldLast;
         th = new TwitterHelper(context, account);
-        networkHelper = new NetworkHelper(context);
+        NetworkHelper networkHelper = new NetworkHelper(context);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String tmp = preferences.getString("screen_name_overview","USER");
         userDisplay = UserDisplayMode.valueOf(tmp);
+        downloadImages = networkHelper.mayDownloadImages();
+
     }
 
     @Override
@@ -69,6 +73,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
         else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+//        System.out.println("IV:" + viewHolder.iv + " @ " + position + " | " + viewHolder.iv.getTag());
 
         T response = items.get(position);
         boolean isOld = false;
@@ -166,26 +171,14 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
         if (response instanceof Status)
             status = (Status) response;
 
-        boolean downloadImages = networkHelper.mayDownloadImages();
-        new TriggerPictureDownloadTask(viewHolder.iv, userOnPicture, downloadImages, status).execute();
-
-/*
-        // In case users devices have issues wrapping the text
-        int len = statusText.length();
-        StringBuilder sb = new StringBuilder();
-        int i = 0;
-        while (i < len ) {
-            int r = len - i;
-            if (r>32)
-                r = 32;
-            String tmp = statusText.substring(i,i+r);
-            sb.append(tmp);
-            sb.append("<br/>");
-            i+=32;
+        viewHolder.iv.setTag(userOnPicture.getScreenName());
+        TriggerPictureDownloadTask downloadTask = new TriggerPictureDownloadTask(viewHolder.iv, userOnPicture, downloadImages, status);
+        if (Build.VERSION.SDK_INT<11) {
+            downloadTask.execute();
         }
-        Spanned sp  = Html.fromHtml(sb.toString());
-        viewHolder.statusText.setText(sp);
-*/
+        else {
+            downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,null);
+        }
 
         viewHolder.userInfo.setText(builder.toSpannableString());
         viewHolder.statusText.setText(statusText);

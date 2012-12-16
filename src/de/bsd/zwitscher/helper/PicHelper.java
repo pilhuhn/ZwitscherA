@@ -71,6 +71,8 @@ public class PicHelper {
 //                Log.i("fetchUserPic","Downloading image for "+ username +" and persisting it locally");
                 BufferedInputStream in = new BufferedInputStream(imageUrl.openStream());
                 bitmap = BitmapFactory.decodeStream(in);
+                bitmap = Bitmap.createScaledBitmap(bitmap,80,80,true);
+
 
                 if (bitmap!=null && externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
                     File iconFile = getPictureFileForUser(username);
