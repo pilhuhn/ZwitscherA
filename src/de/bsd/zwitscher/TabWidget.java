@@ -43,7 +43,6 @@ import android.widget.TabHost;
 public class TabWidget extends TabActivity {
 
     static final String LIST_ID = "list_id";
-    private static final long SEVEN_DAYS = 7 * 86400 * 1000L;
     private TabHost tabHost;
     ProgressBar pg;
     TextView titleTextBox;
@@ -406,7 +405,7 @@ public class TabWidget extends TabActivity {
     private void cleanImages() {
         PicHelper ph = new PicHelper();
         long now = System.currentTimeMillis();
-        ph.cleanup(now - SEVEN_DAYS);
+        ph.cleanup(now);
     }
 
     /**
