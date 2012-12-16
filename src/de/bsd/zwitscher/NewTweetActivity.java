@@ -76,8 +76,9 @@ public class NewTweetActivity extends Activity implements LocationListener {
             getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
             pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         }
-        else
+        else {
             setContentView(R.layout.new_tweet_honeycomb);
+        }
         charCountView = (TextView) findViewById(R.id.CharCount);
         account = AccountHolder.getInstance().getAccount();
         // If account is null, which can happen when called via intent from the
@@ -545,14 +546,11 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        if (android.os.Build.VERSION.SDK_INT>=11) {
-            inflater.inflate(R.menu.new_tweet_menu_honey,menu);
+        inflater.inflate(R.menu.new_tweet_menu,menu);
 
+        if (android.os.Build.VERSION.SDK_INT>=11) {
             ActionBar actionBar = this.getActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-        else {
-            inflater.inflate(R.menu.new_tweet_menu,menu);
         }
         return true;
     }

@@ -69,9 +69,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             pg = (ProgressBar) findViewById(R.id.title_progress_bar);
             titleTextView = (TextView) findViewById(R.id.title_msg_box);
         }
-        else
+        else {
             setContentView(R.layout.single_tweet_honeycomb);
-
+        }
 
         screenWidth = getWindowManager().getDefaultDisplay().getWidth();
 
@@ -779,15 +779,11 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.one_tweet_menu,menu);
         if (android.os.Build.VERSION.SDK_INT>=11) {
-            inflater.inflate(R.menu.one_tweet_menu_honey,menu);
 
             ActionBar actionBar = this.getActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-        else {
-            inflater.inflate(R.menu.one_tweet_menu,menu);
-
         }
         return true;
     }

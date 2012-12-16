@@ -184,10 +184,8 @@ public class TabWidget extends TabActivity {
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		 MenuInflater inflater = getMenuInflater();
-        if (android.os.Build.VERSION.SDK_INT<11)
-		    inflater.inflate(R.menu.main_menu, menu);
-        else {
-            inflater.inflate(R.menu.main_menu_honey,menu);
+        inflater.inflate(R.menu.main_menu, menu);
+        if (Build.VERSION.SDK_INT>=11) {
             MenuItem item = menu.findItem(R.id.ProgressBar);
             pg = (ProgressBar) item.getActionView();
             pg.setVisibility(ProgressBar.INVISIBLE);

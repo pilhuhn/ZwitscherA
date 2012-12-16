@@ -360,7 +360,7 @@ public class UserDetailActivity extends Activity  {
     public boolean onCreateOptionsMenu(Menu menu) {
         if (android.os.Build.VERSION.SDK_INT>=11) {
             MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.user_detail_menu_honey,menu);
+            inflater.inflate(R.menu.user_detail_menu,menu);
 
             weAreFollowingMenuItem = menu.findItem(R.id.follow);
             if (weAreFollowing)

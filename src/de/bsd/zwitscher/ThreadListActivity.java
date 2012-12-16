@@ -77,7 +77,7 @@ public class ThreadListActivity extends ListActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         if (android.os.Build.VERSION.SDK_INT>=11) {
-            inflater.inflate(R.menu.thread_activity_menu_honey,menu);
+            inflater.inflate(R.menu.thread_activity_menu,menu);
             pg = (ProgressBar) menu.findItem(R.id.ProgressBar).getActionView();
 
             ActionBar actionBar = this.getActionBar();
