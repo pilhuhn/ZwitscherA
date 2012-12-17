@@ -62,4 +62,10 @@
     android:title="@string/show_on_web"
     />
 
+  <item android:id="@+id/delete"
+    android:title="@string/delete_status"
+    android:icon="@drawable/ic_menu_delete"
+    />
+
+
 </menu>

@@ -1099,4 +1099,17 @@ public class TwitterHelper {
     public List<Long> getReadIds(List<Long> idsToCheck) {
         return tweetDB.getReads(accountId,idsToCheck);
     }
+
+    public boolean deleteStatus(long id) {
+        try {
+            twitter.destroyStatus(id);
+
+            // TODO remove from tweetdb see also OneTweetActivity.deleteStatus()
+
+            return true;
+        } catch (TwitterException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+            return false;
+        }
+    }
 }

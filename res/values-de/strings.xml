@@ -183,7 +183,9 @@
     <string name="prefs_keep_images">Bilder nach dem Senden behalten</string>
     <string name="prefs_keep_images_long">Sollen Bilder nach dem efolgreichen Senden auf der SD-Karte behalten werden?
     </string>
-  <string name="show_on_web">Im Web anzeigen...</string>
+  <string name="show_on_web">Im Web anzeigen…</string>
+  <string name="delete_status">Status löschen…</string>
+  <string name="delete_status_really">Status wirklich löschen?</string>
 
 
 </resources>

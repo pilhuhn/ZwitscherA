@@ -139,6 +139,10 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                 success = th.followUnfollowUser(request.userId,request.someBool);
                 ret = new UpdateResponse(request.updateType,success,"Follow/Unfollow set");
                 break;
+            case DELETE_STATUS:
+                success = th.deleteStatus(request.id);
+                ret = new UpdateResponse(request.updateType,success,"Status deleted");
+                break;
             default:
                 throw new IllegalArgumentException(context.getString(R.string.update_not_yet_supported, request.updateType));
         }

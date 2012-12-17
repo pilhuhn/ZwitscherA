@@ -195,5 +195,7 @@
     <string name="prefs_keep_images">Keep images after post</string>
     <string name="prefs_keep_images_long">Should images be kept on SD card after successful submit with a new status
     </string>
-  <string name="show_on_web">Show on web...</string>
+  <string name="show_on_web">Show on web…</string>
+  <string name="delete_status">Delete status…</string>
+  <string name="delete_status_really">Really delete status?</string>
 </resources>

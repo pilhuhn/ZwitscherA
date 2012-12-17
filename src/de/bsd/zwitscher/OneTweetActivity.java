@@ -788,6 +788,20 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         return true;
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        if (status.getUser().getScreenName().equals(account.getName())) {
+            menu.findItem(R.id.delete).setEnabled(true);
+        }
+        else {
+            menu.findItem(R.id.delete).setEnabled(false);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+
+    }
+
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
@@ -834,6 +848,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             case R.id.show_on_web:
                 show_on_web();
                 break;
+            case R.id.delete:
+                deleteStatus();
+                break;
 
             default:
                 Log.e(getClass().getName(),"Unknown menu item: " + item.toString());
@@ -841,6 +858,35 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
         return true;
 //        return super.onOptionsItemSelected(item);
+
+    }
+
+    private void deleteStatus() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(R.string.delete_status);
+        builder.setCancelable(false);
+        String msg = getString(R.string.delete_status_really,status.getUser().getScreenName());
+        builder.setMessage(msg);
+
+        builder.setPositiveButton(R.string.yes,new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                UpdateRequest request = new UpdateRequest(UpdateType.DELETE_STATUS);
+                request.id = status.getId();
+                new UpdateStatusTask(OneTweetActivity.this,pg, account).execute(request);
+                // TODO remove from list or mark as deleted ?
+                done(null);
+
+            }
+        });
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+        builder.create().show();
 
     }
 
