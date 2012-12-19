@@ -751,6 +751,7 @@ account)}, null, null, null);
         db.execSQL("DELETE FROM " + TABLE_STATUSES + " WHERE ctime < " + cutOff);
         db.execSQL("DELETE FROM " + TABLE_USERS + " WHERE last_modified < " + cutOff);
         db.execSQL("DELETE FROM " + TABLE_URLS + " WHERE last_modified < " + cutOff);
+        db.execSQL("DELETE FROM " + TABLE_READ_IDS + " WHERE tstamp < " + cutOff);
     }
 
     /**
