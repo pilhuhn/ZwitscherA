@@ -68,11 +68,12 @@ public class UserDetailActivity extends Activity  {
 
         if (android.os.Build.VERSION.SDK_INT<11) {
             requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-            setContentView(R.layout.user_detail);
+        }
+        setContentView(R.layout.user_detail);
+        if (android.os.Build.VERSION.SDK_INT<11) {
             getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
         }
         else {
-            setContentView(R.layout.user_detail_honeycomb);
             pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         }
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);

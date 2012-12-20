@@ -72,13 +72,15 @@ public class NewTweetActivity extends Activity implements LocationListener {
 
         if (android.os.Build.VERSION.SDK_INT<11) {
             requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-            setContentView(R.layout.new_tweet);
+        }
+
+        setContentView(R.layout.new_tweet);
+
+        if (android.os.Build.VERSION.SDK_INT<11) {
             getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
             pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         }
-        else {
-            setContentView(R.layout.new_tweet_honeycomb);
-        }
+
         charCountView = (TextView) findViewById(R.id.CharCount);
         account = AccountHolder.getInstance().getAccount();
         // If account is null, which can happen when called via intent from the

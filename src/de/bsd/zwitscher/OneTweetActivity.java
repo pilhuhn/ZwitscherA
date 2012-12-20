@@ -64,13 +64,14 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
         if (android.os.Build.VERSION.SDK_INT<11) {
             requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-		    setContentView(R.layout.single_tweet);
+        }
+
+		setContentView(R.layout.single_tweet);
+
+        if (android.os.Build.VERSION.SDK_INT<11) {
             getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.window_title);
             pg = (ProgressBar) findViewById(R.id.title_progress_bar);
             titleTextView = (TextView) findViewById(R.id.title_msg_box);
-        }
-        else {
-            setContentView(R.layout.single_tweet_honeycomb);
         }
 
         screenWidth = getWindowManager().getDefaultDisplay().getWidth();
