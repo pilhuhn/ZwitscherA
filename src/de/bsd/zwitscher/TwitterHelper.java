@@ -1092,8 +1092,8 @@ public class TwitterHelper {
         tweetDB.storeSavedSearch(accountId, search.getName(),search.getQuery(),search.getId(),json);
     }
 
-    public void markStatusAsOld(long id) {
-        tweetDB.addRead(accountId,id);
+    public void markStatusesAsOld(List<Long> ids) {
+        tweetDB.addReadIds(accountId,ids);
     }
 
     public List<Long> getReadIds(List<Long> idsToCheck) {

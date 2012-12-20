@@ -23,11 +23,27 @@ import twitter4j.URLEntity;
 import twitter4j.User;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Adapter for individual list rows of
  * the TweetList
+ *
+ * The Adapter's getView() method is repeatedly called when
+ * the user is scrolling through the list, so it needs to be quick.
+ * So one thing is to use the ViewHolder pattern in order to prevent
+ * the repeated inflation of views, which is expensive. When running
+ * through the adapter, we record the list of read statuses in a list and
+ * have the outer activity persiste that result, when the adapter is
+ * about to be replaced or destroyed (in onPause).
+ *
+ * The loading of user images is done in an AsyncTask, that gets the
+ * image view passed. We need to tag that view, as the user may scroll
+ * quickly and in that case the image required on a certain position may
+ * already be a different one. So the background task compares the tag
+ * on the view with the expected one and skips setting the image if the
+ * tags don't match.
  *
  * @author Heiko W. Rupp
  */
@@ -38,6 +54,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
     public List<Long> readIds;
     private long oldLast;
     private final boolean downloadImages;
+    public List<Long> newOlds = new ArrayList<Long>();
 
 
     public StatusAdapter(Context context, Account account, int textViewResourceId, List<T> objects, long oldLast, List<Long> readIds) {
@@ -106,15 +123,15 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
                 // Only color when we have the original one too
                 Status rtStatus = th.getStatusById(rtStatusId,null,false,false,true);
                 if (rtStatus!=null) {
-                    th.markStatusAsOld(rtStatusId);
+                    newOlds.add(rtStatusId);
                     readIds.add(rtStatusId); // If we have seen the retweet once it is enough
                 }
             }
-            th.markStatusAsOld(status.getId());
+            newOlds.add(status.getId());
         }
 
+        // Color the lines
         if (!isOld) {
-
             if (position % 2 == 0)
                 convertView.setBackgroundColor(Color.rgb(15,40,20));
             else
@@ -171,7 +188,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
         if (response instanceof Status)
             status = (Status) response;
 
-        viewHolder.iv.setTag(userOnPicture.getScreenName());
+        viewHolder.iv.setTag(userOnPicture.getScreenName()); // tag to remember which image should be shown
         TriggerPictureDownloadTask downloadTask = new TriggerPictureDownloadTask(viewHolder.iv, userOnPicture, downloadImages, status);
         if (Build.VERSION.SDK_INT<11) {
             downloadTask.execute();

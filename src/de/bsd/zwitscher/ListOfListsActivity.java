@@ -44,7 +44,7 @@ public class ListOfListsActivity extends AbstractListActivity {
 
         }
         else { // >= 11 -> honeycomb and later
-            setContentView(R.layout.tweet_list_layout_honeycomb);
+            setContentView(R.layout.tweet_list_layout);
             // TODO enable/disable reload button
         }
 

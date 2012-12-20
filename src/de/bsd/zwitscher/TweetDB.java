@@ -252,12 +252,16 @@ public class TweetDB {
 
 	}
 
-    void addRead(int account,long id) {
-        ContentValues cv = new ContentValues(3);
-        cv.put("id",id);
-        cv.put(ACCOUNT_ID,account);
-        cv.put("tstamp",System.currentTimeMillis());
-        db.insertWithOnConflict(TABLE_READ_IDS, null, cv,SQLiteDatabase.CONFLICT_IGNORE);
+    void addReadIds(int account,List<Long> ids) {
+        List<ContentValues> values = new ArrayList<ContentValues>(ids.size());
+        for (Long id : ids) {
+            ContentValues cv = new ContentValues(3);
+            cv.put("id",id);
+            cv.put(ACCOUNT_ID,account);
+            cv.put("tstamp",System.currentTimeMillis());
+            values.add(cv);
+        }
+        storeValues(TABLE_READ_IDS,values);
     }
 
     boolean isRead(int account, long id) {
@@ -748,10 +752,26 @@ account)}, null, null, null);
     }
 
     public void cleanStatusesAndUsers(long cutOff) {
+        long now = System.currentTimeMillis();
         db.execSQL("DELETE FROM " + TABLE_STATUSES + " WHERE ctime < " + cutOff);
+        long t2 = System.currentTimeMillis();
+        Log.d("TDB","clean statuses " + (t2-now) + " ms");
+
+        now = System.currentTimeMillis();
         db.execSQL("DELETE FROM " + TABLE_USERS + " WHERE last_modified < " + cutOff);
+        t2 = System.currentTimeMillis();
+        Log.d("TDB","clean users    " + (t2-now) + " ms");
+
+        now = System.currentTimeMillis();
         db.execSQL("DELETE FROM " + TABLE_URLS + " WHERE last_modified < " + cutOff);
+        t2 = System.currentTimeMillis();
+        Log.d("TDB","clean urls     " + (t2-now) + " ms");
+
+        now = System.currentTimeMillis();
         db.execSQL("DELETE FROM " + TABLE_READ_IDS + " WHERE tstamp < " + cutOff);
+        t2 = System.currentTimeMillis();
+        Log.d("TDB","clean read Ids " + (t2-now) + " ms");
+
     }
 
     /**

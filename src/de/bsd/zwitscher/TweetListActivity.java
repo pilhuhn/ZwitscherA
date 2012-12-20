@@ -82,11 +82,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         }
 
         // Set the layout of the list activity
-        if (Build.VERSION.SDK_INT<11)
-            setContentView(R.layout.tweet_list_layout);
-        else
-            setContentView(R.layout.tweet_list_layout_honeycomb);
-
+        setContentView(R.layout.tweet_list_layout);
 
         // Get the windows progress bar from the enclosing TabWidget
         if ((!(theParent instanceof TabWidget)) && (android.os.Build.VERSION.SDK_INT<11)) {
@@ -310,12 +306,15 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         if (newLast2>last) {
             metaList.oldLast=newLast2;
             // the read status from remote is newer than the last read locally, so lets mark those in between as read
+            List<Long> ids = new ArrayList<Long>(statuses.size());
             for (Status s : statuses) {
                 long id = s.getId();
                 if (id>last) {
-                    th.markStatusAsOld(id);
+//                    th.markStatusAsOld(id);
+                    ids.add(id);
                 }
             }
+            th.markStatusesAsOld(ids);
         }
         else {
             metaList.oldLast = last;
@@ -432,6 +431,16 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (getListAdapter() instanceof StatusAdapter) {
+            StatusAdapter adapter = (StatusAdapter) getListAdapter();
+            th.markStatusesAsOld(adapter.newOlds);
+        }
+    }
+
     /**
      * Called from the reload button
      * @param v view that was pressed
@@ -465,7 +474,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             firstVisible + visibleCount >= totalCount-1;
 
 
-//        Log.d("onScroll:","loadMore f=" + firstVisible + ", vc=" + visibleCount + ", tc=" +totalCount);
+//        Log.d("onScroll:","loadMore= " + loadMore + " f=" + firstVisible + ", vc=" + visibleCount + ", tc=" +totalCount);
         if(loadMore) {
 //Debug.startMethodTracing("list" + firstVisible);
             ListAdapter adapter = absListView.getAdapter();
@@ -621,6 +630,14 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 }
                 else { // all others
                     List<twitter4j.Status> statusList = (List<twitter4j.Status>) result.getList();
+                    // Get the old adapter if it existed, get the read ids from it and persist them
+                    if (getListAdapter()!=null) {
+                        StatusAdapter oldOne = (StatusAdapter) getListAdapter();
+                        List<Long> newReadIds = oldOne.newOlds;
+                        th.markStatusesAsOld(newReadIds);
+
+                    }
+
                     List<Long> reads = obtainReadIds(statusList);
                     setListAdapter(new StatusAdapter(context, account, R.layout.tweet_list_item,
                             result.getList(), result.oldLast, reads));

@@ -36,7 +36,7 @@ public class MySearchActivity extends AbstractListActivity {
             postButton.setVisibility(View.GONE);
 
         } else {
-            setContentView(R.layout.tweet_list_layout_honeycomb);
+            setContentView(R.layout.tweet_list_layout);
         }
 
         Intent intent = getIntent();

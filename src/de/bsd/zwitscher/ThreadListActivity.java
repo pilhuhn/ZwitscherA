@@ -58,7 +58,7 @@ public class ThreadListActivity extends ListActivity {
             reloadButton.setVisibility(View.GONE);
         }
         else {
-            setContentView(R.layout.tweet_list_layout_honeycomb);
+            setContentView(R.layout.tweet_list_layout);
         }
 
 
