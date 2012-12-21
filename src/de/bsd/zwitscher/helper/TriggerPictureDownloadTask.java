@@ -2,6 +2,7 @@ package de.bsd.zwitscher.helper;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.util.Pair;
 import twitter4j.User;
 
@@ -44,6 +45,9 @@ public class TriggerPictureDownloadTask extends AsyncTask<Void,Void,Pair<Bitmap,
 
         // Image of the user of the retweeted status
         Bitmap rtBitmap = null;
+        if (status == null) { // E.g. direct message
+            return new Pair<Bitmap,Bitmap>(imageBitmap,null);
+        }
         if (status.isRetweet()) {
             rtBitmap = picHelper.getBitMapForScreenNameFromFile(status.getUser().getScreenName());
 
