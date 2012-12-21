@@ -252,7 +252,7 @@ public class TweetDB {
 
 	}
 
-    void addReadIds(int account,List<Long> ids) {
+    void addReadIds(int account,Set<Long> ids) {
         List<ContentValues> values = new ArrayList<ContentValues>(ids.size());
         for (Long id : ids) {
             ContentValues cv = new ContentValues(3);

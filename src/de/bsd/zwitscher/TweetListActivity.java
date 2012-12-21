@@ -2,8 +2,10 @@ package de.bsd.zwitscher;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -306,7 +308,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         if (newLast2>last) {
             metaList.oldLast=newLast2;
             // the read status from remote is newer than the last read locally, so lets mark those in between as read
-            List<Long> ids = new ArrayList<Long>(statuses.size());
+            Set<Long> ids = new HashSet<Long>(statuses.size());
             for (Status s : statuses) {
                 long id = s.getId();
                 if (id>last) {
@@ -633,7 +635,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     // Get the old adapter if it existed, get the read ids from it and persist them
                     if (getListAdapter()!=null) {
                         StatusAdapter oldOne = (StatusAdapter) getListAdapter();
-                        List<Long> newReadIds = oldOne.newOlds;
+                        Set<Long> newReadIds = oldOne.newOlds;
                         th.markStatusesAsOld(newReadIds);
 
                     }

@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -1092,7 +1093,7 @@ public class TwitterHelper {
         tweetDB.storeSavedSearch(accountId, search.getName(),search.getQuery(),search.getId(),json);
     }
 
-    public void markStatusesAsOld(List<Long> ids) {
+    public void markStatusesAsOld(Set<Long> ids) {
         tweetDB.addReadIds(accountId,ids);
     }
 

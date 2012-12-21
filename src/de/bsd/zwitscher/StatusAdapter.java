@@ -23,8 +23,9 @@ import twitter4j.URLEntity;
 import twitter4j.User;
 
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Adapter for individual list rows of
@@ -54,7 +55,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
     public List<Long> readIds;
     private long oldLast;
     private final boolean downloadImages;
-    public List<Long> newOlds = new ArrayList<Long>();
+    public Set<Long> newOlds = new HashSet<Long>();
 
 
     public StatusAdapter(Context context, Account account, int textViewResourceId, List<T> objects, long oldLast, List<Long> readIds) {
@@ -119,7 +120,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
             // If the status is a RT and we also have the original one
             // on file, then mark the original as seen too
-            if (status.isRetweet() && ! readIds.contains(rtStatusId)) {
+            if (status.isRetweet() && ! readIds.contains(rtStatusId) && !newOlds.contains(rtStatusId)) {
                 // Only color when we have the original one too
                 Status rtStatus = th.getStatusById(rtStatusId,null,false,false,true);
                 if (rtStatus!=null) {
@@ -194,7 +195,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
             downloadTask.execute();
         }
         else {
-            downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,null);
+            downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 
         viewHolder.userInfo.setText(builder.toSpannableString());
