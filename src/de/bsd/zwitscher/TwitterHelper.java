@@ -165,19 +165,21 @@ public class TwitterHelper {
              ret2.addAll(ret);
           }
 
-          // Now sort the two collections we've got to form a linear
-          // timeline.
-          Collections.sort(ret2,new Comparator<DirectMessage>() {
-             public int compare(DirectMessage directMessage, DirectMessage directMessage1) {
-                return (int) (directMessage1.getId() - directMessage.getId());
-             }
-          });
 
 
           tweetDB.updateOrInsertLastRead(accountId, -2,max);
        }
        int numDirects = ret2.size();
        int filled = fillUpDirectsFromDb(ret2);
+
+          // Now sort the two collections we've got to form a linear
+          // timeline.
+          Collections.sort(ret2,new Comparator<DirectMessage>() {
+             public int compare(DirectMessage directMessage, DirectMessage directMessage1) {
+                return (int) (directMessage1.getCreatedAt().compareTo(directMessage.getCreatedAt()));
+             }
+          });
+
 
        MetaList<DirectMessage> result = new MetaList<DirectMessage>(ret2,numDirects,filled);
        return result;
