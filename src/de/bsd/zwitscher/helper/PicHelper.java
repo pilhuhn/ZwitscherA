@@ -71,8 +71,6 @@ public class PicHelper {
 //                Log.i("fetchUserPic","Downloading image for "+ username +" and persisting it locally");
                 BufferedInputStream in = new BufferedInputStream(imageUrl.openStream());
                 bitmap = BitmapFactory.decodeStream(in);
-                bitmap = Bitmap.createScaledBitmap(bitmap,80,80,true);
-
 
                 if (bitmap!=null && externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
                     File iconFile = getPictureFileForUser(username);
@@ -87,7 +85,7 @@ public class PicHelper {
 //               bitmap.recycle();
 			}
 			catch (IOException ioe) {
-				ioe.printStackTrace();
+                Log.w("PicHelper","Failed to download the image: " + ioe.getMessage());
 			}
 //            Log.i("fetchUP","loaded? bm=" + bitmap);
             return bitmap;

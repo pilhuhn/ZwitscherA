@@ -476,6 +476,11 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             firstVisible + visibleCount >= totalCount-1;
 
 
+        // TODO if this is the very first load of a timeline, loadMore will not reveal
+        // new items and just create load -- in this case skip it
+        // TODO introduce a flag for this. Can perhaps be populated from the
+        // knowledge of the stored last read id of the list
+
 //        Log.d("onScroll:","loadMore= " + loadMore + " f=" + firstVisible + ", vc=" + visibleCount + ", tc=" +totalCount);
         if(loadMore) {
 //Debug.startMethodTracing("list" + firstVisible);
@@ -622,6 +627,20 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         @SuppressWarnings("unchecked")
 		@Override
 		protected void onPostExecute(MetaList result) {
+
+            if (result.getNumAdded()==0) {
+
+                // No new items, no need to replace the current adapter
+
+                if (progressBar !=null)
+                    progressBar.setVisibility(ProgressBar.INVISIBLE);
+                if (dialog!=null)
+                    dialog.cancel();
+
+                return;
+
+            }
+
             if (updateListAdapter) {
                 if (listId <-4) { // saved search
                     setListAdapter(new TweetAdapter(context, account, R.layout.tweet_list_item, result.getList()));

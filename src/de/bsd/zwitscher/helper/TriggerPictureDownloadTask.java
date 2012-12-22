@@ -2,7 +2,6 @@ package de.bsd.zwitscher.helper;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.util.Pair;
 import twitter4j.User;
 
@@ -27,11 +26,14 @@ public class TriggerPictureDownloadTask extends AsyncTask<Void,Void,Pair<Bitmap,
         picHelper = new PicHelper();
     }
 
+
     @Override
     protected void onPreExecute() {
-        super.onPreExecute();
 
-        userImageView.setImageBitmap(null);
+        // If the image is already on file, use it, otherwise set the image to null.
+        // This
+        // set the "unknown" image on that one. But not on all images unconditionally
+        userImageView.setImageBitmap(picHelper.getBitMapForScreenNameFromFile(user.getScreenName()));
     }
 
     @Override
@@ -43,11 +45,12 @@ public class TriggerPictureDownloadTask extends AsyncTask<Void,Void,Pair<Bitmap,
             imageBitmap = picHelper.fetchUserPic(user);
         }
 
-        // Image of the user of the retweeted status
-        Bitmap rtBitmap = null;
         if (status == null) { // E.g. direct message
             return new Pair<Bitmap,Bitmap>(imageBitmap,null);
         }
+
+        // Image of the user of the retweeted status
+        Bitmap rtBitmap = null;
         if (status.isRetweet()) {
             rtBitmap = picHelper.getBitMapForScreenNameFromFile(status.getUser().getScreenName());
 
@@ -62,14 +65,17 @@ public class TriggerPictureDownloadTask extends AsyncTask<Void,Void,Pair<Bitmap,
     @Override
     protected void onPostExecute(Pair<Bitmap,Bitmap> bitmaps) {
 
-        if (userImageView.getTag().equals(user.getScreenName()))
+        if (userImageView.getTag().equals(user.getScreenName())) {
             userImageView.setImageBitmap(bitmaps.first);
 
-        userImageView.setRtImage(bitmaps.second);
+            userImageView.setRtImage(bitmaps.second);
 
-        if (status!=null) {
-            userImageView.markFavorite(status.isFavorited());
-            userImageView.markRetweet(status.isRetweet());
+            if (status!=null) {
+                userImageView.markFavorite(status.isFavorited());
+                userImageView.markRetweet(status.isRetweet());
+            }
+
+            userImageView.invalidate(); // Make the view draw itself
         }
     }
 }

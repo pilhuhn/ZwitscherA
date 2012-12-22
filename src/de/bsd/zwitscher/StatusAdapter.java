@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -26,6 +27,7 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * Adapter for individual list rows of
@@ -113,7 +115,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
             } else if (readIds.contains(oid)) {
                 convertView.setBackgroundColor(Color.rgb(0,0,40)); // todo debug color
                 isOld=true;
-            } else if (status.isRetweet() && readIds.contains(rtStatusId)) {
+            } else if (status.isRetweet() && (readIds.contains(rtStatusId) || newOlds.contains(rtStatusId))) {
                 convertView.setBackgroundColor(Color.rgb(40,0,0));
                 isOld=true;
             }
@@ -191,12 +193,20 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
         viewHolder.iv.setTag(userOnPicture.getScreenName()); // tag to remember which image should be shown
         TriggerPictureDownloadTask downloadTask = new TriggerPictureDownloadTask(viewHolder.iv, userOnPicture, downloadImages, status);
-        if (Build.VERSION.SDK_INT<11) {
-            downloadTask.execute();
+        try {
+            if (Build.VERSION.SDK_INT<16) {
+                downloadTask.execute();
+            }
+            else {
+                downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
+        } catch (RejectedExecutionException e) {
+            // This means, the threadpool is full - in that case
+            // the image is just not set/downloaded. This will happen
+            // on further scrolling
+            Log.w("StatusAdapter","Could not execute the picture download: " + e.getMessage());
         }
-        else {
-            downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
+
 
         viewHolder.userInfo.setText(builder.toSpannableString());
         viewHolder.statusText.setText(statusText);

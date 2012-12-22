@@ -51,7 +51,6 @@ public class UserImageView extends ImageView {
      * @param baseBitmap Bitmap to display. Null is allowed
      */
     public void setImageBitmap(Bitmap baseBitmap) {
-        super.setImageBitmap(baseBitmap);
         this.baseBitmap = baseBitmap;
     }
 
