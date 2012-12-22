@@ -373,7 +373,7 @@ public class TwitterHelper {
             // TODO determine account id via db sequence?
             tweetDB.insertOrUpdateAccount(account);
             if (makeDefault)
-                tweetDB.setDefaultAccount(accountId);
+                tweetDB.setDefaultAccount(newId);
 
         }
         else if (service.equalsIgnoreCase("identi.ca")) {
