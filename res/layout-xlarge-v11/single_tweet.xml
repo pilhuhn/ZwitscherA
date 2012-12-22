@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_height="fill_parent"
+            android:layout_width="fill_parent">
+
+    <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        <ImageButton android:layout_width="64dp"
+                     android:layout_height="64dp"
+                     android:src="@drawable/user_unknown"
+                     android:scaleType="fitXY"
+                     android:padding="4px"
+                     android:onClick="displayUserDetail"
+                     android:id="@+id/UserPictureImageView"
+                     android:contentDescription="Picture of the user"/>
+        <TextView android:id="@+id/HintView"
+                  android:layout_height="wrap_content"
+                  android:layout_width="wrap_content"
+                  android:layout_toRightOf="@id/UserPictureImageView"
+                  android:text="@string/click_here"
+                  android:textColor="#AAAA00"
+                  />
+        <TextView android:text="@+id/TextView01"
+                  android:id="@+id/TextView01"
+                  android:layout_width="wrap_content"
+                  android:minLines="2"
+                  android:paddingLeft="5dp"
+                  android:paddingRight="5dp"
+                  android:layout_toRightOf="@id/UserPictureImageView"
+                  android:layout_below="@id/HintView"
+                  android:layout_height="wrap_content"/>
+
+        <TextView android:id="@+id/TweetTextView"
+                  android:layout_below="@+id/UserPictureImageView"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:autoLink="all"
+                  android:layout_margin="2dp"
+                  android:padding="2dp"
+                  android:textSize="16sp"
+                  android:text="@+id/TweetTextView"/>
+        <TextView android:id="@+id/MiscTextView"
+                  android:layout_below="@+id/TweetTextView"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:textStyle="italic"
+                  android:text="@+id/MiscTextView"/>
+        <TextView android:id="@+id/TimeTextView"
+                  android:layout_below="@+id/MiscTextView"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:paddingBottom="10dp"
+                />
+
+
+        <!-- TODO move to a better place -->
+        <ImageView android:id="@+id/FavoriteButton"
+                     android:layout_below="@id/TimeTextView"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_toRightOf="@id/ThreadButton"
+                     android:src="@drawable/favorite_off"
+                     android:text="@string/favorite"/>
+
+        <Spinner android:id="@+id/ot_spinner"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_below="@id/FavoriteButton"
+                 android:prompt="@string/pickUser"
+                 />
+
+
+        <Gallery xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/gallery"
+                 android:layout_width="fill_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_below="@id/ot_spinner"
+                />
+    </RelativeLayout>
+</ScrollView>
