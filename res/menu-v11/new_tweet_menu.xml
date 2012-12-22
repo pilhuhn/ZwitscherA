@@ -7,6 +7,12 @@
           android:icon="@drawable/shorten_url"
     />
 
+  <item android:id="@+id/pickUser"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/pickUser"
+    android:icon="@drawable/ic_menu_invite"
+        />
+
     <item android:id="@+id/camera"
           android:icon="@drawable/ic_menu_camera"
       />
@@ -23,10 +29,5 @@
           android:icon="@drawable/ic_menu_send"
         />
 
-    <item android:id="@+id/pickUser"
-          android:showAsAction="ifRoom|withText"
-          android:title="@string/pickUser"
-      android:icon="@drawable/ic_menu_invite"
-          />
 
 </menu>
