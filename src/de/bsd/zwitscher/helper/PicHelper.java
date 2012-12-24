@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import android.graphics.*;
+import de.bsd.zwitscher.PicHelperState;
 import twitter4j.User;
 import android.os.Environment;
 import android.util.Log;
@@ -66,6 +67,27 @@ public class PicHelper {
 
         // Not found - fetch from remote and store it locally
 		if (!found) {
+
+            // See if there is already another thread syncing. If
+            // so, wait a while to see if it was successful
+            // and then return the data from the file system
+            if (PicHelperState.getInstance().isSyncing(username)) {
+                int rounds = 10;
+                while (rounds>0) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();  // TODO: Customise this generated block
+                    }
+                    if (!PicHelperState.getInstance().isSyncing(username)) {
+                        return getBitMapForScreenNameFromFile(username);
+                    }
+                    rounds--;
+                }
+            }
+            // Not found yet or first to look for the remote picture, start syncing now
+            PicHelperState.getInstance().setSyncing(username);
+
             Bitmap bitmap=null;
             try {
 //                Log.i("fetchUserPic","Downloading image for "+ username +" and persisting it locally");
@@ -87,6 +109,8 @@ public class PicHelper {
 			catch (IOException ioe) {
                 Log.w("PicHelper","Failed to download the image: " + ioe.getMessage());
 			}
+
+            PicHelperState.getInstance().syncDone(username); // We're done, remove syncing state
 //            Log.i("fetchUP","loaded? bm=" + bitmap);
             return bitmap;
 		}
