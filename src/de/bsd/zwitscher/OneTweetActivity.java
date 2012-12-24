@@ -786,12 +786,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             ActionBar actionBar = this.getActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        return true;
-    }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-
+        // Only enable the "delete" item for statuses we authored
         if (status.getUser().getScreenName().equals(account.getName())) {
             menu.findItem(R.id.delete).setEnabled(true);
         }
@@ -799,8 +795,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             menu.findItem(R.id.delete).setEnabled(false);
         }
 
-        return super.onPrepareOptionsMenu(menu);
-
+        return true;
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
