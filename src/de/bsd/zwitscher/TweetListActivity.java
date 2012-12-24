@@ -628,7 +628,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 		@Override
 		protected void onPostExecute(MetaList result) {
 
-            if (result.getNumAdded()==0) {
+            if (getListAdapter()!=null && getListAdapter().getCount()>0 && result.getNumAdded()==0) {
 
                 // No new items, no need to replace the current adapter
 
@@ -636,6 +636,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     progressBar.setVisibility(ProgressBar.INVISIBLE);
                 if (dialog!=null)
                     dialog.cancel();
+                if (titleTextBox!=null)
+                    titleTextBox.setText(account.getAccountIdentifier());
 
                 return;
 
