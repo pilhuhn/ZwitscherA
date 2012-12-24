@@ -22,6 +22,7 @@ import twitter4j.Status;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Just display a Conversation ..
@@ -73,6 +74,18 @@ public class ThreadListActivity extends ListActivity {
         new GetConversationTask().execute(startId);
 
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (getListAdapter() instanceof StatusAdapter) {
+            StatusAdapter adapter = (StatusAdapter) getListAdapter();
+            TwitterHelper th = new TwitterHelper(this,account);
+            th.markStatusesAsOld(adapter.newOlds);
+        }
+    }
+
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
