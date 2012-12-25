@@ -14,7 +14,7 @@
   <item android:id="@+id/thread"
     android:icon="@drawable/ic_thread"
     android:title="@string/show_thread"
-    android:showAsAction="always"
+    android:showAsAction="always|withText"
     />
   <item android:id="@+id/retweet"
     android:icon="@drawable/ic_rt"

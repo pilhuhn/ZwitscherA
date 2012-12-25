@@ -132,6 +132,7 @@
     <string name="wantToRemove">Wollen Sie [%s] wirklich löschen?</string>
     <string name="addFilterExpression">Filterausdruck hinzuf.</string>
     <string name="refresh">Aktualisieren</string>
+    <string name="pickUser">Benutzer auswählen</string>
     <string name="viewOnWeb">Im Web ansehen</string>
     <string name="usersTweets">Tweets des Benutzers</string>
     <string name="retweet">Retweet</string>
@@ -164,6 +165,7 @@
     <string name="cancel">Abbrechen</string>
     <string name="Reply">Antworten</string>
     <string name="Reply_all">Allen antworten</string>
+    <string name="thread">Konversation</string>
     <string name="screen_name_overview">Namensdarstellung</string>
     <string name="prefs_screen_name_overview">Wie sollen die Namen in der Timeline dargestellt werden (eine Änderung wird erst nach einem Reload der Timeline aktiv)</string>
     <string name="Preferences">Einstellungen</string>
