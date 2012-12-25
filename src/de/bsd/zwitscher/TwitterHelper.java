@@ -165,9 +165,9 @@ public class TwitterHelper {
              ret2.addAll(ret);
           }
 
-
-
-          tweetDB.updateOrInsertLastRead(accountId, -2,max);
+          if (max > -1) {
+             tweetDB.updateOrInsertLastRead(accountId, -2,max);
+          }
        }
        int numDirects = ret2.size();
        int filled = fillUpDirectsFromDb(ret2);
