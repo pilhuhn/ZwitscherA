@@ -481,7 +481,7 @@ account)}, null, null, null);
         cv.put(ACCOUNT_ID,account);
         cv.put("owner_name", owner_name);
 
-		db.insert(TABLE_LISTS, null, cv);
+		db.insertWithOnConflict(TABLE_LISTS, null, cv,SQLiteDatabase.CONFLICT_IGNORE);
 	}
 
     /**
@@ -1025,7 +1025,7 @@ account)}, null, null, null);
         cv.put("query",query);
         cv.put("json",json);
 
-        db.insert(TABLE_SEARCHES,null,cv);
+        db.insertWithOnConflict(TABLE_SEARCHES,null,cv,SQLiteDatabase.CONFLICT_IGNORE);
     }
 
     public List<String> getSavedSearches(int account) {
