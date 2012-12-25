@@ -399,7 +399,7 @@ public class TwitterHelper {
             account = new Account(newId,username,null,service,makeDefault,password);
             tweetDB.insertOrUpdateAccount(account);
             if (makeDefault)
-                tweetDB.setDefaultAccount(accountId);
+                tweetDB.setDefaultAccount(newId);
 
         }
 
