@@ -16,6 +16,7 @@
           android:title="@string/new_message"
           android:icon="@drawable/ic_menu_start_conversation"
         />
+<!--
     <item
         android:id="@+id/menu_default_search"
 
@@ -23,6 +24,7 @@
         android:showAsAction="ifRoom"
         android:actionViewClass="android.widget.SearchView"
     />
+-->
     <!--android:icon="@drawable/ic_menu_search"-->
 
     <item android:id="@+id/menu_goto_user"
