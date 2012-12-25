@@ -16,16 +16,12 @@
           android:title="@string/new_message"
           android:icon="@drawable/ic_menu_start_conversation"
         />
-<!--
     <item
         android:id="@+id/menu_default_search"
-
         android:title="@string/searches"
-        android:showAsAction="ifRoom"
-        android:actionViewClass="android.widget.SearchView"
+        android:showAsAction="ifRoom|collapseActionView"
+        android:icon="@drawable/ic_action_search"
     />
--->
-    <!--android:icon="@drawable/ic_menu_search"-->
 
     <item android:id="@+id/menu_goto_user"
           android:title="@string/goto_user"
