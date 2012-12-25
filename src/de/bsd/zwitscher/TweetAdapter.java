@@ -13,7 +13,7 @@ import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.SpannableBuilder;
 import de.bsd.zwitscher.helper.UserImageView;
-import twitter4j.Tweet;
+import twitter4j.Status;
 
 /**
  * Adapter for individual list rows of
@@ -21,7 +21,7 @@ import twitter4j.Tweet;
  *
  * @author Heiko W. Rupp
  */
-class TweetAdapter<T extends Tweet> extends AbstractAdapter<T> {
+class TweetAdapter<T extends Status> extends AbstractAdapter<T> {
 
 
     public TweetAdapter(Context context, Account account, int textViewResourceId, List<T> objects) {
@@ -56,23 +56,25 @@ class TweetAdapter<T extends Tweet> extends AbstractAdapter<T> {
             convertView.setBackgroundColor(Color.DKGRAY);
 
 
-        Tweet tweet = items.get(position);
+        Status tweet = items.get(position);
         Bitmap bi;
 
         SpannableBuilder builder = new SpannableBuilder(extContext);
         String statusText;
 
-        builder.append(tweet.getFromUser(), Typeface.BOLD);
-        if (tweet.getToUser()!=null) {
+        builder.append(tweet.getUser().getName(), Typeface.BOLD);
+/* TODO what is / was this?
+        if (tweet.getRecipientScreenName()!=null) {
             builder.appendSpace();
             builder.append(R.string.to,Typeface.NORMAL)
                 .appendSpace()
-                .append(tweet.getToUser(), Typeface.BOLD);
+                .append(tweet.getRecipientScreenName(), Typeface.BOLD);
         }
+*/
         statusText = tweet.getText();
 
 
-        bi = ph.getBitMapForScreenNameFromFile(tweet.getFromUser());
+        bi = ph.getBitMapForScreenNameFromFile(tweet.getUser().getScreenName());
         if (bi!=null) {
             viewHolder.iv.setImageBitmap(bi);
         }

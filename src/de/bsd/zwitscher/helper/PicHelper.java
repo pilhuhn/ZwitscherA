@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import android.graphics.*;
@@ -42,9 +43,16 @@ public class PicHelper {
         if (user==null)
             return null;
 
-		URL imageUrl = user.getProfileImageURL();
+        String tmp = user.getProfileImageURL();
+        URL imageUrl = null;
+        try {
+            imageUrl = new URL(tmp);
+        } catch (MalformedURLException e) {
+            Log.w("PicHelper","Got bad picture url for user " + user.getScreenName() + ": " + e.getMessage());
+            return null;
+        }
 
-		String username = user.getScreenName();
+        String username = user.getScreenName();
 //        Log.i("fetchUserPic","Looking for pic of user '" + username + "' from '" + imageUrl.toString() + "'");
 		boolean found = false;
 		// TODO use v8 methods when we require v8 in the manifest. Is probably too early yet.

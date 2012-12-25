@@ -1,6 +1,5 @@
 package de.bsd.zwitscher;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -60,7 +59,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
     List<Status> statuses;
     List<DirectMessage> directs;
-    List<Tweet> tweets;
+    List<Status> tweets;
     int list_id;
     ListView lv;
     int newMentions=0;
@@ -350,9 +349,9 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
             if (status.getURLEntities() != null) {
                 for (URLEntity ue : status.getURLEntities()) {
-                    URL expUrl = ue.getExpandedURL();
-                    if (expUrl !=null && expUrl.toString()!=null ) {
-                        m = filterPattern.matcher(expUrl.toString());
+                    String expUrl = ue.getExpandedURL();
+                    if (expUrl != null) {
+                        m = filterPattern.matcher(expUrl);
                         if (m.matches())
                             shouldFilter = true;
                     }
@@ -378,8 +377,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         return messages;
     }
 
-    private MetaList<Tweet> getSavedSearchFromTwitter(int searchId, boolean fromDbOnly) {
-        MetaList<Tweet> messages;
+    private MetaList<Status> getSavedSearchFromTwitter(int searchId, boolean fromDbOnly) {
+        MetaList<Status> messages;
 
         Paging paging = new Paging();
         paging.setCount(20);

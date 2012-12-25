@@ -626,14 +626,14 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         MediaEntity[] mediaEntities = status.getMediaEntities();
         if (mediaEntities!=null) {
             for (MediaEntity me : mediaEntities) {
-                URL url = me.getURL();
+                String url = me.getURL();
                 String target;
-                target = me.getMediaURL().toString();
+                target = me.getMediaURL();
                 if (android.os.Build.VERSION.SDK_INT<11) // TODO decide on screen size and not API version
                     target = target+ ":thumb";
                 else
                     target = target+ ":small";
-                UrlPair pair = new UrlPair(url.toString(), target);
+                UrlPair pair = new UrlPair(url, target);
                 urlPairs.add(pair);
             }
         }
@@ -643,9 +643,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         URLEntity[] ures = status.getURLEntities();
         if (ures!=null) {
             for (URLEntity ue : ures) {
-                URL url = ue.getExpandedURL();
+                String url = ue.getExpandedURL();
                 if (url!=null)
-                    urls.add(url.toString());
+                    urls.add(url);
             }
         }
 

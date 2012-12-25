@@ -220,7 +220,7 @@ public class TwitterHelper {
         List<UserList> userLists;
 		try {
 			String username = account.getName();
-			userLists = twitter.getUserLists(username, -1); // Lists I created
+			userLists = twitter.getUserLists(username); // Lists I created
             userLists.addAll( twitter.getUserListSubscriptions(username, -1) ); // Lists from other users
 			return userLists;
 		} catch (Exception e) {
@@ -272,7 +272,7 @@ public class TwitterHelper {
             else if (account.getServerType().equalsIgnoreCase("identi.ca")) {
                 ConfigurationBuilder cb = new ConfigurationBuilder();
                 cb.setRestBaseURL(HTTP_IDENTI_CA_API);
-                cb.setSearchBaseURL(HTTP_IDENTI_CA_API);
+//                cb.setSearchBaseURL(HTTP_IDENTI_CA_API);
                 cb.setOAuthAccessTokenURL("https://identi.ca/api/oauth/access_token");
                 cb.setOAuthAuthorizationURL("https://identi.ca/api/oauth/authorize");
                 cb.setOAuthRequestTokenURL("https://identi.ca/api/oauth/request_token");
@@ -378,7 +378,7 @@ public class TwitterHelper {
         }
         else if (service.equalsIgnoreCase("identi.ca")) {
             cb.setRestBaseURL(HTTP_IDENTI_CA_API);
-            cb.setSearchBaseURL(HTTP_IDENTI_CA_API);
+//            cb.setSearchBaseURL(HTTP_IDENTI_CA_API);
             cb.setOAuthAccessTokenURL("https://identi.ca/api/oauth/access_token");
 //            cb.setOAuthAuthenticationURL();
             cb.setOAuthAuthorizationURL("https://identi.ca/api/oauth/authorize");
@@ -1066,7 +1066,7 @@ public class TwitterHelper {
         return users;
     }
 
-    public MetaList<Tweet> getSavedSearchesTweets(int searchId, boolean fromDbOnly, Paging paging) {
+    public MetaList<Status> getSavedSearchesTweets(int searchId, boolean fromDbOnly, Paging paging) {
 
         List<SavedSearch> searches = getSavedSearchesFromDb();
         for (SavedSearch search : searches) {
@@ -1076,17 +1076,17 @@ public class TwitterHelper {
                    // TODO set some restriction like language or such
                 try {
                     QueryResult queryResult = twitter.search(query);
-                    List<Tweet> tweets = queryResult.getTweets();
+                    List<Status> tweets = queryResult.getTweets();
                     MetaList metaList = new MetaList(tweets,tweets.size(),0);
                     return metaList;
                 } catch (TwitterException e) {
                     e.printStackTrace();  // TODO: Customise this generated block
-                    return new MetaList<Tweet>();
+                    return new MetaList<Status>();
                 }
             }
         }
 
-        return new MetaList<Tweet>();
+        return new MetaList<Status>();
     }
 
     public void persistSavedSearch(SavedSearch search) {

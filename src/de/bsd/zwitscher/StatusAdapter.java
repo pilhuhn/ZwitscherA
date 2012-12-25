@@ -257,8 +257,8 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
             boolean found=false;
             if (status.getMediaEntities()!=null) {
                 for (MediaEntity me : status.getMediaEntities()) {
-                    URL meURL = me.getURL();
-                    if (meURL !=null && meURL.toString()!=null && meURL.toString().equals(token) && me.getDisplayURL()!=null) {
+                    String meURL = me.getURL();
+                    if (meURL != null && meURL.equals(token) && me.getDisplayURL() != null) {
                         builder.append(me.getDisplayURL());
                         found=true;
                         break;
@@ -267,8 +267,8 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
             }
             if (!found && status.getURLEntities()!=null) {
                 for (URLEntity ue : status.getURLEntities()) {
-                    URL ueURL = ue.getURL();
-                    if (ueURL !=null && ueURL.toString().equals(token) && ue.getDisplayURL()!=null) {
+                    String ueURL = ue.getURL();
+                    if (ueURL !=null && ueURL.equals(token) && ue.getDisplayURL()!=null) {
                         builder.append(ue.getDisplayURL());
                         found=true;
                         break;

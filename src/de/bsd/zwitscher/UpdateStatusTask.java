@@ -81,7 +81,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
                         String res = statusUpdate.getStatus() + " " + tmp;
                         StatusUpdate up = new StatusUpdate(res);
-                        up.setAnnotations(statusUpdate.getAnnotations());
+//                        up.setAnnotations(statusUpdate.getAnnotations());
                         up.setInReplyToStatusId(statusUpdate.getInReplyToStatusId());
                         up.setLocation(statusUpdate.getLocation());
                         up.setPlaceId(statusUpdate.getPlaceId());
