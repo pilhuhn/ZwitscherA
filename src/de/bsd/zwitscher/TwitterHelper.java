@@ -73,8 +73,12 @@ public class TwitterHelper {
 				    statuses = twitter.getHomeTimeline(paging ); //like friends + including retweet
 				break;
 			case -1:
-                if (!fromDbOnly)
-				    statuses = twitter.getMentionsTimeline(paging);
+                if (!fromDbOnly) {
+                    if (!account.isStatusNet())
+				        statuses = twitter.getMentionsTimeline(paging);
+                    else
+                        statuses = twitter.getSNMentions(paging);
+                }
 				break;
 // -2 is directs
             case -3 :
