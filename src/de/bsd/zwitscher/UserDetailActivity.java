@@ -466,7 +466,7 @@ public class UserDetailActivity extends Activity  {
             boolean downloadImages = new NetworkHelper(context).mayDownloadImages();
             Drawable background = null;
             if (downloadImages) {
-                String profileBackgroundImageUrl = user.getProfileBackgroundImageUrl();
+                String profileBackgroundImageUrl = user.getProfileBackgroundImageURL();
                 if (!"".equals(profileBackgroundImageUrl)) {
                     try {
                         URL url = new URL(profileBackgroundImageUrl);

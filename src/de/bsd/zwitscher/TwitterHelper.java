@@ -74,7 +74,7 @@ public class TwitterHelper {
 				break;
 			case -1:
                 if (!fromDbOnly)
-				    statuses = twitter.getMentions(paging);
+				    statuses = twitter.getMentionsTimeline(paging);
 				break;
 // -2 is directs
             case -3 :
@@ -783,7 +783,7 @@ public class TwitterHelper {
      */
     public boolean addUserToLists(long userId, int listId) {
         try {
-            twitter.addUserListMember(listId,userId);
+            twitter.createUserListMember(listId,userId);
         } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
             return false;
