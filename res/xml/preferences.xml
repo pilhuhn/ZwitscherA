@@ -106,4 +106,10 @@
                             android:password="true"/>
     </PreferenceScreen>
 
+  <CheckBoxPreference android:title="Experimental UI"
+    android:key="newui"
+    android:defaultValue="false"
+    android:summary="Enables an experimental UI after the next restart"
+    />
+
 </PreferenceScreen>
