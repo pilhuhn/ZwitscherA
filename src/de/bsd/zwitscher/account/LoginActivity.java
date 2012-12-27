@@ -6,13 +6,17 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import de.bsd.zwitscher.MainActivity;
 import de.bsd.zwitscher.R;
 import de.bsd.zwitscher.TabWidget;
 import de.bsd.zwitscher.TweetDB;
@@ -189,8 +193,17 @@ public class LoginActivity extends Activity {
 	 */
 	private void proceed(Account account) {
         AccountHolder.getInstance().setAccount(account);
-		Intent i = new Intent().setClass(this, TabWidget.class);
-		startActivity(i);
+		Intent i = new Intent();
+//        if (Build.VERSION.SDK_INT<11)
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        boolean newUi = preferences.getBoolean("newui",false);
+
+        if (newUi) { // TODO later use build version
+            i.setClass(this, MainActivity.class);
+        } else {
+            i.setClass(this, TabWidget.class);
+        }
+        startActivity(i);
 		finish();
 	}
 
