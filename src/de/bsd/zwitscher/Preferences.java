@@ -1,6 +1,7 @@
 package de.bsd.zwitscher;
 
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -18,9 +19,16 @@ public class Preferences extends PreferenceActivity implements SharedPreferences
     @Override
     protected void onResume() {
         super.onResume();
-        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-        onSharedPreferenceChanged(getPreferenceScreen().getSharedPreferences(), "ril_user");
-        setRilPassSummary(getPreferenceScreen().getSharedPreferences(), findPreference("ril_password"));
+        SharedPreferences preferences = getPreferenceScreen().getSharedPreferences();
+        preferences.registerOnSharedPreferenceChangeListener(this);
+        onSharedPreferenceChanged(preferences, "ril_user");
+        setRilPassSummary(preferences, findPreference("ril_password"));
+        if (Build.VERSION.SDK_INT>=11) {
+            // The experimental UI needs v11 (Honeycomb or later)
+            findPreference("newui").setEnabled(true);
+        }
+
+
     }
 
     @Override
