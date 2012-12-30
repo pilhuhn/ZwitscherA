@@ -86,6 +86,7 @@
       <activity android:name=".MainActivity" >
       </activity>
 
+      <service android:name=".helper.FetchTimelinesService" />
     </application>
 
 </manifest>

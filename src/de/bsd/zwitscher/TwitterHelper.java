@@ -199,7 +199,7 @@ public class TwitterHelper {
      */
     public List<Status> getStatuesFromDb(long sinceId, int howMany, long list_id) {
         List<Status> ret = new ArrayList<Status>();
-        List<String> responseList = tweetDB.getStatusesObjsOlderThan(accountId, sinceId,howMany,list_id);
+        List<String> responseList = tweetDB.getStatusesObjsOlderThan(accountId, sinceId, howMany, list_id);
         for (String json : responseList) {
             Status status = materializeStatus(json);
             ret.add(status);
@@ -249,7 +249,7 @@ public class TwitterHelper {
      * account object is not set, the default account is used.
      * @return authorized Twitter instance.
      */
-	private Twitter getTwitter() {
+    public Twitter getTwitter() {
         if (account==null)
             account = getDefaultAccount();
 
@@ -427,7 +427,7 @@ public class TwitterHelper {
             updateResponse.setMessage(sentMessage);
             updateResponse.setSuccess();
 		} catch (TwitterException e) {
-            updateResponse.setMessage( e.getLocalizedMessage());
+            updateResponse.setMessage(e.getLocalizedMessage());
             updateResponse.setFailure();
             updateResponse.setStatusCode(e.getStatusCode());
         }
@@ -774,7 +774,7 @@ public class TwitterHelper {
 
             return true;
         } catch (TwitterException e) {
-            Log.w("followUnfollowUser",e.getMessage());
+            Log.w("followUnfollowUser", e.getMessage());
         }
         return false;
     }
@@ -809,7 +809,7 @@ public class TwitterHelper {
         return ret;
     }
 
-    private void persistStatus(Collection<Status> statuses, long list_id) {
+    public void persistStatus(Collection<Status> statuses, long list_id) {
 
 
         List<ContentValues> values = new ArrayList<ContentValues>(statuses.size());

@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
 import de.bsd.zwitscher.account.AccountHolder;
+import de.bsd.zwitscher.helper.FetchTimelinesService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,10 +76,18 @@ public class MainActivity extends Activity implements ActionBar.OnNavigationList
    		Intent i;
    	    // Handle item selection
    	    switch (item.getItemId()) {
-   	    case R.id.preferences:
-   	    	i = new Intent(this, Preferences.class);
-   			startActivity(i);
-   			break;
+            case R.id.preferences:
+                i = new Intent(this, Preferences.class);
+                startActivity(i);
+                break;
+
+            case R.id.refresh:
+                i = new Intent(this, FetchTimelinesService.class);
+                i.putExtra("listIds", new int[]{0,1,3});
+                i.putExtra("account",AccountHolder.getInstance().getAccount());
+                startService(i);
+                break;
+
            // TODO add other menu options
            }
 
