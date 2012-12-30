@@ -48,8 +48,10 @@ public class FetchTimelinesService extends IntentService {
 
 
         for (int listId : listIds ) {
+            Log.i("FetchTimelinesService","Loading list " + listId);
+
             List<Status> statuses;
-            long lastFetchedId = tdb.getLastFetched(accountId, listId);
+            long lastFetchedId = tdb.getLastRead(accountId, listId);
             Paging paging ;
             if (lastFetchedId>0)
                 paging=new Paging(lastFetchedId);
@@ -62,7 +64,10 @@ public class FetchTimelinesService extends IntentService {
                         statuses = twitter.getHomeTimeline(paging);
                         break;
                     case 1:
-                        statuses = twitter.getMentions(paging);
+                        if (account.isStatusNet())
+                            statuses = twitter.getSNMentions(paging);
+                        else
+                            statuses = twitter.getMentionsTimeline(paging);
                         break;
                     case 2:
                         Log.w("Fetcher","Direct messages are not supported");
@@ -75,12 +80,17 @@ public class FetchTimelinesService extends IntentService {
                         statuses = twitter.getUserListStatuses(listId,paging);
                 }
                 if (statuses.size()>0) {
-                    long maxId = th.persistStatus(statuses, listId);
-                    tdb.setLastFetched(accountId,listId,maxId);
+                    th.persistStatus(statuses, listId);
+                    long maxId = statuses.get(0).getId(); // TODO is the assumption that this is the max actually true?
+                    tdb.updateOrInsertLastRead(accountId,listId,maxId);
+                    Intent loadDone = new Intent("zwitscher.LoadDone");
+                    loadDone.putExtra("listId",listId);
+                    sendBroadcast(loadDone);
                 }
             } catch (TwitterException e) {
                 e.printStackTrace();  // TODO: Customise this generated block
             }
+
         }
 
         stopSelf();
