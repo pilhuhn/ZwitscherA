@@ -84,7 +84,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         Intent intent = getIntent();
         String dataString = intent.getDataString();
         Bundle bundle = intent.getExtras();
-        account = AccountHolder.getInstance().getAccount();
+        account = AccountHolder.getInstance(this).getAccount();
 
         // If this is not null, we are called from another app
         if ( dataString!=null) {

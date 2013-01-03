@@ -22,7 +22,6 @@ import twitter4j.Status;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Just display a Conversation ..
@@ -63,7 +62,7 @@ public class ThreadListActivity extends ListActivity {
         }
 
 
-        account = AccountHolder.getInstance().getAccount();
+        account = AccountHolder.getInstance(this).getAccount();
         // Pull the start id ( = id of the calling s
         Intent i = getIntent();
         Bundle b = i.getExtras();

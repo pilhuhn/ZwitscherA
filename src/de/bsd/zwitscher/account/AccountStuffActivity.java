@@ -120,7 +120,7 @@ public class AccountStuffActivity extends Activity {
 
     private void switchToSelectedAccount(Account account) {
         Intent intent = new Intent(this, TabWidget.class);
-        AccountHolder.getInstance().setAccount(account);
+        AccountHolder.getInstance(this).setAccount(account);
         startActivity(intent);
         finish();
     }

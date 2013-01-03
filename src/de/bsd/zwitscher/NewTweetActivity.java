@@ -82,16 +82,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
         }
 
         charCountView = (TextView) findViewById(R.id.CharCount);
-        account = AccountHolder.getInstance().getAccount();
-        // If account is null, which can happen when called via intent from the
-        // outside world
-        if (account==null) {
-            TweetDB tdb = TweetDB.getInstance(getApplicationContext());
-            account = tdb.getDefaultAccount();
-            AccountHolder.getInstance().setAccount(account);
-        }
-
-
+        account = AccountHolder.getInstance(this).getAccount();
 
         final ImageButton tweetButton = (ImageButton) findViewById(R.id.TweetButton);
         edittext = (MultiAutoCompleteTextView) findViewById(R.id.edittext);
@@ -215,10 +206,10 @@ public class NewTweetActivity extends Activity implements LocationListener {
         usernames.add("#java");
         usernames.add("@pilhuhn");
         usernames.add("@RHQ_project");
-        System.out.println("hashes " + AccountHolder.getInstance().getHashTags().size());
-        System.out.println("users  " + AccountHolder.getInstance().getUserNames().size());
-        usernames.addAll(AccountHolder.getInstance().getHashTags());
-        usernames.addAll(AccountHolder.getInstance().getUserNames());
+        System.out.println("hashes " + AccountHolder.getInstance(this).getHashTags().size());
+        System.out.println("users  " + AccountHolder.getInstance(this).getUserNames().size());
+        usernames.addAll(AccountHolder.getInstance(this).getHashTags());
+        usernames.addAll(AccountHolder.getInstance(this).getUserNames());
         ArrayAdapter<String> acAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,
                 usernames.toArray(new String[usernames.size()]));
         edittext.setAdapter(acAdapter);

@@ -81,7 +81,7 @@ public class UserDetailActivity extends Activity  {
         if (followButton!=null)
             followButton.setEnabled(false);
 
-        account = AccountHolder.getInstance().getAccount();
+        account = AccountHolder.getInstance(this).getAccount();
         thTwitterHelper = new TwitterHelper(this, account);
 
         bundle = getIntent().getExtras();
@@ -294,7 +294,7 @@ public class UserDetailActivity extends Activity  {
     public void showUserTweets(View v) {
 
 
-        Intent intent = new Intent().setClass(this,TweetListActivity.class);
+        Intent intent = new Intent().setClass(this, TweetListActivity.class);
         intent.putExtra("userId",userId);
 
         startActivity(intent);
@@ -507,7 +507,7 @@ public class UserDetailActivity extends Activity  {
             User user = (User) params[0];
             Boolean isFriend = (Boolean) params[1];
             theUser = user;
-            fillDetails(user,isFriend);
+            fillDetails(user, isFriend);
             View followButton = findViewById(R.id.userDetail_follow_button);
             if (followButton!=null)
                 followButton.setEnabled(true);

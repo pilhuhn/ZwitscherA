@@ -34,7 +34,7 @@ class CreateAccountTask extends AsyncTask<Void,Void,String> {
         TwitterHelper th = new TwitterHelper(context,null);
         try {
             Account account = th.generateAccountWithXauth(username, password, service, shouldSwitch);
-            AccountHolder.getInstance().setAccount(account);
+            AccountHolder.getInstance(context).setAccount(account);
             return "OK";
         } catch (Exception e) {
             return context.getString(R.string.login_failed) + e.getLocalizedMessage();

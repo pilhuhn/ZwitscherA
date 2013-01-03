@@ -322,7 +322,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         }
 
         for (Status status:metaList.getList()) {
-            AccountHolder accountHolder = AccountHolder.getInstance();
+            AccountHolder accountHolder = AccountHolder.getInstance(this);
             accountHolder.addUserName(status.getUser().getScreenName());
             if (status.getHashtagEntities()!=null) {
                 for (HashtagEntity hte : status.getHashtagEntities()) {

@@ -33,14 +33,10 @@ public abstract class AbstractListActivity extends ListActivity {
             titleTextBox = parent.titleTextBox;
         }
 
-        account = AccountHolder.getInstance().getAccount();
+        account = AccountHolder.getInstance(this).getAccount();
 
-        if (account==null) {
-            TweetDB tmp = TweetDB.getInstance(getApplicationContext());
-            account = tmp.getDefaultAccount();
-        }
         th = new TwitterHelper(this, account);
-        tdb = TweetDB.getInstance(getApplicationContext());
+        tdb = TweetDB.getInstance(this);
 
     }
 

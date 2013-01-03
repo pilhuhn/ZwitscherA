@@ -188,7 +188,7 @@ public class LoginActivity extends Activity {
 	 *            Logged in account
 	 */
 	private void proceed(Account account) {
-        AccountHolder.getInstance().setAccount(account);
+        AccountHolder.getInstance(this).setAccount(account);
 		Intent i = new Intent().setClass(this, TabWidget.class);
 		startActivity(i);
 		finish();
