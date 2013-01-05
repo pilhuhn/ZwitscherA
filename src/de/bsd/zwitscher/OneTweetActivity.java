@@ -3,6 +3,8 @@ package de.bsd.zwitscher;
 
 import android.app.ActionBar;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -195,14 +197,23 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         String s = getString(R.string.via);
         String text = th.getStatusDate(status) + s + status.getSource();
         String from = getString(R.string.from);
+
         if (status.getPlace()!=null) {
+            // See if we have some tool on the system to resolve geo: urls
+            // Otherwise we omit the link
+            Intent geoIntent = new Intent(Intent.ACTION_VIEW,Uri.parse("geo:0,0"));
+            List<ResolveInfo> resolveInfos = getPackageManager().queryIntentActivities(geoIntent, PackageManager.MATCH_DEFAULT_ONLY);
+            boolean supportsGeoUrls = !resolveInfos.isEmpty();
+
             Place place = status.getPlace();
             text += " " + from + " " ;
-            if (place.getFullName()!=null)
+            if (place.getFullName()!=null && supportsGeoUrls) {
                 text += "<a href=\"geo:0,0?q=" + place.getFullName() + ","+ place.getCountry() + "\">";
+            }
             text += place.getFullName();
-            if (place.getFullName()!=null)
+            if (place.getFullName()!=null && supportsGeoUrls) {
                 text += "</a>";
+            }
 
         }
         timeClientView.setText(Html.fromHtml(text));
