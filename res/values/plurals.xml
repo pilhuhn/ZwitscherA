@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <plurals name="new_entries">
+    <item quantity="zero">No new items</item>
+    <item quantity="one">One new item</item>
+    <item quantity="other">Multiple new items</item>
+  </plurals>
+</resources>

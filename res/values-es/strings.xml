@@ -8,7 +8,6 @@
 <string name="direct_message_sent">Mensaje directo enviado</string>
 <string name="hello">Escriba el texto del tweet a continuación:</string>
 <string name="app_name">Zwitscher</string>
-<string name="loading">Cargando tweets …</string>
 <string name="no_connect">No se pudo conectar a Twitter</string>
 <string name="TweetButton">Tweetea esto!</string>
 <string name="ClearButton">Limpiar!</string>
@@ -29,7 +28,7 @@
 <string name="in_reply_to">en respuesta a</string>
 <string name="via">" vía " </string>
 <string name="send_direct_to">Enviando mensaje directo a </string>
-<string name="getting_tweets">Obteniendo tweets</string>
+<string name="getting_statuses">Obteniendo %ss …</string>
 <string name="getting_conversation">Obteniendo conversación</string>
 <string name="follow_user">Seguir al usuario</string>
 <string name="unfollow_user">Dejar de seguir al usuario</string>

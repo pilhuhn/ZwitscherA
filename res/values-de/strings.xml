@@ -6,8 +6,7 @@
     <string name="direct_message_sent">Private Nachricht gesendet</string>
     <string name="hello">Geben Sie den Text ein:</string>
     <string name="app_name">Zwitscher</string>
-    <string name="loading">Lade Tweets…</string>
-    <string name="no_connect">Kann Twitter nicht erreichen</string>
+    <string name="no_connect">Kann den Server nicht erreichen</string>
     <string name="TweetButton">Absenden</string>
     <string name="ClearButton">Löschen</string>
     <string name="home_timeline">Daheim</string>
@@ -24,7 +23,7 @@
     <string name="resent_by">Neu gesendet durch</string>
     <string name="in_reply_to"> als Antwort auf </string>
     <string name="send_direct_to">Sende private Nachricht an </string>
-    <string name="getting_tweets">Lade Tweets</string>
+    <string name="getting_statuses">Lade %ss …</string>
     <string name="getting_conversation">Lade Konversation</string>
     <string name="follow_user">Benutzer folgen</string>
     <string name="unfollow_user">Benutzer nicht folgen</string>
@@ -188,6 +187,6 @@
   <string name="show_on_web">Im Web anzeigen…</string>
   <string name="delete_status">Status löschen…</string>
   <string name="delete_status_really">Status wirklich löschen?</string>
-
+  <string name="no_result">Keine Daten vom Server erhalten</string>
 
 </resources>

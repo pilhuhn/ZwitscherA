@@ -62,8 +62,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     List<Status> tweets;
     int list_id;
     ListView lv;
-    int newMentions=0;
-    private int newDirects=0;
     Long userId=null;
     int userListId = -1;
     private Pattern filterPattern;
@@ -551,7 +549,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         protected void onPreExecute() {
             super.onPreExecute();
             updating = context.getString(R.string.updating);
-            String s = getString(R.string.getting_tweets)+ "...";
+            String s = getString(R.string.getting_statuses, account.getStatusType());
             if (updateListAdapter) {
                 if (progressBar!=null)
                     progressBar.setVisibility(ProgressBar.VISIBLE);
@@ -666,7 +664,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 }
 
                 if (result.getList().size()==0) {
-                    Toast.makeText(context, "Got no result from the server", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, getString(R.string.no_result), Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -694,20 +692,22 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             }
             if (updateListAdapter)
 	            getListView().requestLayout();
-            if (result.getNumOriginal()>0) {
-                Toast.makeText(context,result.getNumOriginal() + " new items",Toast.LENGTH_SHORT).show();
+            if (result.getNumOriginal()>0) { // TODO distinguish the timelines
+                String tmp = context.getResources().getQuantityString(R.plurals.new_entries,result.getNumOriginal());
+                String updating;
+                switch (listId) {
+                    case 0: updating = context.getString(R.string.home_timeline);
+                        break;
+                    case -1: updating = context.getString(R.string.mentions);
+                        break;
+                    case -3: updating = context.getString(R.string.sent);
+                        break;
+                    case -4: updating = context.getString(R.string.favorites);
+                        break;
+                    default: updating = context.getString(R.string.list);
+                }
+                Toast.makeText(context,updating + ": " + tmp,Toast.LENGTH_SHORT).show();
             }
-            if (newMentions>0) {
-                String s = getString(R.string.new_mentions);
-                Toast.makeText(context,newMentions + " " + s,Toast.LENGTH_LONG).show();
-                newMentions=0;
-            }
-            if (newDirects>0) {
-                String s = getString(R.string.new_directs);
-                Toast.makeText(context,newDirects + " " + s,Toast.LENGTH_LONG).show();
-                newDirects=0;
-            }
-
 
             // Only do the next if we actually did an update from twitter
             if (!fromDbOnly && updateListAdapter) {

@@ -7,7 +7,6 @@
 <string name="dent_sent">Envoyé Dent</string>
 <string name="direct_message_sent">Courier privée a été envoyé</string>
 <string name="hello">Ecrivez votre Tweet au-dessus:</string>
-<string name="loading">Obtenir de messages…</string>
 <string name="no_connect">Connexion impossible à Twitter</string>
 <string name="TweetButton">Envoyer!</string>
 <string name="ClearButton">Effacer</string>
@@ -29,7 +28,7 @@
 <string name="in_reply_to">en réponse à</string>
 <string name="via">" via "</string>
 <string name="send_direct_to">Envoie courier privé à</string>
-<string name="getting_tweets">Obtenir des messages</string>
+<string name="getting_statuses">Obtenir des %ss …</string>
 <string name="getting_conversation">Obtenir une conversation</string>
 <string name="follow_user">Suivre l\'utilisateur</string>
 <string name="unfollow_user">Arrêter de suivre l\'utilisateur</string>

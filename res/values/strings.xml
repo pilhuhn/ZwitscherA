@@ -14,8 +14,7 @@
     <string name="direct_message_sent">Direct message sent</string>
     <string name="hello">Enter your tweet text below:</string>
     <string name="app_name">Zwitscher</string>
-    <string name="loading">Loading Tweets …</string>
-    <string name="no_connect">Can not connect to Twitter</string>
+    <string name="no_connect">Can not connect to server</string>
     <string name="TweetButton">Tweet this!</string>
     <string name="ClearButton">Clear!</string>
     <string name="home_timeline">Home</string>
@@ -35,7 +34,7 @@
     <string name="in_reply_to"> in reply to </string>
     <string name="via">" via "</string>
     <string name="send_direct_to">Sending direct message to </string>
-    <string name="getting_tweets">Getting tweets</string>
+    <string name="getting_statuses">Getting %ss …</string>
     <string name="getting_conversation">Getting conversation</string>
     <string name="follow_user">Follow user</string>
     <string name="unfollow_user">Unfollow user</string>
@@ -198,4 +197,6 @@
   <string name="show_on_web">Show on web…</string>
   <string name="delete_status">Delete status…</string>
   <string name="delete_status_really">Really delete status?</string>
+  <string name="no_result">Got no result from the server</string>
+
 </resources>

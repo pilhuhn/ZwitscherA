@@ -14,7 +14,6 @@
     <string name="direct_message_sent">Direct bericht verzonden</string>
     <string name="hello">Tweet hieronder invoeren:</string>
     <string name="app_name">Zwitscher</string>
-    <string name="loading">Tweets worden geladen…</string>
     <string name="no_connect">Geen verbinding met Twitter</string>
     <string name="TweetButton">Tweet dit!</string>
     <string name="ClearButton">Clear!</string>
@@ -35,7 +34,7 @@
     <string name="in_reply_to"> in antwoord op </string>
     <string name="via">" via "</string>
     <string name="send_direct_to">Direct bericht versturen naar: </string>
-    <string name="getting_tweets">Tweets ophalen</string>
+    <string name="getting_statuses">%ss ophalen …</string>
     <string name="getting_conversation">Conversatie ophalen</string>
     <string name="follow_user">Volg Twitteraar:</string>
     <string name="unfollow_user">Stop met volgen</string>

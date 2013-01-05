@@ -174,4 +174,11 @@ public class Account implements Parcelable {
         sb.append('}');
         return sb.toString();
     }
+
+    public String getStatusType() {
+        if (isStatusNet())
+            return "Dent";
+        else
+            return "Tweet";
+    }
 }
