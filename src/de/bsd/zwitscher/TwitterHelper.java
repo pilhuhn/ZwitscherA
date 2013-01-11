@@ -236,6 +236,31 @@ public class TwitterHelper {
 	}
 
     /**
+     * Retrieve the lists, the passed user is subscribed to. The returned
+     * list is filtered down to the lists the current account owns
+     * @param screenName Name of the user to investigate
+     * @return List of list names
+     */
+    public List<String> getListMembership(String screenName) {
+        List<String> userLists;
+        List<UserList> tmp;
+        try {
+            tmp = twitter.getUserListMemberships(screenName, -1, true);
+
+            userLists = new ArrayList<String>(tmp.size());
+            for (UserList ul : tmp) {
+                userLists.add(ul.getName());
+            }
+        }
+        catch (TwitterException te) {
+            te.printStackTrace();
+            userLists = Collections.emptyList();
+        }
+
+        return userLists;
+    }
+
+    /**
      * Get the default account from the tweet db.
      * @return Default account
      */
@@ -794,6 +819,16 @@ public class TwitterHelper {
         }
         return true;
     }
+
+    public boolean removeUserFromList(long userId, int listId) {
+            try {
+                twitter.destroyUserListMember(listId,userId);
+            } catch (TwitterException e) {
+                e.printStackTrace();  // TODO: Customise this generated block
+                return false;
+            }
+            return true;
+        }
 
     public List<Status> getUserTweets(Long userId) {
 

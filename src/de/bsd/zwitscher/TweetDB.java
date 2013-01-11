@@ -468,6 +468,27 @@ account)}, null, null, null);
 	}
 
     /**
+     * Get the lists the current account owns
+     * @param account Account that owns the lists
+     * @return Map with List name and list id
+     */
+    Map<String,Integer> getOwnedLists(Account account) {
+        Map<String,Integer> ret = new HashMap<String, Integer>();
+        Cursor c = db.query(TABLE_LISTS, new String[] {"name","id"}, ACCOUNT_ID_IS + " AND owner_name=?", new String[]{String.valueOf(
+                      account.getId()),account.getName()}, null, null, "name");
+      		if (c.getCount()>0){
+      			c.moveToFirst();
+      			do {
+                  String name = c.getString(0);  // 0 = name
+                  Integer id = c.getInt(1);
+                  ret.put(name, id );
+      			} while (c.moveToNext());
+      		}
+      		c.close();
+      		return ret;
+    }
+
+    /**
      * Add a new list to the database
      * @param account Id of the account to use
      * @param name Name of the lise

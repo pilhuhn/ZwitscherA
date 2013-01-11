@@ -135,6 +135,10 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
                 success = th.addUserToLists(request.userId,(int)request.id);
                 ret = new UpdateResponse(request.updateType,success,"Added");
                 break;
+            case REMOVE_FROM_LIST:
+                success = th.removeUserFromList(request.userId,(int)request.id);
+                ret = new UpdateResponse(request.updateType,success,"Removed");
+                break;
             case FOLLOW_UNFOLLOW:
                 success = th.followUnfollowUser(request.userId,request.someBool);
                 ret = new UpdateResponse(request.updateType,success,"Follow/Unfollow set");

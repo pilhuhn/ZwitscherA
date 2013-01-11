@@ -62,6 +62,8 @@ public class UserDetailActivity extends Activity  {
     private Account account;
     private MenuItem weAreFollowingMenuItem;
     private String userName;
+    List<String> userListNames ;
+    boolean listsLoaded = false;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,8 +98,7 @@ public class UserDetailActivity extends Activity  {
             theUser = thTwitterHelper.getUserById(userId,true);
             if (theUser!=null)
                 fillDetails(theUser,false);
-            else
-                reload();
+            reload();
         }
         else {
             reload();
@@ -309,26 +310,40 @@ public class UserDetailActivity extends Activity  {
     @SuppressWarnings("unused")
     public void addToList(View v) {
 
-        TweetDB tdb = TweetDB.getInstance(getApplicationContext());
+        TweetDB tdb = TweetDB.getInstance(this);
 
         List<String> data = new ArrayList<String>();
-        Set<Map.Entry<Integer,Pair<String,String>>> userListsEntries;
+        Set<Map.Entry<String,Integer>> userListsEntries;
 
-        userListsEntries = tdb.getLists(account.getId()).entrySet();
-        for (Map.Entry<Integer, Pair<String, String>> userList : userListsEntries) {
-            if (userList.getValue().second.equals(account.getName()))
-                data.add(userList.getValue().first);
+        int i = 0;
+        userListsEntries = tdb.getOwnedLists(account).entrySet();
+        boolean[] checked = new boolean[userListsEntries.size()];
+
+        for (Map.Entry<String,Integer> userList : userListsEntries) {
+            data.add(userList.getKey());
+            boolean found = false;
+            for (String listName : userListNames) {
+                if (listName.equals(userList.getKey())) {
+                    found = true;
+                }
+            }
+            checked[i] = found;
+            i++;
         }
 
         Intent intent = new Intent(this,MultiSelectListActivity.class);
         intent.putStringArrayListExtra("data", (ArrayList<String>) data);
-        intent.putExtra("mode","single");
+        // put enabled items separately
+        intent.putExtra("checked", checked);
+        intent.putExtra("mode","multiple");
 
         startActivityForResult(intent, 1);
     }
 
     /**
-     * Callback that is called after the user has selected a list
+     * Callback that is called after the user has selected a list. We need to go thhrough
+     * the result and check if an item was added or removed and then fire the respective
+     * task with the server.
      * @param requestCode selection code of the original event
      * @param resultCode result (ok, not ok)
      * @param data Data from the called Intent
@@ -338,24 +353,43 @@ public class UserDetailActivity extends Activity  {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode==1 && resultCode==RESULT_OK) {
-            String o = (String) data.getExtras().get("data");
+            long[] checkedOnes =  data.getLongArrayExtra("data");
 
             TweetDB tdb = TweetDB.getInstance(getApplicationContext());
-            Set<Map.Entry<Integer,Pair<String,String>>> userListsEntries;
+            Set<Map.Entry<String,Integer>> userListsEntries;
 
-            int listId;
-            userListsEntries = tdb.getLists(account.getId()).entrySet();
-            for (Map.Entry<Integer, Pair<String, String>> userList : userListsEntries) {
-                Pair<String,String> nameOwnerPair = userList.getValue();
-                if (o.equals(nameOwnerPair.first) && nameOwnerPair.second.equals(account.getName())) {
-                    listId = userList.getKey();
-                    UpdateRequest request = new UpdateRequest(UpdateType.ADD_TO_LIST);
-                    request.id=listId;
-                    request.userId=theUser.getId();
-                    new UpdateStatusTask(this,pg,account).execute(request);
+            userListsEntries = tdb.getOwnedLists(account).entrySet();
+            int i = 0;
+            for (Map.Entry<String,Integer> userList : userListsEntries) {
+                String listName = userList.getKey();
+                if (userListNames.contains(listName)) { // the stored lists contains the above userList
+                    if (!isChecked(checkedOnes,i)) {
+                        // not checked -> user wants to remove the list
+                        UpdateRequest request = new UpdateRequest(UpdateType.REMOVE_FROM_LIST);
+                        request.id = userList.getValue();
+                        request.userId=theUser.getId();
+                        new UpdateStatusTask(this,pg,account).execute(request);
+                    }
+
+                } else {
+                    if (isChecked(checkedOnes,i)) {
+                        UpdateRequest request = new UpdateRequest(UpdateType.ADD_TO_LIST);
+                        request.id=userList.getValue();
+                        request.userId=theUser.getId();
+                        new UpdateStatusTask(this,pg,account).execute(request);
+                    }
                 }
+                i++;
             }
         }
+    }
+
+    private boolean isChecked(long[] checkedOnes, int pos) {
+        for (long tmp : checkedOnes) {
+            if (tmp==pos)
+                return true;
+        }
+        return false;
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -375,6 +409,10 @@ public class UserDetailActivity extends Activity  {
             MenuItem pgItem  = menu.findItem(R.id.ProgressBar);
             pg = (ProgressBar) pgItem.getActionView();
             pg.setVisibility(ProgressBar.INVISIBLE);
+
+            MenuItem listsItem = menu.findItem(R.id.addToList);
+            listsItem.setEnabled(listsLoaded);
+
             return true;
         }
         return false;
@@ -484,6 +522,7 @@ public class UserDetailActivity extends Activity  {
 
             }
 
+            userListNames = thTwitterHelper.getListMembership(user.getScreenName());
 
             Boolean isFriend = thTwitterHelper.areWeFollowing(userId);
             weAreFollowing = isFriend;
@@ -531,6 +570,9 @@ public class UserDetailActivity extends Activity  {
             Drawable background = (Drawable) params[2];
             if (background!=null)
                 getWindow().setBackgroundDrawable(background);
+
+            listsLoaded = true;
+            invalidateOptionsMenu();
         }
     }
 }
