@@ -143,10 +143,24 @@ public class LoginActivity extends Activity {
 		EditText passwordText = (EditText) findViewById(R.id.login_password);
 		String password = passwordText.getText().toString();
 		Spinner spinner = (Spinner) findViewById(R.id.spinner1);
-		String service = spinner.getSelectedItem().toString();
+		String tmp = spinner.getSelectedItem().toString();
+        Account.Type service = Account.Type.valueOf(tmp);
+
+        String url;
+        switch (service) {
+            case IDENTICA:
+                url = "https://identi.ca";
+                break;
+//            case STATUSNET:   TODO add url to login screen
+//                url = urlView.getText().toString();
+//                break;
+            default:
+                url = " - do not care -";
+        }
+
 
         try {
-            new CreateAccountTask(this,user,password,service,true).execute().get();
+            new CreateAccountTask(this,user,password,service,true, url).execute().get();
             Log.i("Login.xauth","Account created");
             proceed();
         } catch (InterruptedException e) {

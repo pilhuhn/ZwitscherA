@@ -19,25 +19,28 @@ class CreateAccountTask extends AsyncTask<Void,Void,String> {
     private Activity context;
     private String username;
     private String password;
-    private String service;
+    private Account.Type service;
     private boolean shouldSwitch;
+    private String url;
 
-    public CreateAccountTask(Activity context,String username, String password, String service, boolean shouldSwitch) {
+    public CreateAccountTask(Activity context, String username, String password, Account.Type service, boolean shouldSwitch, String url) {
         this.context=context;
         this.username = username;
         this.password = password;
         this.service = service;
         this.shouldSwitch = shouldSwitch;
+        this.url = url;
     }
 
     protected String doInBackground(Void... voids) {
         TwitterHelper th = new TwitterHelper(context,null);
         try {
-            Account account = th.generateAccountWithXauth(username, password, service, shouldSwitch);
+            Account account = th.generateAccountWithXauth(username, password, service, shouldSwitch, url);
             AccountHolder.getInstance(context).setAccount(account);
             return "OK";
         } catch (Exception e) {
-            return context.getString(R.string.login_failed) + e.getLocalizedMessage();
+            e.printStackTrace();
+            return context.getString(R.string.login_failed) + " " + e.getLocalizedMessage();
         }
 
     }

@@ -902,13 +902,16 @@ account)}, null, null, null);
         if (c.getCount()>0) {
             c.moveToFirst();
             boolean isDefault = c.getInt(6) == 1;
+            String accString = c.getString(5);
+            accString = accString.replaceAll("\\.","");
+            accString = accString.toUpperCase();
             account = new Account(
                     c.getInt(0), // id
                     c.getString(1), // name
                     c.getString(2), // token key
                     c.getString(3), // token secret
                     c.getString(4), // url
-                    c.getString(5), // type /5)
+                    Account.Type.valueOf(accString), // type /5)
                     isDefault // 6
             );
             account.setPassword(c.getString(7));
@@ -949,15 +952,19 @@ account)}, null, null, null);
             c.moveToFirst();
             do {
                 boolean isDefault = c.getInt(6) == 1;
+                String accString = c.getString(5);
+                accString = accString.replaceAll("\\.","");
+                accString = accString.toUpperCase();
+
                 Account account = new Account(
                         c.getInt(0), // id
                         c.getString(1), // name
                         c.getString(2), // token key
                         c.getString(3), // token secret
                         c.getString(4), // url
-                        c.getString(5), // type /5)
+                        Account.Type.valueOf(accString), // type /5)
                         isDefault // 6
-                );
+                        );
                 account.setPassword(c.getString(7));
                 accounts.add(account);
             } while (c.moveToNext());
@@ -970,7 +977,7 @@ account)}, null, null, null);
     public Account getAccountForType(String s) {
         List<Account> accounts = getAccountsForSelection();
         for (Account account : accounts) {
-            if (account.getServerType().equalsIgnoreCase(s))
+            if (account.getServerType().name().equalsIgnoreCase(s))
                 return account;
         }
         return null;
@@ -1007,7 +1014,7 @@ account)}, null, null, null);
         cv.put("tokenKey",account.getAccessTokenKey());
         cv.put("tokenSecret",account.getAccessTokenSecret());
         cv.put("serverUrl", account.getServerUrl());
-        cv.put("serverType", account.getServerType());
+        cv.put("serverType", account.getServerType().name());
         cv.put("isDefault",account.isDefaultAccount() ? 1 : 0);
         cv.put("password",account.getPassword());
 

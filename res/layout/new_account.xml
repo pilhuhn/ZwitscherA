@@ -6,6 +6,13 @@
   android:orientation="vertical"
         >
 
+<TextView android:text="@string/new_account_welcome"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:gravity="center"
+  android:layout_gravity="center_horizontal"
+  />
+
 <TextView
   	android:id="@+id/NewAccountTitle"
   	android:layout_width="wrap_content"
@@ -31,13 +38,15 @@
         <TableRow>
             <TextView android:text="@string/username"
                     style="@style/text"/>
-            <EditText android:id="@+id/new_account_username"/>
+            <EditText android:id="@+id/new_account_username"
+              />
         </TableRow>
         <TableRow>
             <TextView android:text="@string/password"
                     style="@style/text"/>
             <EditText android:id="@+id/new_account_password"
-                    android:password="true"/>
+                    android:password="true"
+              />
         </TableRow>
         <TableRow>
             <TextView android:text="@string/new_account_switch"
@@ -46,6 +55,16 @@
                       android:checked="true"
                       />
         </TableRow>
+      <TableRow android:id="@+id/new_account_url_row">
+          <TextView android:text="Server base URL"
+            android:id="@+id/new_account_url_text"
+                  style="@style/text"/>
+          <EditText android:id="@+id/new_account_url_edit"
+            android:inputType="textUri"
+            android:hint="http://statusnet.do.main/"
+            />
+      </TableRow>
+
     </TableLayout>
 
    <Button

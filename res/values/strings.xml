@@ -198,5 +198,6 @@
   <string name="delete_status">Delete status…</string>
   <string name="delete_status_really">Really delete status?</string>
   <string name="no_result">Got no result from the server</string>
+  <string name="new_account_welcome">Use this screen to create a new account</string>
 
 </resources>

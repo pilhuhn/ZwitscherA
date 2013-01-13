@@ -36,7 +36,6 @@ import twitter4j.media.MediaProvider;
 
 public class TwitterHelper {
 
-    private static final String HTTP_IDENTI_CA_API = "http://identi.ca/api/";
     private Context context;
     private TweetDB tweetDB;
     private Twitter twitter;
@@ -99,7 +98,7 @@ public class TwitterHelper {
 
         }
         catch (Exception e) {
-            System.err.println("Got exception: " + e.getMessage() );
+            Log.e("TwitterHelper","getTimeline: Got exception: " + e.getMessage() );
             if (e.getCause()!=null)
                 System.err.println("   " + e.getCause().getMessage());
             statuses = new ArrayList<Status>();
@@ -281,7 +280,7 @@ public class TwitterHelper {
         MediaProvider mediaProvider = getMediaProvider();
 
         if (account!=null) {
-            if (account.getServerType().equalsIgnoreCase("twitter")) {
+            if (account.getServerType()== Account.Type.TWITTER) {
                 ConfigurationBuilder cb = new ConfigurationBuilder();
                 cb.setIncludeEntitiesEnabled(true);
                 cb.setJSONStoreEnabled(true);
@@ -289,22 +288,20 @@ public class TwitterHelper {
                 Configuration conf = cb.build();
                 OAuthAuthorization auth = new OAuthAuthorization(conf);
                 auth.setOAuthAccessToken(new AccessToken(account.getAccessTokenKey(), account.getAccessTokenSecret()));
-                auth.setOAuthConsumer(Tokens.consumerKey,Tokens.consumerSecret);
+                auth.setOAuthConsumer(Tokens.consumerKey, Tokens.consumerSecret);
                 Twitter twitterInstance = new TwitterFactory(conf).getInstance(auth);
-/*
-                        Tokens.consumerKey,
-                        Tokens.consumerSecret,
-                        new AccessToken(account.getAccessTokenKey(), account.getAccessTokenSecret()));
-*/
                 return twitterInstance;
             }
-            else if (account.getServerType().equalsIgnoreCase("identi.ca")) {
+            else if (account.getServerType()== Account.Type.IDENTICA || account.getServerType()== Account.Type.STATUSNET) {
+                String base = account.getServerUrl();
+                base += "/api/";
+
                 ConfigurationBuilder cb = new ConfigurationBuilder();
-                cb.setRestBaseURL(HTTP_IDENTI_CA_API);
+                cb.setRestBaseURL(base);
 //                cb.setSearchBaseURL(HTTP_IDENTI_CA_API);
-                cb.setOAuthAccessTokenURL("https://identi.ca/api/oauth/access_token");
-                cb.setOAuthAuthorizationURL("https://identi.ca/api/oauth/authorize");
-                cb.setOAuthRequestTokenURL("https://identi.ca/api/oauth/request_token");
+                cb.setOAuthAccessTokenURL(base + "oauth/access_token");
+                cb.setOAuthAuthorizationURL(base + "oauth/authorize");
+                cb.setOAuthRequestTokenURL(base + "oauth/request_token");
                 cb.setIncludeEntitiesEnabled(true);
                 cb.setJSONStoreEnabled(true);
                 Configuration conf = cb.build() ;
@@ -364,7 +361,7 @@ public class TwitterHelper {
 		AccessToken accessToken = twitterInstance.getOAuthAccessToken(requestToken, pin);
 
         int newId = tweetDB.getNewAccountId();
-        Account account = new Account(newId,accessToken.getScreenName(),accessToken.getToken(),accessToken.getTokenSecret(),null,"twitter",true);
+        Account account = new Account(newId,accessToken.getScreenName(),accessToken.getToken(),accessToken.getTokenSecret(),null, Account.Type.TWITTER,true);
 
 	    tweetDB.insertOrUpdateAccount(account);
 
@@ -376,19 +373,21 @@ public class TwitterHelper {
      *
      *
      *
+     *
      * @param username Username to get the token for
      * @param password password of that user and service
-     * @param service service to use. Currently supported are twitter and identi.ca
+     * @param serviceType service to use. Currently supported are twitter and identi.ca
      * @param makeDefault  @throws Exception If the server can not be reached or the credentials are not valid
+     * @param baseUrl
      * @return id of the account
      * @throws Exception when anything goes wrong (e.g wrong username/password etc.)
      */
-    public Account generateAccountWithXauth(String username, String password, String service, boolean makeDefault) throws Exception {
+    public Account generateAccountWithXauth(String username, String password, Account.Type serviceType, boolean makeDefault, String baseUrl) throws Exception {
         ConfigurationBuilder cb = new ConfigurationBuilder();
         Twitter twitterInstance;
         Account account = null;
 
-        if (service.equalsIgnoreCase("twitter")) {
+        if (serviceType== Account.Type.TWITTER) {
             cb.setOAuthConsumerKey(Tokens.consumerKey);
             cb.setOAuthConsumerSecret(Tokens.consumerSecret);
             cb.setIncludeEntitiesEnabled(true);
@@ -398,20 +397,21 @@ public class TwitterHelper {
             twitterInstance = new TwitterFactory(conf).getInstance(auth);
             AccessToken accessToken = twitterInstance.getOAuthAccessToken();
             int newId = tweetDB.getNewAccountId();
-            account = new Account(newId,username,accessToken.getToken(),accessToken.getTokenSecret(),null,"twitter",makeDefault);
+            account = new Account(newId,username,accessToken.getToken(),accessToken.getTokenSecret(),null, Account.Type.TWITTER,makeDefault);
             // TODO determine account id via db sequence?
             tweetDB.insertOrUpdateAccount(account);
             if (makeDefault)
                 tweetDB.setDefaultAccount(newId);
 
         }
-        else if (service.equalsIgnoreCase("identi.ca")) {
-            cb.setRestBaseURL(HTTP_IDENTI_CA_API);
-//            cb.setSearchBaseURL(HTTP_IDENTI_CA_API);
-            cb.setOAuthAccessTokenURL("https://identi.ca/api/oauth/access_token");
-//            cb.setOAuthAuthenticationURL();
-            cb.setOAuthAuthorizationURL("https://identi.ca/api/oauth/authorize");
-            cb.setOAuthRequestTokenURL("https://identi.ca/api/oauth/request_token");
+        else if (serviceType== Account.Type.IDENTICA || serviceType == Account.Type.STATUSNET) {
+
+            Log.i("TwitterHelper","generateAccount with baseUrl="+baseUrl);
+
+            cb.setRestBaseURL(baseUrl + "api/");
+            cb.setOAuthAccessTokenURL(baseUrl + "api/oauth/access_token");
+            cb.setOAuthAuthorizationURL(baseUrl + "api/oauth/authorize");
+            cb.setOAuthRequestTokenURL(baseUrl + "api/oauth/request_token");
             cb.setJSONStoreEnabled(true);
             Configuration conf = cb.build() ;
             TwitterFactory twitterFactory = new TwitterFactory(conf);
@@ -425,7 +425,7 @@ public class TwitterHelper {
 
             // TODO determine account id via db sequence?
             int newId = tweetDB.getNewAccountId();
-            account = new Account(newId,username,null,service,makeDefault,password);
+            account = new Account(newId,username,baseUrl, serviceType,makeDefault,password);
             tweetDB.insertOrUpdateAccount(account);
             if (makeDefault)
                 tweetDB.setDefaultAccount(newId);

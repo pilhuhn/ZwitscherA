@@ -134,7 +134,7 @@ public class TabWidget extends TabActivity {
         tabHost.addTab(homeSpec);
 
 
-        if (account.getServerType().equalsIgnoreCase("twitter")) {
+        if (account.getServerType()== Account.Type.TWITTER) {
             tmp = getString(R.string.list);
             Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
             listsIntent.putExtra("list",0);
@@ -161,7 +161,7 @@ public class TabWidget extends TabActivity {
         tabHost.addTab(homeSpec);
 
 
-        if (account.getServerType().equalsIgnoreCase("twitter")) {
+        if (account.getServerType()== Account.Type.TWITTER) {
 
             Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
             searchIntent.putExtra("list",1);
@@ -334,7 +334,7 @@ public class TabWidget extends TabActivity {
 	private void syncLists() {
 		TwitterHelper th = new TwitterHelper(this, account);
         TweetDB tdb = TweetDB.getInstance(getApplicationContext());
-        if (account.getServerType().equalsIgnoreCase("twitter")) {
+        if (account.getServerType()== Account.Type.TWITTER) {
             List<UserList> userLists = th.getUserLists();
             Map<Integer, Pair<String, String>> storedLists = tdb.getLists(accountId);
             List<Integer> storedListIds = new ArrayList<Integer>(storedLists.size());

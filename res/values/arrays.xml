@@ -40,6 +40,7 @@
     <string-array name="services">
         <item>Twitter</item>
         <item>Identi.ca</item>
+        <item>Generic status net</item>
     </string-array>
     <string-array name="prefs_screen_name">
         <item>User</item>

@@ -13,12 +13,12 @@ public class Account implements Parcelable {
     private String name;
     private String accessTokenKey;
     private String accessTokenSecret;
-    private String serverType;
+    private Type serverType;
     private String serverUrl;
     private boolean defaultAccount;
     private String password;
 
-    public Account(int id, String name, String accessTokenKey, String accessTokenSecret, String serverUrl, String serverType,boolean defaultAccount) {
+    public Account(int id, String name, String accessTokenKey, String accessTokenSecret, String serverUrl, Type serverType,boolean defaultAccount) {
         this.id = id;
         this.name = name;
         this.accessTokenKey = accessTokenKey;
@@ -28,7 +28,7 @@ public class Account implements Parcelable {
         this.defaultAccount = defaultAccount;
     }
 
-    public Account(int id, String name, String serverUrl, String serverType, boolean defaultAccount, String password) {
+    public Account(int id, String name, String serverUrl, Type serverType, boolean defaultAccount, String password) {
         this.id = id;
         this.name = name;
         this.serverUrl = serverUrl;
@@ -42,7 +42,7 @@ public class Account implements Parcelable {
         name = parcel.readString();
         accessTokenKey = parcel.readString();
         accessTokenSecret = parcel.readString();
-        serverType = parcel.readString();
+        serverType = Type.valueOf(parcel.readString());
         serverUrl  = parcel.readString();
         defaultAccount = parcel.readInt() == 1;
         password = parcel.readString();
@@ -73,11 +73,15 @@ public class Account implements Parcelable {
         this.accessTokenSecret = accessTokenSecret;
     }
 
-    public String getServerType() {
+    public Type getServerType() {
         return serverType;
     }
 
     public String getServerUrl() {
+
+        if (serverType==Type.IDENTICA)
+            return "https://identi.ca/";
+
         return serverUrl;
     }
 
@@ -96,9 +100,9 @@ public class Account implements Parcelable {
     }
 
     public boolean isStatusNet() {
-        return !serverType.equalsIgnoreCase("twitter");
-
+        return serverType!=Type.TWITTER;
     }
+
     /**
      * Return a canonical representation of this account that can be used
      * within various places in the UI
@@ -109,7 +113,7 @@ public class Account implements Parcelable {
             return name + "@" + serverUrl;
         }
         else {
-            return name + "@" + serverType;
+            return name + "@" + serverType.getServerTypeName();
         }
     }
 
@@ -122,7 +126,7 @@ public class Account implements Parcelable {
         parcel.writeString(name);
         parcel.writeString(accessTokenKey);
         parcel.writeString(accessTokenSecret);
-        parcel.writeString(serverType);
+        parcel.writeString(serverType.name());
         parcel.writeString(serverUrl);
         parcel.writeInt(defaultAccount ? 1 : 0);
         parcel.writeString(password);
@@ -180,5 +184,27 @@ public class Account implements Parcelable {
             return "Dent";
         else
             return "Tweet";
+    }
+
+    public enum Type {
+        TWITTER("Twitter","Tweet"),
+        IDENTICA("Identi.ca","Dent"),
+        STATUSNET("Status.net","Dent")
+        ;
+        private String serverTypeName;
+        private final String statusName;
+
+        private Type(String serverTypeName, String statusName) {
+            this.serverTypeName = serverTypeName;
+            this.statusName = statusName;
+        }
+
+        public String getServerTypeName() {
+            return serverTypeName;
+        }
+
+        public String getStatusName() {
+            return statusName;
+        }
     }
 }
