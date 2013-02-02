@@ -423,7 +423,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 post(null);
                 break;
             default:
-                Log.i(getClass().getName(),"Unknown item " + item);
+                Log.i("TweetListActivity","Unknown item " + item);
 
         }
 

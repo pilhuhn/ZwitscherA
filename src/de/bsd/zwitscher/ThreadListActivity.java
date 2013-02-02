@@ -105,7 +105,7 @@ public class ThreadListActivity extends ListActivity {
                 finish();
                 break;
             default:
-                Log.e(getClass().getName(), "Unknown item " + item);
+                Log.e("ThreadListActivity", "Unknown item " + item);
 
         }
 

@@ -444,7 +444,7 @@ public class UserDetailActivity extends Activity  {
                 break;
 
             default:
-                Log.e(getClass().getName(), "Unknown menu item: " + item.toString());
+                Log.e("UserDetailActivity", "Unknown menu item: " + item.toString());
 
         }
 

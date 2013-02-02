@@ -571,7 +571,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
                 break;
 
             default:
-                Log.e(getClass().getName(),"Unknown menu item: " + item.toString());
+                Log.e("NewTweetActivity","Unknown menu item: " + item.toString());
 
         }
 

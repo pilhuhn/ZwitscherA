@@ -860,7 +860,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 break;
 
             default:
-                Log.e(getClass().getName(),"Unknown menu item: " + item.toString());
+                Log.e("OneTweetActivity","Unknown menu item: " + item.toString());
         }
 
         return true;
