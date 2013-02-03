@@ -100,6 +100,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 		lv.setOnItemLongClickListener(this); // Directly got to reply
 
         Bundle intentInfo = getIntent().getExtras();
+        boolean fetchAnyway = false;
         if (intentInfo==null) {
             list_id = 0;
         } else {
@@ -116,10 +117,17 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             if (intentInfo.containsKey("unreadCount")) {
                 unreadCount = intentInfo.getInt("unreadCount");
             }
+            fetchAnyway = intentInfo.getBoolean("forceFetch",false);
         }
 
+        // Only get tweets from db to speed things up at start
         boolean fromDbOnly = tdb.getLastRead(account.getId(), list_id) != -1;
-        fillListViewFromTimeline(fromDbOnly); // Only get tweets from db to speed things up at start
+
+        // If fetchAnyway is set, override - happens when switching accounts
+        if (fetchAnyway)
+            fromDbOnly = false;
+
+        fillListViewFromTimeline(fromDbOnly);
     }
 
     @Override

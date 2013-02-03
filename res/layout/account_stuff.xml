@@ -23,6 +23,7 @@
             android:text="@string/select_account_select"
             android:layout_below="@id/NewAccountButton"
             android:textStyle="bold"
+            android:paddingTop="30dp"
             />
 
     <Spinner android:id="@+id/select_account_spinner"

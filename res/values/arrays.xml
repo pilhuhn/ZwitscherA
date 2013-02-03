@@ -38,6 +38,7 @@
         <item>twitter</item>
     </string-array>
     <string-array name="services">
+        <item>Twitter with OAuth (1st time user)</item>
         <item>Twitter</item>
         <item>Identi.ca</item>
         <item>Generic status net</item>

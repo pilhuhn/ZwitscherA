@@ -1,6 +1,7 @@
 package de.bsd.zwitscher.account;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -32,9 +33,15 @@ public class NewAccountActivity extends Activity {
         serviceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                urlRow.setEnabled(position==2);
-                urlText.setEnabled(position==2);
-                urlEdit.setEnabled(position==2);
+                urlRow.setEnabled(position==3);
+                urlText.setEnabled(position==3);
+                urlEdit.setEnabled(position==3);
+
+                TextView usernameView = (TextView) findViewById(R.id.new_account_username);
+                TextView passwordView = (TextView) findViewById(R.id.new_account_password);
+
+                usernameView.setEnabled(position!=0);
+                passwordView.setEnabled(position!=0);
             }
 
             @Override
@@ -65,7 +72,7 @@ public class NewAccountActivity extends Activity {
         Account.Type service ;
         String url;
 
-        if (tmp.equalsIgnoreCase("twitter")) {
+        if (tmp.toLowerCase().startsWith("twitter")) {
             service = Account.Type.TWITTER;
             url = " - do not care -";
         } else if (tmp.equalsIgnoreCase("identi.ca")) {
@@ -86,7 +93,17 @@ public class NewAccountActivity extends Activity {
 
         boolean shouldSwitch = switchBox.isChecked();
 
-        new CreateAccountTask(this,username,password,service,shouldSwitch, url).execute();
+        if (serviceSpinner.getSelectedItemId()==0) { // Twitter with OAuth
+            Intent i = new Intent(this,TwitterLoginActivity.class);
+            startActivity(i);
+
+            if (shouldSwitch) {
+                // TODO
+            }
+        }
+        else {
+            new CreateAccountTask(this,username,password,service,shouldSwitch, url).execute();
+        }
 
     }
 }

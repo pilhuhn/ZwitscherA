@@ -64,6 +64,10 @@ public class LoginActivity extends Activity {
             alert.show();
         }
 
+        Intent i = new Intent(this,NewAccountActivity.class);
+        startActivity(i);
+
+/*
         // TODO change this here, as identi.ca / status.net has nothing to do with Twitter xauth/oauth
 		if (Tokens.xAuthEnabled) { // TODO what about identi.ca
 													// etc? -> 2 step 1st type
@@ -71,7 +75,7 @@ public class LoginActivity extends Activity {
 			setContentView(R.layout.login_layout_classic);
 		} else {
 			setContentView(R.layout.login_layout);
-		}
+		}*/
 	}
 
 	/**

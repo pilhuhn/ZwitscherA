@@ -110,7 +110,12 @@ public class Account implements Parcelable {
      */
     public String getAccountIdentifier() {
         if (serverUrl!=null && !(serverUrl.length() == 0)) {
-            return name + "@" + serverUrl;
+            String tmp = serverUrl;
+            if (tmp.startsWith("http") && tmp.contains("://"))
+                tmp = tmp.substring(tmp.indexOf(":")+3);
+            if (tmp.endsWith("/"))
+                tmp = tmp.substring(0,tmp.length()-1);
+            return name + "@" + tmp;
         }
         else {
             return name + "@" + serverType.getServerTypeName();
