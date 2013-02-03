@@ -92,17 +92,19 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         if ( dataString!=null) {
             // Lets see what server type that is and get an account for it
             // so that we can access the data
+            // This works even with multiple twitter or identica accounts, as we just need one
+            // account to access the data at all
             if (dataString.contains("://twitter.com")) {
                 TweetDB tmp = TweetDB.getInstance(getApplicationContext());
-                account = tmp.getAccountForType("twitter");
+                account = tmp.getAccountForType(Account.Type.TWITTER);
             }
             else if (dataString.contains("://identi.ca")) {
                 TweetDB tmp = TweetDB.getInstance(getApplicationContext());
-                account = tmp.getAccountForType("identi.ca");
+                account = tmp.getAccountForType(Account.Type.IDENTICA);
 
             }
             else {
-                // TODO for e.g. generic status.net
+                // TODO for e.g. generic status.net - loop over existing accounts and check if the base url matches?
             }
 
             if (dataString.matches("http://twitter.com/.*/status/.*$")) {

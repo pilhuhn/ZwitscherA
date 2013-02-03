@@ -895,30 +895,17 @@ account)}, null, null, null);
                 new String[]{String.valueOf(userId), String.valueOf(account)});
     }
 
+    /**
+     * Return the default account or null if no (default) account is found.
+     * As one account is always supposed to be default, null is in fact only
+     * returned if no account is stored in the database.
+     * @return The default account or null
+     */
     public Account getDefaultAccount(){
-        Cursor c;
-        Account account=null;
-        c = db.query(TABLE_ACCOUNTS,null,"isDefault=1", null,null,null,null);
-        if (c.getCount()>0) {
-            c.moveToFirst();
-            boolean isDefault = c.getInt(6) == 1;
-            String accString = c.getString(5);
-            accString = accString.replaceAll("\\.","");
-            accString = accString.toUpperCase();
-            account = new Account(
-                    c.getInt(0), // id
-                    c.getString(1), // name
-                    c.getString(2), // token key
-                    c.getString(3), // token secret
-                    c.getString(4), // url
-                    Account.Type.valueOf(accString), // type /5)
-                    isDefault // 6
-            );
-            account.setPassword(c.getString(7));
-        }
-        c.close();
-        return account;
-
+        List<Account> accounts = getAccountsForSelection(true);
+        if (accounts.size()==0)
+            return null;
+        return accounts.get(0);
     }
 
     /**
@@ -944,10 +931,15 @@ account)}, null, null, null);
     }
 
 
-    public List<Account> getAccountsForSelection() {
+    public List<Account> getAccountsForSelection(boolean defaultOnly) {
+        String selection = null;
+        if (defaultOnly) {
+            selection="isDefault=1";
+        }
+
         Cursor c;
         List<Account> accounts = new ArrayList<Account>();
-        c = db.query(TABLE_ACCOUNTS,null, null,null,null,null,null);
+        c = db.query(TABLE_ACCOUNTS,null, selection,null,null,null,null);
         if (c.getCount()>0) {
             c.moveToFirst();
             do {
@@ -974,10 +966,10 @@ account)}, null, null, null);
         return accounts;
     }
 
-    public Account getAccountForType(String s) {
-        List<Account> accounts = getAccountsForSelection();
+    public Account getAccountForType(Account.Type type) {
+        List<Account> accounts = getAccountsForSelection(false);
         for (Account account : accounts) {
-            if (account.getServerType().name().equalsIgnoreCase(s))
+            if (account.getServerType()==type)
                 return account;
         }
         return null;

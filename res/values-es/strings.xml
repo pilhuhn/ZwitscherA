@@ -100,7 +100,7 @@ Sólo tienes que hacer esto una vez en el inicio de sesión
 <string name="new_account_create_title">Crear cuenta</string>
 <string name="new_account_switch">Cambiar al nuevo usuario</string>
 <string name="new_account_create">Crear!</string>
-<string name="menu_switch_account">Cuentas</string>
+<string name="menu_switch_account">Cuentas…</string>
 <string name="select_account_delete">Borrar cuenta…</string>
 <string name="really_delete">Borrar realmente</string>
 <string name="menu_clean_statuses">Limpiar mensajes</string>

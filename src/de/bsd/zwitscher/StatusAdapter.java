@@ -85,6 +85,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
             viewHolder = new ViewHolder();
             viewHolder.iv = (UserImageView) convertView.findViewById(R.id.ListImageView);
+            viewHolder.iv.setFocusable(false);
             viewHolder.statusText = (TextView) convertView.findViewById(R.id.ListTextView);
             viewHolder.userInfo = (TextView) convertView.findViewById(R.id.ListUserView);
             viewHolder.timeClientInfo = (TextView) convertView.findViewById(R.id.ListTimeView);

@@ -6,18 +6,14 @@
   android:orientation="vertical"
         >
 
-<TextView android:text="@string/new_account_welcome"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  android:gravity="center"
-  android:layout_gravity="center_horizontal"
-  />
 
 <TextView
   	android:id="@+id/NewAccountTitle"
   	android:layout_width="wrap_content"
   	android:layout_height="wrap_content"
   	android:text="@string/new_account_create_title"
+    android:textStyle="bold"
+    android:textSize="20dp"
   	/>
 
     <TableLayout android:layout_height="wrap_content"
@@ -35,20 +31,20 @@
                 android:entries="@array/services"
             />
         </TableRow>
-        <TableRow>
+        <TableRow android:id="@+id/new_account_username_row">
             <TextView android:text="@string/username"
                     style="@style/text"/>
             <EditText android:id="@+id/new_account_username"
               />
         </TableRow>
-        <TableRow>
+        <TableRow android:id="@+id/new_account_password_row">
             <TextView android:text="@string/password"
                     style="@style/text"/>
             <EditText android:id="@+id/new_account_password"
                     android:password="true"
               />
         </TableRow>
-        <TableRow>
+        <TableRow android:id="@+id/new_account_switch_row">
             <TextView android:text="@string/new_account_switch"
                       style="@style/text"/>
             <CheckBox android:id="@+id/new_account_switch"
@@ -67,7 +63,7 @@
 
     </TableLayout>
 
-   <Button
+   <Button android:id="@+id/new_account_create_button"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:text="@string/new_account_create"

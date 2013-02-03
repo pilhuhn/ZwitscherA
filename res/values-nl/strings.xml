@@ -114,7 +114,7 @@
     <string name="new_account_create_title">Creeër account</string>
     <string name="new_account_switch">Overschakelen naar nieuw</string>
     <string name="new_account_create">Creeër!</string>
-    <string name="menu_switch_account">Accounts wisselen</string>
+    <string name="menu_switch_account">Accounts wisselen…</string>
     <string name="select_account_delete">Account verwijderen</string>
     <string name="really_delete">Delete. Echt.</string>
     <string name="menu_clean_statuses">Status vervallen</string>

@@ -117,7 +117,7 @@
     <string name="new_account_create_title">Create account</string>
     <string name="new_account_switch">Switch to new</string>
     <string name="new_account_create">Create!</string>
-    <string name="menu_switch_account">Accounts</string>
+    <string name="menu_switch_account">Accounts…</string>
     <string name="select_account_delete">Delete Account…</string>
     <string name="really_delete">Really delete</string>
     <string name="menu_clean_statuses">Clean up Statuses</string>
@@ -198,6 +198,10 @@
   <string name="delete_status">Delete status…</string>
   <string name="delete_status_really">Really delete status?</string>
   <string name="no_result">Got no result from the server</string>
-  <string name="new_account_welcome">Use this screen to create a new account</string>
+  <string name="account_add">Add account…</string>
+  <string name="account_remove">Remove selected account…</string>
+  <string name="offline_turn_on_networking">You seem to be offline. Please turn on networking and come back.</string>
+  <string name="ok">OK</string>
+  <string name="continue_msg">Continue…</string>
 
 </resources>

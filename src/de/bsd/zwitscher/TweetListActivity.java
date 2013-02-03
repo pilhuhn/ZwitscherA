@@ -95,6 +95,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             imageButton.setVisibility(View.VISIBLE);
         }
         lv = getListView();
+        lv.setItemsCanFocus(false);
         lv.setOnScrollListener(this);
 		lv.setOnItemClickListener(this);
 		lv.setOnItemLongClickListener(this); // Directly got to reply
@@ -721,7 +722,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             if (!fromDbOnly && updateListAdapter) {
                 Log.i("GTLTask", " scroll to " + result.getNumOriginal());
                 // TODO modify to scroll to last-read position
-                getListView().setSelection(result.getNumOriginal() - 1);
+                int position = result.getNumOriginal() - 1;
+                if (position>0) {
+                    getListView().setSelection(position);
+                }
             }
             if (progressBar !=null)
                 progressBar.setVisibility(ProgressBar.INVISIBLE);

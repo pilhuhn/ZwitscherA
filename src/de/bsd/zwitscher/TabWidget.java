@@ -226,7 +226,7 @@ public class TabWidget extends TabActivity {
             break;
         case R.id.DevelDumpAccounts:
             TweetDB tmpDb = TweetDB.getInstance(getApplicationContext());
-            List<Account> allAccounts = tmpDb.getAccountsForSelection();
+            List<Account> allAccounts = tmpDb.getAccountsForSelection(false);
             for (Account a : allAccounts)
                 System.out.println(a);
             break;

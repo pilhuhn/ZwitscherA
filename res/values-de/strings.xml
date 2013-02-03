@@ -113,7 +113,7 @@
     <string name="new_account_create_title">Account anlegen</string>
     <string name="new_account_switch">Zum neuen Account wechseln</string>
     <string name="new_account_create">Anlegen!</string>
-    <string name="menu_switch_account">Accounts</string>
+    <string name="menu_switch_account">Accounts…</string>
     <string name="select_account_delete">Account löschen…</string>
     <string name="really_delete">Wirklich löschen:</string>
     <string name="menu_clean_statuses">Status aufräumen</string>
@@ -188,5 +188,10 @@
   <string name="delete_status">Status löschen…</string>
   <string name="delete_status_really">Status wirklich löschen?</string>
   <string name="no_result">Keine Daten vom Server erhalten</string>
+  <string name="account_add">Account hinzufügen…</string>
+  <string name="account_remove">Account löschen…</string>
+  <string name="offline_turn_on_networking">Es scheint keine Netzwerkverbindung zu geben. Bitte stellen Sie eine Netzwerkverbindung her und starten die Anwendung erneut.</string>
+  <string name="ok">Ok</string>
+  <string name="continue_msg">Weiter…</string>
 
 </resources>

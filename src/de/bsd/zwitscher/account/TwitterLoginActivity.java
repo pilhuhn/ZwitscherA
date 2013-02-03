@@ -60,8 +60,6 @@ public class TwitterLoginActivity extends Activity {
 
     }
 
-    @SuppressWarnings("unused")
-
     private class GetRequestTokenTask extends AsyncTask<Void,Void,RequestToken> {
         @Override
         protected RequestToken doInBackground(Void... voids) {
@@ -91,6 +89,18 @@ public class TwitterLoginActivity extends Activity {
                 e.printStackTrace();  // TODO: Customise this generated block
             }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Account account) {
+            Activity context = TwitterLoginActivity.this;
+
+            // Switch to this new account
+            AccountHolder.getInstance(context).setAccount(account);
+            Intent i = new Intent().setClass(context, TabWidget.class);
+            context.startActivity(i);
+
+            context.finish();
         }
     }
 
