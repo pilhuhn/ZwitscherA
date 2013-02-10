@@ -16,8 +16,9 @@
                 android:layout_height="64dp"
                 android:src="@drawable/user_unknown"
                 android:scaleType="fitXY"
-                android:padding="4px"
-                android:id="@+id/UserPictureImageView"/>
+                android:padding="4dp"
+                android:id="@+id/UserPictureImageView"
+      android:contentDescription="@string/picture_of_user" />
 
 
     <TableLayout android:id="@+id/user_table_layout"

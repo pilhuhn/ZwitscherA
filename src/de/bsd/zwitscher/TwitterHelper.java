@@ -124,9 +124,9 @@ public class TwitterHelper {
      * the JSON representation of the objects in a ThreadLocal. So to obtain
      * it, it must be accessed before the next call to twitter.
      *
-     * @param fromDbOnly
-     * @param paging
-     * @return
+     * @param fromDbOnly If true, only messages that are found in the DB are returned
+     * @param paging A paging object to tell how many items to fetch.
+     * @return A list of direct messages
      */
     public MetaList<DirectMessage> getDirectMessages(boolean fromDbOnly, Paging paging) {
 
@@ -179,7 +179,7 @@ public class TwitterHelper {
           // timeline.
           Collections.sort(ret2,new Comparator<DirectMessage>() {
              public int compare(DirectMessage directMessage, DirectMessage directMessage1) {
-                return (int) (directMessage1.getCreatedAt().compareTo(directMessage.getCreatedAt()));
+                return directMessage1.getCreatedAt().compareTo(directMessage.getCreatedAt());
              }
           });
 
@@ -192,9 +192,9 @@ public class TwitterHelper {
     /**
      * Read status objects from the database only.
      * @param sinceId The oldest Id that should
-     * @param howMany
-     * @param list_id
-     * @return
+     * @param howMany How many items should be retrieved
+     * @param list_id THe id of the list to retrieve the items for
+     * @return List of Statuses
      */
     public List<Status> getStatuesFromDb(long sinceId, int howMany, long list_id) {
         List<Status> ret = new ArrayList<Status>();
@@ -350,7 +350,7 @@ public class TwitterHelper {
     /**
      * Get an auth token the classical OAuth way
      *
-     * @param pin
+     * @param pin Pin obtained from Twitter needed to create the oauth tokens
      * @return the newly created account
      * @throws Exception
      */
@@ -370,15 +370,13 @@ public class TwitterHelper {
 
     /**
      * Generate an account the xAuth way for Twitter. This only works if especially enabled by Twitter
-     *
-     *
-     *
+     * This also works for identi.ca and generic status.net instances.
      *
      * @param username Username to get the token for
      * @param password password of that user and service
      * @param serviceType service to use. Currently supported are twitter and identi.ca
      * @param makeDefault  @throws Exception If the server can not be reached or the credentials are not valid
-     * @param baseUrl
+     * @param baseUrl Base url of the server to connect to (mostly applies to generic status.net instances)
      * @return id of the account
      * @throws Exception when anything goes wrong (e.g wrong username/password etc.)
      */
@@ -462,7 +460,7 @@ public class TwitterHelper {
 	public UpdateResponse retweet(UpdateRequest request) {
         UpdateResponse response = new UpdateResponse(request.updateType,request.id);
 		try {
-			Status tmp = twitter.retweetStatus(request.id);
+			twitter.retweetStatus(request.id);
             response.setSuccess();
 			response.setMessage("Retweeted successfully");
 		} catch (TwitterException e) {
@@ -788,7 +786,6 @@ public class TwitterHelper {
      * @param userId Id of the user to follow
      * @param doFollow If true, send a follow request; unfollow otherwise.
      * @return True in case of success
-     * @todo make async
      */
     public boolean followUnfollowUser(long userId, boolean doFollow ) {
         try {
@@ -834,7 +831,7 @@ public class TwitterHelper {
 
         Paging paging = new Paging();
         paging.setCount(30);
-        List<Status> ret = null;
+        List<Status> ret;
         try {
             ret = twitter.getUserTimeline(userId, paging);
         } catch (TwitterException e) {

@@ -35,6 +35,8 @@ public class UserImageView extends ImageView {
     private Bitmap unknownUserBitmap;
     private Bitmap favBitmap;
     private Rect favRect ;
+    private final Rect unknownUserBitmapRect;
+    private Rect baseBitmapRect;
 
 
     public UserImageView(Context context, AttributeSet attrs) {
@@ -42,6 +44,7 @@ public class UserImageView extends ImageView {
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(context,attrs);
         setLayoutParams(params);
         unknownUserBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.user_unknown);
+        unknownUserBitmapRect = new Rect(0,0,unknownUserBitmap.getWidth(),unknownUserBitmap.getHeight());
         favBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.favorite_on);
         favRect = new Rect(0,0,favBitmap.getWidth(),favBitmap.getHeight());
     }
@@ -52,6 +55,12 @@ public class UserImageView extends ImageView {
      */
     public void setImageBitmap(Bitmap baseBitmap) {
         this.baseBitmap = baseBitmap;
+        if (baseBitmap!=null) {
+            baseBitmapRect = new Rect(0,0,baseBitmap.getWidth(),baseBitmap.getHeight());
+        }
+        else {
+            baseBitmapRect = null;
+        }
     }
 
     /**
@@ -85,11 +94,15 @@ public class UserImageView extends ImageView {
         float factor = getHeight() / 64.0f;
 
 
-        if (baseBitmap==null)
+        Rect SRC;
+        if (baseBitmap==null) {
             baseBitmap= unknownUserBitmap;
-        Rect SRC = new Rect(0,0,baseBitmap.getWidth(),baseBitmap.getHeight());
+            SRC = unknownUserBitmapRect;
+        } else {
+            SRC = baseBitmapRect;
+        }
 
-        // First draw the tweet's user bitmap
+            // First draw the tweet's user bitmap
         if (isRetweet) {
             if (rtBitmap!=null)
                 canvas.drawBitmap(baseBitmap,SRC, scale(RECT64,factor), paint);

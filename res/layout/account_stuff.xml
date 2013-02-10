@@ -63,6 +63,6 @@
         android:onClick="done"
         android:src="@drawable/back_button"
         android:layout_below="@id/select_account_pick_button"
-    />
+      android:contentDescription="@string/done_description" />
 
 </RelativeLayout>

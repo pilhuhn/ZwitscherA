@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="accountTypes">
-        <item>Twitter</item>
-        <item>laconi.ca</item>
-        <item>status.net</item>
-    </string-array>
-
     <string name="status">status</string>
     <string name="reply">Antwoord</string>
     <string name="replyall">Allen beantwoorden</string>
@@ -38,7 +32,6 @@
     <string name="getting_conversation">Conversatie ophalen</string>
     <string name="follow_user">Volg Twitteraar:</string>
     <string name="unfollow_user">Stop met volgen</string>
-    <string name="add">Toevoegen</string>
     <string name="from">van</string>
     <string name="get_user_detail">User details ophalen..</string>
     <string name="get_preview">"Previews laden…"</string>
@@ -48,15 +41,8 @@
     <string name="no_searches_found">Geen resultaten gevonden - Synchroniseren?</string>
     <string name="updating">aan het updaten</string>
 
-    <string name="login_common">Log in op twitter om Zwischer te autoriseren. <br/><br/>
-       klik "Get pin from Twitter", log in via je webbrowser, noteer de PIN en herstart Zwischer en voer de pin in op het openingsscherm. Bevestig met "Set pin"
-        <br/><br/>
-        Dit is eenmalig, bij de eerste keer opstarten.
-    </string>
-    <string name="please_log_in">log in alsjeblieft</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
-    <string name="login">Log in…</string>
     <string name="service">Service</string>
     <string name="new_mentions">nieuw mentions</string>
     <string name="new_directs">nieuw direct messages</string>

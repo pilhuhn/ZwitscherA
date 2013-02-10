@@ -63,7 +63,7 @@ public class TwitterLoginActivity extends Activity {
     private class GetRequestTokenTask extends AsyncTask<Void,Void,RequestToken> {
         @Override
         protected RequestToken doInBackground(Void... voids) {
-            RequestToken rt = null;
+            RequestToken rt;
             try {
                 TwitterHelper th = new TwitterHelper(TwitterLoginActivity.this,null);
                 rt = th.getRequestToken(true);
@@ -80,7 +80,7 @@ public class TwitterLoginActivity extends Activity {
         protected Account doInBackground(String... strings) {
             TwitterHelper th = new TwitterHelper(TwitterLoginActivity.this,null);
             String pin = strings[0];
-            Account acct = null;
+            Account acct;
             try {
                 acct = th.generateAccountWithOauth(pin);
                 return acct;

@@ -264,10 +264,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 List<String> users = new ArrayList<String>(userMentionEntities.length+1);
                 // Add an item 0 as dummy, as the spinner auto-selects it
                 users.add(getString(R.string.pick_a_user));
-                for (int i = 0, userMentionEntitiesLength = userMentionEntities.length;
-                     i < userMentionEntitiesLength; i++) {
-                    UserMentionEntity ume = userMentionEntities[i];
-                    users.add ("@" + ume.getScreenName() + " (" + ume.getName() + ")");
+                for (UserMentionEntity ume : userMentionEntities) {
+                    users.add("@" + ume.getScreenName() + " (" + ume.getName() + ")");
                 }
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
                         users);
@@ -339,7 +337,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             boolean found=false;
             if (status.getMediaEntities()!=null) {
                 for (MediaEntity me : status.getMediaEntities()) {
-                    if (me.getURL().toString().equals(token)) {
+                    if (me.getURL().equals(token)) {
                         builder.append(me.getDisplayURL());
                         found=true;
                         break;
@@ -349,7 +347,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
             if (!found && status.getURLEntities()!=null) {
                 for (URLEntity ue : status.getURLEntities()) {
-                    if (ue.getURL()!=null && ue.getURL().toString().equals(token)) {
+                    if (ue.getURL()!=null && ue.getURL().equals(token)) {
                         if (ue.getExpandedURL() != null) {
                             builder.append(ue.getExpandedURL());
                             found = true;
@@ -503,9 +501,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             if (status.getURLEntities()!=null && status.getURLEntities().length>0) {
                 URLEntity ue = status.getURLEntities()[0]; // TODO grab all urls
                 if (ue.getExpandedURL()!=null)
-                    url = ue.getExpandedURL().toString();
+                    url = ue.getExpandedURL();
                 else if (ue.getURL()!=null)
-                    url = ue.getURL().toString();
+                    url = ue.getURL();
             }
             if (url==null) // Fallback
                 url = "https://twitter.com/#!/" + status.getUser().getScreenName() + "/status/" + status.getId();
@@ -575,7 +573,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         String wrote = user.getName() + "(@" + user.getScreenName() + ") " + s + ":";
         String text = wrote + "\n\n" + status.getText();
         String url ;
-        if (account.getServerType().equals("twitter")) {
+        if (account.getServerType().equals(Account.Type.TWITTER)) {
             url = "http://twitter.com/#!/" + user.getScreenName() + "/status/" + status.getId();
             text = text + "\n\n" + url;
         }
@@ -683,7 +681,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         for (String url :  urls) {
             Log.d("One tweet","Url = " + url);
 //            url = UrlHelper.expandUrl(url); // expand link shorteners TODO that ultimately needs to go into the main parsing for all kinds of links
-            String finalUrlString="";
+            String finalUrlString;
             if (url.contains("yfrog.com")) {
                 // http://twitter.yfrog.com/page/api
                 finalUrlString = url + ":iphone";

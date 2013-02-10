@@ -6,6 +6,7 @@
     />
     <item android:id="@+id/to_top"
           android:icon="@drawable/ic_menu_top"
+          android:title="@string/help_to_top"
           android:showAsAction="always"/>
     <item android:id="@+id/refresh"
           android:title="@string/refresh"

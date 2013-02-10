@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -193,7 +192,7 @@ public class UserDetailActivity extends Activity  {
 
         TextView webView = (TextView) findViewById(R.id.userDetail_web);
         if (user.getURL()!=null) {
-            webView.setText(user.getURL().toString());
+            webView.setText(user.getURL());
             String plc = user.getProfileBackgroundColor();
             if (!plc.equals("")) {
                 if (!plc.startsWith("#"))

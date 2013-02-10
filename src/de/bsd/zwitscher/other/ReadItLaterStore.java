@@ -21,8 +21,8 @@ import twitter4j.Status;
  */
 public class ReadItLaterStore {
 
-    private String user;
-    private String password;
+    private final String user;
+    private final String password;
 
     public ReadItLaterStore(String user, String password) {
         this.user = user;
@@ -122,7 +122,7 @@ public class ReadItLaterStore {
     }
 
 
-    class CheckRilAccountTask extends AsyncTask<String,Void,Boolean> {
+    private class CheckRilAccountTask extends AsyncTask<String,Void,Boolean> {
         @Override
         protected Boolean doInBackground(String... strings) {
             String targetUrl = strings[0];

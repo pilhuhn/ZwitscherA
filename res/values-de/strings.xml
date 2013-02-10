@@ -27,7 +27,6 @@
     <string name="getting_conversation">Lade Konversation</string>
     <string name="follow_user">Benutzer folgen</string>
     <string name="unfollow_user">Benutzer nicht folgen</string>
-    <string name="add">Hinzufügen</string>
     <string name="from">von</string>
     <string name="get_user_detail">Lade Benutzerdaten…</string>
     <string name="get_preview">"Lade Bildvorschau…"</string>
@@ -43,17 +42,8 @@
 
 
 
-    <string name="login_common">
-        Sie müssen sich bei Twitter anmelden, um Zwitscher zu authorisieren.<br/><br/>
-        Um dies zu tun, klicken Sie auf "Get pin from Twitter", geben dann im Browser den Login an
-        und klicken auf "Akzeptieren". Danach müssen Sie sich die PIN merken. Gehen Sie dann zum Home-Screen
-        und starten von dort Zwitscher erneut. Geben Sie die PIN ein und klicken auf "Set pin".<br/><br/>
-        Sie müssen dies nur einmal machen.
-    </string>
-    <string name="please_log_in">Bitte einloggen</string>
     <string name="username">Benutzername</string>
     <string name="password">Passwort</string>
-    <string name="login">Einloggen…</string>
     <string name="service">Dienst</string>
     <string name="new_mentions">Neue Erwähnung(en)</string>
     <string name="new_directs">Neue direkt(e) Nachricht(en)</string>
@@ -140,7 +130,6 @@
     <string name="forward">Weiterleiten</string>
     <string name="speak">Vorlesen</string>
     <string name="favorite">Favorisieren</string>
-    <string name="translating">Übersetze …</string>
     <string name="logging_in">Einloggen …</string>
     <string name="new_message">Neue Nachr.</string>
     <string name="reply">Antwort</string>
@@ -175,7 +164,6 @@
     <string name="update_not_yet_supported">Update type [%s] noch nicht unterstützt</string>
     <string name="pick_a_user">Benutzer auswählen</string>
     <string name="no_ril_user">Keinen Account für Pocket(ReadItLater) gegeben</string>
-    <string name="translation_result">Übersetzung:</string>
     <string name="error_nothing_provided">-nichts angegeben-</string>
     <string name="account_not_valid">Account ist ungültig</string>
     <string name="login_failed">Login fehlgeschlagen</string>
@@ -193,5 +181,10 @@
   <string name="offline_turn_on_networking">Es scheint keine Netzwerkverbindung zu geben. Bitte stellen Sie eine Netzwerkverbindung her und starten die Anwendung erneut.</string>
   <string name="ok">Ok</string>
   <string name="continue_msg">Weiter…</string>
+  <string name="picture_of_user">Picture of the user</string>
+  <string name="server_base_url">Server base URL</string>
+  <string name="logo_description">Zwitscher logo</string>
+  <string name="done_description">Back to previous screen</string>
+  <string name="clear_description">Clear input field</string>
 
 </resources>

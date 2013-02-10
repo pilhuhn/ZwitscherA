@@ -44,7 +44,7 @@ public class PicHelper {
             return null;
 
         String tmp = user.getProfileImageURL();
-        URL imageUrl = null;
+        URL imageUrl;
         try {
             imageUrl = new URL(tmp);
         } catch (MalformedURLException e) {

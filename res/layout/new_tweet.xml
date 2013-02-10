@@ -38,7 +38,7 @@
         android:onClick="done"
         android:src="@drawable/back_button"
         android:layout_below="@id/CharCount"
-            />
+      android:contentDescription="@string/done_description" />
 
 	<ImageButton android:id="@+id/ClearButton"
 			android:text="@string/ClearButton"
@@ -48,7 +48,7 @@
             android:layout_toRightOf="@id/new_tweet_back_button"
             android:onClick="clear"
             android:src="@drawable/clear"
-		/>
+    android:contentDescription="@string/clear_description" />
 
 	<CheckBox android:id="@+id/GeoCheckBox"
 			  android:checked="false"
@@ -67,7 +67,7 @@
                  android:layout_height="wrap_content"
                  android:layout_below="@id/CharCount"
 			     android:layout_toRightOf="@id/ClearButton"
-                 />
+      android:contentDescription="@string/help_camera" />
     <ImageButton android:id="@+id/TweetButton"
             android:text="@string/TweetButton"
             android:layout_width="wrap_content"
@@ -76,7 +76,7 @@
             android:layout_alignParentRight="true"
             android:onClick="finallySend"
             android:src="@drawable/send_letter"
-        />
+      android:contentDescription="@string/help_post_button" />
 
 
 </RelativeLayout>

@@ -18,7 +18,6 @@
              android:layout_height="wrap_content"
              android:layout_width="fill_parent"
              android:prompt="@string/select_account_select"
-             android:layout_below="@id/AccountSelectionTitle"
              android:padding="10dp"
              />
 
@@ -29,7 +28,6 @@
             android:onClick="switchAccount"
             android:text="@string/select_account_pick"
             android:padding="10dp"
-            android:layout_below="@id/select_account_spinner"
             />
 
 

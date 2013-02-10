@@ -32,7 +32,6 @@
 <string name="getting_conversation">Obteniendo conversación</string>
 <string name="follow_user">Seguir al usuario</string>
 <string name="unfollow_user">Dejar de seguir al usuario</string>
-<string name="add">Añadir</string>
 <string name="from">desde</string>
 <string name="get_user_detail">Obteniendo detalles del usuario …</string>
 <string name="get_preview">"Cargando vistas previas…"</string>
@@ -41,14 +40,8 @@
 <string name="please_sync_lists">Por favor sincronice listados</string>
 <string name="no_searches_found">No se encontraron búsquedas guardadas -  necesita sincronizar?</string>
 <string name="updating">Actualizando</string>
-<string name="login_common">Necesita acceder a Twitter para autorizar Zwitscher.
-Para hacer esto, haga click en "Obtener PIN de Twitter", a continuación, iniciar sesión en el navegador, escriba el PIN, y desde la pantalla de inicio, ejecute Zwitscher nuevamente e introduzca el PIN. A continuación haga clic en "Establecer PIN"
-Sólo tienes que hacer esto una vez en el inicio de sesión
-</string>
-<string name="please_log_in">Inicie sesión</string>
 <string name="username">Usuario</string>
 <string name="password">Contraseña</string>
-<string name="login">Acceder…</string>
 <string name="service">Servicio</string>
 <string name="new_mentions">nuevas menciones</string>
 <string name="new_directs">nuevos mensajes directos</string>

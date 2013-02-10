@@ -10,9 +10,10 @@
                      android:layout_height="64dp"
                      android:src="@drawable/user_unknown"
                      android:scaleType="fitXY"
-                     android:padding="4px"
+                     android:padding="4dp"
                      android:onClick="displayUserDetail"
-                     android:id="@+id/UserPictureImageView"/>
+                     android:id="@+id/UserPictureImageView"
+          android:contentDescription="@string/picture_of_user" />
         <TextView android:id="@+id/HintView"
                   android:layout_height="wrap_content"
                   android:layout_width="wrap_content"
@@ -63,7 +64,8 @@
                      android:layout_height="wrap_content"
                      android:onClick="reply"
                      android:src="@drawable/reply_button"
-                     android:text="@string/Reply"/>
+                     android:text="@string/Reply"
+          android:contentDescription="@string/help_reply_button" />
         <ImageButton android:id="@+id/ReplyAllButton"
                      android:layout_below="@id/TimeTextView"
                      android:layout_width="wrap_content"
@@ -71,7 +73,8 @@
                      android:layout_toRightOf="@id/ReplyButton"
                      android:onClick="replyAll"
                      android:src="@drawable/reply_all_button"
-                     android:text="@string/Reply_all"/>
+                     android:text="@string/Reply_all"
+          android:contentDescription="@string/help_reply_all_button" />
 
         <ImageButton android:id="@+id/RetweetButton"
                      android:layout_below="@id/TimeTextView"
@@ -80,7 +83,8 @@
                      android:layout_height="wrap_content"
                      android:onClick="retweet"
                      android:src="@drawable/rt_button_cl"
-                     android:text="@string/retweet"/>
+                     android:text="@string/retweet"
+          android:contentDescription="@string/help_rt_button" />
 
         <ImageButton android:id="@+id/ThreadButton"
                      android:layout_below="@id/ReplyButton"
@@ -88,7 +92,8 @@
                      android:layout_height="wrap_content"
                      android:onClick="threadView"
                      android:src="@drawable/threads"
-                     android:text="@string/thread"/>
+                     android:text="@string/thread"
+          android:contentDescription="@string/help_threads" />
         <ImageButton android:id="@+id/FavoriteButton"
                      android:layout_below="@id/ReplyButton"
                      android:layout_width="wrap_content"
@@ -96,7 +101,8 @@
                      android:layout_toRightOf="@id/ThreadButton"
                      android:onClick="favorite"
                      android:src="@drawable/favorite_off"
-                     android:text="@string/favorite"/>
+                     android:text="@string/favorite"
+          android:contentDescription="@string/help_favorite" />
         <ImageButton android:id="@+id/TranslateButton"
                      android:layout_below="@id/ReplyButton"
                      android:layout_toRightOf="@id/FavoriteButton"
@@ -104,7 +110,8 @@
                      android:layout_height="wrap_content"
                      android:onClick="translate"
                      android:src="@drawable/translate"
-                     android:text="@string/Translate"/>
+                     android:text="@string/Translate"
+          android:contentDescription="@string/help_translate" />
 
         <ImageButton android:id="@+id/DoneButton"
                      android:layout_below="@id/ThreadButton"
@@ -112,7 +119,8 @@
                      android:layout_height="wrap_content"
                      android:onClick="done"
                      android:src="@drawable/back_button"
-                     android:text="@string/Done"/>
+                     android:text="@string/Done"
+          android:contentDescription="@string/done_description" />
         <Spinner android:id="@+id/ot_spinner"
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content"

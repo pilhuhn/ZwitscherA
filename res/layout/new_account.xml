@@ -52,7 +52,7 @@
                       />
         </TableRow>
       <TableRow android:id="@+id/new_account_url_row">
-          <TextView android:text="Server base URL"
+          <TextView android:text="@string/server_base_url"
             android:id="@+id/new_account_url_text"
                   style="@style/text"/>
           <EditText android:id="@+id/new_account_url_edit"
