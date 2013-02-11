@@ -587,7 +587,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 try {
                     Thread.sleep(1000L*startDelaySecs);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    Log.d("GetTimeLineTask",e.getMessage());
                 }
             }
 

@@ -17,8 +17,8 @@ class AbstractAdapter<T> extends ArrayAdapter<T> {
 
     List<T> items;
     PicHelper ph;
-    Context extContext;
-    LayoutInflater inflater;
+    final Context extContext;
+    final LayoutInflater inflater;
 
 
     AbstractAdapter(Context context, int textViewResourceId, List<T> objects) {

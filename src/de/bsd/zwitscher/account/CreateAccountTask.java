@@ -16,12 +16,12 @@ import de.bsd.zwitscher.TwitterHelper;
 class CreateAccountTask extends AsyncTask<Void,Void,String> {
 
     private ProgressDialog dialog;
-    private Activity context;
-    private String username;
-    private String password;
-    private Account.Type service;
-    private boolean shouldSwitch;
-    private String url;
+    private final Activity context;
+    private final String username;
+    private final String password;
+    private final Account.Type service;
+    private final boolean shouldSwitch;
+    private final String url;
 
     public CreateAccountTask(Activity context, String username, String password, Account.Type service, boolean shouldSwitch, String url) {
         this.context=context;

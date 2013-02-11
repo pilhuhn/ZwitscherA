@@ -141,7 +141,7 @@ public class TwitterLoginActivity extends Activity {
                 html = html.substring(0,i);
 
                 try {
-                    Account acct = new GenerateAccountWithOauthTask().execute(html).get();
+                    new GenerateAccountWithOauthTask().execute(html).get();
                     Intent intent = new Intent().setClass(TwitterLoginActivity.this, TabWidget.class);
                     startActivity(intent);
                     finish();

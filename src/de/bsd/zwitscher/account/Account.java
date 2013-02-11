@@ -9,13 +9,13 @@ import android.os.Parcelable;
  * @author Heiko W. Rupp
  */
 public class Account implements Parcelable {
-    private int id;
-    private String name;
+    private final int id;
+    private final String name;
     private String accessTokenKey;
     private String accessTokenSecret;
-    private Type serverType;
+    private final Type serverType;
     private String serverUrl;
-    private boolean defaultAccount;
+    private final boolean defaultAccount;
     private String password;
 
     public Account(int id, String name, String accessTokenKey, String accessTokenSecret, String serverUrl, Type serverType,boolean defaultAccount) {
@@ -196,7 +196,7 @@ public class Account implements Parcelable {
         IDENTICA("Identi.ca","Dent"),
         STATUSNET("Status.net","Dent")
         ;
-        private String serverTypeName;
+        private final String serverTypeName;
         private final String statusName;
 
         private Type(String serverTypeName, String statusName) {

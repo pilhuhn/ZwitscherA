@@ -167,7 +167,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
     private UpdateResponse queueUpUpdate(UpdateRequest request, String message) {
         TweetDB tdb = TweetDB.getInstance(context.getApplicationContext());
 
-        UpdateResponse response = null;
+        UpdateResponse response;
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ObjectOutputStream out = new ObjectOutputStream(bos);
