@@ -571,7 +571,9 @@ public class UserDetailActivity extends Activity  {
                 getWindow().setBackgroundDrawable(background);
 
             listsLoaded = true;
-            invalidateOptionsMenu();
+            if (Build.VERSION.SDK_INT>=11) {
+                invalidateOptionsMenu();
+            }
         }
     }
 }
