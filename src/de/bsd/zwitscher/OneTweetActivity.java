@@ -38,10 +38,16 @@ import twitter4j.User;
 import twitter4j.UserMentionEntity;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This Activity displays one individual status.
@@ -59,6 +65,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     private TextView titleTextView;
     private Account account;
     int screenWidth;
+    private Pattern vineCoPattern = Pattern.compile(".*<.* content=\"(.*)\">");
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -754,6 +761,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
                 finalUrlString = url + tmp; // 120px , 480px or 800px
             }
+            else if (url.contains("://vine.co/v")) {
+                finalUrlString = getVinePreview(url);
+            }
             else if (url.endsWith(".jpg") || url.endsWith(".png") || url.endsWith(".jpeg")) {
                 finalUrlString = url;
             }
@@ -787,6 +797,50 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             urlPairs.add(pair);
         }
         return urlPairs;
+    }
+
+    /**
+     * Get a vine.co thumbnail of the video by parsing the web site content
+     * and looking for a og:image meta tag
+     * @param url Url of the vine video page
+     * @return the url of the thumbnail or null if it can't be found.
+     */
+    private String getVinePreview(String url) {
+        BufferedReader br = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            urlConnection = (HttpURLConnection) new URL(url).openConnection();
+            urlConnection.setDoInput(true);
+            urlConnection.setDoOutput(false);
+            urlConnection.connect();
+
+            br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            String line;
+            while ((line=br.readLine())!=null) {
+                if (line.contains("og:image")) {
+                    Matcher m = vineCoPattern.matcher(line);
+                    if (m.matches()) {
+                        return m.group(1);
+                    }
+                }
+            }
+
+            urlConnection.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+        finally {
+            if (urlConnection!=null)
+                urlConnection.disconnect();
+            if ( br!=null)
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();  // TODO: Customise this generated block
+                }
+
+        }
+        return null;
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -951,6 +1005,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         for (UrlPair urlPair : listOfUrlPairs) {
             Log.i("loadThumbnail", "URL to load is " + urlPair.getTarget());
 
+            if(urlPair.getTarget()==null)
+                continue;
             try {
                 URL picUrl = new URL(urlPair.getTarget());
                 BufferedInputStream in = new BufferedInputStream(picUrl.openStream());
