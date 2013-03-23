@@ -737,7 +737,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 finalUrlString += (screenWidth>320)? "l" : "s";
                 finalUrlString += url.substring(url.lastIndexOf('.')); // 's'mall or 'l'arge
             }
-            else if (url.contains("://instagr.am/p/")) {
+            else if (url.contains("://instagr.am/p/") || url.contains("://instagram.com/p/")) {
 
                 finalUrlString = url;
                 if (!url.endsWith("/"))
