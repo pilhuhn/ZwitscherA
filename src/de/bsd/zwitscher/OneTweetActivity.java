@@ -1095,6 +1095,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         @Override
         protected void onPostExecute(final List<BitmapWithUrl> bitmaps) {
             super.onPostExecute(bitmaps);
+            View galleryProgress = findViewById(R.id.gallery_progress);
+            if (galleryProgress!=null)
+                galleryProgress.setVisibility(View.GONE);
             if (bitmaps!=null) {
                 Gallery g = (Gallery) findViewById(R.id.gallery);
                 ImageAdapter adapter = new ImageAdapter();
