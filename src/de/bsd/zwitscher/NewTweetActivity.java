@@ -88,6 +88,9 @@ public class NewTweetActivity extends Activity implements LocationListener {
         final ImageButton tweetButton = (ImageButton) findViewById(R.id.TweetButton);
         edittext = (MultiAutoCompleteTextView) findViewById(R.id.edittext);
         edittext.setSelected(true);
+        // Set the MultiAutoCompleteTextView in a mode that allows tokenizing and
+        // also the normal spell checker.
+        // See http://stackoverflow.com/questions/4552292/edittext-and-multiautocompletetextview-suggestions/7761754#7761754
         edittext.setRawInputType(InputType.TYPE_CLASS_TEXT
           |InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
           |InputType.TYPE_TEXT_FLAG_AUTO_CORRECT
