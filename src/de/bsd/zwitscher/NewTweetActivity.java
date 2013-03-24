@@ -28,6 +28,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -87,6 +88,10 @@ public class NewTweetActivity extends Activity implements LocationListener {
         final ImageButton tweetButton = (ImageButton) findViewById(R.id.TweetButton);
         edittext = (MultiAutoCompleteTextView) findViewById(R.id.edittext);
         edittext.setSelected(true);
+        edittext.setRawInputType(InputType.TYPE_CLASS_TEXT
+          |InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+          |InputType.TYPE_TEXT_FLAG_AUTO_CORRECT
+          |InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         if (tweetButton!=null)
             tweetButton.setEnabled(false);
 
