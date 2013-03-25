@@ -191,5 +191,11 @@
   <string name="logo_description">Zwitscher logo</string>
   <string name="done_description">Back to previous screen</string>
   <string name="clear_description">Clear input field</string>
+  <string name="added">Added</string>
+  <string name="removed">Removed</string>
+  <string name="follow_unfollow_set">Follow/Unfollow set</string>
+  <string name="status_deleted">Status deleted</string>
+  <string name="load_on_switch">Load on account switch</string>
+  <string name="load_on_switch_descr">Should messages be loaded from the server when switching accounts?</string>
 
 </resources>

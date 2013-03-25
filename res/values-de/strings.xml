@@ -181,10 +181,16 @@
   <string name="offline_turn_on_networking">Es scheint keine Netzwerkverbindung zu geben. Bitte stellen Sie eine Netzwerkverbindung her und starten die Anwendung erneut.</string>
   <string name="ok">Ok</string>
   <string name="continue_msg">Weiter…</string>
-  <string name="picture_of_user">Picture of the user</string>
+  <string name="picture_of_user">Bild des Benutzers</string>
   <string name="server_base_url">Server base URL</string>
-  <string name="logo_description">Zwitscher logo</string>
-  <string name="done_description">Back to previous screen</string>
-  <string name="clear_description">Clear input field</string>
+  <string name="logo_description">Zwitscher Logo</string>
+  <string name="done_description">Zum vorherigen Screen</string>
+  <string name="clear_description">Eingabefeld löschen</string>
+  <string name="added">Hinzugefügt</string>
+  <string name="removed">Gelöscht</string>
+  <string name="follow_unfollow_set">Follow/Unfollow ausgeführt</string>
+  <string name="status_deleted">Status gelöscht</string>
+  <string name="load_on_switch">Laden beim Accountwechsel</string>
+  <string name="load_on_switch_descr">Sollen beim Wechsel des Accounts Nachrichten vom Server geladen werden?</string>
 
 </resources>

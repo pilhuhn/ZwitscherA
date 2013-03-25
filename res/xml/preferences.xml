@@ -55,6 +55,11 @@
                         android:summary="@string/prefs_extra_roaming_descr"
                         android:defaultValue="false"/>
 
+    <CheckBoxPreference android:title="@string/load_on_switch"
+                        android:key="load_on_account_switch"
+                        android:summary="@string/load_on_switch_descr"
+                        android:defaultValue="false"/>
+
     <CheckBoxPreference android:title="@string/prefs_keep_images"
                         android:key="keep_images"
                         android:summary="@string/prefs_keep_images_long"

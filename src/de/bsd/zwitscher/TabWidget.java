@@ -109,7 +109,6 @@ public class TabWidget extends TabActivity {
         tabHost = getTabHost();
         Intent homeIntent = new Intent().setClass(this,TweetListActivity.class);
         homeIntent.putExtra(LIST_ID, 0);
-        homeIntent.putExtra("fetchAnyway",true);
 
         String tmp = getString(R.string.home_timeline);
         TabHost.TabSpec homeSpec = tabHost.newTabSpec("tmp")

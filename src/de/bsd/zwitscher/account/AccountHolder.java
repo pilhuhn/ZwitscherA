@@ -16,6 +16,7 @@ public class AccountHolder {
     private Account account;
     private Set<String> userNames = new HashSet<String>();
     private Set<String> hashTags = new HashSet<String>();
+    private boolean switchingAccounts = false;
 
     public static AccountHolder getInstance(Context context) {
         if (ourInstance.getAccount()==null) {
@@ -26,6 +27,14 @@ public class AccountHolder {
     }
 
     private AccountHolder() {
+    }
+
+    public boolean isSwitchingAccounts() {
+        return switchingAccounts;
+    }
+
+    public void setSwitchingAccounts(boolean switchingAccounts) {
+        this.switchingAccounts = switchingAccounts;
     }
 
     public Account getAccount() {

@@ -152,8 +152,9 @@ public class AccountStuffActivity extends Activity {
 
     private void switchToSelectedAccount(Account account) {
         Intent intent = new Intent(this, TabWidget.class);
-        intent.putExtra("fetchAnyway",true);
-        AccountHolder.getInstance(this).setAccount(account);
+        AccountHolder accountHolder = AccountHolder.getInstance(this);
+        accountHolder.setAccount(account);
+        accountHolder.setSwitchingAccounts(true);
         startActivity(intent);
         finish();
     }
