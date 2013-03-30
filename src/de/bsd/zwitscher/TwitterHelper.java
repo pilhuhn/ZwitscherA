@@ -787,45 +787,31 @@ public class TwitterHelper {
      * @param doFollow If true, send a follow request; unfollow otherwise.
      * @return True in case of success
      */
-    public boolean followUnfollowUser(long userId, boolean doFollow ) {
-        try {
-            if (doFollow)
-                twitter.createFriendship(userId);
-            else
-                twitter.destroyFriendship(userId);
+    public void followUnfollowUser(long userId, boolean doFollow ) throws TwitterException {
+        if (doFollow)
+            twitter.createFriendship(userId);
+        else
+            twitter.destroyFriendship(userId);
 
-            return true;
-        } catch (TwitterException e) {
-            Log.w("followUnfollowUser",e.getMessage());
-        }
-        return false;
     }
 
     /**
      * Add a user to some of our user lists
      * @param userId User to add
      * @param listId ids of the list to put the user on
-     * @return true if successful
      */
-    public boolean addUserToLists(long userId, int listId) {
-        try {
-            twitter.createUserListMember(listId,userId);
-        } catch (TwitterException e) {
-            e.printStackTrace();  // TODO: Customise this generated block
-            return false;
-        }
-        return true;
+    public void addUserToLists(long userId, int listId) throws TwitterException {
+        twitter.createUserListMember(listId, userId);
     }
 
-    public boolean removeUserFromList(long userId, int listId) {
-            try {
-                twitter.destroyUserListMember(listId,userId);
-            } catch (TwitterException e) {
-                e.printStackTrace();  // TODO: Customise this generated block
-                return false;
-            }
-            return true;
-        }
+    /**
+     * Remove a user to some of our user lists
+     * @param userId User to add
+     * @param listId ids of the list to put the user on
+     */
+    public void removeUserFromList(long userId, int listId) throws TwitterException {
+        twitter.destroyUserListMember(listId, userId);
+    }
 
     public List<Status> getUserTweets(Long userId) {
 
@@ -1050,14 +1036,8 @@ public class TwitterHelper {
      * Reports the passed user as spammer
      * @param userId id of the user
      */
-    public int reportAsSpammer(long userId) {
-        try {
-            twitter.reportSpam(userId);
-            return 200;
-        } catch (TwitterException e) {
-            e.printStackTrace();  // TODO: Customise this generated block
-            return 500;
-        }
+    public void reportAsSpammer(long userId) throws TwitterException {
+        twitter.reportSpam(userId);
     }
 
     public List<SavedSearch> getSavedSearchesFromServer() {
@@ -1139,16 +1119,9 @@ public class TwitterHelper {
         return tweetDB.getReads(accountId,idsToCheck);
     }
 
-    public boolean deleteStatus(long id) {
-        try {
-            twitter.destroyStatus(id);
+    public void deleteStatus(long id) throws TwitterException {
+        twitter.destroyStatus(id);
 
-            // TODO remove from tweetdb see also OneTweetActivity.deleteStatus()
-
-            return true;
-        } catch (TwitterException e) {
-            e.printStackTrace();  // TODO: Customise this generated block
-            return false;
-        }
+        // TODO remove from tweetdb see also OneTweetActivity.deleteStatus()
     }
 }

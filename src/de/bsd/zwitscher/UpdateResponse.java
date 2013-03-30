@@ -25,7 +25,7 @@ public class UpdateResponse {
     private String picturePath;
     boolean someBool;
 
-    public UpdateResponse(UpdateType updateType, boolean success, String message) {
+    public UpdateResponse(UpdateType updateType, String message) {
         this.message = message;
         this.success = success;
         this.updateType = updateType;
@@ -50,6 +50,9 @@ public class UpdateResponse {
         this.updateType = updateType;
         this.view = view;
         this.message = url;
+    }
+
+    public UpdateResponse(UpdateType updateType) {
     }
 
     public UpdateType getUpdateType() {

@@ -21,6 +21,7 @@ import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.other.ReadItLaterStore;
 import twitter4j.StatusUpdate;
+import twitter4j.TwitterException;
 import twitter4j.media.MediaProvider;
 
 /**
@@ -68,92 +69,101 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
            return queueUpUpdate(request, "Offline - Queued for later sending");
         }
 
+        try {
 
-        switch (request.updateType) {
-            case UPDATE:
-                if (request.picturePath!=null) {
-                    if (mediaProvider.equals(MediaProvider.TWITTER)) {
-                        request.statusUpdate.setMedia(new File(request.picturePath));
+            switch (request.updateType) {
+                case UPDATE:
+                    if (request.picturePath!=null) {
+                        if (mediaProvider.equals(MediaProvider.TWITTER)) {
+                            request.statusUpdate.setMedia(new File(request.picturePath));
+                        }
+                        else {
+                            StatusUpdate statusUpdate = request.statusUpdate;
+                            String tmp = th.postPicture(request.picturePath, statusUpdate.getStatus()); // TODO remove place holder here
+
+                            String res = statusUpdate.getStatus() + " " + tmp;
+                            StatusUpdate up = new StatusUpdate(res);
+                            up.setInReplyToStatusId(statusUpdate.getInReplyToStatusId());
+                            up.setLocation(statusUpdate.getLocation());
+                            up.setPlaceId(statusUpdate.getPlaceId());
+                            up.setPossiblySensitive(statusUpdate.isPossiblySensitive());
+                            up.setDisplayCoordinates(statusUpdate.isDisplayCoordinates());
+
+                            request.statusUpdate = up;
+                        }
                     }
-                    else {
-                        StatusUpdate statusUpdate = request.statusUpdate;
-                        String tmp = th.postPicture(request.picturePath, statusUpdate.getStatus()); // TODO remove place holder here
-
-                        String res = statusUpdate.getStatus() + " " + tmp;
-                        StatusUpdate up = new StatusUpdate(res);
-//                        up.setAnnotations(statusUpdate.getAnnotations());
-                        up.setInReplyToStatusId(statusUpdate.getInReplyToStatusId());
-                        up.setLocation(statusUpdate.getLocation());
-                        up.setPlaceId(statusUpdate.getPlaceId());
-                        up.setPossiblySensitive(statusUpdate.isPossiblySensitive());
-                        up.setDisplayCoordinates(statusUpdate.isDisplayCoordinates());
-
-                        request.statusUpdate = up;
-                    }
-                }
-                ret = th.updateStatus(request);
-                ret.someBool = request.someBool;
-                break;
-            case FAVORITE:
-                ret = th.favorite(request);
-                break;
-            case DIRECT:
-                ret = th.direct(request);
-                break;
-            case RETWEET:
-                ret = th.retweet(request);
-                break;
-            case UPLOAD_PIC:
-                if (request.picturePath!=null) {
-                    String url = th.postPicture(request.picturePath, request.message);
-                    if (url!=null) {
-                        ret = new UpdateResponse(request.updateType,request.view,url);
-                        ret.setSuccess();
+                    ret = th.updateStatus(request);
+                    ret.someBool = request.someBool;
+                    break;
+                case FAVORITE:
+                    ret = th.favorite(request);
+                    break;
+                case DIRECT:
+                    ret = th.direct(request);
+                    break;
+                case RETWEET:
+                    ret = th.retweet(request);
+                    break;
+                case UPLOAD_PIC:
+                    if (request.picturePath!=null) {
+                        String url = th.postPicture(request.picturePath, request.message);
+                        if (url!=null) {
+                            ret = new UpdateResponse(request.updateType,request.view,url);
+                            ret.setSuccess();
+                        }
+                        else {
+                            ret = new UpdateResponse(request.updateType,request.view,"");
+                            ret.setFailure();
+                            ret.setMessage("Picture upload failed");
+                        }
+                        ret.someBool = request.someBool;
                     }
                     else {
                         ret = new UpdateResponse(request.updateType,request.view,"");
                         ret.setFailure();
-                        ret.setMessage("Picture upload failed");
+                        ret.setMessage("No picture passed");
                     }
-                    ret.someBool = request.someBool;
-                }
-                break;
-            case LATER_READING:
+                    break;
+                case LATER_READING:
 
-                ReadItLaterStore store = new ReadItLaterStore(request.extUser,request.extPassword);
-                String result = store.store(request.status,!account.isStatusNet(),request.url);
-                boolean success;
-                success = result.startsWith("200");
+                    ReadItLaterStore store = new ReadItLaterStore(request.extUser,request.extPassword);
+                    String result = store.store(request.status,!account.isStatusNet(),request.url);
 
-                ret = new UpdateResponse(request.updateType,success,result);
-                break;
-            case REPORT_AS_SPAMMER:
-                th.reportAsSpammer(request.id);
-                ret = new UpdateResponse(request.updateType,true,"OK");
-                break;
-            case ADD_TO_LIST:
-                success = th.addUserToLists(request.userId,(int)request.id);
-                ret = new UpdateResponse(request.updateType,success,"Added");
-                break;
-            case REMOVE_FROM_LIST:
-                success = th.removeUserFromList(request.userId,(int)request.id);
-                ret = new UpdateResponse(request.updateType,success,"Removed");
-                break;
-            case FOLLOW_UNFOLLOW:
-                success = th.followUnfollowUser(request.userId,request.someBool);
-                ret = new UpdateResponse(request.updateType,success,"Follow/Unfollow set");
-                break;
-            case DELETE_STATUS:
-                success = th.deleteStatus(request.id);
-                ret = new UpdateResponse(request.updateType,success,"Status deleted");
-                break;
-            default:
-                throw new IllegalArgumentException(context.getString(R.string.update_not_yet_supported, request.updateType));
+                    ret = new UpdateResponse(request.updateType, result);
+                    break;
+                case REPORT_AS_SPAMMER:
+                    th.reportAsSpammer(request.id);
+                    ret = new UpdateResponse(request.updateType, context.getString(R.string.ok));
+                    break;
+                case ADD_TO_LIST:
+                    th.addUserToLists(request.userId,(int)request.id);
+                    ret = new UpdateResponse(request.updateType, context.getString(R.string.added));
+                    break;
+                case REMOVE_FROM_LIST:
+                    th.removeUserFromList(request.userId,(int)request.id);
+                    ret = new UpdateResponse(request.updateType, context.getString(R.string.removed));
+                    break;
+                case FOLLOW_UNFOLLOW:
+                    th.followUnfollowUser(request.userId,request.someBool);
+                    ret = new UpdateResponse(request.updateType, context.getString(R.string.follow_unfollow_set));
+                    break;
+                case DELETE_STATUS:
+                    th.deleteStatus(request.id);
+                    ret = new UpdateResponse(request.updateType, context.getString(R.string.status_deleted));
+                    break;
+                default:
+                    throw new IllegalArgumentException(context.getString(R.string.update_not_yet_supported, request.updateType));
+            }
+
+            if (ret!=null && (ret.getStatusCode()==502||ret.getStatusCode()==503||ret.getStatusCode()==420)) {
+                ret = queueUpUpdate(request,context.getString(R.string.queueing, ret.getMessage()));
+            }
         }
+        catch (TwitterException e) {
 
-        if (ret!=null && (ret.getStatusCode()==502||ret.getStatusCode()==503))
-            ret = queueUpUpdate(request,context.getString(R.string.queueing, ret.getMessage()));
-
+            ret = queueUpUpdate(request,context.getString(R.string.query_is,ret.getMessage()));
+        }
+        ret.setSuccess();
         return ret;
     }
 
@@ -176,10 +186,10 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
             tdb.persistUpdate(account.getId(), bos.toByteArray());
 
-            response = new UpdateResponse(UpdateType.QUEUED,true,message);
+            response = new UpdateResponse(UpdateType.QUEUED, message);
         } catch (IOException e) {
             e.printStackTrace();  // TODO: Customise this generated block
-            response = new UpdateResponse(UpdateType.QUEUED,false,e.getMessage());
+            response = new UpdateResponse(UpdateType.QUEUED, e.getMessage());
         }
         return response;
     }

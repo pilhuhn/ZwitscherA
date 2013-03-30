@@ -13,6 +13,7 @@ import android.widget.Toast;
 import de.bsd.zwitscher.*;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.other.ReadItLaterStore;
+import twitter4j.TwitterException;
 
 /**
  * A task that sends stuff that got queued while being offline.
@@ -47,7 +48,7 @@ public class FlushQueueTask extends AsyncTask<Void,Integer,Pair<Integer,Integer>
                  UpdateRequest usr = (UpdateRequest) ois.readObject();
                  ois.close();
 
-                 UpdateResponse ret=null;
+                 UpdateResponse ret= new UpdateResponse(usr.getUpdateType());
 
                  switch (usr.getUpdateType()) {
                  case UPDATE:
@@ -67,9 +68,8 @@ public class FlushQueueTask extends AsyncTask<Void,Integer,Pair<Integer,Integer>
                      good++;
                      break;
                  case REPORT_AS_SPAMMER:
-                     int code = th.reportAsSpammer(usr.id); // TODO correct status ?
-                     ret = new UpdateResponse(UpdateType.REPORT_AS_SPAMMER,usr.id);
-                     ret.setStatusCode(code);
+                     ret.setId(usr.id);
+                     th.reportAsSpammer(usr.id);
                      break;
                  case LATER_READING:
                      ReadItLaterStore store = new ReadItLaterStore(usr.extUser,usr.extPassword);
@@ -77,14 +77,16 @@ public class FlushQueueTask extends AsyncTask<Void,Integer,Pair<Integer,Integer>
                      boolean success;
                      success = result.startsWith("200");
 
-                     ret = new UpdateResponse(usr.getUpdateType(),success,result);
+                     ret = new UpdateResponse(usr.getUpdateType(), result);
 
                      if (success)
                          good++;
 
                      break;
+/*
                  default:
                      Log.e("FlushQueueTask","Update type " + usr.getUpdateType() + " not yet supported");
+*/
                  }
                  Log.i("FlushQueueTask","Return was: " + ret);
                  if (ret!=null && ret.getStatusCode() != 502) { // TODO look up codes
@@ -95,9 +97,11 @@ public class FlushQueueTask extends AsyncTask<Void,Integer,Pair<Integer,Integer>
                  e.printStackTrace();  // TODO: Customise this generated block
              } catch (ClassNotFoundException e) {
                  e.printStackTrace();  // TODO: Customise this generated block
+             } catch (TwitterException e) {
+                 e.printStackTrace();  // TODO: Customise this generated block
              }
 
-         }
+        }
 
         Pair<Integer,Integer> result = new Pair<Integer, Integer>(count,good);
         return result;
