@@ -66,6 +66,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     private Account account;
     int screenWidth;
     private Pattern vineCoPattern = Pattern.compile(".*<.* content=\"(.*)\">");
+    private Pattern vimeoPattern = Pattern.compile(".*<thumbnail_large>(.*)</thumbnail_large>.*");
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -764,6 +765,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             else if (url.contains("://vine.co/v")) {
                 finalUrlString = getVinePreview(url);
             }
+            else if (url.contains("://vimeo.com/")) {
+                finalUrlString = getVimeoPreview(url);
+            }
             else if (url.endsWith(".jpg") || url.endsWith(".png") || url.endsWith(".jpeg")) {
                 finalUrlString = url;
             }
@@ -819,6 +823,49 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             while ((line=br.readLine())!=null) {
                 if (line.contains("og:image")) {
                     Matcher m = vineCoPattern.matcher(line);
+                    if (m.matches()) {
+                        return m.group(1);
+                    }
+                }
+            }
+
+            urlConnection.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+        finally {
+            if (urlConnection!=null)
+                urlConnection.disconnect();
+            if ( br!=null)
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();  // TODO: Customise this generated block
+                }
+
+        }
+        return null;
+    }
+
+    private String getVimeoPreview(String url) {
+
+
+        String infoUrl = url.replace("http://vimeo.com/","http://vimeo.com/api/v2/video/");
+        infoUrl += ".xml";
+
+        BufferedReader br = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            urlConnection = (HttpURLConnection) new URL(infoUrl).openConnection();
+            urlConnection.setDoInput(true);
+            urlConnection.setDoOutput(false);
+            urlConnection.connect();
+
+            br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            String line;
+            while ((line=br.readLine())!=null) {
+                if (line.contains("thumbnail_large")) {
+                    Matcher m = vimeoPattern.matcher(line);
                     if (m.matches()) {
                         return m.group(1);
                     }
