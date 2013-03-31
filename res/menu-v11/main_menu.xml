@@ -7,13 +7,13 @@
     <item android:id="@+id/to_top"
           android:icon="@drawable/ic_menu_top"
           android:title="@string/help_to_top"
-          android:showAsAction="always"/>
+          android:showAsAction="ifRoom"/>
     <item android:id="@+id/refresh"
           android:title="@string/refresh"
           android:icon="@drawable/ic_menu_refresh"
           android:showAsAction="always"/>
     <item android:id="@+id/send"
-          android:showAsAction="always|withText"
+          android:showAsAction="ifRoom|withText"
           android:title="@string/new_message"
           android:icon="@drawable/ic_menu_start_conversation"
         />
