@@ -82,10 +82,10 @@
                     />
 
     <CheckBoxPreference android:title="Sync with Tweet Marker"
-                        android:summary="Sync the read status with Tweet Marker (tweetmarker.net)"
+                        android:summary="Sync the read status with Tweet Marker (tweetmarker.net) - Twitter only at the moment"
                         android:key="tweetmarker_sync"
                         android:defaultValue="false"
-                        android:enabled="false"
+                        android:enabled="true"
                         />
 
     <PreferenceScreen android:title="@string/read_it_later_support">

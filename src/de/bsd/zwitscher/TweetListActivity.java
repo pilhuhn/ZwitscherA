@@ -281,8 +281,12 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     	}
 
         // Sync with TweetMarker
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        boolean doTweetMarkerSync = prefs.getBoolean("tweetmarker_sync",false);
+
         long newLast2=-1;
-        if (listId>=0 && !account.isStatusNet() && !fromDbOnly) {
+        if (doTweetMarkerSync && listId>=0 && !account.isStatusNet() && !fromDbOnly) {
             if (listId==0)
                 newLast2 = TweetMarkerSync.syncFromTweetMarker("timeline", account.getName());
             else
