@@ -85,7 +85,7 @@ public class ListOfListsActivity extends AbstractListActivity {
                 result.add(pair);
             }
         }
-        else if (mode==1) {
+        else if (mode==1) { // Saved searches
             List<SavedSearch> searches = th.getSavedSearchesFromDb();
             for (SavedSearch search : searches) {
                 Pair<String,Integer> pair = new Pair<String, Integer>(search.getName(),0);
@@ -197,6 +197,9 @@ public class ListOfListsActivity extends AbstractListActivity {
             if (progressBar !=null)
                 progressBar.setVisibility(ProgressBar.VISIBLE);
 
+            if (Build.VERSION.SDK_INT>=11) {
+                getParent().setProgressBarIndeterminateVisibility(true);
+            }
         }
 
 
@@ -247,6 +250,7 @@ public class ListOfListsActivity extends AbstractListActivity {
                     ab.setTitle(account.getAccountIdentifier());
                     ab.setSubtitle(null);
                 }
+                getParent().setProgressBarIndeterminateVisibility(false);
             }
 
         }

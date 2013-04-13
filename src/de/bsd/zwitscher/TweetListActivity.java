@@ -79,6 +79,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             // We have no enclosing TabWidget, so we need to request the custom title
             requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         }
+        if ((!(theParent instanceof TabWidget)) && (android.os.Build.VERSION.SDK_INT>=11)) {
+            // We have no enclosing TabWidget, so we need to request progress thingy
+            requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        }
 
         // Set the layout of the list activity
         setContentView(R.layout.tweet_list_layout);
@@ -573,13 +577,8 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             updating = context.getString(R.string.updating);
             String s = getString(R.string.getting_statuses, account.getStatusType());
             if (updateListAdapter) {
-                if (progressBar!=null)
+                if (progressBar!=null) {
                     progressBar.setVisibility(ProgressBar.VISIBLE);
-                else {
-                    dialog = new Dialog(context);
-                    dialog.setTitle(s);
-                    dialog.setCancelable(false);
-                    dialog.show();
                 }
             }
             if(titleTextBox!=null) {
@@ -587,8 +586,18 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             }
             if (Build.VERSION.SDK_INT>=11) {
                 ActionBar ab = getActionBar();
-                if (ab!=null)
+                if (ab!=null) {
                     ab.setSubtitle(s);
+                }
+
+                if (getParent()!=null) {
+                    getParent().setProgressBarIndeterminateVisibility(true);
+//                    ((TabWidget)getParent()).showHideAbMenuItems(false);
+                }
+                else {
+                    // No parent tab bar when used on a list
+                    setProgressBarIndeterminateVisibility(true);
+                }
             }
         }
 
@@ -660,6 +669,16 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
                 return;
 
+            }
+
+            if (Build.VERSION.SDK_INT>=11) {
+                if (getParent()!=null) {
+                    getParent().setProgressBarIndeterminateVisibility(false);
+//                    ((TabWidget)getParent()).showHideAbMenuItems(true);
+                } else {
+                    // A list has no TabWdget as parent
+                    setProgressBarIndeterminateVisibility(false);
+                }
             }
 
             if (updateListAdapter) {

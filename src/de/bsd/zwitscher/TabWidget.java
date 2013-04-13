@@ -54,6 +54,7 @@ public class TabWidget extends TabActivity  {
     private Account account;
     private AbstractListActivity listActivity;
     private List<Account> accountList;
+    private Menu menu;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,9 @@ public class TabWidget extends TabActivity  {
 
         if (android.os.Build.VERSION.SDK_INT<11)
             requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+        else {
+            requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        }
 		setContentView(R.layout.tabs);
         if (android.os.Build.VERSION.SDK_INT<11) {
             getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
@@ -207,13 +211,16 @@ public class TabWidget extends TabActivity  {
 
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		 MenuInflater inflater = getMenuInflater();
+		MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         if (Build.VERSION.SDK_INT>=11) {
             MenuItem item = menu.findItem(R.id.ProgressBar);
             pg = (ProgressBar) item.getActionView();
             pg.setVisibility(ProgressBar.INVISIBLE);
         }
+
+        this.menu = menu;
+
         return true;
 	}
 
@@ -350,6 +357,15 @@ public class TabWidget extends TabActivity  {
         return data;
     }
 
+    void showHideAbMenuItems(boolean show) {
+
+        if (Build.VERSION.SDK_INT>=11) {
+            if (menu!=null) {
+                menu.findItem(R.id.to_top).setVisible(show);
+                menu.findItem(R.id.refresh).setVisible(show);
+            }
+        }
+    }
 
     private class SyncSLTask extends AsyncTask<Void,Void,Void> {
 

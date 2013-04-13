@@ -18,8 +18,17 @@
         <attr name="android:galleryItemBackground" />
     </declare-styleable>
 
+    <style name="MyIndeterminateProgress" parent="@android:style/Widget.ProgressBar.Small">
+      <item name="android:minWidth">16dip</item>
+      <item name="android:maxWidth">16dip</item>
+      <item name="android:minHeight">16dip</item>
+      <item name="android:maxHeight">16dip</item>
+    </style>
+
+
     <style name="MyActionBar" parent="android:style/Widget.Holo.ActionBar">
         <item name="android:background">#446644</item>
+        <item name="android:indeterminateProgressStyle">@style/MyIndeterminateProgress</item>
     </style>
 
     <style name="ZwitscherStyle" parent="android:style/Theme.Holo">
