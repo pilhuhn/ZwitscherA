@@ -11,7 +11,6 @@ import java.util.regex.PatternSyntaxException;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -552,7 +551,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         String updating;
         Context context;
         private int listId;
-        Dialog dialog = null;
         private boolean updateListAdapter;
         private int startDelaySecs;
 
@@ -660,26 +658,18 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
                 // No new items, no need to replace the current adapter
 
+/*
                 if (progressBar !=null)
                     progressBar.setVisibility(ProgressBar.INVISIBLE);
-                if (dialog!=null)
-                    dialog.cancel();
                 if (titleTextBox!=null)
                     titleTextBox.setText(account.getAccountIdentifier());
 
                 return;
+*/
+                updateListAdapter=false;
 
             }
 
-            if (Build.VERSION.SDK_INT>=11) {
-                if (getParent()!=null) {
-                    getParent().setProgressBarIndeterminateVisibility(false);
-//                    ((TabWidget)getParent()).showHideAbMenuItems(true);
-                } else {
-                    // A list has no TabWdget as parent
-                    setProgressBarIndeterminateVisibility(false);
-                }
-            }
 
             if (updateListAdapter) {
                 if (listId <-4) { // saved search
@@ -759,10 +749,20 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                     getListView().setSelection(position);
                 }
             }
-            if (progressBar !=null)
+            if (progressBar !=null) {
                 progressBar.setVisibility(ProgressBar.INVISIBLE);
-            if (dialog!=null)
-                dialog.cancel();
+            }
+
+            if (Build.VERSION.SDK_INT>=11) {
+                if (getParent()!=null) {
+                    getParent().setProgressBarIndeterminateVisibility(false);
+//                    ((TabWidget)getParent()).showHideAbMenuItems(true);
+                } else {
+                    // A list has no TabWdget as parent
+                    setProgressBarIndeterminateVisibility(false);
+                }
+            }
+
 
 		}
 
