@@ -740,13 +740,18 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 Toast.makeText(context,updating + ": " + tmp,Toast.LENGTH_SHORT).show();
             }
 
-            // Only do the next if we actually did an update from twitter
-            if (!fromDbOnly && updateListAdapter) {
-                Log.i("GTLTask", " scroll to " + result.getNumOriginal());
-                // TODO modify to scroll to last-read position
-                int position = result.getNumOriginal() - 1;
-                if (position>0) {
-                    getListView().setSelection(position);
+            if (updateListAdapter) {
+                // Only do the next if we actually did an update from twitter
+                if (!fromDbOnly) {
+                    Log.i("GTLTask", " scroll to " + result.getNumOriginal());
+                    // TODO modify to scroll to last-read position
+                    int position = result.getNumOriginal() - 1;
+                    if (position>0) {
+                        getListView().setSelection(position);
+                    }
+                }
+                else if (unreadCount>1) {
+                    getListView().setSelection(unreadCount-1);
                 }
             }
             if (progressBar !=null) {
