@@ -48,14 +48,16 @@ public class ReadItLaterStore {
         json.append("new={");
         json.append("  \"0\":{ \n");
         json.append("      \"url\":\"").append(articleUrl).append("\",\n");
-        json.append("      \"title\":\"").append(tweet.getText()).append("\"");
+        String text = tweet.getText();
+        text = text.replaceAll("\"","'");
+        json.append("      \"title\":\"").append(text).append("\"");
         if (isTwitter) {
             json.append(",\n");
             json.append("      \"ref_id\":\"").append(tweet.getId()).append("\"");
         }
         json.append("} } ");
 
-        System.out.println(json.toString());
+        System.out.println("--> Sending to pocket: "  + json.toString());
         int code;
         String result="-no result-";
 
@@ -72,7 +74,7 @@ public class ReadItLaterStore {
             out.flush();
             code = conn.getResponseCode();
             Map headers = conn.getHeaderFields();
-            System.out.println(headers);
+            System.out.println("--< Headers from Pocket: " + headers);
 
             InputStream inputStream;
             if (code != HttpURLConnection.HTTP_OK)
@@ -88,7 +90,7 @@ public class ReadItLaterStore {
                 }
                 br.close();
                 result = builder.toString();
-                System.out.println(result);
+                System.out.println("--< Answer from Pocket " + result);
             }
 
         } catch (IOException e) {
