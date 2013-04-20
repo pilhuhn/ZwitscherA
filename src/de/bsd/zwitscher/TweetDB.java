@@ -321,7 +321,7 @@ public class TweetDB {
      * @param list_id id of the list
      * @return id of the status that was last read
      */
-	long getLastRead(int account, int list_id) {
+    public long getLastRead(int account, int list_id) {
         Long ret=-1L;
         try {
             Cursor c = db.query(TABLE_LAST_READ, new String[] {"last_read_id"}, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id), String.valueOf(
@@ -399,7 +399,7 @@ account)}, null, null, null);
      * @param list_id List to mark as read
      * @param last_read_id Id of the last read status
      */
-	void updateOrInsertLastRead(int account, int list_id, long last_read_id) {
+    public void updateOrInsertLastRead(int account, int list_id, long last_read_id) {
 		ContentValues cv = new ContentValues();
 		cv.put("list_id", list_id);
 		cv.put("last_read_id", last_read_id);
@@ -466,6 +466,27 @@ account)}, null, null, null);
 		c.close();
 		return ret;
 	}
+
+    /**
+     * Get the lists the current account owns
+     * @param account Account that owns the lists
+     * @return Map with List name and list id
+     */
+    Map<String,Integer> getOwnedLists(Account account) {
+        Map<String,Integer> ret = new HashMap<String, Integer>();
+        Cursor c = db.query(TABLE_LISTS, new String[] {"name","id"}, ACCOUNT_ID_IS + " AND owner_name=?", new String[]{String.valueOf(
+                      account.getId()),account.getName()}, null, null, "name");
+      		if (c.getCount()>0){
+      			c.moveToFirst();
+      			do {
+                  String name = c.getString(0);  // 0 = name
+                  Integer id = c.getInt(1);
+                  ret.put(name, id );
+      			} while (c.moveToNext());
+      		}
+      		c.close();
+      		return ret;
+    }
 
     /**
      * Add a new list to the database
@@ -874,27 +895,17 @@ account)}, null, null, null);
                 new String[]{String.valueOf(userId), String.valueOf(account)});
     }
 
+    /**
+     * Return the default account or null if no (default) account is found.
+     * As one account is always supposed to be default, null is in fact only
+     * returned if no account is stored in the database.
+     * @return The default account or null
+     */
     public Account getDefaultAccount(){
-        Cursor c;
-        Account account=null;
-        c = db.query(TABLE_ACCOUNTS,null,"isDefault=1", null,null,null,null);
-        if (c.getCount()>0) {
-            c.moveToFirst();
-            boolean isDefault = c.getInt(6) == 1;
-            account = new Account(
-                    c.getInt(0), // id
-                    c.getString(1), // name
-                    c.getString(2), // token key
-                    c.getString(3), // token secret
-                    c.getString(4), // url
-                    c.getString(5), // type /5)
-                    isDefault // 6
-            );
-            account.setPassword(c.getString(7));
-        }
-        c.close();
-        return account;
-
+        List<Account> accounts = getAccountsForSelection(true);
+        if (accounts.size()==0)
+            return null;
+        return accounts.get(0);
     }
 
     /**
@@ -920,23 +931,32 @@ account)}, null, null, null);
     }
 
 
-    public List<Account> getAccountsForSelection() {
+    public List<Account> getAccountsForSelection(boolean defaultOnly) {
+        String selection = null;
+        if (defaultOnly) {
+            selection="isDefault=1";
+        }
+
         Cursor c;
         List<Account> accounts = new ArrayList<Account>();
-        c = db.query(TABLE_ACCOUNTS,null, null,null,null,null,null);
+        c = db.query(TABLE_ACCOUNTS,null, selection,null,null,null,null);
         if (c.getCount()>0) {
             c.moveToFirst();
             do {
                 boolean isDefault = c.getInt(6) == 1;
+                String accString = c.getString(5);
+                accString = accString.replaceAll("\\.","");
+                accString = accString.toUpperCase();
+
                 Account account = new Account(
                         c.getInt(0), // id
                         c.getString(1), // name
                         c.getString(2), // token key
                         c.getString(3), // token secret
                         c.getString(4), // url
-                        c.getString(5), // type /5)
+                        Account.Type.valueOf(accString), // type /5)
                         isDefault // 6
-                );
+                        );
                 account.setPassword(c.getString(7));
                 accounts.add(account);
             } while (c.moveToNext());
@@ -946,10 +966,10 @@ account)}, null, null, null);
         return accounts;
     }
 
-    public Account getAccountForType(String s) {
-        List<Account> accounts = getAccountsForSelection();
+    public Account getAccountForType(Account.Type type) {
+        List<Account> accounts = getAccountsForSelection(false);
         for (Account account : accounts) {
-            if (account.getServerType().equalsIgnoreCase(s))
+            if (account.getServerType()==type)
                 return account;
         }
         return null;
@@ -986,7 +1006,7 @@ account)}, null, null, null);
         cv.put("tokenKey",account.getAccessTokenKey());
         cv.put("tokenSecret",account.getAccessTokenSecret());
         cv.put("serverUrl", account.getServerUrl());
-        cv.put("serverType", account.getServerType());
+        cv.put("serverType", account.getServerType().name());
         cv.put("isDefault",account.isDefaultAccount() ? 1 : 0);
         cv.put("password",account.getPassword());
 

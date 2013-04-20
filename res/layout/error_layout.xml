@@ -11,7 +11,7 @@
               android:layout_height="wrap_content"
               android:layout_marginRight="10dp"
               android:src="@drawable/icon"
-            />
+      android:contentDescription="@string/logo_description" />
 
 
     <TextView android:id="@+id/error_head"
@@ -32,7 +32,7 @@
               android:layout_height="wrap_content"
               android:layout_width="fill_parent"
               android:editable="false"
-              />
+      android:inputType="text" />
     <Button android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:onClick="doneButton"

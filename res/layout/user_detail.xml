@@ -16,8 +16,9 @@
                 android:layout_height="80px"
                 android:src="@drawable/user_unknown"
                 android:scaleType="fitXY"
-                android:padding="4px"
-                android:id="@+id/UserPictureImageView"/>
+                android:padding="4dp"
+                android:id="@+id/UserPictureImageView"
+      android:contentDescription="@string/picture_of_user" />
 
 
     <TableLayout android:id="@+id/user_table_layout"
@@ -100,7 +101,7 @@
             android:layout_gravity="left"
             android:onClick="done"
             android:src="@drawable/back_button"
-            />
+          android:contentDescription="@string/done_description" />
         <Button android:id="@+id/userDetail_follow_button"
                 android:text="@string/follow_user"
                 android:layout_height="wrap_content"
@@ -117,13 +118,14 @@
                 android:layout_width="wrap_content"
                 android:layout_gravity="right"
                 android:enabled="false"
-            />
+          android:contentDescription="@string/help_add_list" />
         <ImageButton android:id="@+id/DirectButton"
                      android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="directMessage"
                 android:src="@drawable/direct_button"
-                android:text="@string/Direct"/>
+                android:text="@string/Direct"
+          android:contentDescription="@string/help_direct_button" />
     </LinearLayout>
     <LinearLayout
         android:layout_height="wrap_content"

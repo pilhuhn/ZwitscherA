@@ -27,7 +27,7 @@
                         android:src="@drawable/add_list"
                         style="@style/helpIcon"
 
-                        />
+                  android:contentDescription="@string/help_add_list" />
                 <TextView
                         android:text="@string/help_add_list"
                         style="@style/helpText"
@@ -37,7 +37,7 @@
                 <ImageView
                         android:src="@drawable/back_button"
                         android:background="@android:color/darker_gray"
-                        />
+                  android:contentDescription="@string/help_back_button" />
                 <TextView
                         android:text="@string/help_back_button"
                         style="@style/helpText"
@@ -47,7 +47,7 @@
                 <ImageView
                         android:src="@drawable/camera"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_camera" />
                 <TextView
                         android:text="@string/help_camera"
                         style="@style/helpText"
@@ -57,7 +57,7 @@
                 <ImageView
                         android:src="@drawable/direct_button"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_direct_button" />
                 <TextView
                         android:text="@string/help_direct_button"
                         style="@style/helpText"
@@ -67,7 +67,7 @@
                 <ImageView
                         android:src="@drawable/favorite_off"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_favorite" />
                 <TextView
                         android:text="@string/help_favorite"
                         style="@style/helpText"
@@ -77,7 +77,7 @@
                 <ImageView
                         android:src="@drawable/post_button"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_post_button" />
                 <TextView
                         android:text="@string/help_post_button"
                         style="@style/helpText"
@@ -87,7 +87,7 @@
                 <ImageView
                         android:src="@drawable/reload_button"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_reload_button" />
                 <TextView
                         android:text="@string/help_reload_button"
                         style="@style/helpText"
@@ -97,7 +97,7 @@
                 <ImageView
                         android:src="@drawable/reply_button"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_reply_button" />
                 <TextView
                         android:text="@string/help_reply_button"
                         style="@style/helpText"
@@ -107,7 +107,7 @@
                 <ImageView
                         android:src="@drawable/reply_all_button"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_reply_all_button" />
                 <TextView
                         android:text="@string/help_reply_all_button"
                         style="@style/helpText"
@@ -117,7 +117,7 @@
                 <ImageView
                         android:src="@drawable/rt_button_cl"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_rt_button" />
                 <TextView
                         android:text="@string/help_rt_button"
                         style="@style/helpText"
@@ -127,7 +127,7 @@
                 <ImageView
                         android:src="@drawable/rt_button"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_rt_button_cl" />
                 <TextView
                         android:text="@string/help_rt_button_cl"
                         style="@style/helpText"
@@ -137,7 +137,7 @@
                 <ImageView
                         android:src="@drawable/speaker"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_speaker" />
                 <TextView
                         android:text="@string/help_speaker"
                         style="@style/helpText"
@@ -147,7 +147,7 @@
                 <ImageView
                         android:src="@drawable/threads"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_threads" />
                 <TextView
                         android:text="@string/help_threads"
                         style="@style/helpText"
@@ -157,7 +157,7 @@
                 <ImageView
                         android:src="@drawable/to_top_button"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_to_top" />
                 <TextView
                         android:text="@string/help_to_top"
                         style="@style/helpText"
@@ -167,7 +167,7 @@
                 <ImageView
                         android:src="@drawable/translate"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_translate" />
                 <TextView
                         android:text="@string/help_translate"
                         style="@style/helpText"
@@ -177,7 +177,7 @@
                 <ImageView
                         android:src="@drawable/user_unknown"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_user_unknown" />
                 <TextView
                         android:text="@string/help_user_unknown"
                         style="@style/helpText"
@@ -187,7 +187,7 @@
                 <ImageView
                         android:src="@drawable/select_user"
                         style="@style/helpIcon"
-                        />
+                  android:contentDescription="@string/help_select_user" />
                 <TextView
                         android:text="@string/help_select_user"
                         style="@style/helpText"

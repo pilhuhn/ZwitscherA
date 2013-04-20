@@ -23,7 +23,6 @@ import twitter4j.TwitterResponse;
 import twitter4j.URLEntity;
 import twitter4j.User;
 
-import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -85,6 +84,7 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
 
             viewHolder = new ViewHolder();
             viewHolder.iv = (UserImageView) convertView.findViewById(R.id.ListImageView);
+            viewHolder.iv.setFocusable(false);
             viewHolder.statusText = (TextView) convertView.findViewById(R.id.ListTextView);
             viewHolder.userInfo = (TextView) convertView.findViewById(R.id.ListUserView);
             viewHolder.timeClientInfo = (TextView) convertView.findViewById(R.id.ListTimeView);
@@ -115,6 +115,9 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
             } else if (readIds.contains(oid)) {
                 convertView.setBackgroundColor(Color.rgb(0,0,40)); // todo debug color
                 isOld=true;
+            } else if (newOlds.contains(oid)) {
+                convertView.setBackgroundColor(Color.rgb(0,0,60));
+                isOld=true;
             } else if (status.isRetweet() && (readIds.contains(rtStatusId) || newOlds.contains(rtStatusId))) {
                 convertView.setBackgroundColor(Color.rgb(40,0,0));
                 isOld=true;
@@ -131,6 +134,11 @@ class StatusAdapter<T extends TwitterResponse> extends AbstractAdapter<T> {
                 }
             }
             newOlds.add(status.getId());
+/*  If this is enabled, RTs are marked as one goes, but the coloring is too aggressive when slightly scrolling around
+    Need to still decide if I want that
+            if (rtStatusId!=-1)
+                newOlds.add(rtStatusId);
+*/
         }
 
         // Color the lines

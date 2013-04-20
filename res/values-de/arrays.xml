@@ -24,5 +24,12 @@
         <item>\@-Name</item>
         <item>Benutzer und @-Name</item>
     </string-array>
+  <string-array name="services">
+      <item>Twitter mit OAuth (Neuer Zwitscher Nutzer)</item>
+      <item>Twitter</item>
+      <item>Identi.ca</item>
+      <item>Generisches Status.Net</item>
+  </string-array>
+
 
 </resources>

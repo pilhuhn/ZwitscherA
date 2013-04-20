@@ -30,7 +30,7 @@
             android:onClick="reload"
             android:src="@drawable/reload_button"
             android:layout_gravity="right"
-                />
+          android:contentDescription="@string/help_reload_button" />
         <ImageButton
             android:id="@+id/post_button"
             android:layout_height="wrap_content"
@@ -39,14 +39,14 @@
             android:enabled="true"
             android:src="@drawable/post_button"
             android:layout_gravity="right"
-                />
+          android:contentDescription="@string/help_post_button" />
         <ImageButton
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_gravity="left"
             android:onClick="scrollToTop"
             android:src="@drawable/to_top_button"
-                />
+          android:contentDescription="@string/help_to_top" />
         <ImageButton
             android:id="@+id/back_button"
             android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
             android:onClick="done"
             android:src="@drawable/back_button"
             android:visibility="gone"
-                />
+          android:contentDescription="@string/done_description" />
     </LinearLayout>
 
 </LinearLayout>

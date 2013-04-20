@@ -65,6 +65,10 @@ public class TweetMarkerSync {
         catch (Exception e) {
             e.printStackTrace();
         }
+        finally {
+            if (conn!=null)
+                conn.disconnect();
+        }
 
     }
 
@@ -77,9 +81,9 @@ public class TweetMarkerSync {
 
     /**
      * Read last-read data from TweetMarker
-     * @param collection
-     * @param user
-     * @return
+     * @param collection Name of the collection (i.e. Twitter list)
+     * @param user Name of the Tweetmarker user (= the twitter user name)
+     * @return The latest synced id value
      */
     public static long syncFromTweetMarker(String collection,String user) {
 

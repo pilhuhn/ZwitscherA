@@ -60,12 +60,10 @@ public class TwitterLoginActivity extends Activity {
 
     }
 
-    @SuppressWarnings("unused")
-
     private class GetRequestTokenTask extends AsyncTask<Void,Void,RequestToken> {
         @Override
         protected RequestToken doInBackground(Void... voids) {
-            RequestToken rt = null;
+            RequestToken rt;
             try {
                 TwitterHelper th = new TwitterHelper(TwitterLoginActivity.this,null);
                 rt = th.getRequestToken(true);
@@ -82,7 +80,7 @@ public class TwitterLoginActivity extends Activity {
         protected Account doInBackground(String... strings) {
             TwitterHelper th = new TwitterHelper(TwitterLoginActivity.this,null);
             String pin = strings[0];
-            Account acct = null;
+            Account acct;
             try {
                 acct = th.generateAccountWithOauth(pin);
                 return acct;
@@ -91,6 +89,18 @@ public class TwitterLoginActivity extends Activity {
                 e.printStackTrace();  // TODO: Customise this generated block
             }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Account account) {
+            Activity context = TwitterLoginActivity.this;
+
+            // Switch to this new account
+            AccountHolder.getInstance(context).setAccount(account);
+            Intent i = new Intent().setClass(context, TabWidget.class);
+            context.startActivity(i);
+
+            context.finish();
         }
     }
 
@@ -131,7 +141,7 @@ public class TwitterLoginActivity extends Activity {
                 html = html.substring(0,i);
 
                 try {
-                    Account acct = new GenerateAccountWithOauthTask().execute(html).get();
+                    new GenerateAccountWithOauthTask().execute(html).get();
                     Intent intent = new Intent().setClass(TwitterLoginActivity.this, TabWidget.class);
                     startActivity(intent);
                     finish();

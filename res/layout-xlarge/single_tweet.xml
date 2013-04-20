@@ -10,9 +10,10 @@
                      android:layout_height="80px"
                      android:src="@drawable/user_unknown"
                      android:scaleType="fitXY"
-                     android:padding="4px"
+                     android:padding="4dp"
                      android:onClick="displayUserDetail"
-                     android:id="@+id/UserPictureImageView"/>
+                     android:id="@+id/UserPictureImageView"
+          android:contentDescription="@string/picture_of_user" />
         <TextView android:id="@+id/HintView"
                   android:layout_height="wrap_content"
                   android:layout_width="wrap_content"
@@ -25,8 +26,8 @@
                   android:id="@+id/TextView01"
                   android:layout_width="wrap_content"
                   android:minLines="2"
-                  android:paddingLeft="5px"
-                  android:paddingRight="5px"
+                  android:paddingLeft="5dp"
+                  android:paddingRight="5dp"
                   android:layout_toRightOf="@id/UserPictureImageView"
                   android:layout_below="@id/HintView"
                   android:layout_height="wrap_content"/>
@@ -60,7 +61,8 @@
                      android:layout_height="wrap_content"
                      android:onClick="reply"
                      android:src="@drawable/reply_button"
-                     android:text="@string/Reply"/>
+                     android:text="@string/Reply"
+          android:contentDescription="@string/help_reply_button" />
         <ImageButton android:id="@+id/ReplyAllButton"
                      android:layout_below="@id/TimeTextView"
                      android:layout_width="wrap_content"
@@ -68,7 +70,8 @@
                      android:layout_toRightOf="@id/ReplyButton"
                      android:onClick="replyAll"
                      android:src="@drawable/reply_all_button"
-                     android:text="@string/Reply_all"/>
+                     android:text="@string/Reply_all"
+          android:contentDescription="@string/help_reply_all_button" />
 
         <ImageButton android:id="@+id/RetweetButton"
                      android:layout_below="@id/TimeTextView"
@@ -77,7 +80,8 @@
                      android:layout_height="wrap_content"
                      android:onClick="retweet"
                      android:src="@drawable/rt_button"
-                     android:text="@string/retweet"/>
+                     android:text="@string/retweet"
+          android:contentDescription="@string/help_rt_button" />
         <ImageButton android:id="@+id/ClassicRetweetButton"
                      android:layout_below="@id/TimeTextView"
                      android:layout_toRightOf="@id/RetweetButton"
@@ -85,7 +89,8 @@
                      android:layout_height="wrap_content"
                      android:onClick="classicRetweet"
                      android:src="@drawable/rt_button_cl"
-                     android:text="Classic Retweet"/>
+                     android:text="@string/help_rt_button_cl"
+          android:contentDescription="@string/help_rt_button_cl" />
 
         <ImageButton android:id="@+id/ThreadButton"
                      android:layout_below="@id/TimeTextView"
@@ -94,7 +99,8 @@
                      android:layout_height="wrap_content"
                      android:onClick="threadView"
                      android:src="@drawable/threads"
-                     android:text="@string/thread"/>
+                     android:text="@string/thread"
+          android:contentDescription="@string/help_threads" />
         <Button android:id="@+id/DirectButton"
                      android:layout_below="@id/TimeTextView"
                      android:layout_width="wrap_content"
@@ -109,7 +115,8 @@
                      android:layout_toRightOf="@id/DirectButton"
                      android:onClick="favorite"
                      android:src="@drawable/favorite_off"
-                     android:text="@string/favorite"/>
+                     android:text="@string/favorite"
+          android:contentDescription="@string/help_favorite" />
 
         <ImageButton android:id="@+id/SpeakButton"
                      android:layout_below="@id/TimeTextView"
@@ -118,7 +125,8 @@
                      android:layout_height="wrap_content"
                      android:onClick="speak"
                      android:src="@drawable/speaker"
-                     android:text="@string/speak"/>
+                     android:text="@string/speak"
+          android:contentDescription="@string/help_speaker" />
         <ImageButton android:id="@+id/TranslateButton"
                      android:layout_below="@id/TimeTextView"
                      android:layout_toRightOf="@id/SpeakButton"
@@ -126,7 +134,8 @@
                      android:layout_height="wrap_content"
                      android:onClick="translate"
                      android:src="@drawable/translate"
-                     android:text="@string/Translate"/>
+                     android:text="@string/Translate"
+          android:contentDescription="@string/help_translate" />
         <ImageButton android:layout_below="@id/TimeTextView"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
@@ -135,7 +144,7 @@
                      android:onClick="send"
                      android:src="@drawable/direct_button"
                      android:id="@+id/SendButton"
-                />
+          android:contentDescription="@string/help_post_button" />
 
         <Button android:id="@+id/ril_button"
                 android:text="@string/ril_button"
@@ -153,7 +162,8 @@
                      android:layout_height="wrap_content"
                      android:onClick="done"
                      android:src="@drawable/back_button"
-                     android:text="@string/Done"/>
+                     android:text="@string/Done"
+          android:contentDescription="@string/done_description" />
         <Spinner android:id="@+id/ot_spinner"
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content"
@@ -161,10 +171,23 @@
                  android:prompt="@string/pickUser"
                  />
 
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ot_spinner"
+        android:orientation="vertical"
+        >
         <Gallery xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/gallery"
-                 android:layout_width="fill_parent"
+                 android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:layout_below="@id/ot_spinner"
                 />
+        <ProgressBar android:layout_width="wrap_content"
+          android:id="@+id/gallery_progress"
+          android:layout_height="wrap_content"
+          android:indeterminateBehavior="cycle"
+          android:visibility="visible"
+          android:layout_gravity="center"
+          android:indeterminate="true"/>
+      </LinearLayout>
     </RelativeLayout>
 </ScrollView>

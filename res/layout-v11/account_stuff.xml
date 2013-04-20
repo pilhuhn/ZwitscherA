@@ -1,37 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-
-    <Button
-            android:id="@+id/NewAccountButton"
-            android:text="@string/select_account_new"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="newAccount"
-            android:padding="10dp"
-            android:paddingBottom="20dp"
-            />
-
 
     <TextView
             android:id="@+id/AccountSelectionTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/select_account_select"
-            android:layout_below="@id/NewAccountButton"
             android:textStyle="bold"
             android:textSize="20dp"
-            android:paddingTop="30dp"
             />
 
     <Spinner android:id="@+id/select_account_spinner"
              android:layout_height="wrap_content"
              android:layout_width="fill_parent"
              android:prompt="@string/select_account_select"
-             android:layout_below="@id/AccountSelectionTitle"
              android:padding="10dp"
              />
 
@@ -42,10 +28,10 @@
             android:onClick="switchAccount"
             android:text="@string/select_account_pick"
             android:padding="10dp"
-            android:layout_below="@id/select_account_spinner"
             />
 
 
+<!--
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -63,6 +49,7 @@
         android:onClick="done"
         android:src="@drawable/back_button"
         android:layout_below="@id/select_account_pick_button"
-      android:contentDescription="@string/done_description" />
+    />
+-->
 
-</RelativeLayout>
+</LinearLayout>

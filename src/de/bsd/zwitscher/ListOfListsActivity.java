@@ -85,7 +85,7 @@ public class ListOfListsActivity extends AbstractListActivity {
                 result.add(pair);
             }
         }
-        else if (mode==1) {
+        else if (mode==1) { // Saved searches
             List<SavedSearch> searches = th.getSavedSearchesFromDb();
             for (SavedSearch search : searches) {
                 Pair<String,Integer> pair = new Pair<String, Integer>(search.getName(),0);
@@ -141,7 +141,6 @@ public class ListOfListsActivity extends AbstractListActivity {
             if (listId!=-1) {
 
                 int count = adapter.getUnreadCountForPosition(position);
-                tdb.markAllRead(listId, account.getId()); // TODO Too early ? How to pass the number of unreads to the inner list?
                 adapter.setCountForItem(position,0);
                 adapter.notifyDataSetChanged();
                 getListView().requestLayout();
@@ -152,7 +151,7 @@ public class ListOfListsActivity extends AbstractListActivity {
                 intent.putExtra("userListOwner",ownerName);
                 intent.putExtra("unreadCount",count);
 
-                startActivity(intent);
+                startActivityForResult(intent, listId);
             }
         } else if (mode ==1) {
             List<SavedSearch> searches = th.getSavedSearchesFromDb();
@@ -166,6 +165,18 @@ public class ListOfListsActivity extends AbstractListActivity {
                 }
             }
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        // Mark the list as read when we return from it.
+        // request code = listId
+        tdb.markAllRead(requestCode, account.getId());
+        // Request re-layouting the list of lists, as the count has changed (just to be sure)
+        adapter.notifyDataSetChanged();
+        getListView().requestLayout();
+
     }
 
     /**
@@ -197,6 +208,9 @@ public class ListOfListsActivity extends AbstractListActivity {
             if (progressBar !=null)
                 progressBar.setVisibility(ProgressBar.VISIBLE);
 
+            if (Build.VERSION.SDK_INT>=11) {
+                getParent().setProgressBarIndeterminateVisibility(true);
+            }
         }
 
 
@@ -247,6 +261,7 @@ public class ListOfListsActivity extends AbstractListActivity {
                     ab.setTitle(account.getAccountIdentifier());
                     ab.setSubtitle(null);
                 }
+                getParent().setProgressBarIndeterminateVisibility(false);
             }
 
         }

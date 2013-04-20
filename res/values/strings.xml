@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="accountTypes">
-        <item>Twitter</item>
-        <item>laconi.ca</item>
-        <item>status.net</item>
-    </string-array>
-
     <string name="status">status</string>
     <string name="reply">reply</string>
     <string name="replyall">replyAll</string>
@@ -14,8 +8,7 @@
     <string name="direct_message_sent">Direct message sent</string>
     <string name="hello">Enter your tweet text below:</string>
     <string name="app_name">Zwitscher</string>
-    <string name="loading">Loading Tweets …</string>
-    <string name="no_connect">Can not connect to Twitter</string>
+    <string name="no_connect">Can not connect to server</string>
     <string name="TweetButton">Tweet this!</string>
     <string name="ClearButton">Clear!</string>
     <string name="home_timeline">Home</string>
@@ -35,11 +28,10 @@
     <string name="in_reply_to"> in reply to </string>
     <string name="via">" via "</string>
     <string name="send_direct_to">Sending direct message to </string>
-    <string name="getting_tweets">Getting tweets</string>
+    <string name="getting_statuses">Getting %ss …</string>
     <string name="getting_conversation">Getting conversation</string>
     <string name="follow_user">Follow user</string>
     <string name="unfollow_user">Unfollow user</string>
-    <string name="add">Add</string>
     <string name="from">from</string>
     <string name="get_user_detail">Getting user details …</string>
     <string name="get_preview">"Loading previews…"</string>
@@ -49,16 +41,8 @@
     <string name="no_searches_found">No saved searches found - do you need to sync?</string>
     <string name="updating">Updating</string>
 
-    <string name="login_common">You need to log into Twitter to authorize Zwitscher. <br/><br/>
-        To do this, click on "Get pin from Twitter", then log in in the Browser, write down the PIN and then
-        from the home screen start Zwitscher again and enter the pin. Then click on "Set pin"
-        <br/><br/>
-        You only have to do this once at initial login
-    </string>
-    <string name="please_log_in">Please log in</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
-    <string name="login">Log in…</string>
     <string name="service">Service</string>
     <string name="new_mentions">new mentions</string>
     <string name="new_directs">new direct messages</string>
@@ -118,7 +102,7 @@
     <string name="new_account_create_title">Create account</string>
     <string name="new_account_switch">Switch to new</string>
     <string name="new_account_create">Create!</string>
-    <string name="menu_switch_account">Accounts</string>
+    <string name="menu_switch_account">Accounts…</string>
     <string name="select_account_delete">Delete Account…</string>
     <string name="really_delete">Really delete</string>
     <string name="menu_clean_statuses">Clean up Statuses</string>
@@ -146,7 +130,6 @@
     <string name="forward">Forward</string>
     <string name="speak">Read out loud</string>
     <string name="favorite">Favorite</string>
-    <string name="translating">Translating…</string>
     <string name="logging_in">Logging in…</string>
     <string name="new_message">New Msg</string>
     <string name="take_picture_via">Take picture via:</string>
@@ -179,14 +162,13 @@
     <string name="screen_name_overview">Name display</string>
     <string name="prefs_screen_name_overview">How to display names in the timeline (a change will only be active after a timeline reload)</string>
     <string name="Preferences">Preferences</string>
-    <string name="add_to_list">Add to list…</string>
+    <string name="add_to_list">Manage lists…</string>
     <string name="query_is">Query is</string>
     <string name="no_items_found">No items found</string>
     <string name="queueing">Server seems down or overloaded, queued for later sending. [%s]</string>
     <string name="update_not_yet_supported">Update type %s not supported yet</string>
     <string name="pick_a_user">Pick a user</string>
     <string name="no_ril_user">No user/password for Pocket(ReadItLater) given</string>
-    <string name="translation_result">Translation result:</string>
     <string name="error_nothing_provided">-nothing provided-</string>
     <string name="account_not_valid">Account is not valid</string>
     <string name="login_failed">Login failed</string>
@@ -198,4 +180,22 @@
   <string name="show_on_web">Show on web…</string>
   <string name="delete_status">Delete status…</string>
   <string name="delete_status_really">Really delete status?</string>
+  <string name="no_result">Got no result from the server</string>
+  <string name="account_add">Add account…</string>
+  <string name="account_remove">Remove selected account…</string>
+  <string name="offline_turn_on_networking">You seem to be offline. Please turn on networking and come back.</string>
+  <string name="ok">OK</string>
+  <string name="continue_msg">Continue…</string>
+  <string name="picture_of_user">Picture of the user</string>
+  <string name="server_base_url">Server base URL</string>
+  <string name="logo_description">Zwitscher logo</string>
+  <string name="done_description">Back to previous screen</string>
+  <string name="clear_description">Clear input field</string>
+  <string name="added">Added</string>
+  <string name="removed">Removed</string>
+  <string name="follow_unfollow_set">Follow/Unfollow set</string>
+  <string name="status_deleted">Status deleted</string>
+  <string name="load_on_switch">Load on account switch</string>
+  <string name="load_on_switch_descr">Should messages be loaded from the server when switching accounts?</string>
+
 </resources>

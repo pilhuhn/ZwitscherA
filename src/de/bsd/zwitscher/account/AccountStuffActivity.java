@@ -7,7 +7,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -43,6 +46,35 @@ public class AccountStuffActivity extends Activity {
         spinner.setSelection(checked);
 
 	}
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (Build.VERSION.SDK_INT>=11) { // New menu -> V11 only
+            getMenuInflater().inflate(R.menu.account_stuff,menu);
+            getActionBar().setHomeButtonEnabled(true);
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+            case R.id.account_stuff_new_account:
+                newAccount(null);
+                break;
+            case R.id.account_stuff_delete_account:
+                deleteAccount(null);
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);    // TODO: Customise this generated block
+    }
 
     @SuppressWarnings("unused")
 	public void newAccount(View view) {
@@ -101,7 +133,7 @@ public class AccountStuffActivity extends Activity {
         tdb.deleteAccount(account);
 
         // Just select the first available account to switch to
-        List<Account> theAccounts = tdb.getAccountsForSelection();
+        List<Account> theAccounts = tdb.getAccountsForSelection(false);
         if (!theAccounts.isEmpty()) {
             Account first = theAccounts.get(0);
             tdb.setDefaultAccount(first.getId());
@@ -120,7 +152,9 @@ public class AccountStuffActivity extends Activity {
 
     private void switchToSelectedAccount(Account account) {
         Intent intent = new Intent(this, TabWidget.class);
-        AccountHolder.getInstance().setAccount(account);
+        AccountHolder accountHolder = AccountHolder.getInstance(this);
+        accountHolder.setAccount(account);
+        accountHolder.setSwitchingAccounts(true);
         startActivity(intent);
         finish();
     }
@@ -132,14 +166,14 @@ public class AccountStuffActivity extends Activity {
 
     private void getAccounts() {
         TweetDB tdb = TweetDB.getInstance(getApplicationContext());
-        accounts = tdb.getAccountsForSelection();
+        accounts = tdb.getAccountsForSelection(false);
     }
 
     private List<String> getStringsForAccounts() {
         List<String> data = new ArrayList<String>(accounts.size());
         for (Account account : accounts) {
-            String e = account.getAccountIdentifier();
-            data.add(e);
+            String identifier = account.getAccountIdentifier();
+            data.add(identifier);
         }
         return data;
     }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -14,12 +15,15 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
+import de.bsd.zwitscher.account.AccountNavigationListener;
 import de.bsd.zwitscher.account.AccountStuffActivity;
 import de.bsd.zwitscher.account.LoginActivity;
 import de.bsd.zwitscher.helper.CleanupTask;
@@ -40,7 +44,7 @@ import android.widget.TabHost;
  * Activity that creates the Tab bar and starts the various
  * activities on the tabs. Also hosts the main menu.
  */
-public class TabWidget extends TabActivity {
+public class TabWidget extends TabActivity  {
 
     static final String LIST_ID = "list_id";
     private TabHost tabHost;
@@ -49,32 +53,19 @@ public class TabWidget extends TabActivity {
     private int accountId;
     private Account account;
     private AbstractListActivity listActivity;
+    private List<Account> accountList;
+    private Menu menu;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
         Log.i("TabWidget","onCreate");
-        if (android.os.Build.VERSION.SDK_INT<11)
-            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-		setContentView(R.layout.tabs);
-        if (android.os.Build.VERSION.SDK_INT<11) {
-            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
-            pg = (ProgressBar) findViewById(R.id.title_progress_bar);
-            titleTextBox = (TextView) findViewById(R.id.title_msg_box);
-        }
 
-        account = AccountHolder.getInstance().getAccount();
-        /*
-         * When the application got killed/swapped out, TabWidget will be called first,
-         * so we need to re-create the account.
-         */
-        if (account==null) {
-            TweetDB tdb = TweetDB.getInstance(getApplicationContext());
-            account = tdb.getDefaultAccount();
-            AccountHolder.getInstance().setAccount(account);
-        }
+        account = AccountHolder.getInstance(this).getAccount();
 
+        // Account should be non-null. If it is null, no default account is available,
+        // so user did not go through the login procedure
         if (account==null) {
             // Still null -> initial login failed
             Intent i = new Intent().setClass(this, LoginActivity.class);
@@ -85,6 +76,46 @@ public class TabWidget extends TabActivity {
 
         accountId = account.getId();
         Log.i("TabWidget","Account=" + account);
+
+
+        if (android.os.Build.VERSION.SDK_INT<11)
+            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+        else {
+            requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        }
+		setContentView(R.layout.tabs);
+        if (android.os.Build.VERSION.SDK_INT<11) {
+            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
+            pg = (ProgressBar) findViewById(R.id.title_progress_bar);
+            titleTextBox = (TextView) findViewById(R.id.title_msg_box);
+        }
+        else {
+            ActionBar actionBar = getActionBar();
+
+            getAccountNames(); // Initialize accountList
+            // We want the account list in the action bar for easy switching
+            if (accountList.size()>1) {
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
+                SpinnerAdapter accountSpinnerAdapter = getAccountSpinnerAdapter();
+                // We need a separate class for the callback, as othewise we would pull in the ActionBar class
+                // and would thus not work on Android 2.2
+                actionBar.setListNavigationCallbacks(accountSpinnerAdapter, new AccountNavigationListener(this, accountList, account));
+                // Don't show the title, as the account list already shows that data
+                actionBar.setDisplayShowTitleEnabled(false);
+
+                for (int i = 0; i< accountList.size(); i++) {
+                    if (accountList.get(i).equals(account)) {
+                        actionBar.setSelectedNavigationItem(i);
+                    }
+                }
+            }
+            else {
+                getActionBar().setTitle(account.getAccountIdentifier());
+            }
+        }
+
+
 
         setupTabs();
 
@@ -97,7 +128,7 @@ public class TabWidget extends TabActivity {
         super.onResume();
 
         Log.i("TabWidget","onResume");
-        Account tmp = AccountHolder.getInstance().getAccount();
+        Account tmp = AccountHolder.getInstance(this).getAccount();
         if (!tmp.equals(account)) {
             // New account, so re-setup tabs
             tabHost.clearAllTabs();
@@ -107,8 +138,6 @@ public class TabWidget extends TabActivity {
         Log.i("TabWidget","Account=" + account);
         if (titleTextBox!=null)
             titleTextBox.setText(account.getAccountIdentifier());
-        if (Build.VERSION.SDK_INT>=11)
-            getActionBar().setTitle(account.getAccountIdentifier());
     }
 
     private void setupTabs() {
@@ -141,7 +170,7 @@ public class TabWidget extends TabActivity {
         tabHost.addTab(homeSpec);
 
 
-        if (account.getServerType().equalsIgnoreCase("twitter")) {
+        if (account.getServerType()== Account.Type.TWITTER) {
             tmp = getString(R.string.list);
             Intent listsIntent = new Intent().setClass(this,ListOfListsActivity.class);
             listsIntent.putExtra("list",0);
@@ -168,7 +197,7 @@ public class TabWidget extends TabActivity {
         tabHost.addTab(homeSpec);
 
 
-        if (account.getServerType().equalsIgnoreCase("twitter")) {
+        if (account.getServerType()== Account.Type.TWITTER) {
 
             Intent searchIntent = new Intent().setClass(this,ListOfListsActivity.class);
             searchIntent.putExtra("list",1);
@@ -182,13 +211,16 @@ public class TabWidget extends TabActivity {
 
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		 MenuInflater inflater = getMenuInflater();
+		MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         if (Build.VERSION.SDK_INT>=11) {
             MenuItem item = menu.findItem(R.id.ProgressBar);
             pg = (ProgressBar) item.getActionView();
             pg.setVisibility(ProgressBar.INVISIBLE);
         }
+
+        this.menu = menu;
+
         return true;
 	}
 
@@ -232,7 +264,7 @@ public class TabWidget extends TabActivity {
             break;
         case R.id.DevelDumpAccounts:
             TweetDB tmpDb = TweetDB.getInstance(getApplicationContext());
-            List<Account> allAccounts = tmpDb.getAccountsForSelection();
+            List<Account> allAccounts = tmpDb.getAccountsForSelection(false);
             for (Account a : allAccounts)
                 System.out.println(a);
             break;
@@ -305,6 +337,36 @@ public class TabWidget extends TabActivity {
 
     }
 
+    ////////////// OnNavigationListener and Spinnerssetup - mostly copied from AccountStuffActivity. TODO unite that again
+    public SpinnerAdapter getAccountSpinnerAdapter() {
+        List<String> data = getAccountNames();
+
+        SpinnerAdapter adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,data);
+
+        return adapter;
+    }
+
+    private List<String> getAccountNames() {
+        TweetDB tdb = TweetDB.getInstance(getApplicationContext());
+        accountList = tdb.getAccountsForSelection(false);
+        List<String> data = new ArrayList<String>(accountList.size());
+        for (Account account : accountList) {
+            String identifier = account.getAccountIdentifier();
+            data.add(identifier);
+        }
+        return data;
+    }
+
+    void showHideAbMenuItems(boolean show) {
+
+        if (Build.VERSION.SDK_INT>=11) {
+            if (menu!=null) {
+                menu.findItem(R.id.to_top).setVisible(show);
+                menu.findItem(R.id.refresh).setVisible(show);
+            }
+        }
+    }
+
     private class SyncSLTask extends AsyncTask<Void,Void,Void> {
 
         private Context context;
@@ -341,7 +403,7 @@ public class TabWidget extends TabActivity {
 	private void syncLists() {
 		TwitterHelper th = new TwitterHelper(this, account);
         TweetDB tdb = TweetDB.getInstance(getApplicationContext());
-        if (account.getServerType().equalsIgnoreCase("twitter")) {
+        if (account.getServerType()== Account.Type.TWITTER) {
             List<UserList> userLists = th.getUserLists();
             Map<Integer, Pair<String, String>> storedLists = tdb.getLists(accountId);
             List<Integer> storedListIds = new ArrayList<Integer>(storedLists.size());

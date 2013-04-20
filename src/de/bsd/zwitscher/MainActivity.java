@@ -84,7 +84,7 @@ public class MainActivity extends Activity implements ActionBar.OnNavigationList
             case R.id.refresh:
                 i = new Intent(this, FetchTimelinesService.class);
                 i.putExtra("listIds", new int[]{0,1,3});
-                i.putExtra("account",AccountHolder.getInstance().getAccount());
+                i.putExtra("account",AccountHolder.getInstance(this).getAccount());
                 startService(i);
                 break;
 

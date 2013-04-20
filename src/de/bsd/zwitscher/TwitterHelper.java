@@ -36,7 +36,6 @@ import twitter4j.media.MediaProvider;
 
 public class TwitterHelper {
 
-    private static final String HTTP_IDENTI_CA_API = "http://identi.ca/api/";
     private Context context;
     private TweetDB tweetDB;
     private Twitter twitter;
@@ -99,7 +98,7 @@ public class TwitterHelper {
 
         }
         catch (Exception e) {
-            System.err.println("Got exception: " + e.getMessage() );
+            Log.e("TwitterHelper","getTimeline: Got exception: " + e.getMessage() );
             if (e.getCause()!=null)
                 System.err.println("   " + e.getCause().getMessage());
             statuses = new ArrayList<Status>();
@@ -125,9 +124,9 @@ public class TwitterHelper {
      * the JSON representation of the objects in a ThreadLocal. So to obtain
      * it, it must be accessed before the next call to twitter.
      *
-     * @param fromDbOnly
-     * @param paging
-     * @return
+     * @param fromDbOnly If true, only messages that are found in the DB are returned
+     * @param paging A paging object to tell how many items to fetch.
+     * @return A list of direct messages
      */
     public MetaList<DirectMessage> getDirectMessages(boolean fromDbOnly, Paging paging) {
 
@@ -180,7 +179,7 @@ public class TwitterHelper {
           // timeline.
           Collections.sort(ret2,new Comparator<DirectMessage>() {
              public int compare(DirectMessage directMessage, DirectMessage directMessage1) {
-                return (int) (directMessage1.getCreatedAt().compareTo(directMessage.getCreatedAt()));
+                return directMessage1.getCreatedAt().compareTo(directMessage.getCreatedAt());
              }
           });
 
@@ -193,9 +192,9 @@ public class TwitterHelper {
     /**
      * Read status objects from the database only.
      * @param sinceId The oldest Id that should
-     * @param howMany
-     * @param list_id
-     * @return
+     * @param howMany How many items should be retrieved
+     * @param list_id THe id of the list to retrieve the items for
+     * @return List of Statuses
      */
     public List<Status> getStatuesFromDb(long sinceId, int howMany, long list_id) {
         List<Status> ret = new ArrayList<Status>();
@@ -236,6 +235,31 @@ public class TwitterHelper {
 	}
 
     /**
+     * Retrieve the lists, the passed user is subscribed to. The returned
+     * list is filtered down to the lists the current account owns
+     * @param screenName Name of the user to investigate
+     * @return List of list names
+     */
+    public List<String> getListMembership(String screenName) {
+        List<String> userLists;
+        List<UserList> tmp;
+        try {
+            tmp = twitter.getUserListMemberships(screenName, -1, true);
+
+            userLists = new ArrayList<String>(tmp.size());
+            for (UserList ul : tmp) {
+                userLists.add(ul.getName());
+            }
+        }
+        catch (TwitterException te) {
+            te.printStackTrace();
+            userLists = Collections.emptyList();
+        }
+
+        return userLists;
+    }
+
+    /**
      * Get the default account from the tweet db.
      * @return Default account
      */
@@ -256,7 +280,7 @@ public class TwitterHelper {
         MediaProvider mediaProvider = getMediaProvider();
 
         if (account!=null) {
-            if (account.getServerType().equalsIgnoreCase("twitter")) {
+            if (account.getServerType()== Account.Type.TWITTER) {
                 ConfigurationBuilder cb = new ConfigurationBuilder();
                 cb.setIncludeEntitiesEnabled(true);
                 cb.setJSONStoreEnabled(true);
@@ -264,22 +288,20 @@ public class TwitterHelper {
                 Configuration conf = cb.build();
                 OAuthAuthorization auth = new OAuthAuthorization(conf);
                 auth.setOAuthAccessToken(new AccessToken(account.getAccessTokenKey(), account.getAccessTokenSecret()));
-                auth.setOAuthConsumer(Tokens.consumerKey,Tokens.consumerSecret);
+                auth.setOAuthConsumer(Tokens.consumerKey, Tokens.consumerSecret);
                 Twitter twitterInstance = new TwitterFactory(conf).getInstance(auth);
-/*
-                        Tokens.consumerKey,
-                        Tokens.consumerSecret,
-                        new AccessToken(account.getAccessTokenKey(), account.getAccessTokenSecret()));
-*/
                 return twitterInstance;
             }
-            else if (account.getServerType().equalsIgnoreCase("identi.ca")) {
+            else if (account.getServerType()== Account.Type.IDENTICA || account.getServerType()== Account.Type.STATUSNET) {
+                String base = account.getServerUrl();
+                base += "/api/";
+
                 ConfigurationBuilder cb = new ConfigurationBuilder();
-                cb.setRestBaseURL(HTTP_IDENTI_CA_API);
+                cb.setRestBaseURL(base);
 //                cb.setSearchBaseURL(HTTP_IDENTI_CA_API);
-                cb.setOAuthAccessTokenURL("https://identi.ca/api/oauth/access_token");
-                cb.setOAuthAuthorizationURL("https://identi.ca/api/oauth/authorize");
-                cb.setOAuthRequestTokenURL("https://identi.ca/api/oauth/request_token");
+                cb.setOAuthAccessTokenURL(base + "oauth/access_token");
+                cb.setOAuthAuthorizationURL(base + "oauth/authorize");
+                cb.setOAuthRequestTokenURL(base + "oauth/request_token");
                 cb.setIncludeEntitiesEnabled(true);
                 cb.setJSONStoreEnabled(true);
                 Configuration conf = cb.build() ;
@@ -328,7 +350,7 @@ public class TwitterHelper {
     /**
      * Get an auth token the classical OAuth way
      *
-     * @param pin
+     * @param pin Pin obtained from Twitter needed to create the oauth tokens
      * @return the newly created account
      * @throws Exception
      */
@@ -339,7 +361,7 @@ public class TwitterHelper {
 		AccessToken accessToken = twitterInstance.getOAuthAccessToken(requestToken, pin);
 
         int newId = tweetDB.getNewAccountId();
-        Account account = new Account(newId,accessToken.getScreenName(),accessToken.getToken(),accessToken.getTokenSecret(),null,"twitter",true);
+        Account account = new Account(newId,accessToken.getScreenName(),accessToken.getToken(),accessToken.getTokenSecret(),null, Account.Type.TWITTER,true);
 
 	    tweetDB.insertOrUpdateAccount(account);
 
@@ -348,22 +370,22 @@ public class TwitterHelper {
 
     /**
      * Generate an account the xAuth way for Twitter. This only works if especially enabled by Twitter
-     *
-     *
+     * This also works for identi.ca and generic status.net instances.
      *
      * @param username Username to get the token for
      * @param password password of that user and service
-     * @param service service to use. Currently supported are twitter and identi.ca
+     * @param serviceType service to use. Currently supported are twitter and identi.ca
      * @param makeDefault  @throws Exception If the server can not be reached or the credentials are not valid
+     * @param baseUrl Base url of the server to connect to (mostly applies to generic status.net instances)
      * @return id of the account
      * @throws Exception when anything goes wrong (e.g wrong username/password etc.)
      */
-    public Account generateAccountWithXauth(String username, String password, String service, boolean makeDefault) throws Exception {
+    public Account generateAccountWithXauth(String username, String password, Account.Type serviceType, boolean makeDefault, String baseUrl) throws Exception {
         ConfigurationBuilder cb = new ConfigurationBuilder();
         Twitter twitterInstance;
         Account account = null;
 
-        if (service.equalsIgnoreCase("twitter")) {
+        if (serviceType== Account.Type.TWITTER) {
             cb.setOAuthConsumerKey(Tokens.consumerKey);
             cb.setOAuthConsumerSecret(Tokens.consumerSecret);
             cb.setIncludeEntitiesEnabled(true);
@@ -373,20 +395,21 @@ public class TwitterHelper {
             twitterInstance = new TwitterFactory(conf).getInstance(auth);
             AccessToken accessToken = twitterInstance.getOAuthAccessToken();
             int newId = tweetDB.getNewAccountId();
-            account = new Account(newId,username,accessToken.getToken(),accessToken.getTokenSecret(),null,"twitter",makeDefault);
+            account = new Account(newId,username,accessToken.getToken(),accessToken.getTokenSecret(),null, Account.Type.TWITTER,makeDefault);
             // TODO determine account id via db sequence?
             tweetDB.insertOrUpdateAccount(account);
             if (makeDefault)
                 tweetDB.setDefaultAccount(newId);
 
         }
-        else if (service.equalsIgnoreCase("identi.ca")) {
-            cb.setRestBaseURL(HTTP_IDENTI_CA_API);
-//            cb.setSearchBaseURL(HTTP_IDENTI_CA_API);
-            cb.setOAuthAccessTokenURL("https://identi.ca/api/oauth/access_token");
-//            cb.setOAuthAuthenticationURL();
-            cb.setOAuthAuthorizationURL("https://identi.ca/api/oauth/authorize");
-            cb.setOAuthRequestTokenURL("https://identi.ca/api/oauth/request_token");
+        else if (serviceType== Account.Type.IDENTICA || serviceType == Account.Type.STATUSNET) {
+
+            Log.i("TwitterHelper","generateAccount with baseUrl="+baseUrl);
+
+            cb.setRestBaseURL(baseUrl + "api/");
+            cb.setOAuthAccessTokenURL(baseUrl + "api/oauth/access_token");
+            cb.setOAuthAuthorizationURL(baseUrl + "api/oauth/authorize");
+            cb.setOAuthRequestTokenURL(baseUrl + "api/oauth/request_token");
             cb.setJSONStoreEnabled(true);
             Configuration conf = cb.build() ;
             TwitterFactory twitterFactory = new TwitterFactory(conf);
@@ -400,7 +423,7 @@ public class TwitterHelper {
 
             // TODO determine account id via db sequence?
             int newId = tweetDB.getNewAccountId();
-            account = new Account(newId,username,null,service,makeDefault,password);
+            account = new Account(newId,username,baseUrl, serviceType,makeDefault,password);
             tweetDB.insertOrUpdateAccount(account);
             if (makeDefault)
                 tweetDB.setDefaultAccount(newId);
@@ -437,7 +460,7 @@ public class TwitterHelper {
 	public UpdateResponse retweet(UpdateRequest request) {
         UpdateResponse response = new UpdateResponse(request.updateType,request.id);
 		try {
-			Status tmp = twitter.retweetStatus(request.id);
+			twitter.retweetStatus(request.id);
             response.setSuccess();
 			response.setMessage("Retweeted successfully");
 		} catch (TwitterException e) {
@@ -763,43 +786,38 @@ public class TwitterHelper {
      * @param userId Id of the user to follow
      * @param doFollow If true, send a follow request; unfollow otherwise.
      * @return True in case of success
-     * @todo make async
      */
-    public boolean followUnfollowUser(long userId, boolean doFollow ) {
-        try {
-            if (doFollow)
-                twitter.createFriendship(userId);
-            else
-                twitter.destroyFriendship(userId);
+    public void followUnfollowUser(long userId, boolean doFollow ) throws TwitterException {
+        if (doFollow)
+            twitter.createFriendship(userId);
+        else
+            twitter.destroyFriendship(userId);
 
-            return true;
-        } catch (TwitterException e) {
-            Log.w("followUnfollowUser", e.getMessage());
-        }
-        return false;
     }
 
     /**
      * Add a user to some of our user lists
      * @param userId User to add
      * @param listId ids of the list to put the user on
-     * @return true if successful
      */
-    public boolean addUserToLists(long userId, int listId) {
-        try {
-            twitter.createUserListMember(listId,userId);
-        } catch (TwitterException e) {
-            e.printStackTrace();  // TODO: Customise this generated block
-            return false;
-        }
-        return true;
+    public void addUserToLists(long userId, int listId) throws TwitterException {
+        twitter.createUserListMember(listId, userId);
+    }
+
+    /**
+     * Remove a user to some of our user lists
+     * @param userId User to add
+     * @param listId ids of the list to put the user on
+     */
+    public void removeUserFromList(long userId, int listId) throws TwitterException {
+        twitter.destroyUserListMember(listId, userId);
     }
 
     public List<Status> getUserTweets(Long userId) {
 
         Paging paging = new Paging();
         paging.setCount(30);
-        List<Status> ret = null;
+        List<Status> ret;
         try {
             ret = twitter.getUserTimeline(userId, paging);
         } catch (TwitterException e) {
@@ -1018,14 +1036,8 @@ public class TwitterHelper {
      * Reports the passed user as spammer
      * @param userId id of the user
      */
-    public int reportAsSpammer(long userId) {
-        try {
-            twitter.reportSpam(userId);
-            return 200;
-        } catch (TwitterException e) {
-            e.printStackTrace();  // TODO: Customise this generated block
-            return 500;
-        }
+    public void reportAsSpammer(long userId) throws TwitterException {
+        twitter.reportSpam(userId);
     }
 
     public List<SavedSearch> getSavedSearchesFromServer() {
@@ -1107,16 +1119,9 @@ public class TwitterHelper {
         return tweetDB.getReads(accountId,idsToCheck);
     }
 
-    public boolean deleteStatus(long id) {
-        try {
-            twitter.destroyStatus(id);
+    public void deleteStatus(long id) throws TwitterException {
+        twitter.destroyStatus(id);
 
-            // TODO remove from tweetdb see also OneTweetActivity.deleteStatus()
-
-            return true;
-        } catch (TwitterException e) {
-            e.printStackTrace();  // TODO: Customise this generated block
-            return false;
-        }
+        // TODO remove from tweetdb see also OneTweetActivity.deleteStatus()
     }
 }

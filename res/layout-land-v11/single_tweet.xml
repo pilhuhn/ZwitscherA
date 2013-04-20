@@ -10,10 +10,10 @@
                      android:layout_height="64dp"
                      android:src="@drawable/user_unknown"
                      android:scaleType="fitXY"
-                     android:padding="4px"
+                     android:padding="4dp"
                      android:onClick="displayUserDetail"
                      android:id="@+id/UserPictureImageView"
-                     android:contentDescription="Picture of the user"/>
+                     android:contentDescription="@string/picture_of_user"/>
         <TextView android:id="@+id/HintView"
                   android:layout_height="wrap_content"
                   android:layout_width="wrap_content"
@@ -55,13 +55,13 @@
 
         <!-- TODO move to a better place -->
         <ImageView android:id="@+id/FavoriteButton"
-                     android:layout_below="@id/TimeTextView"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
-                     android:layout_toRightOf="@id/TextView01"
-
+                     android:layout_toRightOf="@id/UserPictureImageView"
+          android:layout_below="@id/TextView01"
                      android:src="@drawable/favorite_off"
-                     android:text="@string/favorite"/>
+                     android:text="@string/favorite"
+          android:contentDescription="@string/help_favorite" />
 
         <Spinner android:id="@+id/ot_spinner"
                  android:layout_width="match_parent"
@@ -71,10 +71,24 @@
                  />
 
 
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ot_spinner"
+        android:orientation="vertical"
+        >
         <Gallery xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/gallery"
-                 android:layout_width="fill_parent"
+                 android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:layout_below="@id/ot_spinner"
+          android:layout_gravity="center"
                 />
+        <ProgressBar android:layout_width="wrap_content"
+          android:id="@+id/gallery_progress"
+          android:layout_height="wrap_content"
+          android:indeterminateBehavior="cycle"
+          android:visibility="visible"
+          android:layout_gravity="center"
+          android:indeterminate="true"/>
+      </LinearLayout>
     </RelativeLayout>
 </ScrollView>

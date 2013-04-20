@@ -3,6 +3,8 @@ package de.bsd.zwitscher;
 
 import android.app.ActionBar;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -36,10 +38,16 @@ import twitter4j.User;
 import twitter4j.UserMentionEntity;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This Activity displays one individual status.
@@ -57,6 +65,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     private TextView titleTextView;
     private Account account;
     int screenWidth;
+    private Pattern vineCoPattern = Pattern.compile(".*<.* content=\"(.*)\">");
+    private Pattern vimeoPattern = Pattern.compile(".*<thumbnail_large>(.*)</thumbnail_large>.*");
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,23 +94,25 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         Intent intent = getIntent();
         String dataString = intent.getDataString();
         Bundle bundle = intent.getExtras();
-        account = AccountHolder.getInstance().getAccount();
+        account = AccountHolder.getInstance(this).getAccount();
 
         // If this is not null, we are called from another app
         if ( dataString!=null) {
             // Lets see what server type that is and get an account for it
             // so that we can access the data
+            // This works even with multiple twitter or identica accounts, as we just need one
+            // account to access the data at all
             if (dataString.contains("://twitter.com")) {
                 TweetDB tmp = TweetDB.getInstance(getApplicationContext());
-                account = tmp.getAccountForType("twitter");
+                account = tmp.getAccountForType(Account.Type.TWITTER);
             }
             else if (dataString.contains("://identi.ca")) {
                 TweetDB tmp = TweetDB.getInstance(getApplicationContext());
-                account = tmp.getAccountForType("identi.ca");
+                account = tmp.getAccountForType(Account.Type.IDENTICA);
 
             }
             else {
-                // TODO for e.g. generic status.net
+                // TODO for e.g. generic status.net - loop over existing accounts and check if the base url matches?
             }
 
             if (dataString.matches("http://twitter.com/.*/status/.*$")) {
@@ -195,14 +207,23 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         String s = getString(R.string.via);
         String text = th.getStatusDate(status) + s + status.getSource();
         String from = getString(R.string.from);
+
         if (status.getPlace()!=null) {
+            // See if we have some tool on the system to resolve geo: urls
+            // Otherwise we omit the link
+            Intent geoIntent = new Intent(Intent.ACTION_VIEW,Uri.parse("geo:0,0"));
+            List<ResolveInfo> resolveInfos = getPackageManager().queryIntentActivities(geoIntent, PackageManager.MATCH_DEFAULT_ONLY);
+            boolean supportsGeoUrls = !resolveInfos.isEmpty();
+
             Place place = status.getPlace();
             text += " " + from + " " ;
-            if (place.getFullName()!=null)
+            if (place.getFullName()!=null && supportsGeoUrls) {
                 text += "<a href=\"geo:0,0?q=" + place.getFullName() + ","+ place.getCountry() + "\">";
+            }
             text += place.getFullName();
-            if (place.getFullName()!=null)
+            if (place.getFullName()!=null && supportsGeoUrls) {
                 text += "</a>";
+            }
 
         }
         timeClientView.setText(Html.fromHtml(text));
@@ -251,10 +272,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 List<String> users = new ArrayList<String>(userMentionEntities.length+1);
                 // Add an item 0 as dummy, as the spinner auto-selects it
                 users.add(getString(R.string.pick_a_user));
-                for (int i = 0, userMentionEntitiesLength = userMentionEntities.length;
-                     i < userMentionEntitiesLength; i++) {
-                    UserMentionEntity ume = userMentionEntities[i];
-                    users.add ("@" + ume.getScreenName() + " (" + ume.getName() + ")");
+                for (UserMentionEntity ume : userMentionEntities) {
+                    users.add("@" + ume.getScreenName() + " (" + ume.getName() + ")");
                 }
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
                         users);
@@ -326,7 +345,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             boolean found=false;
             if (status.getMediaEntities()!=null) {
                 for (MediaEntity me : status.getMediaEntities()) {
-                    if (me.getURL().toString().equals(token)) {
+                    if (me.getURL().equals(token)) {
                         builder.append(me.getDisplayURL());
                         found=true;
                         break;
@@ -336,7 +355,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
             if (!found && status.getURLEntities()!=null) {
                 for (URLEntity ue : status.getURLEntities()) {
-                    if (ue.getURL()!=null && ue.getURL().toString().equals(token)) {
+                    if (ue.getURL()!=null && ue.getURL().equals(token)) {
                         if (ue.getExpandedURL() != null) {
                             builder.append(ue.getExpandedURL());
                             found = true;
@@ -490,9 +509,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             if (status.getURLEntities()!=null && status.getURLEntities().length>0) {
                 URLEntity ue = status.getURLEntities()[0]; // TODO grab all urls
                 if (ue.getExpandedURL()!=null)
-                    url = ue.getExpandedURL().toString();
+                    url = ue.getExpandedURL();
                 else if (ue.getURL()!=null)
-                    url = ue.getURL().toString();
+                    url = ue.getURL();
             }
             if (url==null) // Fallback
                 url = "https://twitter.com/#!/" + status.getUser().getScreenName() + "/status/" + status.getId();
@@ -562,7 +581,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         String wrote = user.getName() + "(@" + user.getScreenName() + ") " + s + ":";
         String text = wrote + "\n\n" + status.getText();
         String url ;
-        if (account.getServerType().equals("twitter")) {
+        if (account.getServerType().equals(Account.Type.TWITTER)) {
             url = "http://twitter.com/#!/" + user.getScreenName() + "/status/" + status.getId();
             text = text + "\n\n" + url;
         }
@@ -670,7 +689,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         for (String url :  urls) {
             Log.d("One tweet","Url = " + url);
 //            url = UrlHelper.expandUrl(url); // expand link shorteners TODO that ultimately needs to go into the main parsing for all kinds of links
-            String finalUrlString="";
+            String finalUrlString;
             if (url.contains("yfrog.com")) {
                 // http://twitter.yfrog.com/page/api
                 finalUrlString = url + ":iphone";
@@ -719,7 +738,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 finalUrlString += (screenWidth>320)? "l" : "s";
                 finalUrlString += url.substring(url.lastIndexOf('.')); // 's'mall or 'l'arge
             }
-            else if (url.contains("://instagr.am/p/")) {
+            else if (url.contains("://instagr.am/p/") || url.contains("://instagram.com/p/")) {
 
                 finalUrlString = url;
                 if (!url.endsWith("/"))
@@ -742,6 +761,12 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                     tmp = ":120px";
 
                 finalUrlString = url + tmp; // 120px , 480px or 800px
+            }
+            else if (url.contains("://vine.co/v")) {
+                finalUrlString = getVinePreview(url);
+            }
+            else if (url.contains("://vimeo.com/")) {
+                finalUrlString = getVimeoPreview(url);
             }
             else if (url.endsWith(".jpg") || url.endsWith(".png") || url.endsWith(".jpeg")) {
                 finalUrlString = url;
@@ -776,6 +801,93 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             urlPairs.add(pair);
         }
         return urlPairs;
+    }
+
+    /**
+     * Get a vine.co thumbnail of the video by parsing the web site content
+     * and looking for a og:image meta tag
+     * @param url Url of the vine video page
+     * @return the url of the thumbnail or null if it can't be found.
+     */
+    private String getVinePreview(String url) {
+        BufferedReader br = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            urlConnection = (HttpURLConnection) new URL(url).openConnection();
+            urlConnection.setDoInput(true);
+            urlConnection.setDoOutput(false);
+            urlConnection.connect();
+
+            br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            String line;
+            while ((line=br.readLine())!=null) {
+                if (line.contains("og:image")) {
+                    Matcher m = vineCoPattern.matcher(line);
+                    if (m.matches()) {
+                        return m.group(1);
+                    }
+                }
+            }
+
+            urlConnection.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+        finally {
+            if (urlConnection!=null)
+                urlConnection.disconnect();
+            if ( br!=null)
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();  // TODO: Customise this generated block
+                }
+
+        }
+        return null;
+    }
+
+    private String getVimeoPreview(String url) {
+
+
+        String infoUrl = url.replace("http://vimeo.com/","http://vimeo.com/api/v2/video/");
+        infoUrl += ".xml";
+
+        BufferedReader br = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            urlConnection = (HttpURLConnection) new URL(infoUrl).openConnection();
+            urlConnection.setDoInput(true);
+            urlConnection.setDoOutput(false);
+            urlConnection.connect();
+
+            br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            String line;
+            while ((line=br.readLine())!=null) {
+                if (line.contains("thumbnail_large")) {
+                    Matcher m = vimeoPattern.matcher(line);
+                    if (m.matches()) {
+                        return m.group(1);
+                    }
+                }
+            }
+
+            urlConnection.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();  // TODO: Customise this generated block
+        }
+        finally {
+            if (urlConnection!=null)
+                urlConnection.disconnect();
+            if ( br!=null)
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();  // TODO: Customise this generated block
+                }
+
+        }
+        return null;
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -849,7 +961,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 break;
 
             default:
-                Log.e(getClass().getName(),"Unknown menu item: " + item.toString());
+                Log.e("OneTweetActivity","Unknown menu item: " + item.toString());
         }
 
         return true;
@@ -940,6 +1052,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         for (UrlPair urlPair : listOfUrlPairs) {
             Log.i("loadThumbnail", "URL to load is " + urlPair.getTarget());
 
+            if(urlPair.getTarget()==null)
+                continue;
             try {
                 URL picUrl = new URL(urlPair.getTarget());
                 BufferedInputStream in = new BufferedInputStream(picUrl.openStream());
@@ -1028,6 +1142,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         @Override
         protected void onPostExecute(final List<BitmapWithUrl> bitmaps) {
             super.onPostExecute(bitmaps);
+            View galleryProgress = findViewById(R.id.gallery_progress);
+            if (galleryProgress!=null)
+                galleryProgress.setVisibility(View.GONE);
             if (bitmaps!=null) {
                 Gallery g = (Gallery) findViewById(R.id.gallery);
                 ImageAdapter adapter = new ImageAdapter();

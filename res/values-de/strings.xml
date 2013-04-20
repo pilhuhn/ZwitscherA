@@ -6,8 +6,7 @@
     <string name="direct_message_sent">Private Nachricht gesendet</string>
     <string name="hello">Geben Sie den Text ein:</string>
     <string name="app_name">Zwitscher</string>
-    <string name="loading">Lade Tweets…</string>
-    <string name="no_connect">Kann Twitter nicht erreichen</string>
+    <string name="no_connect">Kann den Server nicht erreichen</string>
     <string name="TweetButton">Absenden</string>
     <string name="ClearButton">Löschen</string>
     <string name="home_timeline">Daheim</string>
@@ -24,11 +23,10 @@
     <string name="resent_by">Neu gesendet durch</string>
     <string name="in_reply_to"> als Antwort auf </string>
     <string name="send_direct_to">Sende private Nachricht an </string>
-    <string name="getting_tweets">Lade Tweets</string>
+    <string name="getting_statuses">Lade %ss …</string>
     <string name="getting_conversation">Lade Konversation</string>
     <string name="follow_user">Benutzer folgen</string>
     <string name="unfollow_user">Benutzer nicht folgen</string>
-    <string name="add">Hinzufügen</string>
     <string name="from">von</string>
     <string name="get_user_detail">Lade Benutzerdaten…</string>
     <string name="get_preview">"Lade Bildvorschau…"</string>
@@ -44,17 +42,8 @@
 
 
 
-    <string name="login_common">
-        Sie müssen sich bei Twitter anmelden, um Zwitscher zu authorisieren.<br/><br/>
-        Um dies zu tun, klicken Sie auf "Get pin from Twitter", geben dann im Browser den Login an
-        und klicken auf "Akzeptieren". Danach müssen Sie sich die PIN merken. Gehen Sie dann zum Home-Screen
-        und starten von dort Zwitscher erneut. Geben Sie die PIN ein und klicken auf "Set pin".<br/><br/>
-        Sie müssen dies nur einmal machen.
-    </string>
-    <string name="please_log_in">Bitte einloggen</string>
     <string name="username">Benutzername</string>
     <string name="password">Passwort</string>
-    <string name="login">Einloggen…</string>
     <string name="service">Dienst</string>
     <string name="new_mentions">Neue Erwähnung(en)</string>
     <string name="new_directs">Neue direkt(e) Nachricht(en)</string>
@@ -114,7 +103,7 @@
     <string name="new_account_create_title">Account anlegen</string>
     <string name="new_account_switch">Zum neuen Account wechseln</string>
     <string name="new_account_create">Anlegen!</string>
-    <string name="menu_switch_account">Accounts</string>
+    <string name="menu_switch_account">Accounts…</string>
     <string name="select_account_delete">Account löschen…</string>
     <string name="really_delete">Wirklich löschen:</string>
     <string name="menu_clean_statuses">Status aufräumen</string>
@@ -141,7 +130,6 @@
     <string name="forward">Weiterleiten</string>
     <string name="speak">Vorlesen</string>
     <string name="favorite">Favorisieren</string>
-    <string name="translating">Übersetze …</string>
     <string name="logging_in">Einloggen …</string>
     <string name="new_message">Neue Nachr.</string>
     <string name="reply">Antwort</string>
@@ -169,14 +157,13 @@
     <string name="screen_name_overview">Namensdarstellung</string>
     <string name="prefs_screen_name_overview">Wie sollen die Namen in der Timeline dargestellt werden (eine Änderung wird erst nach einem Reload der Timeline aktiv)</string>
     <string name="Preferences">Einstellungen</string>
-    <string name="add_to_list">Zu Liste hinzufügen…</string>
+    <string name="add_to_list">Listen verwalten…</string>
     <string name="query_is">Suche nach</string>
     <string name="no_items_found">Keine Einträge gefunden</string>
     <string name="queueing">Server scheint down oder überladen. Für späteres Senden gespeichert. [%s]</string>
     <string name="update_not_yet_supported">Update type [%s] noch nicht unterstützt</string>
     <string name="pick_a_user">Benutzer auswählen</string>
     <string name="no_ril_user">Keinen Account für Pocket(ReadItLater) gegeben</string>
-    <string name="translation_result">Übersetzung:</string>
     <string name="error_nothing_provided">-nichts angegeben-</string>
     <string name="account_not_valid">Account ist ungültig</string>
     <string name="login_failed">Login fehlgeschlagen</string>
@@ -188,6 +175,22 @@
   <string name="show_on_web">Im Web anzeigen…</string>
   <string name="delete_status">Status löschen…</string>
   <string name="delete_status_really">Status wirklich löschen?</string>
-
+  <string name="no_result">Keine Daten vom Server erhalten</string>
+  <string name="account_add">Account hinzufügen…</string>
+  <string name="account_remove">Account löschen…</string>
+  <string name="offline_turn_on_networking">Es scheint keine Netzwerkverbindung zu geben. Bitte stellen Sie eine Netzwerkverbindung her und starten die Anwendung erneut.</string>
+  <string name="ok">Ok</string>
+  <string name="continue_msg">Weiter…</string>
+  <string name="picture_of_user">Bild des Benutzers</string>
+  <string name="server_base_url">Server base URL</string>
+  <string name="logo_description">Zwitscher Logo</string>
+  <string name="done_description">Zum vorherigen Screen</string>
+  <string name="clear_description">Eingabefeld löschen</string>
+  <string name="added">Hinzugefügt</string>
+  <string name="removed">Gelöscht</string>
+  <string name="follow_unfollow_set">Follow/Unfollow ausgeführt</string>
+  <string name="status_deleted">Status gelöscht</string>
+  <string name="load_on_switch">Laden beim Accountwechsel</string>
+  <string name="load_on_switch_descr">Sollen beim Wechsel des Accounts Nachrichten vom Server geladen werden?</string>
 
 </resources>

@@ -11,7 +11,6 @@ import java.util.regex.PatternSyntaxException;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -62,8 +61,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     List<Status> tweets;
     int list_id;
     ListView lv;
-    int newMentions=0;
-    private int newDirects=0;
     Long userId=null;
     int userListId = -1;
     private Pattern filterPattern;
@@ -81,6 +78,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             // We have no enclosing TabWidget, so we need to request the custom title
             requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         }
+        if ((!(theParent instanceof TabWidget)) && (android.os.Build.VERSION.SDK_INT>=11)) {
+            // We have no enclosing TabWidget, so we need to request progress thingy
+            requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        }
 
         // Set the layout of the list activity
         setContentView(R.layout.tweet_list_layout);
@@ -97,6 +98,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             imageButton.setVisibility(View.VISIBLE);
         }
         lv = getListView();
+        lv.setItemsCanFocus(false);
         lv.setOnScrollListener(this);
 		lv.setOnItemClickListener(this);
 		lv.setOnItemLongClickListener(this); // Directly got to reply
@@ -120,8 +122,25 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             }
         }
 
+        // Only get tweets from db to speed things up at start
         boolean fromDbOnly = tdb.getLastRead(account.getId(), list_id) != -1;
-        fillListViewFromTimeline(fromDbOnly); // Only get tweets from db to speed things up at start
+
+        // Check if we are switching accounts and the user wants to load messages from remote
+        AccountHolder accountHolder = AccountHolder.getInstance(this);
+        if (accountHolder.isSwitchingAccounts()) {
+            accountHolder.setSwitchingAccounts(false); // reset flag
+
+            // Ok, we are switching. Now check preferences
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean loadOnAccountChange = preferences.getBoolean("load_on_account_switch",false);
+
+            if (loadOnAccountChange) { // preferences say ok to load
+                fromDbOnly = false;
+            }
+        }
+
+        // Start loading messages to be displayed
+        fillListViewFromTimeline(fromDbOnly);
     }
 
     @Override
@@ -265,8 +284,12 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
     	}
 
         // Sync with TweetMarker
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        boolean doTweetMarkerSync = prefs.getBoolean("tweetmarker_sync",false);
+
         long newLast2=-1;
-        if (listId>=0 && !account.isStatusNet() && !fromDbOnly) {
+        if (doTweetMarkerSync && listId>=0 && !account.isStatusNet() && !fromDbOnly) {
             if (listId==0)
                 newLast2 = TweetMarkerSync.syncFromTweetMarker("timeline", account.getName());
             else
@@ -322,7 +345,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         }
 
         for (Status status:metaList.getList()) {
-            AccountHolder accountHolder = AccountHolder.getInstance();
+            AccountHolder accountHolder = AccountHolder.getInstance(this);
             accountHolder.addUserName(status.getUser().getScreenName());
             if (status.getHashtagEntities()!=null) {
                 for (HashtagEntity hte : status.getHashtagEntities()) {
@@ -425,7 +448,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 post(null);
                 break;
             default:
-                Log.i(getClass().getName(),"Unknown item " + item);
+                Log.i("TweetListActivity","Unknown item " + item);
 
         }
 
@@ -452,10 +475,20 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         // Now check and process items that were created while we were offline
         new FlushQueueTask(this, account).execute();
 
+        // TODO this is not really executed in parallel and seems to block the update of the
+        // TODO main timeline
+        // TODO the main timeline updates quicky and terminates when teh spinner thingy hides
+        // TODO but if the next code is also executed, the timeline is only refreshed after
+        // TODO this is all done
+        // TODO this may be a fight for the tweets table ?
+
         NetworkHelper networkHelper = new NetworkHelper(this);
         if (list_id == 0 &&  networkHelper.mayReloadAdditional()) {
-            new GetTimeLineTask(this,-1,false, 1).execute(false);
-            new GetTimeLineTask(this,-2,false, 2).execute(false);
+            System.out.println("### triggering GTLT -1");
+            new GetTimeLineTask(this,-1,false, 5).execute(false);
+            System.out.println("### triggering GTLT -2");
+            new GetTimeLineTask(this,-2,false, 3).execute(false);
+            System.out.println("### triggering done");
         }
     }
 
@@ -528,7 +561,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         String updating;
         Context context;
         private int listId;
-        Dialog dialog = null;
         private boolean updateListAdapter;
         private int startDelaySecs;
 
@@ -551,15 +583,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         protected void onPreExecute() {
             super.onPreExecute();
             updating = context.getString(R.string.updating);
-            String s = getString(R.string.getting_tweets)+ "...";
+            String s = getString(R.string.getting_statuses, account.getStatusType());
             if (updateListAdapter) {
-                if (progressBar!=null)
+                if (progressBar!=null) {
                     progressBar.setVisibility(ProgressBar.VISIBLE);
-                else {
-                    dialog = new Dialog(context);
-                    dialog.setTitle(s);
-                    dialog.setCancelable(false);
-                    dialog.show();
                 }
             }
             if(titleTextBox!=null) {
@@ -567,8 +594,17 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             }
             if (Build.VERSION.SDK_INT>=11) {
                 ActionBar ab = getActionBar();
-                if (ab!=null)
+                if (ab!=null) {
                     ab.setSubtitle(s);
+                }
+
+                if (getParent()!=null) {
+                    getParent().setProgressBarIndeterminateVisibility(true);
+                }
+                else {
+                    // No parent tab bar when used on a list
+                    setProgressBarIndeterminateVisibility(true);
+                }
             }
         }
 
@@ -580,7 +616,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 try {
                     Thread.sleep(1000L*startDelaySecs);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    Log.d("GetTimeLineTask",e.getMessage());
                 }
             }
 
@@ -630,17 +666,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             if (getListAdapter()!=null && getListAdapter().getCount()>0 && result.getNumAdded()==0) {
 
                 // No new items, no need to replace the current adapter
-
-                if (progressBar !=null)
-                    progressBar.setVisibility(ProgressBar.INVISIBLE);
-                if (dialog!=null)
-                    dialog.cancel();
-                if (titleTextBox!=null)
-                    titleTextBox.setText(account.getAccountIdentifier());
-
-                return;
+                updateListAdapter=false;
 
             }
+
 
             if (updateListAdapter) {
                 if (listId <-4) { // saved search
@@ -666,7 +695,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 }
 
                 if (result.getList().size()==0) {
-                    Toast.makeText(context, "Got no result from the server", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, getString(R.string.no_result), Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -694,31 +723,50 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             }
             if (updateListAdapter)
 	            getListView().requestLayout();
-            if (result.getNumOriginal()>0) {
-                Toast.makeText(context,result.getNumOriginal() + " new items",Toast.LENGTH_SHORT).show();
-            }
-            if (newMentions>0) {
-                String s = getString(R.string.new_mentions);
-                Toast.makeText(context,newMentions + " " + s,Toast.LENGTH_LONG).show();
-                newMentions=0;
-            }
-            if (newDirects>0) {
-                String s = getString(R.string.new_directs);
-                Toast.makeText(context,newDirects + " " + s,Toast.LENGTH_LONG).show();
-                newDirects=0;
+            if (result.getNumOriginal()>0) { // TODO distinguish the timelines
+                String tmp = context.getResources().getQuantityString(R.plurals.new_entries,result.getNumOriginal());
+                String updating;
+                switch (listId) {
+                    case 0: updating = context.getString(R.string.home_timeline);
+                        break;
+                    case -1: updating = context.getString(R.string.mentions);
+                        break;
+                    case -3: updating = context.getString(R.string.sent);
+                        break;
+                    case -4: updating = context.getString(R.string.favorites);
+                        break;
+                    default: updating = context.getString(R.string.list);
+                }
+                Toast.makeText(context,updating + ": " + tmp,Toast.LENGTH_SHORT).show();
             }
 
-
-            // Only do the next if we actually did an update from twitter
-            if (!fromDbOnly && updateListAdapter) {
-                Log.i("GTLTask", " scroll to " + result.getNumOriginal());
-                // TODO modify to scroll to last-read position
-                getListView().setSelection(result.getNumOriginal() - 1);
+            if (updateListAdapter) {
+                // Only do the next if we actually did an update from twitter
+                if (!fromDbOnly) {
+                    Log.i("GTLTask", " scroll to " + result.getNumOriginal());
+                    // TODO modify to scroll to last-read position
+                    int position = result.getNumOriginal() - 1;
+                    if (position>0) {
+                        getListView().setSelection(position);
+                    }
+                }
+                else if (unreadCount>1) {
+                    getListView().setSelection(unreadCount-1);
+                }
             }
-            if (progressBar !=null)
+            if (progressBar !=null) {
                 progressBar.setVisibility(ProgressBar.INVISIBLE);
-            if (dialog!=null)
-                dialog.cancel();
+            }
+
+            if (Build.VERSION.SDK_INT>=11) {
+                if (getParent()!=null) {
+                    getParent().setProgressBarIndeterminateVisibility(false);
+                } else {
+                    // A list has no TabWdget as parent
+                    setProgressBarIndeterminateVisibility(false);
+                }
+            }
+
 
 		}
 

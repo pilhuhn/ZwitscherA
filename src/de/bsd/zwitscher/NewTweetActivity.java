@@ -28,6 +28,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -82,20 +83,18 @@ public class NewTweetActivity extends Activity implements LocationListener {
         }
 
         charCountView = (TextView) findViewById(R.id.CharCount);
-        account = AccountHolder.getInstance().getAccount();
-        // If account is null, which can happen when called via intent from the
-        // outside world
-        if (account==null) {
-            TweetDB tdb = TweetDB.getInstance(getApplicationContext());
-            account = tdb.getDefaultAccount();
-            AccountHolder.getInstance().setAccount(account);
-        }
-
-
+        account = AccountHolder.getInstance(this).getAccount();
 
         final ImageButton tweetButton = (ImageButton) findViewById(R.id.TweetButton);
         edittext = (MultiAutoCompleteTextView) findViewById(R.id.edittext);
         edittext.setSelected(true);
+        // Set the MultiAutoCompleteTextView in a mode that allows tokenizing and
+        // also the normal spell checker.
+        // See http://stackoverflow.com/questions/4552292/edittext-and-multiautocompletetextview-suggestions/7761754#7761754
+        edittext.setRawInputType(InputType.TYPE_CLASS_TEXT
+          |InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+          |InputType.TYPE_TEXT_FLAG_AUTO_CORRECT
+          |InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         if (tweetButton!=null)
             tweetButton.setEnabled(false);
 
@@ -215,10 +214,10 @@ public class NewTweetActivity extends Activity implements LocationListener {
         usernames.add("#java");
         usernames.add("@pilhuhn");
         usernames.add("@RHQ_project");
-        System.out.println("hashes " + AccountHolder.getInstance().getHashTags().size());
-        System.out.println("users  " + AccountHolder.getInstance().getUserNames().size());
-        usernames.addAll(AccountHolder.getInstance().getHashTags());
-        usernames.addAll(AccountHolder.getInstance().getUserNames());
+        System.out.println("hashes " + AccountHolder.getInstance(this).getHashTags().size());
+        System.out.println("users  " + AccountHolder.getInstance(this).getUserNames().size());
+        usernames.addAll(AccountHolder.getInstance(this).getHashTags());
+        usernames.addAll(AccountHolder.getInstance(this).getUserNames());
         ArrayAdapter<String> acAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_dropdown_item_1line,
                 usernames.toArray(new String[usernames.size()]));
         edittext.setAdapter(acAdapter);
@@ -580,7 +579,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
                 break;
 
             default:
-                Log.e(getClass().getName(),"Unknown menu item: " + item.toString());
+                Log.e("NewTweetActivity","Unknown menu item: " + item.toString());
 
         }
 

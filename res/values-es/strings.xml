@@ -8,7 +8,6 @@
 <string name="direct_message_sent">Mensaje directo enviado</string>
 <string name="hello">Escriba el texto del tweet a continuación:</string>
 <string name="app_name">Zwitscher</string>
-<string name="loading">Cargando tweets …</string>
 <string name="no_connect">No se pudo conectar a Twitter</string>
 <string name="TweetButton">Tweetea esto!</string>
 <string name="ClearButton">Limpiar!</string>
@@ -29,11 +28,10 @@
 <string name="in_reply_to">en respuesta a</string>
 <string name="via">" vía " </string>
 <string name="send_direct_to">Enviando mensaje directo a </string>
-<string name="getting_tweets">Obteniendo tweets</string>
+<string name="getting_statuses">Obteniendo %ss …</string>
 <string name="getting_conversation">Obteniendo conversación</string>
 <string name="follow_user">Seguir al usuario</string>
 <string name="unfollow_user">Dejar de seguir al usuario</string>
-<string name="add">Añadir</string>
 <string name="from">desde</string>
 <string name="get_user_detail">Obteniendo detalles del usuario …</string>
 <string name="get_preview">"Cargando vistas previas…"</string>
@@ -42,14 +40,8 @@
 <string name="please_sync_lists">Por favor sincronice listados</string>
 <string name="no_searches_found">No se encontraron búsquedas guardadas -  necesita sincronizar?</string>
 <string name="updating">Actualizando</string>
-<string name="login_common">Necesita acceder a Twitter para autorizar Zwitscher.
-Para hacer esto, haga click en "Obtener PIN de Twitter", a continuación, iniciar sesión en el navegador, escriba el PIN, y desde la pantalla de inicio, ejecute Zwitscher nuevamente e introduzca el PIN. A continuación haga clic en "Establecer PIN"
-Sólo tienes que hacer esto una vez en el inicio de sesión
-</string>
-<string name="please_log_in">Inicie sesión</string>
 <string name="username">Usuario</string>
 <string name="password">Contraseña</string>
-<string name="login">Acceder…</string>
 <string name="service">Servicio</string>
 <string name="new_mentions">nuevas menciones</string>
 <string name="new_directs">nuevos mensajes directos</string>
@@ -101,7 +93,7 @@ Sólo tienes que hacer esto una vez en el inicio de sesión
 <string name="new_account_create_title">Crear cuenta</string>
 <string name="new_account_switch">Cambiar al nuevo usuario</string>
 <string name="new_account_create">Crear!</string>
-<string name="menu_switch_account">Cuentas</string>
+<string name="menu_switch_account">Cuentas…</string>
 <string name="select_account_delete">Borrar cuenta…</string>
 <string name="really_delete">Borrar realmente</string>
 <string name="menu_clean_statuses">Limpiar mensajes</string>
