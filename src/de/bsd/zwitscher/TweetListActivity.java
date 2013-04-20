@@ -475,10 +475,20 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         // Now check and process items that were created while we were offline
         new FlushQueueTask(this, account).execute();
 
+        // TODO this is not really executed in parallel and seems to block the update of the
+        // TODO main timeline
+        // TODO the main timeline updates quicky and terminates when teh spinner thingy hides
+        // TODO but if the next code is also executed, the timeline is only refreshed after
+        // TODO this is all done
+        // TODO this may be a fight for the tweets table ?
+
         NetworkHelper networkHelper = new NetworkHelper(this);
         if (list_id == 0 &&  networkHelper.mayReloadAdditional()) {
-            new GetTimeLineTask(this,-1,false, 1).execute(false);
-            new GetTimeLineTask(this,-2,false, 2).execute(false);
+            System.out.println("### triggering GTLT -1");
+            new GetTimeLineTask(this,-1,false, 5).execute(false);
+            System.out.println("### triggering GTLT -2");
+            new GetTimeLineTask(this,-2,false, 3).execute(false);
+            System.out.println("### triggering done");
         }
     }
 
@@ -590,7 +600,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
                 if (getParent()!=null) {
                     getParent().setProgressBarIndeterminateVisibility(true);
-//                    ((TabWidget)getParent()).showHideAbMenuItems(false);
                 }
                 else {
                     // No parent tab bar when used on a list
@@ -657,15 +666,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             if (getListAdapter()!=null && getListAdapter().getCount()>0 && result.getNumAdded()==0) {
 
                 // No new items, no need to replace the current adapter
-
-/*
-                if (progressBar !=null)
-                    progressBar.setVisibility(ProgressBar.INVISIBLE);
-                if (titleTextBox!=null)
-                    titleTextBox.setText(account.getAccountIdentifier());
-
-                return;
-*/
                 updateListAdapter=false;
 
             }
@@ -761,7 +761,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             if (Build.VERSION.SDK_INT>=11) {
                 if (getParent()!=null) {
                     getParent().setProgressBarIndeterminateVisibility(false);
-//                    ((TabWidget)getParent()).showHideAbMenuItems(true);
                 } else {
                     // A list has no TabWdget as parent
                     setProgressBarIndeterminateVisibility(false);
