@@ -321,7 +321,7 @@ public class TweetDB {
      * @param list_id id of the list
      * @return id of the status that was last read
      */
-	long getLastRead(int account, int list_id) {
+    public long getLastRead(int account, int list_id) {
         Long ret=-1L;
         try {
             Cursor c = db.query(TABLE_LAST_READ, new String[] {"last_read_id"}, "list_id = ? AND " + ACCOUNT_ID_IS, new String[] {String.valueOf(list_id), String.valueOf(
@@ -399,7 +399,7 @@ account)}, null, null, null);
      * @param list_id List to mark as read
      * @param last_read_id Id of the last read status
      */
-	void updateOrInsertLastRead(int account, int list_id, long last_read_id) {
+    public void updateOrInsertLastRead(int account, int list_id, long last_read_id) {
 		ContentValues cv = new ContentValues();
 		cv.put("list_id", list_id);
 		cv.put("last_read_id", last_read_id);

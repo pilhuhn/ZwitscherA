@@ -72,12 +72,12 @@ public class TweetListFragment extends ListFragment implements LoaderManager.Loa
 
     @Override
     public Loader<List<Status>> onCreateLoader(int id, Bundle args) {
-        return new StatusListLoader(getActivity(),AccountHolder.getInstance().getAccount(), listId);
+        return new StatusListLoader(getActivity(),AccountHolder.getInstance(getActivity()).getAccount(), listId);
     }
 
     @Override
     public void onLoadFinished(Loader<List<Status>> loader, List<Status> data) {
-        setListAdapter(new StatusAdapter<Status>(getActivity(), AccountHolder.getInstance().getAccount(),R.layout.tweet_list_item,data,-1,new ArrayList<Long>()));
+        setListAdapter(new StatusAdapter<Status>(getActivity(), AccountHolder.getInstance(getActivity()).getAccount(),R.layout.tweet_list_item,data,-1,new ArrayList<Long>()));
     }
 
     @Override
