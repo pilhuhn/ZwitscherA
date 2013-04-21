@@ -736,13 +736,17 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                         break;
                     case -1: updating = context.getString(R.string.mentions);
                         break;
+                    case -2 : updating = context.getString(R.string.direct);
+                        break;
                     case -3: updating = context.getString(R.string.sent);
                         break;
                     case -4: updating = context.getString(R.string.favorites);
                         break;
                     default: updating = context.getString(R.string.list);
                 }
-                Toast.makeText(context,updating + ": " + tmp,Toast.LENGTH_SHORT).show();
+                if (listId!=-2) { // direct messages produce too many false positives
+                    Toast.makeText(context,updating + ": " + tmp,Toast.LENGTH_SHORT).show();
+                }
             }
 
             if (updateListAdapter) {
