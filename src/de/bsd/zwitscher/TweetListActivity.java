@@ -526,10 +526,13 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                         DirectMessage message = (DirectMessage) item;
 
                         List<DirectMessage> messages = th.getDirectsFromDb(message.getId(),7);
-                        for (DirectMessage direct : messages) {
-                            sta.insert(direct, totalCount + i);
-                            directs.add(direct);
-                            i++;
+                        if (messages.size()>0) {
+                            for (DirectMessage direct : messages) {
+                                sta.insert(direct, totalCount + i);
+                                directs.add(direct);
+                                i++;
+                            }
+                            sta.notifyDataSetChanged();
                         }
                     } else if (item instanceof Status) {
                         Status last = (Status) item;
@@ -538,17 +541,19 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
                         List<Status> newStatuses = th.getStatuesFromDb(last.getId(),7,list_id);
                         // TODO add checking for old
-                        List<Long> readIds = obtainReadIds(newStatuses);
-                        sta.readIds.addAll(readIds);
-                        for (Status status : newStatuses ) {
-                            if (!matchesFilter(status)) {
-                                sta.insert(status, totalCount + i);
-                                statuses.add(status);
-                                i++;
+                        if (newStatuses.size()>0) {
+                            List<Long> readIds = obtainReadIds(newStatuses);
+                            sta.readIds.addAll(readIds);
+                            for (Status status : newStatuses ) {
+                                if (!matchesFilter(status)) {
+                                    sta.insert(status, totalCount + i);
+                                    statuses.add(status);
+                                    i++;
+                                }
                             }
+                            sta.notifyDataSetChanged();
                         }
                     }
-                    sta.notifyDataSetChanged();
                 }
             }
 //Debug.stopMethodTracing();
