@@ -273,24 +273,22 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 // Add an item 0 as dummy, as the spinner auto-selects it
                 users.add(getString(R.string.pick_a_user));
                 for (UserMentionEntity ume : userMentionEntities) {
-                    users.add("@" + ume.getScreenName() + " (" + ume.getName() + ")");
+                    String entry = "@" + ume.getScreenName() + " (" + ume.getName() + ")";
+                    if (!users.contains(entry)) {
+                        users.add(entry);
+                    }
+                }
+                // Also add the retweeter to the list
+                if (status.isRetweet() ) {
+                    String entry = "@" + status.getUser().getScreenName() +" (" + status.getUser().getName() + ")";
+                    if (!users.contains(entry)) {
+                        users.add(entry);
+                    }
                 }
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
                         users);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
-/*
-                spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        if (i>0) {
-                        Intent intent = new Intent(OneTweetActivity.this, UserDetailActivity.class);
-                        intent.putExtra("userName", userMentionEntities[i-1].getScreenName());
-                        startActivity(intent);
-                        }
-                    }
-                });
-*/
                 spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
