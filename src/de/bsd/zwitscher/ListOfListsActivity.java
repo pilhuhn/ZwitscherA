@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.widget.ListView;
@@ -174,6 +175,12 @@ public class ListOfListsActivity extends AbstractListActivity {
         // request code = listId
         tdb.markAllRead(requestCode, account.getId());
         // Request re-layouting the list of lists, as the count has changed (just to be sure)
+        if (adapter==null) {
+            // Rare case, can happen when the user was in a list, then left for a different
+            // apps, the system pages out the activity and on return it gets re-created without
+            // an adapter.
+            setupAdapter();
+        }
         adapter.notifyDataSetChanged();
         getListView().requestLayout();
 
