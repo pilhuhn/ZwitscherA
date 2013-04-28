@@ -67,6 +67,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     int screenWidth;
     private Pattern vineCoPattern = Pattern.compile(".*<.* content=\"(.*)\">");
     private Pattern vimeoPattern = Pattern.compile(".*<thumbnail_large>(.*)</thumbnail_large>.*");
+    private Pattern youTubePattern = Pattern.compile(".*v=(\\w+)&?.*");
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -696,12 +697,17 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 //                            default.png => 120x90
                 //                            1... jpg => other 120x90 thumbs
                 String videoId;
-                // TODO what if the url contains ?embedd etc ?
+
                 if (url.startsWith("http://youtu.be/")) {
                     videoId = url.substring(16);
-                }
-                else { // TODO exact string ?
-                    videoId = url.substring(url.indexOf("v=")+2);
+                } else {
+                    Matcher m = youTubePattern.matcher(url);
+                    if (m.matches()) {
+                        videoId = m.group(1);
+                    }
+                    else {
+                        videoId = url; // More or less a dummy
+                    }
                 }
                 finalUrlString = "http://i.ytimg.com/vi/" + videoId + "/0.jpg";
             }
