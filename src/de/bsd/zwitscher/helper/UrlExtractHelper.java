@@ -40,7 +40,7 @@ public class UrlExtractHelper {
             if (url.startsWith("http://youtu.be/")) {
                 videoId = url.substring(16);
             } else {
-                Pattern youTubePattern = Pattern.compile(".*v=(\\w+)&?.*");
+                Pattern youTubePattern = Pattern.compile(".*v=([\\w\\-]+)&?.*",Pattern.CASE_INSENSITIVE);
                 Matcher m = youTubePattern.matcher(url);
                 if (m.matches()) {
                     videoId = m.group(1);
