@@ -1,6 +1,7 @@
 package de.bsd.zwitscher.helper;
 
 
+import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -191,7 +192,15 @@ public class UrlExtractHelper {
             JSONArray annotations = data.getJSONArray("annotations");
             JSONObject annotationValue = annotations.getJSONObject(0);
             JSONObject value = annotationValue.getJSONObject("value");
-            String finalUrl = value.getString("thumbnail_large_url");
+            String finalUrl;
+            if (value.has("thumbnail_large_url")) {
+                finalUrl = value.getString("thumbnail_large_url");
+            } else if (value.has("thumbnail_url")) {
+                finalUrl = value.getString("thumbnail_url");
+            } else {
+                Log.i("app.net","no thumbnails found for " + builder.toString());
+                finalUrl = null;
+            }
 
             return finalUrl;
 
