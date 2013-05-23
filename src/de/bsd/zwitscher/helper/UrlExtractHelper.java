@@ -36,19 +36,25 @@ public class UrlExtractHelper {
             // http://i.ytimg.com/vi/%s/  0.jpg => default 480x360
             //                            default.png => 120x90
             //                            1... jpg => other 120x90 thumbs
-            String videoId;
+            String videoId = null;
 
             if (url.startsWith("http://youtu.be/")) {
+                Pattern youTuBePattern = Pattern.compile(".*youtu.be/([\\w\\-]+).*",Pattern.CASE_INSENSITIVE);
                 videoId = url.substring(16);
+                Matcher m = youTuBePattern.matcher(url);
+                if (m.matches()) {
+                    videoId = m.group(1);
+                }
             } else {
                 Pattern youTubePattern = Pattern.compile(".*v=([\\w\\-]+)&?.*",Pattern.CASE_INSENSITIVE);
                 Matcher m = youTubePattern.matcher(url);
                 if (m.matches()) {
                     videoId = m.group(1);
                 }
-                else {
-                    videoId = url; // More or less a dummy
-                }
+            }
+            if (videoId==null) {
+                videoId="NOT_FOUND";
+                Log.i("Youtube","No preview match for " + url);
             }
             finalUrlString = "http://i.ytimg.com/vi/" + videoId + "/0.jpg";
         }
