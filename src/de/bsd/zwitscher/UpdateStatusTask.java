@@ -66,7 +66,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
         if (!nh.isOnline()) {
 
             // We are not online, queue the request
-           return queueUpUpdate(request, "Offline - Queued for later sending");
+           return queueUpUpdate(request, context.getString(R.string.queueing));
         }
 
         try {
@@ -156,7 +156,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
             }
 
             if (ret!=null && (ret.getStatusCode()==502||ret.getStatusCode()==503||ret.getStatusCode()==420)) {
-                ret = queueUpUpdate(request,context.getString(R.string.queueing, ret.getMessage()));
+                ret = queueUpUpdate(request,context.getString(R.string.queueing_code, ret.getMessage()));
             }
         }
         catch (TwitterException e) {
@@ -187,6 +187,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
             tdb.persistUpdate(account.getId(), bos.toByteArray());
 
             response = new UpdateResponse(UpdateType.QUEUED, message);
+            response.setSuccess(); // This is the success of the queueing, not the inner job.
         } catch (IOException e) {
             e.printStackTrace();  // TODO: Customise this generated block
             response = new UpdateResponse(UpdateType.QUEUED, e.getMessage());

@@ -160,7 +160,8 @@
     <string name="add_to_list">Listen verwalten…</string>
     <string name="query_is">Suche nach</string>
     <string name="no_items_found">Keine Einträge gefunden</string>
-    <string name="queueing">Server scheint down oder überladen. Für späteres Senden gespeichert. [%s]</string>
+    <string name="queueing">Für späteres Senden gespeichert.</string>
+    <string name="queueing_code">Server scheint down oder überladen. Für späteres Senden gespeichert. [%s]</string>
     <string name="update_not_yet_supported">Update type [%s] noch nicht unterstützt</string>
     <string name="pick_a_user">Benutzer auswählen</string>
     <string name="no_ril_user">Keinen Account für Pocket(ReadItLater) gegeben</string>
