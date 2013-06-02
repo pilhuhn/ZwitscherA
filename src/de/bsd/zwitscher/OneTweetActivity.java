@@ -496,9 +496,19 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         if (account.isStatusNet())
             url = "https://identi.ca/notice/" + status.getId();
         else {
+
+            // If we have a RT; then the URLEntities are on the retweeted status
+            Status theStatus;
+            if (status.isRetweet()) {
+                theStatus = status.getRetweetedStatus();
+            } else {
+                theStatus = status;
+            }
+
+
             // do not link to the status here, but to the link(s) inside
-            if (status.getURLEntities()!=null && status.getURLEntities().length>0) {
-                URLEntity ue = status.getURLEntities()[0]; // TODO grab all urls
+            if (theStatus.getURLEntities()!=null && theStatus.getURLEntities().length>0) {
+                URLEntity ue = theStatus.getURLEntities()[0]; // TODO grab all urls
                 if (ue.getExpandedURL()!=null)
                     url = ue.getExpandedURL();
                 else if (ue.getURL()!=null)
