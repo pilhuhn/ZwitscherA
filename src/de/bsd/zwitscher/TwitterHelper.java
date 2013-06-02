@@ -97,7 +97,7 @@ public class TwitterHelper {
             persistStatus(statuses,list_id);
 
         }
-        catch (Exception e) {
+        catch (TwitterException e) {
             Log.e("TwitterHelper","getTimeline: Got exception: " + e.getMessage() );
             if (e.getCause()!=null)
                 System.err.println("   " + e.getCause().getMessage());
@@ -226,7 +226,7 @@ public class TwitterHelper {
 			userLists = twitter.getUserLists(username); // Lists I created
             userLists.addAll( twitter.getUserListSubscriptions(username, -1) ); // Lists from other users
 			return userLists;
-		} catch (Exception e) {
+		} catch (TwitterException e) {
             // called from background task, so no toast allowed
 			e.printStackTrace();
 			userLists = Collections.emptyList();
@@ -525,7 +525,7 @@ public class TwitterHelper {
 
                 persistStatus(statuses,listId);
 
-            } catch (Exception e) {
+            } catch (TwitterException e) {
                 statuses = new ArrayList<Status>();
 
                 System.err.println("Got exception: " + e.getMessage() );
@@ -640,7 +640,7 @@ public class TwitterHelper {
                 sList.add(status);
                 persistStatus(sList, id);
             }
-        } catch (Exception e) {
+        } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
         }
         return status;
@@ -785,7 +785,6 @@ public class TwitterHelper {
      * Send a request to follow or unfollow a user
      * @param userId Id of the user to follow
      * @param doFollow If true, send a follow request; unfollow otherwise.
-     * @return True in case of success
      */
     public void followUnfollowUser(long userId, boolean doFollow ) throws TwitterException {
         if (doFollow)
@@ -991,7 +990,7 @@ public class TwitterHelper {
             String url;
             url = upload.upload(file,message);
             return url;
-        } catch (Exception e) {
+        } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
         }
         return null;

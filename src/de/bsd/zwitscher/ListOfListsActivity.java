@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import de.bsd.zwitscher.helper.CaseInsensitivePairComparator;
 import de.bsd.zwitscher.helper.MetaList;
+import de.bsd.zwitscher.helper.NetworkHelper;
 import twitter4j.Paging;
 import twitter4j.SavedSearch;
 
@@ -224,23 +225,27 @@ public class ListOfListsActivity extends AbstractListActivity {
         @Override
         protected Void doInBackground(Void... params) {
 
-            for (Map.Entry<Integer, Pair<String, String>> entry : userListsEntries) {
+            NetworkHelper networkHelper = new NetworkHelper(context);
 
-                Pair<String, String> nameOwnerPair = entry.getValue();
-                publishProgress(nameOwnerPair.first);
+            if (networkHelper.isOnline()) {
+                for (Map.Entry<Integer, Pair<String, String>> entry : userListsEntries) {
 
-                Paging paging = new Paging();
-                paging.setCount(100);
+                    Pair<String, String> nameOwnerPair = entry.getValue();
+                    publishProgress(nameOwnerPair.first);
 
-                int listId = entry.getKey();
-                long lastFetched = tdb.getLastFetched(account.getId(), listId);
-                if (lastFetched>0)
-                    paging.setSinceId(lastFetched);
-                MetaList<twitter4j.Status> list = th.getUserList(paging, listId, false, -1);
-                long newOnes = list.getNumOriginal();
-                if (newOnes>0) {
-                    long maxId = list.getList().get(0).getId();
-                    tdb.updateOrInsertLastFetched(account.getId(), listId, maxId);
+                    Paging paging = new Paging();
+                    paging.setCount(100);
+
+                    int listId = entry.getKey();
+                    long lastFetched = tdb.getLastFetched(account.getId(), listId);
+                    if (lastFetched>0)
+                        paging.setSinceId(lastFetched);
+                    MetaList<twitter4j.Status> list = th.getUserList(paging, listId, false, -1);
+                    long newOnes = list.getNumOriginal();
+                    if (newOnes>0) {
+                        long maxId = list.getList().get(0).getId();
+                        tdb.updateOrInsertLastFetched(account.getId(), listId, maxId);
+                    }
                 }
             }
 

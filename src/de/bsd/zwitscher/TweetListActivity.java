@@ -617,7 +617,19 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 		@Override
         @SuppressWarnings("unchecked")
 		protected MetaList doInBackground(Boolean... params) {
-            if (startDelaySecs>0) {
+
+            fromDbOnly = params[0];
+
+            if (!fromDbOnly) {
+                NetworkHelper networkHelper = new NetworkHelper(context);
+                if (!networkHelper.isOnline()) {
+                    // User wants stuff from the server, but we are offline
+                    // so "fail fast"
+                    fromDbOnly=true;
+                }
+            }
+
+            if (startDelaySecs>0 && !fromDbOnly) {
                 try {
                     Thread.sleep(1000L*startDelaySecs);
                 } catch (InterruptedException e) {
@@ -625,7 +637,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 }
             }
 
-            fromDbOnly = params[0];
+
 	        MetaList data;
             if (userId!=null) {
                 List<twitter4j.Status> statuses = th.getUserTweets(userId);

@@ -41,12 +41,10 @@ public class FlushQueueTask extends AsyncTask<Void,Integer,Pair<Integer,Integer>
         List<Pair<Integer,byte[]>> list = tdb.getUpdatesForAccount(account.getId());
         Integer count = list.size();
         int good=0;
+
         for (Pair pair : list) {
              try {
-                 byte[] bytes = (byte[]) pair.second;
-                 ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes));
-                 UpdateRequest usr = (UpdateRequest) ois.readObject();
-                 ois.close();
+                 UpdateRequest usr = liquifyUpdateRequest(pair);
 
                  UpdateResponse ret= new UpdateResponse(usr.getUpdateType());
 
@@ -70,23 +68,12 @@ public class FlushQueueTask extends AsyncTask<Void,Integer,Pair<Integer,Integer>
                  case REPORT_AS_SPAMMER:
                      ret.setId(usr.id);
                      th.reportAsSpammer(usr.id);
+                     good++;
                      break;
                  case LATER_READING:
-                     ReadItLaterStore store = new ReadItLaterStore(usr.extUser,usr.extPassword);
-                     String result = store.store(usr.status,!account.isStatusNet(),usr.url);
-                     boolean success;
-                     success = result.startsWith("200");
-
-                     ret = new UpdateResponse(usr.getUpdateType(), result);
-
-                     if (success)
-                         good++;
+                     good = sendToPocket(good, usr, ret);
 
                      break;
-/*
-                 default:
-                     Log.e("FlushQueueTask","Update type " + usr.getUpdateType() + " not yet supported");
-*/
                  }
                  Log.i("FlushQueueTask","Return was: " + ret);
                  if (ret!=null && ret.getStatusCode() != 502) { // TODO look up codes
@@ -107,6 +94,21 @@ public class FlushQueueTask extends AsyncTask<Void,Integer,Pair<Integer,Integer>
         return result;
     }
 
+    private int sendToPocket(int good, UpdateRequest usr, UpdateResponse ret) {
+        ReadItLaterStore store = new ReadItLaterStore(usr.extUser,usr.extPassword);
+        String result = store.store(usr.status,!account.isStatusNet(),usr.url);
+        boolean success;
+        success = result.startsWith("200");
+
+        ret.setMessage(result);
+
+        if (success) {
+            good++;
+            ret.setSuccess();
+        }
+        return good;
+    }
+
     @Override
     protected void onPostExecute(Pair<Integer,Integer> result) {
         super.onPostExecute(result);
@@ -115,4 +117,18 @@ public class FlushQueueTask extends AsyncTask<Void,Integer,Pair<Integer,Integer>
             Toast.makeText(context,s,Toast.LENGTH_LONG).show();
         }
     }
+
+    /**
+     * Extract the UpdateRequest from the passed pair.
+     * @param pair The pair to extract the request from
+     * @return The Request
+     */
+    private UpdateRequest liquifyUpdateRequest(Pair pair) throws IOException, ClassNotFoundException {
+        byte[] bytes = (byte[]) pair.second;
+        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes));
+        UpdateRequest usr = (UpdateRequest) ois.readObject();
+        ois.close();
+        return usr;
+    }
+
 }

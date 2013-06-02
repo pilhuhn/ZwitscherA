@@ -53,7 +53,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
         TwitterHelper th = new TwitterHelper(context.getApplicationContext(), account);
 
         UpdateRequest request = requests[0];
-        UpdateResponse ret=null;
+        UpdateResponse ret;
 
         MediaProvider mediaProvider = th.getMediaProvider();
         if (request.updateType==UpdateType.UPDATE && request.picturePath!=null) {
@@ -161,7 +161,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
         }
         catch (TwitterException e) {
 
-            ret = queueUpUpdate(request,context.getString(R.string.query_is,ret.getMessage()));
+            ret = queueUpUpdate(request,context.getString(R.string.queueing));
         }
         ret.setSuccess();
         return ret;
