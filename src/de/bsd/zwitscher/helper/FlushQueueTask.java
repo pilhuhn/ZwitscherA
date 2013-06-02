@@ -110,7 +110,9 @@ public class FlushQueueTask extends AsyncTask<Void,Integer,Pair<Integer,Integer>
     @Override
     protected void onPostExecute(Pair<Integer,Integer> result) {
         super.onPostExecute(result);
-        if (result.first>0)
-            Toast.makeText(context,"Successfully sent " + result.second + " items out of " + result.first,Toast.LENGTH_LONG).show();
+        if (result.first>0) {
+            String s = context.getResources().getString(R.string.successfully_sent,result.second,result.first);
+            Toast.makeText(context,s,Toast.LENGTH_LONG).show();
+        }
     }
 }
