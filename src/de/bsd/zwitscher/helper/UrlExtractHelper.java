@@ -125,7 +125,7 @@ public class UrlExtractHelper {
         else if (url.contains("://photos.app.net")) {
             finalUrlString = getAppNetPreviewUrl(url);
         }
-        else if (url.endsWith(".jpg") || url.endsWith(".png") || url.endsWith(".jpeg")) {
+        else if (urlPointsToImage(url)) {
             finalUrlString = url;
         }
         else {
@@ -156,6 +156,20 @@ public class UrlExtractHelper {
         }
         return finalUrlString;
 
+    }
+
+    /**
+     * Determine if the passed argument ends with a image file type extension like
+     * .gif, .jpg, .jpeg or .png
+     * @param in String to test
+     * @return True if a matching ending is found, false otherwise
+     */
+    private static boolean urlPointsToImage(String in) {
+        String tmp = in.toLowerCase();
+        if (tmp.endsWith(".jpg") || tmp.endsWith(".png") || tmp.endsWith(".jpeg") || tmp.endsWith(".gif")) {
+            return true;
+        }
+        return false;
     }
 
     /**
