@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.bsd.zwitscher"
           android:installLocation="preferExternal"
-          android:versionName="0.95"
-          android:versionCode="95"
+          android:versionName="0.96"
+          android:versionCode="96"
           >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -65,9 +65,6 @@
 
         <activity android:name=".account.NewAccountActivity"/>
         <activity android:name=".account.AccountStuffActivity"/>
-
-        <activity android:name="Preferences" android:label="Preferences"/>
-
 
         <activity android:name=".ThreadListActivity" android:hardwareAccelerated="true"/>
         <activity android:name=".UserDetailActivity"/>
