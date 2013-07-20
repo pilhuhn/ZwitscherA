@@ -262,7 +262,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             final UserMentionEntity[] userMentionEntities = status.getUserMentionEntities();
             if (userMentionEntities !=null && userMentionEntities.length>0) {
                 spinner.setVisibility(View.VISIBLE);
-                List<String> users = new ArrayList<String>(userMentionEntities.length+1);
+                final List<String> users = new ArrayList<String>(userMentionEntities.length+2);
                 // Add an item 0 as dummy, as the spinner auto-selects it
                 users.add(getString(R.string.pick_a_user));
                 for (UserMentionEntity ume : userMentionEntities) {
@@ -288,7 +288,10 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                         // Our dummy is at position 0
                         if (position>0) {
                             Intent intent = new Intent(OneTweetActivity.this, UserDetailActivity.class);
-                            intent.putExtra("userName", userMentionEntities[position-1].getScreenName());
+                            String screenName = users.get(position);
+                            screenName = screenName.substring(1); // Skip over initial @
+                            screenName = screenName.substring(0,screenName.indexOf(' '));
+                            intent.putExtra("userName", screenName);
                             startActivity(intent);
                         }
                         // reset to item 0, so that repeated selection of the same item works.
