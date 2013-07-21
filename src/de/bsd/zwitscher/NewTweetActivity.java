@@ -349,7 +349,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
             request.picturePath = picturePath;
         request.someBool = pictureRemovable;
         Toast.makeText(this,R.string.trying_to_send,Toast.LENGTH_SHORT).show();
-        new UpdateStatusTask(this,pg, account).execute(request);
+        UpdateStatusService.sendUpdate(this,account,request);
 	}
 
     /**
@@ -366,7 +366,7 @@ public class NewTweetActivity extends Activity implements LocationListener {
         request.someBool = pictureRemovable;
         Toast.makeText(this,R.string.trying_to_send,Toast.LENGTH_SHORT).show();
 
-        new UpdateStatusTask(this,pg, account).execute(request);
+        UpdateStatusService.sendUpdate(this,account,request);
     }
 
     /**

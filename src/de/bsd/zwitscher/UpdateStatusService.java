@@ -5,16 +5,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.bsd.zwitscher.account.Account;
@@ -25,34 +24,39 @@ import twitter4j.TwitterException;
 import twitter4j.media.MediaProvider;
 
 /**
-* Task that does async updates to the server
+* Intent service that does async updates to the server
 *
 * @author Heiko W. Rupp
 */
-class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
+public class UpdateStatusService extends IntentService {
 
-    private Context context;
-    private ProgressBar progressBar;
-    private Account account;
-
-    public UpdateStatusTask(Context context, ProgressBar progressBar, Account account) {
-        this.context = context;
-        this.progressBar = progressBar;
-        this.account = account;
+    public UpdateStatusService() {
+        super("UpdateStatusService");
     }
 
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        if (progressBar!=null)
-            progressBar.setVisibility(ProgressBar.VISIBLE);
+    UpdateStatusService(String name) {
+        super(name);
     }
 
+    public static void sendUpdate(Context caller, Account account, UpdateRequest request) {
+        Intent intent = new Intent(caller,UpdateStatusService.class);
+        intent.putExtra("account",account);
+        intent.putExtra("request",request);
+        caller.startService(intent);
+    }
+
+
     @Override
-    protected UpdateResponse doInBackground(UpdateRequest... requests) {
+    protected void onHandleIntent(Intent intent) {
+
+        Bundle bundle = intent.getExtras();
+
+        UpdateRequest request = bundle.getParcelable("request");
+        Account account = bundle.getParcelable("account");
+        Context context = getApplicationContext();
+
         TwitterHelper th = new TwitterHelper(context.getApplicationContext(), account);
 
-        UpdateRequest request = requests[0];
         UpdateResponse ret;
 
         MediaProvider mediaProvider = th.getMediaProvider();
@@ -66,7 +70,8 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
         if (!nh.isOnline()) {
 
             // We are not online, queue the request
-           return queueUpUpdate(request, context.getString(R.string.queueing));
+           queueUpUpdate(request, context.getString(R.string.queueing), account);
+           stopSelf(); // TODO correct?
         }
 
         try {
@@ -156,26 +161,30 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
             }
 
             if (ret!=null && (ret.getStatusCode()==502||ret.getStatusCode()==503||ret.getStatusCode()==420)) {
-                ret = queueUpUpdate(request,context.getString(R.string.queueing_code, ret.getMessage()));
+                ret = queueUpUpdate(request,context.getString(R.string.queueing_code, ret.getMessage()), account);
             }
         }
         catch (TwitterException e) {
 
-            ret = queueUpUpdate(request,context.getString(R.string.queueing));
+            ret = queueUpUpdate(request,context.getString(R.string.queueing), account);
         }
         ret.setSuccess();
-        return ret;
+//        return ;
+        onPostExecute(ret);
+        stopSelf();
     }
 
     /**
      * Queue up the Update request for later sending.
+     *
      * @param request Request to queue up
      * @param message Reason why this was queued
+     * @param account
      * @return a new surrogate request to continue processing with
      * @see de.bsd.zwitscher.helper.FlushQueueTask
      */
-    private UpdateResponse queueUpUpdate(UpdateRequest request, String message) {
-        TweetDB tdb = TweetDB.getInstance(context.getApplicationContext());
+    private UpdateResponse queueUpUpdate(UpdateRequest request, String message, Account account) {
+        TweetDB tdb = TweetDB.getInstance(getApplicationContext());
 
         UpdateResponse response;
         try {
@@ -196,11 +205,11 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
     }
 
     protected void onPostExecute(UpdateResponse result) {
-        if (progressBar!=null)
-            progressBar.setVisibility(ProgressBar.INVISIBLE);
+//        if (progressBar!=null)
+//            progressBar.setVisibility(ProgressBar.INVISIBLE);
 
         if (result==null) {
-            Toast.makeText(context,"No result - should not happen",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"No result - should not happen",Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -241,7 +250,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
 
         if (result.isSuccess())
-            Toast.makeText(context.getApplicationContext(), result.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), result.getMessage(), Toast.LENGTH_LONG).show();
         else
             createNotification(result);
     }
@@ -252,7 +261,7 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
      */
     private void createNotification(UpdateResponse result) {
         String ns = Context.NOTIFICATION_SERVICE;
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(ns);
+        NotificationManager mNotificationManager = (NotificationManager) getApplicationContext().getSystemService(ns);
         mNotificationManager.cancelAll();
         int icon = R.drawable.icon; // TODO create small version for status bar
         Notification notification = new Notification(icon,result.getUpdateType().toString() + " failed",System.currentTimeMillis());
@@ -269,15 +278,15 @@ class UpdateStatusTask extends AsyncTask<UpdateRequest,Void,UpdateResponse> {
 
         //contentView.setImageViewResource(R.id.image, R.drawable.notification_image);
 
-        Intent intent = new Intent(context,ErrorDisplayActivity.class);
+        Intent intent = new Intent(getApplicationContext(),ErrorDisplayActivity.class);
         Bundle bundle=new Bundle(3);
         bundle.putString("e_head", head);
         bundle.putString("e_body", text);
         bundle.putString("e_text", message);
         intent.putExtras(bundle);
-        PendingIntent pintent = PendingIntent.getActivity(context,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pintent = PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
 
-        notification.setLatestEventInfo(context,
+        notification.setLatestEventInfo(getApplicationContext(),
                 head,
                 text,
                 pintent);

@@ -267,7 +267,7 @@ public class UserDetailActivity extends Activity  {
         UpdateRequest request = new UpdateRequest(UpdateType.FOLLOW_UNFOLLOW);
         request.userId = theUser.getId();
         request.someBool = !weAreFollowing;
-        new UpdateStatusTask(this,pg,account).execute(request);
+        UpdateStatusService.sendUpdate(this,account,request);
     }
 
 
@@ -367,7 +367,7 @@ public class UserDetailActivity extends Activity  {
                         UpdateRequest request = new UpdateRequest(UpdateType.REMOVE_FROM_LIST);
                         request.id = userList.getValue();
                         request.userId=theUser.getId();
-                        new UpdateStatusTask(this,pg,account).execute(request);
+                        UpdateStatusService.sendUpdate(this,account,request);
                     }
 
                 } else {
@@ -375,7 +375,7 @@ public class UserDetailActivity extends Activity  {
                         UpdateRequest request = new UpdateRequest(UpdateType.ADD_TO_LIST);
                         request.id=userList.getValue();
                         request.userId=theUser.getId();
-                        new UpdateStatusTask(this,pg,account).execute(request);
+                        UpdateStatusService.sendUpdate(this,account,request);
                     }
                 }
                 i++;

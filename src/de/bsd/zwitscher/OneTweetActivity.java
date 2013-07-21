@@ -420,7 +420,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 	public void retweet(View v) {
         UpdateRequest request = new UpdateRequest(UpdateType.RETWEET);
         request.id = status.getId();
-        new UpdateStatusTask(this,pg, account).execute(request);
+        UpdateStatusService.sendUpdate(this,account,request);
 	}
 
 
@@ -462,7 +462,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         request.status = status;
         request.view = favoriteButton;
 
-        new UpdateStatusTask(this,pg, account).execute(request);
+        UpdateStatusService.sendUpdate(this,account,request);
 
     }
 
@@ -527,7 +527,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         request.extUser = user;
         request.extPassword = password;
 
-        new UpdateStatusTask(this,pg, account).execute(request);
+        UpdateStatusService.sendUpdate(this,account,request);
 
     }
 
@@ -791,8 +791,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             public void onClick(DialogInterface dialogInterface, int i) {
                 UpdateRequest request = new UpdateRequest(UpdateType.DELETE_STATUS);
                 request.id = status.getId();
-                new UpdateStatusTask(OneTweetActivity.this,pg, account).execute(request);
-                // TODO remove from list or mark as deleted ?
+                UpdateStatusService.sendUpdate(OneTweetActivity.this,account,request);
                 done(null);
 
             }
@@ -836,7 +835,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 UpdateRequest request = new UpdateRequest(UpdateType.REPORT_AS_SPAMMER);
                 request.id = status.getUser().getId();
 
-                new UpdateStatusTask(OneTweetActivity.this,pg, account).execute(request);
+                UpdateStatusService.sendUpdate(OneTweetActivity.this,account,request);
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {

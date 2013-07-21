@@ -81,6 +81,7 @@
         </activity>
         <activity android:name=".account.TwitterLoginActivity"/>
 
+      <service android:name=".UpdateStatusService"/>
     </application>
 
 </manifest>

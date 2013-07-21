@@ -273,7 +273,7 @@ public class TwitterHelper {
      * account object is not set, the default account is used.
      * @return authorized Twitter instance.
      */
-	private Twitter getTwitter() {
+    public Twitter getTwitter() {
         if (account==null)
             account = getDefaultAccount();
 
@@ -285,6 +285,9 @@ public class TwitterHelper {
                 cb.setIncludeEntitiesEnabled(true);
                 cb.setJSONStoreEnabled(true);
                 cb.setMediaProvider(mediaProvider.toString());
+                cb.setHttpConnectionTimeout(60*1000);
+                cb.setHttpReadTimeout(240*1000); // 4 min
+                cb.setHttpRetryCount(3);
                 Configuration conf = cb.build();
                 OAuthAuthorization auth = new OAuthAuthorization(conf);
                 auth.setOAuthAccessToken(new AccessToken(account.getAccessTokenKey(), account.getAccessTokenSecret()));
@@ -453,6 +456,7 @@ public class TwitterHelper {
             updateResponse.setMessage( e.getLocalizedMessage());
             updateResponse.setFailure();
             updateResponse.setStatusCode(e.getStatusCode());
+            Log.e("TH::updateStatus","Update failed",e);
         }
         return updateResponse;
 	}
@@ -826,7 +830,7 @@ public class TwitterHelper {
         return ret;
     }
 
-    private void persistStatus(Collection<Status> statuses, long list_id) {
+    public void persistStatus(Collection<Status> statuses, long list_id) {
 
 
         List<ContentValues> values = new ArrayList<ContentValues>(statuses.size());
