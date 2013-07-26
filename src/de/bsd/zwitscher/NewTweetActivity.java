@@ -151,6 +151,15 @@ public class NewTweetActivity extends Activity implements LocationListener {
                         textOben.setText(s + " "+ toUser.getScreenName());
                     }
                 }
+                else {
+                    // New tweet as reply to a direct message
+                    if (op.equals(getString(R.string.direct))) {
+                        if (directUser!=null)
+                                                   toUser = directUser;
+                        String s = getString(R.string.send_direct_to);
+                                                textOben.setText(s + " "+ toUser.getScreenName());
+                    }
+                }
             }
             else { // OP is null -> new tweet
                 if (bundleText!=null)

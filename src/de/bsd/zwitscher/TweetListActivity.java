@@ -159,6 +159,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
     /**
      * Handle click on a list item which triggers the detail view of that item
+     * for general items or a reply for a direct message
      * @param parent Parent view
      * @param view Clicked view
      * @param position Position in the list that was clicked
