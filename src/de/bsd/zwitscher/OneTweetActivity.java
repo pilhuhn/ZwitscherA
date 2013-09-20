@@ -17,6 +17,7 @@ import android.widget.*;
 
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
+import de.bsd.zwitscher.helper.GetOneStatusTask;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.helper.PicHelper;
 import de.bsd.zwitscher.helper.UrlExtractHelper;
@@ -43,6 +44,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * This Activity displays one individual status.
@@ -112,7 +114,13 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 String tids = dataString.substring(dataString.lastIndexOf("/")+1);
                 Long tid = Long.parseLong(tids);
                 TwitterHelper th = new TwitterHelper(this, account);
-                status = th.getStatusById(tid,0L,false,false, false);
+                try {
+                    status = new GetOneStatusTask(th).execute(tid).get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();  // TODO: Customise this generated block
+                } catch (ExecutionException e) {
+                    e.printStackTrace();  // TODO: Customise this generated block
+                }
             } else if (dataString.matches("http://twitter.com/#!/.*$")) {
                 // A user - forward to UserDetailActivity TODO: remove once this is coded in AndroidManifest.xml
                 String userName = dataString.substring(dataString.lastIndexOf("/")+1);
@@ -709,7 +717,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
         }
 
         // Only enable the "delete" item for statuses we authored
-        if (status.getUser().getScreenName().equals(account.getName())) {
+        if (status != null && status.getUser().getScreenName().equals(account.getName())) {
             menu.findItem(R.id.delete).setEnabled(true);
         }
         else {
