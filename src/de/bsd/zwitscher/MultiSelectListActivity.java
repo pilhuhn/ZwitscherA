@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,12 +48,14 @@ public class MultiSelectListActivity extends ListActivity implements AdapterView
                 @Override
                 public void onClick(View v) {
                     SparseBooleanArray positions = getListView().getCheckedItemPositions();
-                    int count = getListView().getCheckedItemCount();
-                    long[] items = new long[count];
-                    int pos = 0;
-                    for (int i = 0; i < getListView().getCount(); i++) {
+                    List<Integer> positionsList = new ArrayList<Integer>(positions.size());
+                    for (int i = 0; i < positions.size();i++) {
                         if (positions.get(i))
-                            items[pos++] = i;
+                            positionsList.add(i);
+                    }
+                    long[] items = new long[positionsList.size()];
+                    for (int i = 0; i < positionsList.size(); i++) {
+                        items[i]=positionsList.get(i);
                     }
 
                     Intent intent = prepareReturnedIntent();
