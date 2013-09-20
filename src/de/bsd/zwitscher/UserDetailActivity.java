@@ -465,6 +465,9 @@ public class UserDetailActivity extends Activity  {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            if (Build.VERSION.SDK_INT>=11 && weAreFollowingMenuItem!=null) {
+                    weAreFollowingMenuItem.setEnabled(false);
+            }
             if (pg!=null) {
                 pg.setVisibility(ProgressBar.VISIBLE);
 
@@ -555,6 +558,7 @@ public class UserDetailActivity extends Activity  {
                         weAreFollowingMenuItem.setTitle(R.string.unfollow_user);
                     else
                         weAreFollowingMenuItem.setTitle(R.string.follow_user);
+                    weAreFollowingMenuItem.setEnabled(true);
                 }
             }
 
