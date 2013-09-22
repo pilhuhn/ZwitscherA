@@ -11,7 +11,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -70,7 +73,8 @@ public class UpdateStatusService extends IntentService {
         if (!nh.isOnline()) {
 
             // We are not online, queue the request
-           queueUpUpdate(request, context.getString(R.string.queueing), account);
+           ret = queueUpUpdate(request, context.getString(R.string.queueing), account);
+           createNotification(ret);
            stopSelf(); // TODO correct?
         }
 
@@ -85,7 +89,7 @@ public class UpdateStatusService extends IntentService {
                         else {
                             StatusUpdate statusUpdate = request.statusUpdate;
                             String tmp = th.postPicture(request.picturePath, statusUpdate.getStatus()); // TODO remove place holder here
-
+// TODO if tmp == null picture upload failed - it is probably a good idea to inform the user.
                             String res = statusUpdate.getStatus() + " " + tmp;
                             StatusUpdate up = new StatusUpdate(res);
                             up.setInReplyToStatusId(statusUpdate.getInReplyToStatusId());
@@ -249,9 +253,11 @@ public class UpdateStatusService extends IntentService {
         }
 
 
+/*
         if (result.isSuccess())
             Toast.makeText(getApplicationContext(), result.getMessage(), Toast.LENGTH_LONG).show();
         else
+*/
             createNotification(result);
     }
 
@@ -261,36 +267,87 @@ public class UpdateStatusService extends IntentService {
      */
     private void createNotification(UpdateResponse result) {
         String ns = Context.NOTIFICATION_SERVICE;
-        NotificationManager mNotificationManager = (NotificationManager) getApplicationContext().getSystemService(ns);
+        final NotificationManager mNotificationManager = (NotificationManager) getApplicationContext().getSystemService(ns);
         mNotificationManager.cancelAll();
-        int icon = R.drawable.icon; // TODO create small version for status bar
-        Notification notification = new Notification(icon,result.getUpdateType().toString() + " failed",System.currentTimeMillis());
+        int icon = R.drawable.zwitscher_notif; // TODO create small version for status bar
+        Notification notification;
+        if (Build.VERSION.SDK_INT<11) {
+            if (!result.isSuccess()) {
+                notification = new Notification(icon,result.getUpdateType().toString() + " failed",System.currentTimeMillis());
+            } else {
+                notification = new Notification(icon,result.getUpdateType().toString(), System.currentTimeMillis());
+            }
+        }
+        else {
+            Notification.Builder builder = new Notification.Builder(getApplicationContext());
+            if (result.isSuccess()) {
+                builder.setAutoCancel(true);
+            }
+            builder.setContentTitle("Zwitscher update");
+            String text = "Result of " + result.getUpdateType().toString() + " is success: " + result.isSuccess();
+//            builder.setContentText(text);
+            builder.setSubText(text);
+            builder.setTicker(getString(R.string.sending_succeeded));
+            builder.setSmallIcon(R.drawable.zwitscher_notif);
+            notification = builder.build();
+        }
 
-        String head =  result.getUpdateType() + " failed:";
-        String text =  result.getMessage();
-        String message ="";
-        if (result.getUpdateType()==UpdateType.QUEUED)
-            message = "Queueing failed : "+ result.getMessage();
-        if (result.getUpdateType()==UpdateType.UPDATE)
-            message= result.getUpdate().getStatus();
-        if (result.getUpdateType()==UpdateType.DIRECT)
-            message= result.getOrigMessage();
 
         //contentView.setImageViewResource(R.id.image, R.drawable.notification_image);
 
-        Intent intent = new Intent(getApplicationContext(),ErrorDisplayActivity.class);
-        Bundle bundle=new Bundle(3);
-        bundle.putString("e_head", head);
-        bundle.putString("e_body", text);
-        bundle.putString("e_text", message);
-        intent.putExtras(bundle);
-        PendingIntent pintent = PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pintent;
+        if (result.isSuccess()) {
 
-        notification.setLatestEventInfo(getApplicationContext(),
-                head,
-                text,
-                pintent);
+            pintent = PendingIntent.getActivity(getApplicationContext(), 0, new Intent(), PendingIntent.FLAG_CANCEL_CURRENT);
+        } else {
+            // Only set the Error display intent when this is no success
+            String head =  result.getUpdateType() + " failed:";
+            String text =  result.getMessage();
+            String message ="";
+            if (result.getUpdateType()==UpdateType.QUEUED)
+                message = "Queueing failed : "+ result.getMessage();
+            if (result.getUpdateType()==UpdateType.UPDATE)
+                message= result.getUpdate().getStatus();
+            if (result.getUpdateType()==UpdateType.DIRECT)
+                message= result.getOrigMessage();
+
+            Intent intent = new Intent(getApplicationContext(),ErrorDisplayActivity.class);
+            Bundle bundle=new Bundle(3);
+            bundle.putString("e_head", head);
+            bundle.putString("e_body", text);
+            bundle.putString("e_text", message);
+            intent.putExtras(bundle);
+            pintent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+            notification.setLatestEventInfo(getApplicationContext(),
+                    head,
+                    text,
+                    pintent);
+
+        }
+
         mNotificationManager.notify(3,notification);
+
+        if (result.isSuccess()) {
+            // remove notifcation after some time secs
+
+
+            long delayInMilliseconds = 5000;
+            final HandlerThread t = new HandlerThread("bla");
+            t.start();
+
+            Runnable r = new Runnable() {
+
+                public void run() {
+                    mNotificationManager.cancel(3);
+                    t.quit();
+                }
+            };
+
+            Handler h = new Handler(t.getLooper());
+            boolean success = h.postDelayed(r, delayInMilliseconds);
+
+        }
     }
 
 }

@@ -199,5 +199,6 @@
   <string name="load_on_switch">Load on account switch</string>
   <string name="load_on_switch_descr">Should messages be loaded from the server when switching accounts?</string>
   <string name="successfully_sent">"Successfully sent %1$d items out of %2$d</string>
+  <string name="sending_succeeded">Sending succeeded</string>
 
 </resources>

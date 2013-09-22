@@ -194,5 +194,6 @@
   <string name="load_on_switch">Laden beim Accountwechsel</string>
   <string name="load_on_switch_descr">Sollen beim Wechsel des Accounts Nachrichten vom Server geladen werden?</string>
   <string name="successfully_sent">"Erfolgreich %1$d von %2$d gesendet</string>
+  <string name="sending_succeeded">Erfolgreich gesendet</string>
 
 </resources>

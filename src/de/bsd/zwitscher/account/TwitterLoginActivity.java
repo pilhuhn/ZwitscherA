@@ -147,7 +147,7 @@ public class TwitterLoginActivity extends Activity {
                     finish();
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(),
-                            "Error: " + e.getMessage(), 15000).show();
+                            "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }

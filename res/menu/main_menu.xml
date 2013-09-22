@@ -2,7 +2,7 @@
 	<item android:alphabeticShortcut="P"
 		  android:id="@+id/preferences"
 		  android:titleCondensed="Prefs"
-		  android:title="Preferences"
+		  android:title="@string/Preferences"
           android:icon="@drawable/wrench"
 		  android:enabled="true"
 		  android:visible="true"/>

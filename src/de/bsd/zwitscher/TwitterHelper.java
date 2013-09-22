@@ -987,6 +987,7 @@ public class TwitterHelper {
             props.put(PropertyConfiguration.OAUTH_ACCESS_TOKEN_SECRET,accessTokenSecret);
             props.put(PropertyConfiguration.OAUTH_CONSUMER_KEY, Tokens.consumerKey);
             props.put(PropertyConfiguration.OAUTH_CONSUMER_SECRET, Tokens.consumerSecret);
+            props.put(PropertyConfiguration.HTTP_READ_TIMEOUT,240*1000); // 4mins
             Configuration conf = new PropertyConfiguration(props);
 
             ImageUploadFactory factory = new ImageUploadFactory(conf);
