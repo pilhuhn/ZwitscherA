@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Parcelable;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -44,7 +45,7 @@ public class UpdateStatusService extends IntentService {
     public static void sendUpdate(Context caller, Account account, UpdateRequest request) {
         Intent intent = new Intent(caller,UpdateStatusService.class);
         intent.putExtra("account",account);
-        intent.putExtra("request",request);
+        intent.putExtra("request",(Parcelable)request);
         caller.startService(intent);
     }
 
@@ -87,9 +88,17 @@ public class UpdateStatusService extends IntentService {
                             request.statusUpdate.setMedia(new File(request.picturePath));
                         }
                         else {
+                            // External picture provider like yfrog
                             StatusUpdate statusUpdate = request.statusUpdate;
-                            String tmp = th.postPicture(request.picturePath, statusUpdate.getStatus()); // TODO remove place holder here
-// TODO if tmp == null picture upload failed - it is probably a good idea to inform the user.
+                            String tmp = th.postPicture(request.picturePath, statusUpdate.getStatus());
+                            // if tmp == null picture upload failed - it is probably a good idea to inform the user.
+                            if (tmp==null) {
+                                UpdateResponse tmpResponse = new UpdateResponse(request.updateType,"Picture upload failed - was the image too big?");
+                                tmpResponse.setFailure();
+                                createNotification(tmpResponse);
+                                return;
+
+                            }
                             String res = statusUpdate.getStatus() + " " + tmp;
                             StatusUpdate up = new StatusUpdate(res);
                             up.setInReplyToStatusId(statusUpdate.getInReplyToStatusId());
@@ -173,7 +182,7 @@ public class UpdateStatusService extends IntentService {
             ret = queueUpUpdate(request,context.getString(R.string.queueing), account);
         }
         ret.setSuccess();
-//        return ;
+
         onPostExecute(ret);
         stopSelf();
     }
@@ -205,12 +214,11 @@ public class UpdateStatusService extends IntentService {
             e.printStackTrace();  // TODO: Customise this generated block
             response = new UpdateResponse(UpdateType.QUEUED, e.getMessage());
         }
+        createNotification(response);
         return response;
     }
 
     protected void onPostExecute(UpdateResponse result) {
-//        if (progressBar!=null)
-//            progressBar.setVisibility(ProgressBar.INVISIBLE);
 
         if (result==null) {
             Toast.makeText(getApplicationContext(),"No result - should not happen",Toast.LENGTH_SHORT).show();
@@ -253,12 +261,7 @@ public class UpdateStatusService extends IntentService {
         }
 
 
-/*
-        if (result.isSuccess())
-            Toast.makeText(getApplicationContext(), result.getMessage(), Toast.LENGTH_LONG).show();
-        else
-*/
-            createNotification(result);
+        createNotification(result);
     }
 
     /**
@@ -269,7 +272,7 @@ public class UpdateStatusService extends IntentService {
         String ns = Context.NOTIFICATION_SERVICE;
         final NotificationManager mNotificationManager = (NotificationManager) getApplicationContext().getSystemService(ns);
         mNotificationManager.cancelAll();
-        int icon = R.drawable.zwitscher_notif; // TODO create small version for status bar
+        int icon = R.drawable.zwitscher_notif;
         Notification notification;
         if (Build.VERSION.SDK_INT<11) {
             if (!result.isSuccess()) {
@@ -287,13 +290,15 @@ public class UpdateStatusService extends IntentService {
             String text = "Result of " + result.getUpdateType().toString() + " is success: " + result.isSuccess();
 //            builder.setContentText(text);
             builder.setSubText(text);
-            builder.setTicker(getString(R.string.sending_succeeded));
+            if (result.getUpdateType()==UpdateType.QUEUED) {
+                builder.setTicker("Queued for later sending");
+            } else {
+                builder.setTicker(getString(R.string.sending_succeeded));
+            }
             builder.setSmallIcon(R.drawable.zwitscher_notif);
             notification = builder.build();
         }
 
-
-        //contentView.setImageViewResource(R.id.image, R.drawable.notification_image);
 
         PendingIntent pintent;
         if (result.isSuccess()) {
@@ -306,8 +311,11 @@ public class UpdateStatusService extends IntentService {
             String message ="";
             if (result.getUpdateType()==UpdateType.QUEUED)
                 message = "Queueing failed : "+ result.getMessage();
-            if (result.getUpdateType()==UpdateType.UPDATE)
-                message= result.getUpdate().getStatus();
+            if (result.getUpdateType()==UpdateType.UPDATE) {
+                if (result.getUpdate()!=null && result.getUpdate().getStatus()!=null) {
+                    message= result.getUpdate().getStatus();
+                }
+            }
             if (result.getUpdateType()==UpdateType.DIRECT)
                 message= result.getOrigMessage();
 

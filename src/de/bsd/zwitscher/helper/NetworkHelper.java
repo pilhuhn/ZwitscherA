@@ -79,7 +79,7 @@ public class NetworkHelper {
                     return false;
             }
 
-        } else if (type==ConnectivityManager.TYPE_WIFI && configType==2) {
+        } else if (type==ConnectivityManager.TYPE_WIFI && configType<6) {
             return true; // Wifi is 'better' than mobile and 'Never' was caught earlier
         } else {
             Log.i("NetworkHelper","Unknown connectivity type: " + info.getTypeName());

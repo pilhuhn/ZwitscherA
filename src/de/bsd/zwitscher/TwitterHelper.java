@@ -228,7 +228,6 @@ public class TwitterHelper {
 			return userLists;
 		} catch (TwitterException e) {
             // called from background task, so no toast allowed
-			e.printStackTrace();
 			userLists = Collections.emptyList();
 		}
         return userLists;
@@ -1050,7 +1049,6 @@ public class TwitterHelper {
         try {
             searches = twitter.getSavedSearches();
         } catch (TwitterException e) {
-            e.printStackTrace();  // TODO: Customise this generated block
             searches = Collections.emptyList();
         }
 

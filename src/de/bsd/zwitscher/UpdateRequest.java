@@ -13,7 +13,7 @@ import twitter4j.StatusUpdate;
  *
  * @author Heiko W. Rupp
  */
-public class UpdateRequest implements Parcelable {
+public class UpdateRequest implements Parcelable, Serializable {
 
     UpdateType updateType;
     String message;
