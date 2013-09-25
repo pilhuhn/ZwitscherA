@@ -15,7 +15,7 @@ public class UpdateResponse {
     StatusUpdate update;
     long id;
     String message;
-    boolean success;
+    boolean success=true;
     UpdateType updateType;
     Status status;
     View view;

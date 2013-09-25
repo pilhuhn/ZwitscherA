@@ -181,7 +181,6 @@ public class UpdateStatusService extends IntentService {
 
             ret = queueUpUpdate(request,context.getString(R.string.queueing), account);
         }
-        ret.setSuccess();
 
         onPostExecute(ret);
         stopSelf();
@@ -304,6 +303,10 @@ public class UpdateStatusService extends IntentService {
         if (result.isSuccess()) {
 
             pintent = PendingIntent.getActivity(getApplicationContext(), 0, new Intent(), PendingIntent.FLAG_CANCEL_CURRENT);
+            if (Build.VERSION.SDK_INT<11) {
+                notification.setLatestEventInfo(getApplicationContext(),result.getUpdateType().toString(),
+                        result.isSuccess()? "Success": ("Failure: " + result.getMessage()) ,pintent);
+            }
         } else {
             // Only set the Error display intent when this is no success
             String head =  result.getUpdateType() + " failed:";
