@@ -9,8 +9,12 @@ native Json support in the Android libraries
 - this lets me learn that part
 - it scales down the application size.
 
-I did not really set a target Android platform - at the end
-it has to work on my HTC Desire with Android 2.2.
+For the start I did not really set a target Android platform - at the end
+it had to work on my HTC Desire with Android 2.2.
+This has been changed since and futher development on the master
+branch will only be for Api level 14 and later, which corresponds
+to Android 4.0+. The statistics from the market show that > 65%
+of all devices that run Zwitscher run on 4.0+
 
 Zwitscher hat been translated into some languages - if you want
 to help translating into new languages, ping me.
