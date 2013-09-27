@@ -287,8 +287,11 @@ public class UpdateStatusService extends IntentService {
             }
             builder.setContentTitle("Zwitscher update");
             String text = "Result of " + result.getUpdateType().toString() + " is success: " + result.isSuccess();
-//            builder.setContentText(text);
-            builder.setSubText(text);
+            if (Build.VERSION.SDK_INT<16) {
+                builder.setContentText(text);
+            } else {
+                builder.setSubText(text);
+            }
             if (result.getUpdateType()==UpdateType.QUEUED) {
                 builder.setTicker("Queued for later sending");
             } else {
