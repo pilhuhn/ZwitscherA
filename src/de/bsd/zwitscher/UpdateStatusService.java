@@ -295,7 +295,11 @@ public class UpdateStatusService extends IntentService {
                 builder.setTicker(getString(R.string.sending_succeeded));
             }
             builder.setSmallIcon(R.drawable.zwitscher_notif);
-            notification = builder.build();
+            if (Build.VERSION.SDK_INT<16) {
+                notification = builder.getNotification();
+            } else {
+                notification = builder.build();
+            }
         }
 
 
