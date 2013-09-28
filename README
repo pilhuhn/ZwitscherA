@@ -37,6 +37,8 @@ public class Tokens {
 
     public static String tweetMarkerToken = "";
 
+    public static String bugSenseKey = "";
+
 }
 
 To obtain this Token, go to http://twitter.com/apps and log in.
@@ -60,6 +62,10 @@ Zwitscher can now also sync last read information with
 TweetMarker.com (and thus with clients like Twitterriffic).
 To enable this, you also need to have a token in above tokens file
 
+== Support for BugSense
+
+If you supply a token value for bugSense, BugSense crash reporting
+is turned on.
 
 ==========================
 

@@ -21,6 +21,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import com.bugsense.trace.BugSense;
+import com.bugsense.trace.BugSenseHandler;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.account.AccountNavigationListener;
@@ -61,6 +63,9 @@ public class TabWidget extends TabActivity  {
 		super.onCreate(savedInstanceState);
 
         Log.i("TabWidget","onCreate");
+        if (Tokens.bugSenseKey!=null && !Tokens.bugSenseKey.isEmpty()) {
+            BugSenseHandler.initAndStartSession(this,Tokens.bugSenseKey);
+        }
 
         account = AccountHolder.getInstance(this).getAccount();
 
@@ -85,7 +90,7 @@ public class TabWidget extends TabActivity  {
         }
 		setContentView(R.layout.tabs);
         if (android.os.Build.VERSION.SDK_INT<11) {
-            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
+            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.window_title);
             pg = (ProgressBar) findViewById(R.id.title_progress_bar);
             titleTextBox = (TextView) findViewById(R.id.title_msg_box);
         }
