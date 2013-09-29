@@ -15,7 +15,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -33,7 +32,6 @@ import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.helper.FlushQueueTask;
@@ -74,11 +72,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         super.onCreate(savedInstanceState);
 
         Activity theParent = getParent();
-        if ((!(theParent instanceof TabWidget)) && (android.os.Build.VERSION.SDK_INT<11)) {
-            // We have no enclosing TabWidget, so we need to request the custom title
-            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-        }
-        if ((!(theParent instanceof TabWidget)) && (android.os.Build.VERSION.SDK_INT>=11)) {
+        if (!(theParent instanceof TabWidget)) {
             // We have no enclosing TabWidget, so we need to request progress thingy
             requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         }
@@ -86,17 +80,6 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
         // Set the layout of the list activity
         setContentView(R.layout.tweet_list_layout);
 
-        // Get the windows progress bar from the enclosing TabWidget
-        if ((!(theParent instanceof TabWidget)) && (android.os.Build.VERSION.SDK_INT<11)) {
-            // We have no enclosing TabWidget, so we need our window here
-            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.window_title);
-            progressBar = (ProgressBar) findViewById(R.id.title_progress_bar);
-            titleTextBox = (TextView) findViewById(R.id.title_msg_box);
-
-
-            ImageButton imageButton = (ImageButton) findViewById(R.id.back_button);
-            imageButton.setVisibility(View.VISIBLE);
-        }
         lv = getListView();
         lv.setItemsCanFocus(false);
         lv.setOnScrollListener(this);
@@ -416,7 +399,7 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
     public boolean onCreateOptionsMenu(Menu menu) {
         Activity theParent = getParent();
-        if ((!(theParent instanceof TabWidget) && Build.VERSION.SDK_INT>=11)) {
+        if (!(theParent instanceof TabWidget)) {
 
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.list_activity_menu_honey,menu);
@@ -426,12 +409,9 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
             return true;
         }
-        else if (theParent instanceof TabWidget) {
+        else {
             return theParent.onCreateOptionsMenu(menu);
         }
-
-        return false;
-
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -598,19 +578,17 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             if(titleTextBox!=null) {
                 titleTextBox.setText(s);
             }
-            if (Build.VERSION.SDK_INT>=11) {
-                ActionBar ab = getActionBar();
-                if (ab!=null) {
-                    ab.setSubtitle(s);
-                }
+            ActionBar ab = getActionBar();
+            if (ab!=null) {
+                ab.setSubtitle(s);
+            }
 
-                if (getParent()!=null) {
-                    getParent().setProgressBarIndeterminateVisibility(true);
-                }
-                else {
-                    // No parent tab bar when used on a list
-                    setProgressBarIndeterminateVisibility(true);
-                }
+            if (getParent()!=null) {
+                getParent().setProgressBarIndeterminateVisibility(true);
+            }
+            else {
+                // No parent tab bar when used on a list
+                setProgressBarIndeterminateVisibility(true);
             }
         }
 
@@ -719,25 +697,23 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
             if (titleTextBox!=null)
                 titleTextBox.setText(account.getAccountIdentifier());
-            if (Build.VERSION.SDK_INT>=11) {
-                ActionBar ab = getActionBar();
-                if (ab!=null) {
-                    String s=null;
-                    Map<Integer,Pair<String,String>> userLists = tdb.getLists(account.getId());
-                    if (userListId !=-1) {
-                        Pair<String,String> nameOwnerPair = userLists.get(userListId);
-                        if (nameOwnerPair!=null) {
-                            String tmp;
-                            if (nameOwnerPair.second.equals(account.getName()))
-                                tmp = nameOwnerPair.first;
-                            else
-                                tmp = "@" +nameOwnerPair.second + "/" + nameOwnerPair.first;
-                            s =tmp;
-                        }
+            ActionBar ab = getActionBar();
+            if (ab!=null) {
+                String s=null;
+                Map<Integer,Pair<String,String>> userLists = tdb.getLists(account.getId());
+                if (userListId !=-1) {
+                    Pair<String,String> nameOwnerPair = userLists.get(userListId);
+                    if (nameOwnerPair!=null) {
+                        String tmp;
+                        if (nameOwnerPair.second.equals(account.getName()))
+                            tmp = nameOwnerPair.first;
+                        else
+                            tmp = "@" +nameOwnerPair.second + "/" + nameOwnerPair.first;
+                        s =tmp;
                     }
-                    ab.setTitle(account.getAccountIdentifier());
-                    ab.setSubtitle(s);
                 }
+                ab.setTitle(account.getAccountIdentifier());
+                ab.setSubtitle(s);
             }
             if (updateListAdapter)
 	            getListView().requestLayout();
@@ -780,15 +756,12 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
                 progressBar.setVisibility(ProgressBar.INVISIBLE);
             }
 
-            if (Build.VERSION.SDK_INT>=11) {
-                if (getParent()!=null) {
-                    getParent().setProgressBarIndeterminateVisibility(false);
-                } else {
-                    // A list has no TabWdget as parent
-                    setProgressBarIndeterminateVisibility(false);
-                }
+            if (getParent()!=null) {
+                getParent().setProgressBarIndeterminateVisibility(false);
+            } else {
+                // A list has no TabWdget as parent
+                setProgressBarIndeterminateVisibility(false);
             }
-
 
 		}
 
@@ -797,12 +770,9 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             super.onProgressUpdate(values);
             if(titleTextBox!=null)
                 titleTextBox.setText(updating +" "+ values[0] + "...");
-            if (Build.VERSION.SDK_INT>=11) {
-                ActionBar ab = getActionBar();
-                if (ab!=null)
-                    ab.setSubtitle(updating +" "+ values[0] + "...");
-            }
-
+            ActionBar ab = getActionBar();
+            if (ab!=null)
+                ab.setSubtitle(updating +" "+ values[0] + "...");
         }
     }
 

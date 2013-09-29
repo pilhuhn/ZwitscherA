@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
@@ -19,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -67,16 +65,8 @@ public class UserDetailActivity extends Activity  {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (android.os.Build.VERSION.SDK_INT<11) {
-            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-        }
         setContentView(R.layout.user_detail);
-        if (android.os.Build.VERSION.SDK_INT<11) {
-            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
-        }
-        else {
-            pg = (ProgressBar) findViewById(R.id.title_progress_bar);
-        }
+        pg = (ProgressBar) findViewById(R.id.title_progress_bar);
         titleTextBox = (TextView) findViewById(R.id.title_msg_box);
         followButton = (Button) findViewById(R.id.userDetail_follow_button);
         if (followButton!=null)
@@ -392,29 +382,26 @@ public class UserDetailActivity extends Activity  {
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (android.os.Build.VERSION.SDK_INT>=11) {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.user_detail_menu,menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.user_detail_menu,menu);
 
-            weAreFollowingMenuItem = menu.findItem(R.id.follow);
-            if (weAreFollowing)
-                weAreFollowingMenuItem.setTitle(R.string.unfollow_user);
-            else
-                weAreFollowingMenuItem.setTitle(R.string.follow_user);
+        weAreFollowingMenuItem = menu.findItem(R.id.follow);
+        if (weAreFollowing)
+            weAreFollowingMenuItem.setTitle(R.string.unfollow_user);
+        else
+            weAreFollowingMenuItem.setTitle(R.string.follow_user);
 
-            ActionBar actionBar = this.getActionBar();
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = this.getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
-            MenuItem pgItem  = menu.findItem(R.id.ProgressBar);
-            pg = (ProgressBar) pgItem.getActionView();
-            pg.setVisibility(ProgressBar.INVISIBLE);
+        MenuItem pgItem  = menu.findItem(R.id.ProgressBar);
+        pg = (ProgressBar) pgItem.getActionView();
+        pg.setVisibility(ProgressBar.INVISIBLE);
 
-            MenuItem listsItem = menu.findItem(R.id.addToList);
-            listsItem.setEnabled(listsLoaded);
+        MenuItem listsItem = menu.findItem(R.id.addToList);
+        listsItem.setEnabled(listsLoaded);
 
-            return true;
-        }
-        return false;
+        return true;
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -465,20 +452,14 @@ public class UserDetailActivity extends Activity  {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if (Build.VERSION.SDK_INT>=11 && weAreFollowingMenuItem!=null) {
-                    weAreFollowingMenuItem.setEnabled(false);
+            if (weAreFollowingMenuItem!=null) {
+                weAreFollowingMenuItem.setEnabled(false);
             }
             if (pg!=null) {
                 pg.setVisibility(ProgressBar.VISIBLE);
 
             }
-            if (Build.VERSION.SDK_INT>=11) {
-                getActionBar().setTitle(R.string.get_user_detail);
-            }
-            else if (titleTextBox!=null) {
-                String s = getString(R.string.get_user_detail);
-                titleTextBox.setText(s);
-            }
+            getActionBar().setTitle(R.string.get_user_detail);
         }
 
 
@@ -552,7 +533,6 @@ public class UserDetailActivity extends Activity  {
             View followButton = findViewById(R.id.userDetail_follow_button);
             if (followButton!=null)
                 followButton.setEnabled(true);
-            if (Build.VERSION.SDK_INT>=11) {
                 if (weAreFollowingMenuItem!=null) {
                     if (isFriend)
                         weAreFollowingMenuItem.setTitle(R.string.unfollow_user);
@@ -560,24 +540,17 @@ public class UserDetailActivity extends Activity  {
                         weAreFollowingMenuItem.setTitle(R.string.follow_user);
                     weAreFollowingMenuItem.setEnabled(true);
                 }
-            }
 
             if (pg!=null)
                 pg.setVisibility(ProgressBar.INVISIBLE);
-            if (Build.VERSION.SDK_INT>=11) {
-                getActionBar().setTitle(R.string.app_name);
-            }
-            else if (titleTextBox!=null)
-                titleTextBox.setText("");
+            getActionBar().setTitle(R.string.app_name);
 
             Drawable background = (Drawable) params[2];
             if (background!=null)
                 getWindow().setBackgroundDrawable(background);
 
             listsLoaded = true;
-            if (Build.VERSION.SDK_INT>=11) {
-                invalidateOptionsMenu();
-            }
+            invalidateOptionsMenu();
         }
     }
 }

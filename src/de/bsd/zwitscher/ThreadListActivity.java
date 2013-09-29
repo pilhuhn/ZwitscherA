@@ -11,8 +11,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -42,24 +40,7 @@ public class ThreadListActivity extends ListActivity {
 
         thisActivity = this;
 
-        if (android.os.Build.VERSION.SDK_INT<11) {
-            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-            // Set the layout of the list activity
-            setContentView(R.layout.tweet_list_layout);
-            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
-            pg = (ProgressBar) findViewById(R.id.title_progress_bar);
-            titleTextBox = (TextView) findViewById(R.id.title_msg_box);
-
-
-            ImageButton backButton = (ImageButton) findViewById(R.id.back_button);
-            backButton.setVisibility(View.VISIBLE);
-            // Disable the reload button
-            ImageButton reloadButton = (ImageButton) findViewById(R.id.tweet_list_reload_button);
-            reloadButton.setVisibility(View.GONE);
-        }
-        else {
-            setContentView(R.layout.tweet_list_layout);
-        }
+        setContentView(R.layout.tweet_list_layout);
 
 
         account = AccountHolder.getInstance(this).getAccount();
@@ -88,14 +69,12 @@ public class ThreadListActivity extends ListActivity {
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        if (android.os.Build.VERSION.SDK_INT>=11) {
-            inflater.inflate(R.menu.thread_activity_menu,menu);
-            pg = (ProgressBar) menu.findItem(R.id.ProgressBar).getActionView();
+        inflater.inflate(R.menu.thread_activity_menu,menu);
+        pg = (ProgressBar) menu.findItem(R.id.ProgressBar).getActionView();
 
-            ActionBar actionBar = this.getActionBar();
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = this.getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
-        }
         return true;
     }
 

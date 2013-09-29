@@ -15,6 +15,7 @@ import android.text.method.LinkMovementMethod;
 import android.view.*;
 import android.widget.*;
 
+import com.bugsense.trace.BugSenseHandler;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.helper.GetOneStatusTask;
@@ -67,17 +68,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-        if (android.os.Build.VERSION.SDK_INT<11) {
-            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-        }
-
 		setContentView(R.layout.single_tweet);
-
-        if (android.os.Build.VERSION.SDK_INT<11) {
-            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.window_title);
-            pg = (ProgressBar) findViewById(R.id.title_progress_bar);
-            titleTextView = (TextView) findViewById(R.id.title_msg_box);
-        }
 
         screenWidth = getWindowManager().getDefaultDisplay().getWidth();
 
@@ -572,6 +563,8 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
             Log.e("1TA", "Failed to set on utterance listener");
         }
 
+        BugSenseHandler.sendEvent("Speak used");
+
         HashMap<String, String> ttsParams = new HashMap<String, String>();
 		ttsParams.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "tweet_status_msg" + status.getUser().getScreenName());
 		tts.speak(status.getText(), TextToSpeech.QUEUE_FLUSH, ttsParams);
@@ -660,10 +653,7 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
                 String url = me.getURL();
                 String target;
                 target = me.getMediaURL();
-                if (android.os.Build.VERSION.SDK_INT<11) // TODO decide on screen size and not API version
-                    target = target+ ":thumb";
-                else
-                    target = target+ ":small";
+                target = target+ ":small";
                 UrlPair pair = new UrlPair(url, target);
                 urlPairs.add(pair);
             }
@@ -710,11 +700,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.one_tweet_menu,menu);
-        if (android.os.Build.VERSION.SDK_INT>=11) {
 
-            ActionBar actionBar = this.getActionBar();
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+        ActionBar actionBar = this.getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         // Only enable the "delete" item for statuses we authored
         if (status != null && status.getUser().getScreenName().equals(account.getName())) {

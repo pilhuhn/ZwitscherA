@@ -33,7 +33,6 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.Window;
 import android.widget.*;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
@@ -71,16 +70,8 @@ public class NewTweetActivity extends Activity implements LocationListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (android.os.Build.VERSION.SDK_INT<11) {
-            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-        }
 
         setContentView(R.layout.new_tweet);
-
-        if (android.os.Build.VERSION.SDK_INT<11) {
-            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
-            pg = (ProgressBar) findViewById(R.id.title_progress_bar);
-        }
 
         charCountView = (TextView) findViewById(R.id.CharCount);
         account = AccountHolder.getInstance(this).getAccount();
@@ -558,10 +549,8 @@ public class NewTweetActivity extends Activity implements LocationListener {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.new_tweet_menu,menu);
 
-        if (android.os.Build.VERSION.SDK_INT>=11) {
-            ActionBar actionBar = this.getActionBar();
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+        ActionBar actionBar = this.getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
         return true;
     }
 

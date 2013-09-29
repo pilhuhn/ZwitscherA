@@ -4,9 +4,7 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.widget.ListView;
@@ -35,20 +33,8 @@ public class ListOfListsActivity extends AbstractListActivity {
 
         mode = getIntent().getIntExtra("list",0);
 
-        View reloadButton;
-        if (Build.VERSION.SDK_INT<11) {
-            setContentView(R.layout.tweet_list_layout);
-            reloadButton = findViewById(R.id.tweet_list_reload_button);
-            if (mode==0)
-                reloadButton.setEnabled(true);
-            else
-                reloadButton.setEnabled(false);  // disabled for stored searches (for now), as the tweets are not persisted
-
-        }
-        else { // >= 11 -> honeycomb and later
-            setContentView(R.layout.tweet_list_layout);
-            // TODO enable/disable reload button
-        }
+        setContentView(R.layout.tweet_list_layout);
+        // TODO enable/disable reload button
 
 
     }
@@ -216,9 +202,7 @@ public class ListOfListsActivity extends AbstractListActivity {
             if (progressBar !=null)
                 progressBar.setVisibility(ProgressBar.VISIBLE);
 
-            if (Build.VERSION.SDK_INT>=11) {
-                getParent().setProgressBarIndeterminateVisibility(true);
-            }
+            getParent().setProgressBarIndeterminateVisibility(true);
         }
 
 
@@ -265,16 +249,14 @@ public class ListOfListsActivity extends AbstractListActivity {
             if (titleTextBox!=null)
                 titleTextBox.setText("");
 
-            if (Build.VERSION.SDK_INT>=11) {
-                ActionBar ab = getActionBar();
-                if (ab==null && parent!=null)
-                    ab=parent.getActionBar();
-                if (ab!=null) {
-                    ab.setTitle(account.getAccountIdentifier());
-                    ab.setSubtitle(null);
-                }
-                getParent().setProgressBarIndeterminateVisibility(false);
+            ActionBar ab = getActionBar();
+            if (ab==null && parent!=null)
+                ab=parent.getActionBar();
+            if (ab!=null) {
+                ab.setTitle(account.getAccountIdentifier());
+                ab.setSubtitle(null);
             }
+            getParent().setProgressBarIndeterminateVisibility(false);
 
         }
 
@@ -289,14 +271,12 @@ public class ListOfListsActivity extends AbstractListActivity {
                 titleTextBox.setText(text);
             }
 
-            if (Build.VERSION.SDK_INT>=11) {
-                ActionBar ab = getActionBar();
-                if (ab==null && parent!=null)
-                    ab=parent.getActionBar();
-                if (ab!=null) {
-                    ab.setTitle(R.string.updating);
-                    ab.setSubtitle(list);
-                }
+            ActionBar ab = getActionBar();
+            if (ab==null && parent!=null)
+                ab=parent.getActionBar();
+            if (ab!=null) {
+                ab.setTitle(R.string.updating);
+                ab.setSubtitle(list);
             }
         }
     }

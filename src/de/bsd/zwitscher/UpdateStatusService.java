@@ -20,6 +20,7 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.bugsense.trace.BugSenseHandler;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.NetworkHelper;
 import de.bsd.zwitscher.other.ReadItLaterStore;
@@ -178,7 +179,7 @@ public class UpdateStatusService extends IntentService {
             }
         }
         catch (TwitterException e) {
-
+            BugSenseHandler.sendExceptionMessage("UpdateStatus",request.getUpdateType().toString(),e);
             ret = queueUpUpdate(request,context.getString(R.string.queueing), account);
         }
 
@@ -210,7 +211,7 @@ public class UpdateStatusService extends IntentService {
             response = new UpdateResponse(UpdateType.QUEUED, message);
             response.setSuccess(); // This is the success of the queueing, not the inner job.
         } catch (IOException e) {
-            e.printStackTrace();  // TODO: Customise this generated block
+            BugSenseHandler.sendException(e);
             response = new UpdateResponse(UpdateType.QUEUED, e.getMessage());
         }
         createNotification(response);
@@ -273,7 +274,7 @@ public class UpdateStatusService extends IntentService {
         mNotificationManager.cancelAll();
         int icon = R.drawable.zwitscher_notif;
         Notification notification;
-        if (Build.VERSION.SDK_INT<11) {
+        if (Build.VERSION.SDK_INT<16) {
             if (!result.isSuccess()) {
                 notification = new Notification(icon,result.getUpdateType().toString() + " failed",System.currentTimeMillis());
             } else {
@@ -287,8 +288,11 @@ public class UpdateStatusService extends IntentService {
             }
             builder.setContentTitle("Zwitscher update");
             String text = "Result of " + result.getUpdateType().toString() + " is success: " + result.isSuccess();
-//            builder.setContentText(text);
-            builder.setSubText(text);
+            if (Build.VERSION.SDK_INT<16) {
+                builder.setContentText(text);
+            } else {
+                builder.setSubText(text);
+            }
             if (result.getUpdateType()==UpdateType.QUEUED) {
                 builder.setTicker("Queued for later sending");
             } else {
@@ -307,10 +311,6 @@ public class UpdateStatusService extends IntentService {
         if (result.isSuccess()) {
 
             pintent = PendingIntent.getActivity(getApplicationContext(), 0, new Intent(), PendingIntent.FLAG_CANCEL_CURRENT);
-            if (Build.VERSION.SDK_INT<11) {
-                notification.setLatestEventInfo(getApplicationContext(),result.getUpdateType().toString(),
-                        result.isSuccess()? "Success": ("Failure: " + result.getMessage()) ,pintent);
-            }
         } else {
             // Only set the Error display intent when this is no success
             String head =  result.getUpdateType() + " failed:";

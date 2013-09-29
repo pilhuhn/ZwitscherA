@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <uses-sdk android:minSdkVersion="14"
-              android:targetSdkVersion="18"/>
+              android:targetSdkVersion="14"/>
 
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.location" android:required="false"/>

@@ -18,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import com.bugsense.trace.BugSenseHandler;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.ExpandUrlRunner;
 import de.bsd.zwitscher.helper.MetaList;
@@ -996,6 +997,7 @@ public class TwitterHelper {
             return url;
         } catch (TwitterException e) {
             e.printStackTrace();  // TODO: Customise this generated block
+            BugSenseHandler.sendExceptionMessage("postPicture", getMediaProvider().name().toString(),e);
         }
         return null;
     }
