@@ -31,6 +31,8 @@ import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.SavedSearch;
 import twitter4j.UserList;
 
+import com.bugsense.trace.BugSenseHandler;
+
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -61,6 +63,9 @@ public class TabWidget extends TabActivity  {
 		super.onCreate(savedInstanceState);
 
         Log.i("TabWidget","onCreate");
+        if (Tokens.bugSenseKey!=null && !Tokens.bugSenseKey.isEmpty()) {
+            BugSenseHandler.initAndStartSession(this, Tokens.bugSenseKey);
+        }
 
         account = AccountHolder.getInstance(this).getAccount();
 
@@ -78,41 +83,30 @@ public class TabWidget extends TabActivity  {
         Log.i("TabWidget","Account=" + account);
 
 
-        if (android.os.Build.VERSION.SDK_INT<11)
-            requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-        else {
-            requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        }
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.tabs);
-        if (android.os.Build.VERSION.SDK_INT<11) {
-            getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.window_title);
-            pg = (ProgressBar) findViewById(R.id.title_progress_bar);
-            titleTextBox = (TextView) findViewById(R.id.title_msg_box);
-        }
-        else {
-            ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getActionBar();
 
-            getAccountNames(); // Initialize accountList
-            // We want the account list in the action bar for easy switching
-            if (accountList.size()>1) {
-                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        getAccountNames(); // Initialize accountList
+        // We want the account list in the action bar for easy switching
+        if (accountList.size()>1) {
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
-                SpinnerAdapter accountSpinnerAdapter = getAccountSpinnerAdapter();
-                // We need a separate class for the callback, as othewise we would pull in the ActionBar class
-                // and would thus not work on Android 2.2
-                actionBar.setListNavigationCallbacks(accountSpinnerAdapter, new AccountNavigationListener(this, accountList, account));
-                // Don't show the title, as the account list already shows that data
-                actionBar.setDisplayShowTitleEnabled(false);
+            SpinnerAdapter accountSpinnerAdapter = getAccountSpinnerAdapter();
+            // We need a separate class for the callback, as othewise we would pull in the ActionBar class
+            // and would thus not work on Android 2.2
+            actionBar.setListNavigationCallbacks(accountSpinnerAdapter, new AccountNavigationListener(this, accountList, account));
+            // Don't show the title, as the account list already shows that data
+            actionBar.setDisplayShowTitleEnabled(false);
 
-                for (int i = 0; i< accountList.size(); i++) {
-                    if (accountList.get(i).equals(account)) {
-                        actionBar.setSelectedNavigationItem(i);
-                    }
+            for (int i = 0; i< accountList.size(); i++) {
+                if (accountList.get(i).equals(account)) {
+                    actionBar.setSelectedNavigationItem(i);
                 }
             }
-            else {
-                getActionBar().setTitle(account.getAccountIdentifier());
-            }
+        }
+        else {
+            getActionBar().setTitle(account.getAccountIdentifier());
         }
 
 
@@ -213,11 +207,9 @@ public class TabWidget extends TabActivity  {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
-        if (Build.VERSION.SDK_INT>=11) {
-            MenuItem item = menu.findItem(R.id.ProgressBar);
-            pg = (ProgressBar) item.getActionView();
-            pg.setVisibility(ProgressBar.INVISIBLE);
-        }
+        MenuItem item = menu.findItem(R.id.ProgressBar);
+        pg = (ProgressBar) item.getActionView();
+        pg.setVisibility(ProgressBar.INVISIBLE);
 
         this.menu = menu;
 
@@ -359,13 +351,11 @@ public class TabWidget extends TabActivity  {
 
     void showHideAbMenuItems(boolean show) {
 
-        if (Build.VERSION.SDK_INT>=11) {
-            if (menu!=null) {
-                menu.findItem(R.id.to_top).setVisible(show);
-                menu.findItem(R.id.refresh).setVisible(show);
-            }
+        if (menu!=null) {
+            menu.findItem(R.id.to_top).setVisible(show);
+            menu.findItem(R.id.refresh).setVisible(show);
         }
-    }
+}
 
     private class SyncSLTask extends AsyncTask<Void,Void,Void> {
 
