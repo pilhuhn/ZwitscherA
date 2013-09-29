@@ -63,9 +63,6 @@ public class TabWidget extends TabActivity  {
 		super.onCreate(savedInstanceState);
 
         Log.i("TabWidget","onCreate");
-        if (Tokens.bugSenseKey!=null && !Tokens.bugSenseKey.isEmpty()) {
-            BugSenseHandler.initAndStartSession(this, Tokens.bugSenseKey);
-        }
 
         account = AccountHolder.getInstance(this).getAccount();
 

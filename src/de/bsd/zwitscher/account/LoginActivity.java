@@ -5,8 +5,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import com.bugsense.trace.BugSenseHandler;
 import de.bsd.zwitscher.R;
 import de.bsd.zwitscher.TabWidget;
+import de.bsd.zwitscher.Tokens;
 import de.bsd.zwitscher.TweetDB;
 import de.bsd.zwitscher.helper.NetworkHelper;
 
@@ -17,6 +19,11 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+        if (Tokens.bugSenseKey!=null && !Tokens.bugSenseKey.isEmpty()) {
+            BugSenseHandler.initAndStartSession(this, Tokens.bugSenseKey);
+        }
+
 		tweetDB = TweetDB.getInstance(getApplicationContext());
 	}
 
