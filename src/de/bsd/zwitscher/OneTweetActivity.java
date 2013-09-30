@@ -134,7 +134,9 @@ public class OneTweetActivity extends Activity implements OnInitListener, OnUtte
 
         } else {
             // Called from within Zwitscher
-            status = (Status) bundle.get(getString(R.string.status));
+            if (bundle!=null) {
+                status = (Status) bundle.get("status"); // NO-NLS
+            }
         }
 
 
