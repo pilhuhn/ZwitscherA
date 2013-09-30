@@ -58,8 +58,6 @@ public class NetworkHelper {
         }
         if (configType==6) // Never
             return false;
-        if (configType==1)
-            return true; // Always
 
         if (type== ConnectivityManager.TYPE_MOBILE) {
             if (info.isRoaming() && !whenRoaming) {
@@ -70,7 +68,7 @@ public class NetworkHelper {
             switch (configType) {
                 case 1: return true;  // Always
                 case 2: return false; // WiFi necessary - but this is a mobile network
-                case 3: return subType > TelephonyManager.NETWORK_TYPE_UMTS;
+                case 3: return subType >= TelephonyManager.NETWORK_TYPE_UMTS;
                 case 4: return subType >= TelephonyManager.NETWORK_TYPE_EDGE;
                 case 5: return subType >= TelephonyManager.NETWORK_TYPE_GPRS;
                 case 6: return false; // Never
