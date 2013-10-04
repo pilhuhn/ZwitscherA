@@ -153,13 +153,20 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
 
         if (statuses!=null) {
          Intent i = new Intent(this,OneTweetActivity.class);
-         i.putExtra(getString(R.string.status), statuses.get(position));
-         startActivity(i);
+            if (statuses.size()>=position) {
+                Status value = statuses.get(position);
+                i.putExtra("status", value); // NON-NLS
+                startActivity(i);
+            }
+            else {
+                Toast.makeText(this,"Item at position " + position + " not found. Please refresh list",Toast.LENGTH_LONG);
+            }
+
         }
         else if (directs!=null) {
            Intent i = new Intent(this, NewTweetActivity.class);
            i.putExtra("user",directs.get(position).getSender());
-           i.putExtra("op",getString(R.string.direct));
+           i.putExtra("op","Directs");
            startActivity(i);
         } else {
             // Tweets; TODO
