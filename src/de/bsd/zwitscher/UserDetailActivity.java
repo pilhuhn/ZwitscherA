@@ -134,7 +134,7 @@ public class UserDetailActivity extends Activity  {
             viewOnWebButton.setEnabled(true);
 
         String colorString = user.getProfileBackgroundColor();
-        if (colorString.equals("")) {
+        if (colorString==null || colorString.equals("")) {
             colorString = "#EFEFEF";
         }
         if (!colorString.startsWith("#"))  // identi.ca sends the # , but twitter does not
