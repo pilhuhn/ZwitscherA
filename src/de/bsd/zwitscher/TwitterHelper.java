@@ -981,6 +981,11 @@ public class TwitterHelper {
             String accessTokenToken = account.getAccessTokenKey();
             String accessTokenSecret = account.getAccessTokenSecret();
 
+            if (accessTokenSecret == null || accessTokenToken == null) {
+                BugSenseHandler.sendEvent("postPicture: Token was null for account " + account);
+                return null;
+            }
+
             Properties props = new Properties();
             props.put(PropertyConfiguration.MEDIA_PROVIDER,mProvider);
             props.put(PropertyConfiguration.OAUTH_ACCESS_TOKEN,accessTokenToken);
@@ -996,7 +1001,6 @@ public class TwitterHelper {
             url = upload.upload(file,message);
             return url;
         } catch (TwitterException e) {
-            e.printStackTrace();  // TODO: Customise this generated block
             BugSenseHandler.sendExceptionMessage("postPicture", getMediaProvider().name().toString(),e);
         }
         return null;
