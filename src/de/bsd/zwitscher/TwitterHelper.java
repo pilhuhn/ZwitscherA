@@ -18,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import com.bugsense.trace.BugSenseHandler;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.helper.ExpandUrlRunner;
 import de.bsd.zwitscher.helper.MetaList;
@@ -980,6 +981,11 @@ public class TwitterHelper {
             String accessTokenToken = account.getAccessTokenKey();
             String accessTokenSecret = account.getAccessTokenSecret();
 
+            if (accessTokenSecret == null || accessTokenToken == null) {
+                BugSenseHandler.sendEvent("postPicture: Token was null for account " + account);
+                return null;
+            }
+
             Properties props = new Properties();
             props.put(PropertyConfiguration.MEDIA_PROVIDER,mProvider);
             props.put(PropertyConfiguration.OAUTH_ACCESS_TOKEN,accessTokenToken);
@@ -995,7 +1001,7 @@ public class TwitterHelper {
             url = upload.upload(file,message);
             return url;
         } catch (TwitterException e) {
-            e.printStackTrace();  // TODO: Customise this generated block
+            BugSenseHandler.sendException(e);
         }
         return null;
     }
