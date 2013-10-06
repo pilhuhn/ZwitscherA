@@ -49,9 +49,8 @@ import java.util.Set;
 public class UserDetailActivity extends Activity  {
 
     Bundle bundle;
-    TwitterHelper thTwitterHelper;
+    TwitterHelper twitterHelper;
     ProgressBar pg;
-    TextView titleTextBox;
     User theUser;
     boolean weAreFollowing = false;
     Button followButton ;
@@ -66,14 +65,12 @@ public class UserDetailActivity extends Activity  {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.user_detail);
-        pg = (ProgressBar) findViewById(R.id.title_progress_bar);
-        titleTextBox = (TextView) findViewById(R.id.title_msg_box);
         followButton = (Button) findViewById(R.id.userDetail_follow_button);
         if (followButton!=null)
             followButton.setEnabled(false);
 
         account = AccountHolder.getInstance(this).getAccount();
-        thTwitterHelper = new TwitterHelper(this, account);
+        twitterHelper = new TwitterHelper(this, account);
 
         bundle = getIntent().getExtras();
         if (bundle!=null) {
@@ -82,9 +79,10 @@ public class UserDetailActivity extends Activity  {
             TextView userNameView = (TextView) findViewById(R.id.UserName);
             userNameView.setText(userName);
         }
-                    // If the user is in the DB, show the saved state while reloading its data
+
+        // If the user is in the DB, show the saved state while reloading its data
         if (userId!=0) {
-            theUser = thTwitterHelper.getUserById(userId,true);
+            theUser = twitterHelper.getUserById(userId,true);
             if (theUser!=null)
                 fillDetails(theUser,false);
             reload();
@@ -471,11 +469,11 @@ public class UserDetailActivity extends Activity  {
 
             if (params[0] instanceof Long) {
                 userId = (Long) params[0];
-                user = thTwitterHelper.getUserById(userId, false);
+                user = twitterHelper.getUserById(userId, false);
             }
             else if (params[0] instanceof String) {
                 String name= (String) params[0];
-                user = thTwitterHelper.getUserByScreenName(name, false);
+                user = twitterHelper.getUserByScreenName(name, false);
                 if (user==null)
                     return new Object[]{};
                 userId = user.getId();
@@ -505,9 +503,9 @@ public class UserDetailActivity extends Activity  {
 
             }
 
-            userListNames = thTwitterHelper.getListMembership(user.getScreenName());
+            userListNames = twitterHelper.getListMembership(user.getScreenName());
 
-            Boolean isFriend = thTwitterHelper.areWeFollowing(userId);
+            Boolean isFriend = twitterHelper.areWeFollowing(userId);
             weAreFollowing = isFriend;
             Object[] res = new Object[3];
             res[0] = user;
