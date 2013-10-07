@@ -503,7 +503,7 @@ public class UserDetailActivity extends Activity  {
 
             }
 
-            userListNames = twitterHelper.getListMembership(user.getScreenName());
+            userListNames = twitterHelper.getListMembershipFromServer(user.getScreenName());
 
             Boolean isFriend = twitterHelper.areWeFollowing(userId);
             weAreFollowing = isFriend;

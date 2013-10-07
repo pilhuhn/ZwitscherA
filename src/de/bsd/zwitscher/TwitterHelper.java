@@ -219,7 +219,7 @@ public class TwitterHelper {
     }
 
 
-    public List<UserList> getUserLists() {
+    public List<UserList> getUserListsFromServer() {
 
         List<UserList> userLists;
 		try {
@@ -240,7 +240,7 @@ public class TwitterHelper {
      * @param screenName Name of the user to investigate
      * @return List of list names
      */
-    public List<String> getListMembership(String screenName) {
+    public List<String> getListMembershipFromServer(String screenName) {
         List<String> userLists;
         List<UserList> tmp;
         try {
@@ -1001,7 +1001,7 @@ public class TwitterHelper {
             url = upload.upload(file,message);
             return url;
         } catch (TwitterException e) {
-            BugSenseHandler.sendExceptionMessage("postPicture", getMediaProvider().name().toString(),e);
+            BugSenseHandler.sendExceptionMessage("postPicture", getMediaProvider().name().toString(), e);
         }
         return null;
     }

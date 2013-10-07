@@ -22,9 +22,10 @@ import java.util.*;
  *
  * @author Heiko W. Rupp
  */
+@Deprecated
 public class ListOfListsActivity extends AbstractListActivity {
 
-    Set<Map.Entry<Integer,Pair<String,String>>> userListsEntries;
+    List<ZUserList> userListsEntries;
     int mode;
     ListOfListLineItemAdapter adapter;
 
@@ -53,16 +54,11 @@ public class ListOfListsActivity extends AbstractListActivity {
 
         if (mode==0) {
             // Display users lists
-            userListsEntries = tdb.getLists(account.getId()).entrySet();
-            for (Map.Entry<Integer, Pair<String, String>> userList : userListsEntries) {
-                Pair<String, String> nameOwnerPair = userList.getValue();
-                String listname;
-                if (account.getName().equals(nameOwnerPair.second))
-                    listname = nameOwnerPair.first;
-                else
-                    listname = "@" + nameOwnerPair.second + "/" + nameOwnerPair.first;
+            userListsEntries = tdb.getLists(account.getId());
+            for (ZUserList zul : userListsEntries) {
 
-                int count=tdb.getUnreadCount(account.getId(),userList.getKey());
+                String listname = zul.getDisplayName(account);
+                int count=tdb.getUnreadCount(account.getId(),zul.listId);
 
                 Pair<String,Integer> pair = new Pair<String,Integer>(listname,count);
                 result.add(pair);
@@ -114,15 +110,10 @@ public class ListOfListsActivity extends AbstractListActivity {
         if (mode==0) { // User list
             int listId = -1 ;
             String ownerName = account.getName();
-            for (Map.Entry<Integer, Pair<String, String>> entry : userListsEntries) {
-                Pair<String,String> nameOwnerPair = entry.getValue();
-                if (text.startsWith("@") && text.equals("@"+nameOwnerPair.second +"/" +nameOwnerPair.first)) {
-                    listId = entry.getKey();
-                    ownerName = nameOwnerPair.second;
-                }
-                else if (!text.startsWith("@") && text.equals(nameOwnerPair.first)) {
-                    listId = entry.getKey();
-                    ownerName = nameOwnerPair.second;
+            for (ZUserList zul : userListsEntries) {
+                if (zul.matches(text)) {
+                    listId = zul.listId;
+                    ownerName = zul.ownerName;
                 }
             }
 
@@ -212,15 +203,14 @@ public class ListOfListsActivity extends AbstractListActivity {
             NetworkHelper networkHelper = new NetworkHelper(context);
 
             if (networkHelper.isOnline()) {
-                for (Map.Entry<Integer, Pair<String, String>> entry : userListsEntries) {
+                for (ZUserList zul : userListsEntries) {
 
-                    Pair<String, String> nameOwnerPair = entry.getValue();
-                    publishProgress(nameOwnerPair.first);
+                    publishProgress(zul.listName);
 
                     Paging paging = new Paging();
                     paging.setCount(100);
 
-                    int listId = entry.getKey();
+                    int listId = zul.listId;
                     long lastFetched = tdb.getLastFetched(account.getId(), listId);
                     if (lastFetched>0)
                         paging.setSinceId(lastFetched);

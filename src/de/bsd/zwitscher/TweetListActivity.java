@@ -51,6 +51,7 @@ import twitter4j.*;
  * </ul>
  * @author Heiko W. Rupp
  */
+@Deprecated
 public class TweetListActivity extends AbstractListActivity implements AbsListView.OnScrollListener,
         OnItemClickListener, OnItemLongClickListener {
 
@@ -707,16 +708,10 @@ public class TweetListActivity extends AbstractListActivity implements AbsListVi
             ActionBar ab = getActionBar();
             if (ab!=null) {
                 String s=null;
-                Map<Integer,Pair<String,String>> userLists = tdb.getLists(account.getId());
-                if (userListId !=-1) {
-                    Pair<String,String> nameOwnerPair = userLists.get(userListId);
-                    if (nameOwnerPair!=null) {
-                        String tmp;
-                        if (nameOwnerPair.second.equals(account.getName()))
-                            tmp = nameOwnerPair.first;
-                        else
-                            tmp = "@" +nameOwnerPair.second + "/" + nameOwnerPair.first;
-                        s =tmp;
+                List<ZUserList> userLists = tdb.getLists(account.getId());
+                for (ZUserList zul : userLists) {
+                    if (zul.listId == userListId) {
+                        s = zul.getDisplayName(account);
                     }
                 }
                 ab.setTitle(account.getAccountIdentifier());

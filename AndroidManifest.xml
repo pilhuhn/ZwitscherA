@@ -80,6 +80,7 @@
                    android:resource="@xml/searchable"/>
         </activity>
         <activity android:name=".account.TwitterLoginActivity"/>
+      <activity android:name=".MainActivity" />
 
       <service android:name=".UpdateStatusService"/>
     </application>

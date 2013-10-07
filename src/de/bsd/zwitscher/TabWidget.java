@@ -31,8 +31,6 @@ import de.bsd.zwitscher.helper.PicHelper;
 import twitter4j.SavedSearch;
 import twitter4j.UserList;
 
-import com.bugsense.trace.BugSenseHandler;
-
 import android.app.TabActivity;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -46,6 +44,7 @@ import android.widget.TabHost;
  * Activity that creates the Tab bar and starts the various
  * activities on the tabs. Also hosts the main menu.
  */
+@Deprecated
 public class TabWidget extends TabActivity  {
 
     static final String LIST_ID = "list_id";
@@ -391,11 +390,12 @@ public class TabWidget extends TabActivity  {
 		TwitterHelper th = new TwitterHelper(this, account);
         TweetDB tdb = TweetDB.getInstance(getApplicationContext());
         if (account.getServerType()== Account.Type.TWITTER) {
-            List<UserList> userLists = th.getUserLists();
-            Map<Integer, Pair<String, String>> storedLists = tdb.getLists(accountId);
+            List<UserList> userLists = th.getUserListsFromServer();
+            List<ZUserList> storedLists = tdb.getLists(accountId);
             List<Integer> storedListIds = new ArrayList<Integer>(storedLists.size());
-            storedListIds.addAll(storedLists.keySet());
 
+
+/* TODO re-implement
             // Check for lists to add
             for (UserList userList : userLists) {
                 if (!storedListIds.contains(userList.getId())) {
@@ -417,6 +417,7 @@ public class TabWidget extends TabActivity  {
                 }
             }
             syncSearches(th,tdb);
+*/
         }
 
 	}

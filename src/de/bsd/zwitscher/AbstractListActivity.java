@@ -14,6 +14,7 @@ import de.bsd.zwitscher.account.AccountHolder;
  * Superclass for Tabs with list stuff
  * @author Heiko W. Rupp
  */
+@Deprecated
 public abstract class AbstractListActivity extends ListActivity {
 
     ProgressBar progressBar;

@@ -449,8 +449,8 @@ account)}, null, null, null);
      * @return Map with List Id and Pair (listname,list owner )
      * @param account Id of the account to use
      */
-	Map<Integer, Pair<String, String>> getLists(int account) {
-		Map<Integer, Pair<String, String>> ret = new HashMap<Integer, Pair<String, String>>();
+	List<ZUserList> getLists(int account) {
+        List<ZUserList> ret = new ArrayList<ZUserList>();
 		Cursor c = db.query(TABLE_LISTS, new String[] {"name","owner_name","id"}, ACCOUNT_ID_IS, new String[]{String.valueOf(
                 account)}, null, null, "name");
 		if (c.getCount()>0){
@@ -459,8 +459,8 @@ account)}, null, null, null);
 				String name = c.getString(0);  // 0 = name
 				String owner = c.getString(1); // 1 = list owner screen name
                 Integer id = c.getInt(2);
-                Pair<String,String> pair = new Pair<String, String>(name,owner);
-				ret.put(id, pair);
+                ZUserList zul = new ZUserList(id,name,owner);
+				ret.add(zul);
 			} while (c.moveToNext());
 		}
 		c.close();

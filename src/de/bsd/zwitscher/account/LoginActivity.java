@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import com.bugsense.trace.BugSenseHandler;
+import de.bsd.zwitscher.MainActivity;
 import de.bsd.zwitscher.R;
 import de.bsd.zwitscher.TabWidget;
 import de.bsd.zwitscher.Tokens;
@@ -21,7 +22,7 @@ public class LoginActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
         if (Tokens.bugSenseKey!=null && !Tokens.bugSenseKey.isEmpty()) {
-            BugSenseHandler.initAndStartSession(this, Tokens.bugSenseKey);
+ //           BugSenseHandler.initAndStartSession(this, Tokens.bugSenseKey);
         }
 
 		tweetDB = TweetDB.getInstance(getApplicationContext());
@@ -74,7 +75,7 @@ public class LoginActivity extends Activity {
 	 */
 	private void proceed(Account account) {
         AccountHolder.getInstance(this).setAccount(account);
-		Intent i = new Intent().setClass(this, TabWidget.class);
+		Intent i = new Intent().setClass(this, MainActivity.class);
 		startActivity(i);
 		finish();
 	}
