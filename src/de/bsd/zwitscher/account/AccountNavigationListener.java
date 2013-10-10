@@ -4,7 +4,7 @@ package de.bsd.zwitscher.account;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
-import de.bsd.zwitscher.TabWidget;
+import de.bsd.zwitscher.MainActivity;
 import de.bsd.zwitscher.TweetDB;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class AccountNavigationListener implements ActionBar.OnNavigationListener
         if (!selectedAccount.equals(currentAccount)) {
             TweetDB tdb = TweetDB.getInstance(context);
             tdb.setDefaultAccount(selectedAccount.getId());
-            Intent intent = new Intent(context, TabWidget.class);
+            Intent intent = new Intent(context, MainActivity.class);
             AccountHolder accountHolder = AccountHolder.getInstance(context);
             accountHolder.setAccount(selectedAccount);
             accountHolder.setSwitchingAccounts(true);

@@ -13,8 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import de.bsd.zwitscher.MainActivity;
 import de.bsd.zwitscher.R;
-import de.bsd.zwitscher.TabWidget;
 import de.bsd.zwitscher.TweetDB;
 
 /**
@@ -147,7 +147,7 @@ public class AccountStuffActivity extends Activity {
     }
 
     private void switchToSelectedAccount(Account account) {
-        Intent intent = new Intent(this, TabWidget.class);
+        Intent intent = new Intent(this, MainActivity.class);
         AccountHolder accountHolder = AccountHolder.getInstance(this);
         accountHolder.setAccount(account);
         accountHolder.setSwitchingAccounts(true);

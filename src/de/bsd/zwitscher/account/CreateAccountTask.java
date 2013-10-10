@@ -5,8 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.widget.Toast;
+import de.bsd.zwitscher.MainActivity;
 import de.bsd.zwitscher.R;
-import de.bsd.zwitscher.TabWidget;
 import de.bsd.zwitscher.TwitterHelper;
 
 /**
@@ -60,7 +60,7 @@ class CreateAccountTask extends AsyncTask<Void,Void,String> {
 
         Toast.makeText(context,message,Toast.LENGTH_LONG).show();
 
-		Intent i = new Intent().setClass(context, TabWidget.class);
+		Intent i = new Intent().setClass(context, MainActivity.class);
 		context.startActivity(i);
 
         context.finish();
