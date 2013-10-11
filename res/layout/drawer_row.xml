@@ -26,4 +26,13 @@
     android:background="#151"
     android:textStyle="bold"
     />
+  <TextView
+    android:id="@+id/unreadView"
+    android:layout_width="wrap_content"
+    android:layout_height="60dp"
+    android:layout_gravity="right"
+    android:textColor="#222222"
+    android:textSize="15sp"
+    android:background="#151"
+    />
 </LinearLayout>

@@ -44,6 +44,7 @@ public class DrawerLineAdapter extends ArrayAdapter<ZUserList> {
 
             viewHolder = new ViewHolder();
             viewHolder.textView = (TextView) convertView.findViewById(R.id.textView1);
+            viewHolder.unreadView = (TextView) convertView.findViewById(R.id.unreadView);
             viewHolder.imageView = (ImageView) convertView.findViewById(R.id.imgView);
             convertView.setTag(viewHolder);
         }
@@ -51,9 +52,10 @@ public class DrawerLineAdapter extends ArrayAdapter<ZUserList> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.textView.setText(userLists.get(position).getDisplayName(account));
+        ZUserList zUserList = userLists.get(position);
+        viewHolder.textView.setText(zUserList.getDisplayName(account));
         ImageView imageView = viewHolder.imageView;
-        int listId = userLists.get(position).listId;
+        int listId = zUserList.listId;
         switch (listId) {
             case 0: imageView.setImageResource(R.drawable.ic_tab_home); break;
             case -1: imageView.setImageResource(R.drawable.ic_tab_mention); break;
@@ -69,11 +71,18 @@ public class DrawerLineAdapter extends ArrayAdapter<ZUserList> {
                 }
         }
 
+        if (zUserList.unreadCount>0) {
+            viewHolder.unreadView.setText(zUserList.unreadCount);
+        } else {
+            viewHolder.unreadView.setText("");
+        }
+
         return convertView;
     }
 
     static class ViewHolder {
         TextView textView;
         ImageView imageView;
+        TextView unreadView;
     }
 }

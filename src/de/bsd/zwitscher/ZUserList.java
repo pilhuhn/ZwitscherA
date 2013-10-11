@@ -15,6 +15,7 @@ public class ZUserList {
     String listName;
     int listId;
     String ownerName;
+    int unreadCount;
 
     public ZUserList(int listId, String listName, String ownerName) {
         this.listName = listName;
