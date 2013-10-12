@@ -104,8 +104,11 @@ public class ThreadListActivity extends ListActivity {
             case android.R.id.home:
                 finish();
                 break;
+            case R.id.to_top:
+                getListView().setSelection(0);
+                break;
             default:
-                Log.e("ThreadListActivity", "Unknown item " + item);
+                Log.e("ThreadListActivity", "Unknown item " + item.getItemId());
 
         }
 
