@@ -83,6 +83,7 @@
       <activity android:name=".MainActivity" />
 
       <service android:name=".UpdateStatusService"/>
+      <service android:name=".helper.FetchTimelinesService"/>
     </application>
 
 </manifest>

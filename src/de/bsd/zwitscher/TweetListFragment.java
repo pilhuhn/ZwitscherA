@@ -2,17 +2,22 @@ package de.bsd.zwitscher;
 
 
 import android.app.ListFragment;
+import android.app.LoaderManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.Loader;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import de.bsd.zwitscher.account.Account;
-import de.bsd.zwitscher.helper.MetaList;
-import twitter4j.Paging;
+import de.bsd.zwitscher.helper.StatusListLoader;
 import twitter4j.Status;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Show the list of tweets.
@@ -26,10 +31,14 @@ import java.util.ArrayList;
  *
  * @author Heiko W. Rupp
  */
-public class TweetListFragment extends ListFragment {
+public class TweetListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<List<Status>> {
 
+    private static final String LOAD_DONE = "zwitscher.LoadDone";
+    private TweetDB tweetDb;
+    private String tag;
     private int listId;
     private Account account;
+    private UpdateFinishReceiver receiver;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,28 +47,73 @@ public class TweetListFragment extends ListFragment {
         return view;
     }
 
-    void setListId(int listId) {
-        this.listId = listId;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        tweetDb = TweetDB.getInstance(getActivity());
     }
 
     @Override
     public void onActivityCreated(Bundle savedState) {
-
         super.onActivityCreated(savedState);
-        ListView lv ;
+
+        IntentFilter filter = new IntentFilter(LOAD_DONE);
+        receiver = new UpdateFinishReceiver();
+        getActivity().registerReceiver(receiver,filter);
 
 
-        TwitterHelper th = new TwitterHelper(getActivity(),account);
-        MetaList<Status> statuses = th.getTimeline(new Paging(), listId, true);
+        // Prepare the loader.  Either re-connect with an existing one,
+        // or start a new one.
+        Bundle loaderArgs = new Bundle();
+        loaderArgs.putInt("listId", listId);
+        getLoaderManager().initLoader(0, loaderArgs, this);
+        getListView().setOverscrollHeader(getResources().getDrawable(R.drawable.ic_menu_top)); // TODO what icon?
+        getListView().setOverscrollFooter(getResources().getDrawable(R.drawable.ic_menu_share)); // TODO what icon?
 
-        setListAdapter(new StatusAdapter<Status>(getActivity(), account, R.layout.tweet_list_item, statuses.getList(), 0, new ArrayList<Long>()));
+    }
 
-        lv = getListView();
-        lv.setItemsCanFocus(false);
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
 
+        getActivity().unregisterReceiver(receiver);
+    }
+
+    @Override
+    public Loader<List<Status>> onCreateLoader(int id, Bundle args) {
+        return new StatusListLoader(getActivity(), account, listId);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Status>> loader, List<Status> data) {
+        setListAdapter(new StatusAdapter<Status>(getActivity(), account,R.layout.tweet_list_item,data,-1,new ArrayList<Long>()));
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Status>> loader) {
+        // TODO: Customise this generated block
     }
 
     public void setAccount(Account account) {
         this.account = account;
+    }
+
+    void setListId(int listId) {
+        this.listId = listId;
+    }
+
+
+    private class UpdateFinishReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int intentListId = intent.getIntExtra("listId",0);
+            if (intentListId == listId ) {
+                Bundle loaderArgs = new Bundle();
+                loaderArgs.putInt("listId", listId);
+                getLoaderManager().restartLoader(0, loaderArgs, TweetListFragment.this);
+            }
+        }
     }
 }

@@ -8,16 +8,23 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SpinnerAdapter;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
 import de.bsd.zwitscher.account.AccountNavigationListener;
+import de.bsd.zwitscher.account.AccountStuffActivity;
 import de.bsd.zwitscher.account.LoginActivity;
+import de.bsd.zwitscher.helper.CleanupTask;
+import de.bsd.zwitscher.helper.FetchTimelinesService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +42,9 @@ public class MainActivity extends Activity {
     private List<Account> accountList;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
+    private ProgressBar progressItem;
+    private Menu menu;
+    private int listId;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,6 +159,7 @@ public class MainActivity extends Activity {
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
             ZUserList zul = (ZUserList) ((ListView)parent).getAdapter().getItem(position);
+            listId = zul.listId;
             selectItem(zul);
         }
     }
@@ -175,5 +186,92 @@ public class MainActivity extends Activity {
 //        setTitle(mPlanetTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
     }
+
+    @Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        MenuItem item = menu.findItem(R.id.ProgressBar);
+        progressItem = (ProgressBar) item.getActionView();
+        progressItem.setVisibility(ProgressBar.INVISIBLE);
+
+        this.menu = menu;
+
+        return true;
+	}
+
+    @Override
+   	public boolean onOptionsItemSelected(MenuItem item) {
+   		Intent i;
+   	    // Handle item selection
+   	    switch (item.getItemId()) {
+   	    case R.id.preferences:
+   	    	i = new Intent(this, Preferences.class);
+   			startActivity(i);
+   			break;
+   	    case R.id.reloadLists:
+   //	  		syncLists();
+//               new SyncSLTask(this).execute();
+   	  		break;
+           case R.id.DevelResetLastRead:
+//               resetLastRead();
+               break;
+           case R.id.DevelCleanTweets:
+//               cleanTweetDB();
+               break;
+           case R.id.DevelCleanImages:
+//               cleanImages();
+               break;
+           case R.id.AccountStuff:
+               i = new Intent(this, AccountStuffActivity.class);
+               startActivity(i);
+               break;
+           case R.id.helpMenu:
+               i = new Intent(MainActivity.this, HelpActivity.class); // TODO Fragment
+               startActivity(i);
+               break;
+           case R.id.menu_cleanTweets:
+               new CleanupTask(this).execute();
+               break;
+           case R.id.DevelDumpAccounts:
+               TweetDB tmpDb = TweetDB.getInstance(getApplicationContext());
+               List<Account> allAccounts = tmpDb.getAccountsForSelection(false);
+               for (Account a : allAccounts)
+                   System.out.println(a);
+               break;
+           /// below are Honeycomb ActionBar items
+           case R.id.refresh:
+               // forward to the inner list's reload/referesh
+//               if (listActivity!=null)
+//                   listActivity.reload(null);
+               Intent fetcher = new Intent(this, FetchTimelinesService.class);
+               fetcher.putExtra("account",account);
+               fetcher.putExtra("listIds",new int[] { listId});
+               startService(fetcher);
+               break;
+           case R.id.send:
+               i = new Intent(this,NewTweetActivity.class);
+               startActivity(i);
+               break;
+           case R.id.to_top:
+//               if (listActivity!=null)
+//                   listActivity.scrollToTop(null);
+               break;
+           case R.id.menu_feedback:
+//               send_feedback();
+               break;
+           case R.id.menu_goto_user:
+//               displayUserInfo();
+               break;
+           case R.id.menu_default_search:
+               onSearchRequested();
+               break;
+   	    default:
+               System.out.println("Unknown option " + item.toString());
+   	        return super.onOptionsItemSelected(item);
+   	    }
+   	    return true;
+   	}
+
 
 }
