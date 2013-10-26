@@ -21,7 +21,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import com.bugsense.trace.BugSense;
 import com.bugsense.trace.BugSenseHandler;
 import de.bsd.zwitscher.account.Account;
 import de.bsd.zwitscher.account.AccountHolder;
@@ -63,7 +62,7 @@ public class TabWidget extends TabActivity  {
 		super.onCreate(savedInstanceState);
 
         Log.i("TabWidget","onCreate");
-        if (Tokens.bugSenseKey!=null && !Tokens.bugSenseKey.isEmpty()) {
+        if (Tokens.bugSenseKey!=null && Tokens.bugSenseKey.length()>0) {
             BugSenseHandler.initAndStartSession(this,Tokens.bugSenseKey);
         }
 
