@@ -139,12 +139,15 @@ public class UserDetailActivity extends Activity  {
             colorString = "#" + colorString;
         getWindow().setTitleColor(Color.parseColor(colorString));
         String textColorString = user.getProfileTextColor();
-        if (textColorString.equals(""))
-            textColorString = colorString;
+        int textColor = 0x555555;
+            if (textColorString!= null) {
+                if ( textColorString.equals(""))
+                    textColorString = colorString;
 
-        if (!textColorString.startsWith("#"))
-            textColorString = "#" + textColorString;
-        int textColor = Color.parseColor(textColorString);
+                if (!textColorString.startsWith("#"))
+                    textColorString = "#" + textColorString;
+            textColor = Color.parseColor(textColorString);
+        }
 
         userNameView.setTextColor(textColor);
 
