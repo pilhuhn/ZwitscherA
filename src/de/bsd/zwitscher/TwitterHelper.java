@@ -74,10 +74,10 @@ public class TwitterHelper {
 				break;
 			case -1:
                 if (!fromDbOnly) {
-                    if (!account.isStatusNet())
+//                    if (!account.isStatusNet())
 				        statuses = twitter.getMentionsTimeline(paging);
-                    else
-                        statuses = twitter.getSNMentions(paging);
+//                    else
+//                        statuses = twitter.getSNMentions(paging);
                 }
 				break;
 // -2 is directs
